@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de Prospecção</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<style>
+  :root{
+    --bg:#0b1220; --panel:#101a2e; --card:#16233c; --card2:#1b2b4a;
+    --line:#243352; --txt:#e7eefb; --mut:#93a7c9; --acc:#22c55e; --acc-d:#16a34a;
+    --blue:#3b82f6; --red:#ef4444; --amber:#f59e0b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,sans-serif;
+    background:var(--bg); color:var(--txt); overflow:hidden;
+  }
+  #app{display:flex; height:100vh; width:100vw}
+
+  /* ---------- Sidebar ---------- */
+  #sidebar{
+    width:390px; min-width:390px; height:100%; display:flex; flex-direction:column;
+    background:var(--panel); border-right:1px solid var(--line); z-index:1000;
+  }
+  #sidebar header{padding:16px 16px 12px; border-bottom:1px solid var(--line)}
+  #sidebar h1{font-size:18px; letter-spacing:.2px; display:flex; align-items:center; gap:8px}
+  #sidebar h1 .dot{width:10px;height:10px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+  #sidebar header p{color:var(--mut); font-size:12.5px; margin-top:4px}
+
+  .controls{padding:12px 16px; border-bottom:1px solid var(--line)}
+  .controls label{display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--mut); margin:8px 0 4px}
+  .controls input{
+    width:100%; padding:10px 12px; border-radius:9px; border:1px solid var(--line);
+    background:var(--card); color:var(--txt); font-size:14px; outline:none;
+  }
+  .controls input:focus{border-color:var(--blue)}
+  .row{display:flex; gap:8px; margin-top:10px}
+  button{
+    border:1px solid var(--line); background:var(--card); color:var(--txt);
+    padding:9px 12px; border-radius:9px; font-size:13.5px; cursor:pointer; white-space:nowrap;
+  }
+  button:hover{background:var(--card2)}
+  button:disabled{opacity:.45; cursor:not-allowed}
+  button.primary{background:var(--acc-d); border-color:var(--acc-d); font-weight:600}
+  button.primary:hover{background:var(--acc)}
+  .grow{flex:1}
+
+  label.auto{
+    display:flex; align-items:center; gap:7px; margin-top:12px; font-size:12.5px;
+    color:var(--txt); text-transform:none; letter-spacing:0; cursor:pointer;
+  }
+  label.auto input{width:auto}
+  label.auto span{color:var(--mut); font-size:11.5px}
+  #status{font-size:12.5px; color:var(--mut); margin-top:10px; min-height:18px; line-height:1.4}
+  #status.ok{color:var(--acc)}
+  #status.err{color:var(--red)}
+  #status .spin{
+    display:inline-block; width:11px; height:11px; border:2px solid var(--mut);
+    border-top-color:transparent; border-radius:50%; animation:sp 0.8s linear infinite;
+    vertical-align:-1px; margin-right:6px;
+  }
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex; border-bottom:1px solid var(--line)}
+  .tabs button{
+    flex:1; border:none; border-radius:0; background:transparent; padding:11px 8px;
+    color:var(--mut); font-weight:600; font-size:13px; border-bottom:2px solid transparent;
+  }
+  .tabs button.active{color:var(--txt); border-bottom-color:var(--acc)}
+  .tabs .badge{
+    background:var(--card2); border-radius:20px; padding:1px 8px; font-size:11.5px; margin-left:6px;
+  }
+  .pane{flex:1; overflow-y:auto; display:none}
+  .pane.active{display:block}
+  .pane::-webkit-scrollbar{width:9px}
+  .pane::-webkit-scrollbar-thumb{background:var(--line); border-radius:9px}
+
+  /* ---------- Result list ---------- */
+  .item{
+    padding:11px 14px; border-bottom:1px solid var(--line); cursor:pointer; position:relative;
+  }
+  .item:hover{background:var(--card)}
+  .item.sel{background:var(--card2)}
+  .item .head{display:flex; align-items:flex-start; gap:8px}
+  .item .head strong{font-size:13.5px; flex:1; line-height:1.3}
+  .chip{
+    font-size:10.5px; background:#123c2a; color:#7ce7ae; border:1px solid #1d5c40;
+    padding:2px 8px; border-radius:20px; white-space:nowrap;
+  }
+  .item .addr{font-size:12px; color:var(--mut); margin-top:3px; line-height:1.35}
+  .item .links{margin-top:6px; display:flex; flex-wrap:wrap; gap:4px 10px; font-size:12px}
+  .item .links a{color:#7fb3ff; text-decoration:none}
+  .item .links a:hover{text-decoration:underline}
+  .save-btn{
+    margin-top:7px; font-size:12px; padding:5px 10px; border-radius:7px;
+  }
+  .save-btn.saved{border-color:var(--acc-d); color:var(--acc)}
+  .empty{padding:26px 18px; color:var(--mut); font-size:13px; line-height:1.6; text-align:center}
+
+  /* ---------- Route pane ---------- */
+  .stop{padding:10px 14px; border-bottom:1px solid var(--line); display:flex; gap:10px; align-items:flex-start}
+  .stop .num{
+    min-width:24px; height:24px; border-radius:50%; background:var(--acc-d); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; margin-top:2px;
+  }
+  .stop .info{flex:1; cursor:pointer}
+  .stop .info strong{font-size:13.5px}
+  .stop .info .addr{font-size:12px; color:var(--mut); margin-top:2px}
+  .stop .ops{display:flex; flex-direction:column; gap:3px}
+  .stop .ops button{padding:2px 7px; font-size:12px; border-radius:6px}
+  .rota-actions{padding:12px 14px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px}
+  .rota-actions button{font-size:12.5px}
+  #rotaLinks{padding:0 14px}
+  #rotaLinks a{display:block; color:#7fb3ff; font-size:13px; padding:7px 0; border-bottom:1px dashed var(--line); text-decoration:none}
+  #rotaLinks a:hover{text-decoration:underline}
+
+  #sidebar footer{
+    padding:8px 14px; border-top:1px solid var(--line); color:var(--mut); font-size:11px;
+  }
+  #sidebar footer a{color:var(--mut)}
+
+  /* ---------- Map ---------- */
+  #mapWrap{flex:1; position:relative}
+  #map{position:absolute; inset:0; background:#dfe8ef}
+  #btnArea{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%); z-index:900;
+    background:#fff; color:#1c2b40; border:none; box-shadow:0 2px 10px rgba(0,0,0,.28);
+    font-weight:600; border-radius:22px; padding:9px 16px;
+  }
+  #btnArea:hover{background:#f1f5f9}
+  #hintClick{
+    position:absolute; bottom:16px; left:50%; transform:translateX(-50%); z-index:900;
+    background:rgba(13,20,35,.85); color:#cfe0f8; font-size:12px; padding:7px 14px;
+    border-radius:20px; pointer-events:none; white-space:nowrap;
+  }
+
+  /* Leaflet popup */
+  .leaflet-popup-content{margin:12px 14px; min-width:210px}
+  .pp strong{font-size:14px}
+  .pp .chip{margin-left:0}
+  .pp .addr{font-size:12px; color:#546a8a; margin:5px 0}
+  .pp .links{display:flex; flex-wrap:wrap; gap:3px 10px; font-size:12.5px; margin-top:4px}
+  .pp .links a{color:#2563eb; text-decoration:none}
+  .pp button{margin-top:9px; width:100%; background:var(--acc-d); color:#fff; border:none; font-weight:600}
+  .pp button.saved{background:#94a3b8}
+  .pp input{width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13.5px; margin-top:2px}
+  .stop-ico{background:none; border:none}
+  .stop-badge{
+    width:26px; height:26px; border-radius:50%; background:var(--acc-d); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12.5px;
+    border:2.5px solid #fff; box-shadow:0 1px 6px rgba(0,0,0,.4);
+  }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:760px){
+    #app{flex-direction:column-reverse}
+    #sidebar{width:100%; min-width:0; height:52vh; border-right:none; border-top:1px solid var(--line)}
+    #mapWrap{height:48vh}
+    #sidebar header p{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <header>
+      <h1><span class="dot"></span>Mapa de Prospecção</h1>
+      <p>Digite um nicho (fornecedores, compradores, serviços…) e rastreie tudo que existe na área escolhida.</p>
+    </header>
+
+    <div class="controls">
+      <label for="nicho">Nicho / segmento</label>
+      <input id="nicho" list="sugestoes" placeholder="ex.: barbearia, pizzaria, atacado, imobiliária…" autocomplete="off">
+      <datalist id="sugestoes"></datalist>
+
+      <label for="area">Área (cidade, bairro ou região)</label>
+      <input id="area" placeholder="ex.: Campinas SP · Savassi, Belo Horizonte" autocomplete="off">
+
+      <div class="row">
+        <button id="btnBuscar" class="primary grow">🔎 Buscar no mapa</button>
+        <button id="btnTudo" title="Listar todos os estabelecimentos na área visível do mapa">🌐 Tudo da área</button>
+      </div>
+      <div class="row">
+        <button id="btnLoc" class="grow">📍 Minha localização</button>
+        <button id="btnCsv" class="grow" disabled>⬇️ Exportar CSV</button>
+      </div>
+      <label class="auto"><input type="checkbox" id="autoBusca"> 🧭 Busca inteligente ao mover o mapa <span>(rastreia enquanto você navega)</span></label>
+      <div id="status">Pronto. Escolha um nicho e uma área para começar.</div>
+    </div>
+
+    <nav class="tabs">
+      <button id="tabRes" class="active">Resultados <span class="badge" id="cntRes">0</span></button>
+      <button id="tabRota">Minha rota <span class="badge" id="cntRota">0</span></button>
+    </nav>
+
+    <div id="paneRes" class="pane active">
+      <div class="empty">Nenhuma busca ainda.<br>Ex.: nicho <b>barbearia</b> + área <b>Uberlândia</b>.</div>
+    </div>
+
+    <div id="paneRota" class="pane">
+      <div class="rota-actions">
+        <button id="btnVerRota">🔭 Ver rota no mapa</button>
+        <button id="btnGmaps">🗺️ Abrir no Google Maps</button>
+        <button id="btnCsvRota">⬇️ CSV da rota</button>
+        <button id="btnLimpar">🗑️ Limpar</button>
+      </div>
+      <div id="rotaLinks"></div>
+      <div id="listaRota"></div>
+    </div>
+
+    <footer>Dados © colaboradores do <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · Overpass API · Rota salva neste navegador</footer>
+  </aside>
+
+  <div id="mapWrap">
+    <div id="map"></div>
+    <button id="btnArea" hidden>🔄 Buscar nesta área</button>
+    <div id="hintClick">💡 Clique em qualquer ponto do mapa para salvar um local manual na rota</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+'use strict';
+
+/* ================= Config ================= */
+const OVERPASS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter'
+];
+const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
+const MAX_RESULTS = 800;
+const STORAGE_KEY = 'prospeccao.rota.v1';
+
+/* Nichos conhecidos → tags OSM ('chave=valor' exato, 'chave~regex' parcial) */
+const PRESETS = {
+  'barbearia':['shop=hairdresser'], 'barbeiro':['shop=hairdresser'], 'cabeleireiro':['shop=hairdresser'],
+  'salao de beleza':['shop=beauty','shop=hairdresser'], 'estetica':['shop=beauty'],
+  'manicure':['shop=beauty'], 'esmalteria':['shop=beauty'],
+  'academia':['leisure=fitness_centre'], 'crossfit':['leisure=fitness_centre'], 'pilates':['leisure=fitness_centre'],
+  'restaurante':['amenity=restaurant'], 'lanchonete':['amenity=fast_food'],
+  'hamburgueria':['cuisine~burger'], 'pizzaria':['cuisine~pizza'],
+  'churrascaria':['cuisine~churrasc|barbecue|steak'], 'sorveteria':['amenity=ice_cream'],
+  'cafeteria':['amenity=cafe'], 'cafe':['amenity=cafe'], 'padaria':['shop=bakery'],
+  'confeitaria':['shop=confectionery','shop=pastry'], 'doceria':['shop=confectionery'],
+  'acougue':['shop=butcher'], 'mercado':['shop=supermarket','shop=convenience'],
+  'mercearia':['shop=convenience'], 'supermercado':['shop=supermarket'], 'hortifruti':['shop=greengrocer'],
+  'farmacia':['amenity=pharmacy'], 'drogaria':['amenity=pharmacy'],
+  'pet shop':['shop=pet'], 'petshop':['shop=pet'], 'veterinario':['amenity=veterinary'], 'veterinaria':['amenity=veterinary'],
+  'dentista':['amenity=dentist'], 'odontologia':['amenity=dentist'],
+  'clinica':['amenity=clinic','amenity=doctors'], 'medico':['amenity=doctors'],
+  'laboratorio':['healthcare=laboratory'], 'hospital':['amenity=hospital'],
+  'fisioterapia':['healthcare=physiotherapist'], 'psicologo':['healthcare=psychotherapist'],
+  'advogado':['office=lawyer'], 'advocacia':['office=lawyer'],
+  'contabilidade':['office=accountant'], 'contador':['office=accountant'],
+  'imobiliaria':['office=estate_agent'], 'seguros':['office=insurance'],
+  'banco':['amenity=bank'], 'loterica':['shop=lottery'], 'cartorio':['office=notary'],
+  'coworking':['office=coworking','amenity=coworking_space'],
+  'escola':['amenity=school'], 'creche':['amenity=kindergarten'],
+  'faculdade':['amenity=college','amenity=university'],
+  'curso de ingles':['amenity=language_school'], 'escola de idiomas':['amenity=language_school'],
+  'autoescola':['amenity=driving_school'], 'igreja':['amenity=place_of_worship'],
+  'oficina':['shop=car_repair'], 'oficina mecanica':['shop=car_repair'], 'mecanica':['shop=car_repair'],
+  'funilaria':['shop=car_repair'], 'auto pecas':['shop=car_parts'], 'autopecas':['shop=car_parts'],
+  'lava rapido':['amenity=car_wash'], 'lava jato':['amenity=car_wash'],
+  'posto de gasolina':['amenity=fuel'], 'posto':['amenity=fuel'], 'borracharia':['shop=tyres'],
+  'concessionaria':['shop=car'], 'loja de motos':['shop=motorcycle'], 'bicicletaria':['shop=bicycle'],
+  'hotel':['tourism=hotel'], 'pousada':['tourism=guest_house'], 'motel':['tourism=motel'],
+  'loja de roupas':['shop=clothes'], 'moda':['shop=clothes'], 'calcados':['shop=shoes'],
+  'otica':['shop=optician'], 'joalheria':['shop=jewelry'], 'relojoaria':['shop=watches'],
+  'celular':['shop=mobile_phone'], 'assistencia tecnica':['shop=mobile_phone','shop=electronics'],
+  'eletronicos':['shop=electronics'], 'informatica':['shop=computer'],
+  'papelaria':['shop=stationery'], 'livraria':['shop=books'], 'floricultura':['shop=florist'],
+  'presentes':['shop=gift'], 'brinquedos':['shop=toys'], 'moveis':['shop=furniture'],
+  'eletrodomesticos':['shop=appliance'],
+  'material de construcao':['shop=doityourself','shop=hardware','shop=trade'],
+  'tintas':['shop=paint'], 'vidracaria':['craft=glaziery'], 'serralheria':['craft=metal_construction'],
+  'marcenaria':['craft=carpenter'], 'grafica':['shop=copyshop','craft=printer'],
+  'tatuagem':['shop=tattoo'], 'bar':['amenity=bar','amenity=pub'], 'balada':['amenity=nightclub'],
+  'distribuidora de bebidas':['shop=alcohol','shop=beverages'], 'adega':['shop=alcohol','shop=wine'],
+  'tabacaria':['shop=tobacco'], 'lavanderia':['shop=laundry','shop=dry_cleaning'],
+  'chaveiro':['craft=key_cutter','shop=locksmith'], 'costureira':['craft=tailor','shop=tailor'],
+  'atacado':['shop=wholesale'], 'atacadista':['shop=wholesale'],
+  'distribuidora':['shop=wholesale','shop=beverages'], 'fornecedor':['shop=wholesale','shop=trade'],
+  'industria':['man_made=works'], 'fabrica':['man_made=works'], 'transportadora':['office=logistics']
+};
+
+/* Tradução de categorias OSM mais comuns */
+const CAT_PT = {
+  hairdresser:'Barbearia/Cabeleireiro', beauty:'Beleza/Estética', fitness_centre:'Academia',
+  sports_centre:'Centro esportivo', restaurant:'Restaurante', fast_food:'Lanchonete', cafe:'Cafeteria',
+  ice_cream:'Sorveteria', bakery:'Padaria', confectionery:'Doceria', pastry:'Confeitaria',
+  butcher:'Açougue', supermarket:'Supermercado', convenience:'Mercearia', greengrocer:'Hortifruti',
+  pharmacy:'Farmácia', pet:'Pet Shop', veterinary:'Veterinário', dentist:'Dentista',
+  clinic:'Clínica', doctors:'Consultório médico', hospital:'Hospital', laboratory:'Laboratório',
+  lawyer:'Advocacia', accountant:'Contabilidade', estate_agent:'Imobiliária', insurance:'Seguros',
+  bank:'Banco', lottery:'Lotérica', notary:'Cartório', coworking:'Coworking', coworking_space:'Coworking',
+  school:'Escola', kindergarten:'Creche', college:'Faculdade', university:'Universidade',
+  language_school:'Escola de idiomas', driving_school:'Autoescola', place_of_worship:'Igreja/Templo',
+  car_repair:'Oficina mecânica', car_parts:'Auto peças', car_wash:'Lava rápido', fuel:'Posto de combustível',
+  tyres:'Borracharia', car:'Concessionária', motorcycle:'Loja de motos', bicycle:'Bicicletaria',
+  hotel:'Hotel', guest_house:'Pousada', motel:'Motel', clothes:'Loja de roupas', shoes:'Calçados',
+  optician:'Ótica', jewelry:'Joalheria', watches:'Relojoaria', mobile_phone:'Celulares',
+  electronics:'Eletrônicos', computer:'Informática', stationery:'Papelaria', books:'Livraria',
+  florist:'Floricultura', gift:'Presentes', toys:'Brinquedos', furniture:'Móveis',
+  appliance:'Eletrodomésticos', doityourself:'Material de construção', hardware:'Ferragens',
+  trade:'Atacado/Obra', paint:'Tintas', glaziery:'Vidraçaria', metal_construction:'Serralheria',
+  carpenter:'Marcenaria', copyshop:'Gráfica/Copiadora', printer:'Gráfica', tattoo:'Estúdio de tatuagem',
+  bar:'Bar', pub:'Pub', nightclub:'Casa noturna', alcohol:'Bebidas', beverages:'Bebidas', wine:'Adega',
+  tobacco:'Tabacaria', laundry:'Lavanderia', dry_cleaning:'Lavanderia', locksmith:'Chaveiro',
+  key_cutter:'Chaveiro', tailor:'Costura', wholesale:'Atacadista', works:'Indústria/Fábrica',
+  logistics:'Transportadora', marketplace:'Feira/Mercado'
+};
+
+/* ================= Helpers ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();
+const escRx = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '\\"');
+
+function status(msg, cls, spinning){
+  const el = $('#status');
+  el.className = cls || '';
+  el.innerHTML = (spinning ? '<span class="spin"></span>' : '') + msg;
+}
+
+function catLabel(tags){
+  for (const k of ['shop','amenity','craft','office','leisure','tourism','healthcare','cuisine','man_made']){
+    if (tags[k]){
+      const v = String(tags[k]).split(';')[0];
+      return CAT_PT[v] || (v.charAt(0).toUpperCase() + v.slice(1).replace(/_/g,' '));
+    }
+  }
+  return 'Estabelecimento';
+}
+
+function waLink(phone){
+  let d = String(phone).replace(/\D/g, '');
+  if (!d) return null;
+  if (!d.startsWith('55') && d.length <= 11) d = '55' + d;
+  return 'https://wa.me/' + d;
+}
+
+function instaLink(v){
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) return v;
+  return 'https://instagram.com/' + v.replace(/^@/, '');
+}
+
+function gmapsLink(lat, lng){
+  return `https://www.google.com/maps/search/?api=1&query=${lat}%2C${lng}`;
+}
+
+function linksHtml(r){
+  const out = [];
+  if (r.phone) out.push(`<a href="tel:${esc(r.phone)}">📞 ${esc(r.phone)}</a>`);
+  const wa = r.phone && waLink(r.phone);
+  if (wa) out.push(`<a href="${esc(wa)}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
+  if (r.website) out.push(`<a href="${esc(r.website)}" target="_blank" rel="noopener">🌐 Site</a>`);
+  if (r.insta) out.push(`<a href="${esc(r.insta)}" target="_blank" rel="noopener">📷 Instagram</a>`);
+  out.push(`<a href="${esc(gmapsLink(r.lat, r.lng))}" target="_blank" rel="noopener">🗺️ Google Maps</a>`);
+  return out.join('');
+}
+
+/* ================= State ================= */
+let map, cluster, routeLayer, routeLine;
+let results = [];
+let rota = loadRota();
+let lastNiche = '';
+let autoTimer = null;
+let busy = false;
+
+function loadRota(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+function saveRotaStore(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(rota));
+}
+
+/* ================= Map init ================= */
+function init(){
+  map = L.map('map', { zoomControl: true }).setView([-18.5, -46.5], 5); // Sudeste do Brasil
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    maxZoom: 20,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/">CARTO</a>'
+  }).addTo(map);
+
+  cluster = (L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 46 }) : L.layerGroup()).addTo(map);
+  routeLayer = L.layerGroup().addTo(map);
+
+  // sugestões de nichos
+  $('#sugestoes').innerHTML = Object.keys(PRESETS).sort().map(k => `<option value="${esc(k)}">`).join('');
+
+  map.on('click', onMapClick);
+  map.on('movestart', () => { if (autoTimer) clearTimeout(autoTimer); });
+  map.on('moveend', onMoveEnd);
+
+  $('#btnBuscar').addEventListener('click', buscar);
+  $('#btnTudo').addEventListener('click', () => searchBounds(map.getBounds(), null));
+  $('#btnArea').addEventListener('click', () => searchBounds(map.getBounds(), lastNiche || null));
+  $('#btnLoc').addEventListener('click', minhaLocalizacao);
+  $('#btnCsv').addEventListener('click', () => exportCsv(results, 'prospeccao'));
+  $('#btnCsvRota').addEventListener('click', () => exportCsv(rota, 'rota'));
+  $('#btnLimpar').addEventListener('click', limparRota);
+  $('#btnVerRota').addEventListener('click', verRota);
+  $('#btnGmaps').addEventListener('click', abrirRotaGmaps);
+
+  ['#nicho', '#area'].forEach(sel =>
+    $(sel).addEventListener('keydown', e => { if (e.key === 'Enter') buscar(); }));
+
+  $('#tabRes').addEventListener('click', () => setTab('res'));
+  $('#tabRota').addEventListener('click', () => setTab('rota'));
+
+  // delegação de cliques na lista de resultados
+  $('#paneRes').addEventListener('click', e => {
+    const save = e.target.closest('.save-btn');
+    const item = e.target.closest('.item');
+    if (save){ e.stopPropagation(); toggleSave(results[+save.dataset.i]); return; }
+    if (e.target.closest('a')) return;
+    if (item) focusResult(+item.dataset.i);
+  });
+
+  // delegação na lista da rota
+  $('#listaRota').addEventListener('click', e => {
+    const st = e.target.closest('.stop'); if (!st) return;
+    const i = +st.dataset.i;
+    if (e.target.closest('.up'))      { moveStop(i, -1); }
+    else if (e.target.closest('.down')){ moveStop(i, +1); }
+    else if (e.target.closest('.rm')) { removeStop(i); }
+    else if (e.target.closest('.info')){
+      map.flyTo([rota[i].lat, rota[i].lng], Math.max(map.getZoom(), 16), { duration: .6 });
+    }
+  });
+
+  renderRota();
+  setTimeout(() => { $('#hintClick').style.opacity = '0'; $('#hintClick').style.transition = 'opacity 1s'; }, 9000);
+}
+
+function onMoveEnd(){
+  if (lastNiche || results.length) $('#btnArea').hidden = false;
+  if (!$('#autoBusca').checked || busy) return;
+  const niche = lastNiche || $('#nicho').value.trim();
+  if (!niche) return;
+  const b = map.getBounds();
+  const span = (b.getNorth() - b.getSouth()) * (b.getEast() - b.getWest());
+  if (span > 2.5){
+    status('🧭 Aproxime o zoom para a busca inteligente rastrear a área.', '');
+    return;
+  }
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => searchBounds(map.getBounds(), niche), 700);
+}
+
+function setTab(t){
+  $('#tabRes').classList.toggle('active', t === 'res');
+  $('#tabRota').classList.toggle('active', t === 'rota');
+  $('#paneRes').classList.toggle('active', t === 'res');
+  $('#paneRota').classList.toggle('active', t === 'rota');
+}
+
+function minhaLocalizacao(){
+  if (!navigator.geolocation){ status('Geolocalização não suportada neste navegador.', 'err'); return; }
+  status('Obtendo sua localização…', '', true);
+  navigator.geolocation.getCurrentPosition(
+    p => { map.setView([p.coords.latitude, p.coords.longitude], 14); status('Localização encontrada. Agora busque um nicho aqui.', 'ok'); },
+    () => status('Não foi possível obter a localização (verifique a permissão).', 'err'),
+    { timeout: 12000 }
+  );
+}
+
+/* ================= Busca ================= */
+async function geocode(q){
+  const url = `${NOMINATIM}?format=jsonv2&limit=1&accept-language=pt-BR&q=${encodeURIComponent(q)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('geocode');
+  const js = await res.json();
+  return js[0] || null;
+}
+
+async function buscar(){
+  const niche = $('#nicho').value.trim();
+  const areaTxt = $('#area').value.trim();
+  if (!niche && !areaTxt){ status('Digite um nicho (ex.: barbearia) e/ou uma área.', 'err'); return; }
+
+  let bounds = map.getBounds();
+  if (areaTxt){
+    status(`Localizando “${esc(areaTxt)}”…`, '', true);
+    try {
+      const g = await geocode(areaTxt);
+      if (!g){ status('Área não encontrada. Tente “bairro, cidade UF”.', 'err'); return; }
+      const bb = g.boundingbox.map(Number); // [S, N, W, E]
+      bounds = L.latLngBounds([bb[0], bb[2]], [bb[1], bb[3]]);
+      map.fitBounds(bounds, { padding: [20, 20] });
+    } catch {
+      status('Falha ao localizar a área (sem conexão?).', 'err'); return;
+    }
+  }
+  if (!niche){ status('Área localizada. Agora digite o nicho e clique em Buscar.', 'ok'); return; }
+  await searchBounds(bounds, niche);
+}
+
+function buildQuery(niche, b){
+  const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
+  const parts = [];
+  if (niche){
+    const preset = PRESETS[norm(niche)];
+    if (preset) for (const t of preset){
+      const m = t.match(/^([a-z_:]+)([=~])(.+)$/);
+      if (!m) continue;
+      parts.push(m[2] === '=' ? `nwr["${m[1]}"="${m[3]}"](${bbox});`
+                              : `nwr["${m[1]}"~"${m[3]}",i](${bbox});`);
+    }
+    const variants = [...new Set([niche, norm(niche)])].filter(Boolean).map(escRx).join('|');
+    parts.push(`nwr["name"~"${variants}",i](${bbox});`);
+  } else {
+    // “Tudo da área”: todo tipo de comércio, serviço e indústria
+    parts.push(
+      `nwr["shop"](${bbox});`,
+      `nwr["craft"](${bbox});`,
+      `nwr["office"](${bbox});`,
+      `nwr["healthcare"](${bbox});`,
+      `nwr["amenity"~"^(restaurant|fast_food|cafe|bar|pub|nightclub|ice_cream|pharmacy|dentist|clinic|doctors|veterinary|hospital|bank|fuel|car_wash|car_rental|driving_school|language_school|kindergarten|school|college|university|coworking_space|marketplace|cinema|theatre)$"](${bbox});`,
+      `nwr["leisure"~"^(fitness_centre|sports_centre)$"](${bbox});`,
+      `nwr["tourism"~"^(hotel|guest_house|motel)$"](${bbox});`,
+      `nwr["man_made"="works"](${bbox});`
+    );
+  }
+  return `[out:json][timeout:50];(${parts.join('')});out center ${MAX_RESULTS};`;
+}
+
+async function fetchOverpass(query){
+  let lastErr;
+  for (const url of OVERPASS){
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 60000);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'data=' + encodeURIComponent(query),
+        signal: ctrl.signal
+      });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e){ lastErr = e; }
+  }
+  throw lastErr || new Error('overpass');
+}
+
+async function searchBounds(bounds, niche){
+  const span = (bounds.getNorth() - bounds.getSouth()) * (bounds.getEast() - bounds.getWest());
+  const limit = niche ? 2.5 : 0.6;
+  if (span > limit){
+    status('Área grande demais para essa busca — aproxime o zoom ou indique um bairro/cidade.', 'err');
+    return;
+  }
+  lastNiche = niche || '';
+  busy = true;
+  $('#btnArea').hidden = true;
+  $('#btnBuscar').disabled = $('#btnTudo').disabled = true;
+  status(niche ? `Rastreando “${esc(niche)}” na área…` : 'Rastreando todos os estabelecimentos da área…', '', true);
+
+  try {
+    const js = await fetchOverpass(buildQuery(niche, bounds));
+    results = parseElements(js);
+    renderResults();
+    setTab('res');
+    if (!results.length){
+      status('Nada encontrado nessa área. Tente outro termo (ex.: “salão de beleza”) ou amplie a área.', 'err');
+    } else {
+      const cap = results.length >= MAX_RESULTS ? ' (limite atingido — reduza a área para ver todos)' : '';
+      status(`✅ ${results.length} estabelecimento(s) encontrados${cap}.`, 'ok');
+    }
+  } catch (e){
+    status('Falha ao consultar o OpenStreetMap (servidor ocupado ou área muito grande). Tente de novo em instantes.', 'err');
+  } finally {
+    $('#btnBuscar').disabled = $('#btnTudo').disabled = false;
+    setTimeout(() => { busy = false; }, 400); // evita o auto disparar sobre o próprio fitBounds
+  }
+}
+
+function parseElements(js){
+  const seen = new Set();
+  const out = [];
+  for (const el of (js.elements || [])){
+    const t = el.tags; if (!t) continue;
+    const lat = el.lat ?? el.center?.lat, lng = el.lon ?? el.center?.lon;
+    if (lat == null || lng == null) continue;
+    const name = t.name || '';
+    const key = name ? `${norm(name)}|${lat.toFixed(3)}|${lng.toFixed(3)}` : `${el.type}/${el.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const addr = [
+      [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(', '),
+      t['addr:suburb']
+    ].filter(Boolean).join(' – ');
+    out.push({
+      id: `${el.type}/${el.id}`,
+      name, cat: catLabel(t),
+      phone: t.phone || t['contact:phone'] || t['contact:mobile'] || '',
+      website: t.website || t['contact:website'] || '',
+      insta: instaLink(t['contact:instagram'] || ''),
+      addr, city: t['addr:city'] || '',
+      lat, lng
+    });
+  }
+  out.sort((a, b) => (a.name || 'zzzz').localeCompare(b.name || 'zzzz', 'pt-BR'));
+  return out;
+}
+
+/* ================= Render resultados ================= */
+function inRota(r){
+  return rota.some(s => s.id === r.id || (s.lat === r.lat && s.lng === r.lng));
+}
+
+function popupContent(r){
+  const div = document.createElement('div');
+  div.className = 'pp';
+  div.innerHTML = `
+    <strong>${esc(r.name || '(Sem nome)')}</strong><br>
+    <span class="chip">${esc(r.cat)}</span>
+    <div class="addr">${esc([r.addr, r.city].filter(Boolean).join(' · ') || 'Endereço não informado')}</div>
+    <div class="links">${linksHtml(r)}</div>`;
+  const btn = document.createElement('button');
+  const saved = inRota(r);
+  btn.textContent = saved ? '✓ Na rota (clique p/ remover)' : '➕ Salvar na rota';
+  if (saved) btn.classList.add('saved');
+  btn.addEventListener('click', () => { toggleSave(r); map.closePopup(); });
+  div.appendChild(btn);
+  return div;
+}
+
+function renderResults(){
+  cluster.clearLayers();
+  $('#cntRes').textContent = results.length;
+  $('#btnCsv').disabled = !results.length;
+
+  const pane = $('#paneRes');
+  if (!results.length){
+    pane.innerHTML = '<div class="empty">Nenhum resultado nesta busca.</div>';
+    return;
+  }
+  pane.innerHTML = results.map((r, i) => `
+    <div class="item" data-i="${i}">
+      <div class="head">
+        <strong>${esc(r.name || '(Sem nome)')}</strong>
+        <span class="chip">${esc(r.cat)}</span>
+      </div>
+      ${r.addr || r.city ? `<div class="addr">📍 ${esc([r.addr, r.city].filter(Boolean).join(' · '))}</div>` : ''}
+      <div class="links">${linksHtml(r)}</div>
+      <button class="save-btn ${inRota(r) ? 'saved' : ''}" data-i="${i}">${inRota(r) ? '✓ Na rota' : '➕ Salvar na rota'}</button>
+    </div>`).join('');
+
+  for (const r of results){
+    const m = L.marker([r.lat, r.lng]);
+    m.bindPopup(() => popupContent(r), { maxWidth: 280 });
+    r._marker = m;
+    cluster.addLayer(m);
+  }
+}
+
+function focusResult(i){
+  const r = results[i]; if (!r) return;
+  document.querySelectorAll('#paneRes .item').forEach(el => el.classList.toggle('sel', +el.dataset.i === i));
+  const open = () => r._marker.openPopup();
+  if (cluster.zoomToShowLayer) cluster.zoomToShowLayer(r._marker, open);
+  else { map.flyTo([r.lat, r.lng], Math.max(map.getZoom(), 17), { duration: .5 }); setTimeout(open, 600); }
+}
+
+/* ================= Rota (locais salvos) ================= */
+function toggleSave(r){
+  if (!r) return;
+  const idx = rota.findIndex(s => s.id === r.id || (s.lat === r.lat && s.lng === r.lng));
+  if (idx >= 0){ rota.splice(idx, 1); status('Local removido da rota.', ''); }
+  else {
+    rota.push({ id: r.id, name: r.name || '(Sem nome)', cat: r.cat, phone: r.phone || '',
+                website: r.website || '', insta: r.insta || '', addr: r.addr || '', city: r.city || '',
+                lat: r.lat, lng: r.lng });
+    status(`✅ “${esc(r.name || 'Local')}” salvo na rota (${rota.length} parada(s)).`, 'ok');
+  }
+  saveRotaStore(); renderRota();
+  if (results.length) renderResults(); // atualiza botões “na rota”
+}
+
+function onMapClick(e){
+  const { lat, lng } = e.latlng;
+  const div = document.createElement('div');
+  div.className = 'pp';
+  div.innerHTML = `<strong>Adicionar local manual</strong>
+    <div class="addr">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
+    <input type="text" placeholder="Nome do local (ex.: Cliente João)" maxlength="80">`;
+  const inp = div.querySelector('input');
+  const btn = document.createElement('button');
+  btn.textContent = '➕ Salvar na rota';
+  btn.addEventListener('click', () => {
+    rota.push({ id: 'manual/' + Math.round(lat * 1e6) + '/' + Math.round(lng * 1e6),
+                name: inp.value.trim() || 'Ponto marcado', cat: 'Manual', phone: '', website: '',
+                insta: '', addr: '', city: '', lat, lng });
+    saveRotaStore(); renderRota(); map.closePopup();
+    status(`✅ Ponto salvo na rota (${rota.length} parada(s)).`, 'ok');
+    setTab('rota');
+  });
+  div.appendChild(btn);
+  L.popup({ maxWidth: 260 }).setLatLng(e.latlng).setContent(div).openOn(map);
+  setTimeout(() => inp.focus(), 60);
+}
+
+function renderRota(){
+  $('#cntRota').textContent = rota.length;
+  const lst = $('#listaRota');
+  $('#rotaLinks').innerHTML = '';
+
+  if (!rota.length){
+    lst.innerHTML = `<div class="empty">Nenhum local salvo ainda.<br><br>
+      💾 Use <b>➕ Salvar na rota</b> nos resultados,<br>
+      ou <b>clique direto no mapa</b> para marcar um ponto manual.<br><br>
+      A lista fica salva neste navegador — feche e volte depois.</div>`;
+  } else {
+    lst.innerHTML = rota.map((s, i) => `
+      <div class="stop" data-i="${i}">
+        <div class="num">${i + 1}</div>
+        <div class="info">
+          <strong>${esc(s.name)}</strong> <span class="chip">${esc(s.cat)}</span>
+          <div class="addr">${esc([s.addr, s.city].filter(Boolean).join(' · ') || `${s.lat.toFixed(5)}, ${s.lng.toFixed(5)}`)}</div>
+          ${s.phone ? `<div class="addr">📞 ${esc(s.phone)}</div>` : ''}
+        </div>
+        <div class="ops">
+          <button class="up" title="Subir">▲</button>
+          <button class="down" title="Descer">▼</button>
+          <button class="rm" title="Remover">✕</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // desenha a rota no mapa
+  routeLayer.clearLayers();
+  rota.forEach((s, i) => {
+    L.marker([s.lat, s.lng], {
+      icon: L.divIcon({ className: 'stop-ico', html: `<div class="stop-badge">${i + 1}</div>`,
+                        iconSize: [26, 26], iconAnchor: [13, 13] })
+    }).bindTooltip(`${i + 1}. ${s.name}`).addTo(routeLayer);
+  });
+  if (rota.length >= 2){
+    routeLine = L.polyline(rota.map(s => [s.lat, s.lng]),
+      { color: '#2563eb', weight: 3, dashArray: '7 7', opacity: .85 }).addTo(routeLayer);
+  }
+}
+
+function moveStop(i, dir){
+  const j = i + dir;
+  if (j < 0 || j >= rota.length) return;
+  [rota[i], rota[j]] = [rota[j], rota[i]];
+  saveRotaStore(); renderRota();
+}
+
+function removeStop(i){
+  rota.splice(i, 1);
+  saveRotaStore(); renderRota();
+  if (results.length) renderResults();
+}
+
+function limparRota(){
+  if (!rota.length) return;
+  if (!confirm(`Apagar as ${rota.length} parada(s) salvas?`)) return;
+  rota = [];
+  saveRotaStore(); renderRota();
+  if (results.length) renderResults();
+}
+
+function verRota(){
+  if (!rota.length){ status('Nenhum local salvo na rota ainda.', 'err'); return; }
+  map.fitBounds(L.latLngBounds(rota.map(s => [s.lat, s.lng])), { padding: [50, 50] });
+  setTab('rota');
+}
+
+function abrirRotaGmaps(){
+  const box = $('#rotaLinks');
+  if (!rota.length){ status('Salve locais na rota primeiro.', 'err'); return; }
+  if (rota.length === 1){
+    window.open(gmapsLink(rota[0].lat, rota[0].lng), '_blank'); return;
+  }
+  // Google Maps aceita ~10 paradas por link → divide em trechos
+  const legs = [];
+  for (let i = 0; i < rota.length - 1; i += 9){
+    const seg = rota.slice(i, Math.min(i + 10, rota.length));
+    const o = seg[0], d = seg[seg.length - 1];
+    const wp = seg.slice(1, -1).map(s => `${s.lat},${s.lng}`).join('|');
+    legs.push(`https://www.google.com/maps/dir/?api=1&origin=${o.lat},${o.lng}&destination=${d.lat},${d.lng}` +
+              (wp ? `&waypoints=${encodeURIComponent(wp)}` : '') + `&travelmode=driving`);
+  }
+  if (legs.length === 1){ window.open(legs[0], '_blank'); return; }
+  box.innerHTML = '<div class="empty" style="padding:10px">Rota longa — abra por trechos:</div>' +
+    legs.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">🗺️ Trecho ${i + 1} (paradas ${i * 9 + 1} → ${Math.min(i * 9 + 10, rota.length)})</a>`).join('');
+}
+
+/* ================= Export CSV ================= */
+function exportCsv(list, prefix){
+  if (!list.length){ status('Nada para exportar ainda.', 'err'); return; }
+  const cols = ['Nome','Categoria','Telefone','WhatsApp','Site','Instagram','Endereço','Cidade','Latitude','Longitude','Google Maps'];
+  const rows = list.map(r => [
+    r.name || '(Sem nome)', r.cat, r.phone, (r.phone && waLink(r.phone)) || '',
+    r.website, r.insta || '', r.addr, r.city, r.lat, r.lng, gmapsLink(r.lat, r.lng)
+  ]);
+  const csv = '﻿' + [cols, ...rows]
+    .map(row => row.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'))
+    .join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const d = new Date().toISOString().slice(0, 10);
+  a.download = `${prefix}-${(norm($('#nicho').value) || 'area').replace(/\s+/g, '-')}-${d}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  status(`⬇️ CSV exportado com ${list.length} registro(s).`, 'ok');
+}
+
+init();
+</script>
+</body>
+</html>
