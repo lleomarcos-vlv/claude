@@ -69,8 +69,10 @@ Em caso de contradição entre documentos, **o Bible prevalece** (respeitadas as
 | 00 Master Prompt | ✅ Concluído v1.0 |
 | 01 Constituição | ✅ Concluído v1.0 |
 | 02 Project Bible | ✅ Ativo v1.0 (este) |
-| 03 Roadmap | 🟡 Em produção |
-| 04–24 | ⬜ Pendentes (produção em ondas) |
+| 03 Roadmap | ✅ Concluído v1.0 |
+| 04–24 | ✅ Concluídos v1.0 (kit completo — todos os 24 documentos + Master Prompt produzidos) |
+
+> **Marco:** o kit de documentação (00–24) foi concluído em 21/07/2026, totalizando ~100 mil palavras de documentação técnica. As próximas fases passam da **documentação** para a **execução** (código), sempre guiadas por este Bible.
 
 ## 9. Estado do Roadmap (macro)
 | Fase | Etapas | Status |
