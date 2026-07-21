@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.constraints.Positive;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/estoque/itens")
@@ -51,5 +54,24 @@ public class EstoqueController {
     @GetMapping("/{id}")
     public ItemResponse buscar(@PathVariable String id) {
         return ItemResponse.of(service.buscar(id));
+    }
+
+    @GetMapping
+    public List<ItemResponse> listar() {
+        return service.listar().stream().map(ItemResponse::of).toList();
+    }
+
+    public record EntradaRequest(@NotNull @Positive BigDecimal quantidade, String origem) {
+    }
+
+    @PostMapping("/{id}/entradas")
+    public ItemResponse entrada(@PathVariable String id, @Valid @RequestBody EntradaRequest req) {
+        String origem = (req.origem() == null || req.origem().isBlank()) ? "ENTRADA_MANUAL" : req.origem();
+        return ItemResponse.of(service.entrada(id, req.quantidade(), origem));
+    }
+
+    @GetMapping("/reposicao")
+    public List<ItemResponse> reposicao() {
+        return service.itensParaRepor().stream().map(ItemResponse::of).toList();
     }
 }

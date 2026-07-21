@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class EstoqueService {
@@ -50,5 +51,27 @@ public class EstoqueService {
         item.baixa(quantidade);
         itens.save(item);
         movimentacoes.save(MovimentacaoEstoque.de(tenant, item.getId(), "SAIDA", quantidade, origem));
+    }
+
+    /** Entrada de estoque (ex.: recebimento de compra) com origem rastreável. */
+    @Transactional
+    public ItemEstoque entrada(String itemId, BigDecimal quantidade, String origem) {
+        String tenant = TenantContext.require();
+        ItemEstoque item = buscar(itemId);
+        item.entrada(quantidade);
+        itens.save(item);
+        movimentacoes.save(MovimentacaoEstoque.de(tenant, item.getId(), "ENTRADA", quantidade, origem));
+        return item;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemEstoque> listar() {
+        return itens.findByTenantIdOrderBySkuAsc(TenantContext.require());
+    }
+
+    /** Itens que atingiram o ponto de reposição (sugestão de compra — KSI). */
+    @Transactional(readOnly = true)
+    public List<ItemEstoque> itensParaRepor() {
+        return itens.findParaRepor(TenantContext.require());
     }
 }
