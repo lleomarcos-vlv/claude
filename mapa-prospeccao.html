@@ -128,11 +128,32 @@
   #mapWrap{flex:1; position:relative}
   #map{position:absolute; inset:0; background:#dfe8ef}
   #btnArea{
-    position:absolute; top:14px; left:50%; transform:translateX(-50%); z-index:900;
+    position:absolute; top:60px; left:50%; transform:translateX(-50%); z-index:900;
     background:#fff; color:#1c2b40; border:none; box-shadow:0 2px 10px rgba(0,0,0,.28);
     font-weight:600; border-radius:22px; padding:9px 16px;
   }
   #btnArea:hover{background:#f1f5f9}
+
+  /* barra de categorias rápidas (estilo Google Maps) */
+  #chips{
+    position:absolute; top:12px; left:12px; right:118px; z-index:901;
+    display:flex; gap:8px; overflow-x:auto; padding:2px 2px 6px;
+    scrollbar-width:none; -ms-overflow-style:none;
+  }
+  #chips::-webkit-scrollbar{display:none}
+  #chips button{
+    flex:0 0 auto; background:#fff; color:#1c2b40; border:none;
+    box-shadow:0 2px 8px rgba(0,0,0,.25); border-radius:22px; padding:8px 14px;
+    font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px;
+  }
+  #chips button:hover{background:#f1f5f9}
+  #chips button.active{background:var(--acc-d); color:#fff; box-shadow:0 2px 10px rgba(22,163,74,.5)}
+  #btnSat{
+    position:absolute; top:12px; right:12px; z-index:901;
+    background:#fff; color:#1c2b40; border:none; box-shadow:0 2px 8px rgba(0,0,0,.25);
+    border-radius:22px; padding:8px 13px; font-weight:600; font-size:13px;
+  }
+  #btnSat:hover{background:#f1f5f9}
   #hintClick{
     position:absolute; bottom:16px; left:50%; transform:translateX(-50%); z-index:900;
     background:rgba(13,20,35,.85); color:#cfe0f8; font-size:12px; padding:7px 14px;
@@ -218,6 +239,8 @@
 
   <div id="mapWrap">
     <div id="map"></div>
+    <div id="chips"></div>
+    <button id="btnSat" title="Alternar mapa / satélite">🛰️ Satélite</button>
     <button id="btnArea" hidden>🔄 Buscar nesta área</button>
     <div id="hintClick">💡 Clique em qualquer ponto do mapa para salvar um local manual na rota</div>
   </div>
@@ -369,7 +392,7 @@ function linksHtml(r){
 }
 
 /* ================= State ================= */
-let map, cluster, routeLayer, routeLine;
+let map, cluster, routeLayer, routeLine, baseMapa, baseSat, sat = false;
 let results = [];
 let rota = loadRota();
 let lastNiche = '';
@@ -388,10 +411,22 @@ function saveRotaStore(){
 function init(){
   map = L.map('map', { zoomControl: true }).setView([-18.5, -46.5], 5); // Sudeste do Brasil
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  // Camada "Mapa" (ruas) e camada "Satélite" (imagem aérea + nomes das ruas por cima)
+  baseMapa = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     maxZoom: 20,
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/">CARTO</a>'
-  }).addTo(map);
+  });
+  baseSat = L.layerGroup([
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 20, attribution: 'Imagem © Esri, Maxar, Earthstar Geographics'
+    }),
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20, opacity: .95
+    })
+  ]);
+  baseMapa.addTo(map);
+  $('#btnSat').addEventListener('click', toggleSat);
+  buildChips();
 
   cluster = (L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 46 }) : L.layerGroup()).addTo(map);
   routeLayer = L.layerGroup().addTo(map);
@@ -442,6 +477,56 @@ function init(){
 
   renderRota();
   setTimeout(() => { $('#hintClick').style.opacity = '0'; $('#hintClick').style.transition = 'opacity 1s'; }, 9000);
+}
+
+/* Categorias rápidas — cada chip preenche o nicho e busca na vista atual */
+const CHIPS = [
+  ['🍽️','Restaurantes','restaurante'], ['🍔','Lanches','lanchonete'], ['☕','Cafés','cafeteria'],
+  ['🍕','Pizzarias','pizzaria'], ['🍺','Bares','bar'], ['🏨','Hotéis','hotel'],
+  ['🛒','Mercados','supermercado'], ['🥖','Padarias','padaria'], ['💊','Farmácias','farmacia'],
+  ['✂️','Barbearias','barbearia'], ['💇','Salões','salao de beleza'], ['🏋️','Academias','academia'],
+  ['🐾','Pet Shops','pet shop'], ['🦷','Dentistas','dentista'], ['⚕️','Clínicas','clinica'],
+  ['⛽','Postos','posto de gasolina'], ['🔧','Oficinas','oficina mecanica'], ['🚗','Concessionárias','concessionaria'],
+  ['🏦','Bancos','banco'], ['⚖️','Advocacia','advogado'], ['🏠','Imobiliárias','imobiliaria'],
+  ['👕','Roupas','loja de roupas'], ['👟','Calçados','calcados'], ['📱','Celulares','celular'],
+  ['🏗️','Construção','material de construcao'], ['📦','Atacado','atacado'], ['🚚','Transportadoras','transportadora']
+];
+
+function buildChips(){
+  const box = $('#chips');
+  box.innerHTML = '';
+  for (const [emo, label, niche] of CHIPS){
+    const b = document.createElement('button');
+    b.dataset.niche = niche;
+    b.innerHTML = `<span>${emo}</span>${label}`;
+    b.addEventListener('click', () => quickSearch(niche));
+    box.appendChild(b);
+  }
+}
+
+function highlightChip(niche){
+  document.querySelectorAll('#chips button').forEach(b =>
+    b.classList.toggle('active', b.dataset.niche === norm(niche)));
+}
+
+function quickSearch(niche){
+  $('#nicho').value = niche;
+  highlightChip(niche);
+  const b = map.getBounds();
+  const span = (b.getNorth() - b.getSouth()) * (b.getEast() - b.getWest());
+  const areaTxt = $('#area').value.trim();
+  if (span > 2.5){
+    if (areaTxt) buscar();                       // ainda distante: vai até a área digitada
+    else status('🔍 Aproxime o mapa na sua região (ou digite a área) e toque na categoria.', 'err');
+    return;
+  }
+  searchBounds(b, niche);                          // já com zoom: rastreia a vista atual
+}
+
+function toggleSat(){
+  sat = !sat;
+  if (sat){ map.removeLayer(baseMapa); baseSat.addTo(map); $('#btnSat').textContent = '🗺️ Mapa'; }
+  else    { map.removeLayer(baseSat); baseMapa.addTo(map); $('#btnSat').textContent = '🛰️ Satélite'; }
 }
 
 function onMoveEnd(){
@@ -564,6 +649,7 @@ async function searchBounds(bounds, niche){
     return;
   }
   lastNiche = niche || '';
+  highlightChip(niche || '');
   busy = true;
   $('#btnArea').hidden = true;
   $('#btnBuscar').disabled = $('#btnTudo').disabled = true;
