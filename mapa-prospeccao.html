@@ -311,7 +311,84 @@ const PRESETS = {
   'chaveiro':['craft=key_cutter','shop=locksmith'], 'costureira':['craft=tailor','shop=tailor'],
   'atacado':['shop=wholesale'], 'atacadista':['shop=wholesale'],
   'distribuidora':['shop=wholesale','shop=beverages'], 'fornecedor':['shop=wholesale','shop=trade'],
-  'industria':['man_made=works'], 'fabrica':['man_made=works'], 'transportadora':['office=logistics']
+  'industria':['man_made=works'], 'fabrica':['man_made=works'], 'transportadora':['office=logistics'],
+
+  /* ---------- AGRO · RURAL · PRODUÇÃO ---------- */
+  'fazenda':['place=farm','landuse=farmyard','building=farm'],
+  'sitio':['place=farm','landuse=farmyard'], 'chacara':['place=farm','landuse=farmyard'],
+  'granja':['landuse=farmyard','building=farm'], 'haras':['leisure=horse_riding','landuse=farmyard'],
+  'produtor rural':['place=farm','shop=farm','landuse=farmyard'],
+  'produtor':['place=farm','shop=farm','man_made=works'],
+  'agropecuaria':['shop=agrarian'], 'agro':['shop=agrarian'], 'agronegocio':['shop=agrarian'],
+  'insumos agricolas':['shop=agrarian'], 'produtos agricolas':['shop=agrarian','shop=farm'],
+  'racao':['shop=agrarian','shop=pet'], 'sementes':['shop=agrarian'],
+  'defensivos':['shop=agrarian'], 'fertilizantes':['shop=agrarian'],
+  'maquinas agricolas':['shop=agrarian','craft=agricultural_engines','shop=trade'],
+  'tratores':['shop=agrarian','craft=agricultural_engines'],
+  'implementos agricolas':['shop=agrarian','craft=agricultural_engines'],
+  'cooperativa':['office=cooperative','shop=agrarian'],
+  'produtos da fazenda':['shop=farm'], 'venda direta':['shop=farm'],
+  'viveiro':['landuse=plant_nursery','shop=garden_centre'],
+  'viveiro de plantas':['landuse=plant_nursery'], 'jardinagem':['shop=garden_centre'],
+  'garden':['shop=garden_centre'], 'paisagismo':['shop=garden_centre'],
+  'pomar':['landuse=orchard'], 'vinhedo':['landuse=vineyard'], 'vinicola':['craft=winery'],
+  'cervejaria':['craft=brewery'], 'destilaria':['craft=distillery'], 'alambique':['craft=distillery'],
+  'laticinio':['shop=dairy','shop=cheese'], 'laticinios':['shop=dairy','shop=cheese'],
+  'queijaria':['shop=cheese','shop=dairy'], 'apiario':['shop=farm'], 'mel':['shop=farm'],
+  'piscicultura':['landuse=aquaculture'], 'aquicultura':['landuse=aquaculture'],
+  'frigorifico':['man_made=works','shop=butcher'], 'abatedouro':['man_made=works'],
+  'silo':['man_made=silo'], 'armazem':['man_made=silo','building=warehouse','shop=wholesale'],
+  'madeireira':['shop=trade','craft=sawmill','man_made=works'], 'serraria':['craft=sawmill'],
+  'reflorestamento':['landuse=forest'], 'silvicultura':['office=forestry','landuse=forest'],
+  'pedreira':['landuse=quarry'], 'mineracao':['landuse=quarry'],
+
+  /* ---------- ALIMENTOS · PRODUTORES ---------- */
+  'peixaria':['shop=seafood'], 'quitanda':['shop=greengrocer'], 'emporio':['shop=deli','shop=convenience'],
+  'produtos naturais':['shop=health_food'], 'torrefacao':['shop=coffee'],
+  'especiarias':['shop=spices'], 'temperos':['shop=spices'], 'suplementos':['shop=nutrition_supplements'],
+
+  /* ---------- INDÚSTRIA · ATACADO · FORNECEDORES ---------- */
+  'atacarejo':['shop=wholesale','shop=supermarket'], 'importadora':['shop=wholesale','office=company'],
+  'exportadora':['shop=wholesale','office=company'], 'representante comercial':['office=company'],
+  'logistica':['office=logistics'], 'armazenagem':['building=warehouse','man_made=silo'],
+  'metalurgica':['man_made=works','craft=metal_construction'], 'usinagem':['craft=metal_construction','man_made=works'],
+  'plasticos':['man_made=works'], 'embalagens':['man_made=works','shop=trade'],
+  'textil':['man_made=works'], 'quimica':['man_made=works'],
+
+  /* ---------- CONSTRUÇÃO · MATERIAIS ---------- */
+  'construtora':['office=construction_company','craft=builder'], 'engenharia':['office=engineer'],
+  'arquitetura':['office=architect'], 'arquiteto':['office=architect'],
+  'marmoraria':['shop=stone','craft=stonemason'], 'granito':['craft=stonemason'],
+  'pisos':['shop=tile','shop=flooring'], 'revestimentos':['shop=tile'], 'ceramica':['shop=tile','craft=pottery'],
+  'materiais eletricos':['shop=electrical','shop=trade'], 'eletrica':['shop=electrical'],
+  'hidraulica':['shop=hardware','shop=trade'], 'esquadrias':['craft=window_construction'],
+  'aluminio':['craft=metal_construction'], 'serralheria':['craft=metal_construction'],
+
+  /* ---------- SERVIÇOS · ESCRITÓRIOS ---------- */
+  'consultoria':['office=consulting','office=company'], 'marketing':['office=advertising_agency'],
+  'publicidade':['office=advertising_agency'], 'agencia de marketing':['office=advertising_agency'],
+  'ti':['office=it'], 'software':['office=it'], 'tecnologia':['office=it','office=telecommunication'],
+  'agencia de viagens':['shop=travel_agency'], 'turismo':['shop=travel_agency'],
+  'financeira':['office=financial'], 'corretora':['office=financial','office=insurance'],
+  'cambio':['amenity=bureau_de_change'], 'correios':['amenity=post_office'],
+  'sindicato':['office=association'], 'associacao':['office=association','office=ngo'], 'ong':['office=ngo'],
+  'funeraria':['shop=funeral_directors'], 'fotografo':['craft=photographer','shop=photo'],
+  'buffet':['amenity=events_venue','shop=party'], 'festas':['shop=party'],
+
+  /* ---------- SAÚDE · BEM-ESTAR ---------- */
+  'massagem':['shop=massage','leisure=spa'], 'spa':['leisure=spa'],
+  'material medico':['shop=medical_supply'], 'ortopedia':['shop=medical_supply'],
+
+  /* ---------- COMÉRCIO DIVERSO ---------- */
+  'cosmeticos':['shop=cosmetics'], 'perfumaria':['shop=perfumery','shop=cosmetics'],
+  'tecidos':['shop=fabric'], 'armarinho':['shop=sewing','shop=fabric'],
+  'colchoes':['shop=bed'], 'cama mesa banho':['shop=houseware','shop=bed'],
+  'decoracao':['shop=interior_decoration'], 'utilidades':['shop=houseware','shop=variety_store'],
+  'bazar':['shop=variety_store'], 'artesanato':['shop=craft'], 'antiguidades':['shop=antiques'],
+  'brecho':['shop=second_hand'], 'usados':['shop=second_hand'],
+  'ferro velho':['shop=scrap_yard'], 'sucata':['shop=scrap_yard','amenity=recycling'],
+  'reciclagem':['amenity=recycling'], 'caminhoes':['shop=truck'], 'nautica':['shop=boat'],
+  'escola de musica':['amenity=music_school'], 'biblioteca':['amenity=library'], 'lava-jato':['amenity=car_wash']
 };
 
 /* Tradução de categorias OSM mais comuns */
@@ -338,7 +415,38 @@ const CAT_PT = {
   bar:'Bar', pub:'Pub', nightclub:'Casa noturna', alcohol:'Bebidas', beverages:'Bebidas', wine:'Adega',
   tobacco:'Tabacaria', laundry:'Lavanderia', dry_cleaning:'Lavanderia', locksmith:'Chaveiro',
   key_cutter:'Chaveiro', tailor:'Costura', wholesale:'Atacadista', works:'Indústria/Fábrica',
-  logistics:'Transportadora', marketplace:'Feira/Mercado'
+  logistics:'Transportadora', marketplace:'Feira/Mercado',
+  // agro / rural / produção
+  farm:'Fazenda/Produtor', farmyard:'Sede de fazenda', agrarian:'Agropecuária',
+  agricultural_engines:'Máquinas agrícolas', garden_centre:'Jardinagem/Garden',
+  plant_nursery:'Viveiro de plantas', orchard:'Pomar', vineyard:'Vinhedo', winery:'Vinícola',
+  brewery:'Cervejaria', distillery:'Destilaria/Alambique', dairy:'Laticínios', cheese:'Queijaria',
+  aquaculture:'Piscicultura', silo:'Silo/Armazém', sawmill:'Serraria/Madeireira',
+  forest:'Reflorestamento', forestry:'Silvicultura', quarry:'Pedreira/Mineração',
+  cooperative:'Cooperativa', horse_riding:'Haras/Hípica',
+  // alimentos / produtores
+  seafood:'Peixaria', deli:'Empório', health_food:'Produtos naturais', coffee:'Torrefação',
+  spices:'Especiarias/Temperos', nutrition_supplements:'Suplementos',
+  // indústria / atacado / fornecedores
+  warehouse:'Armazém/Depósito', company:'Empresa/Escritório',
+  // construção / materiais
+  construction_company:'Construtora', engineer:'Engenharia', architect:'Arquitetura',
+  builder:'Construção', stone:'Marmoraria', stonemason:'Marmoraria/Granito',
+  tile:'Pisos e revestimentos', flooring:'Pisos', electrical:'Materiais elétricos',
+  window_construction:'Esquadrias', pottery:'Cerâmica',
+  // serviços / escritórios
+  consulting:'Consultoria', advertising_agency:'Marketing/Publicidade', it:'TI/Software',
+  telecommunication:'Telecom', travel_agency:'Agência de viagens', financial:'Financeira',
+  bureau_de_change:'Câmbio', post_office:'Correios', association:'Sindicato/Associação',
+  ngo:'ONG', funeral_directors:'Funerária', photographer:'Fotógrafo', photo:'Foto',
+  party:'Festas', events_venue:'Buffet/Eventos',
+  // saúde / bem-estar / diverso
+  massage:'Massagem', spa:'Spa', medical_supply:'Material médico/Ortopedia',
+  cosmetics:'Cosméticos', perfumery:'Perfumaria', fabric:'Tecidos', sewing:'Armarinho',
+  bed:'Colchões', houseware:'Utilidades', interior_decoration:'Decoração',
+  variety_store:'Bazar', craft:'Artesanato', antiques:'Antiguidades', second_hand:'Brechó/Usados',
+  scrap_yard:'Ferro velho/Sucata', recycling:'Reciclagem', truck:'Caminhões', boat:'Náutica',
+  music_school:'Escola de música', library:'Biblioteca'
 };
 
 /* ================= Helpers ================= */
@@ -354,7 +462,7 @@ function status(msg, cls, spinning){
 }
 
 function catLabel(tags){
-  for (const k of ['shop','amenity','craft','office','leisure','tourism','healthcare','cuisine','man_made']){
+  for (const k of ['shop','amenity','craft','office','leisure','tourism','healthcare','man_made','place','landuse','building','cuisine']){
     if (tags[k]){
       const v = String(tags[k]).split(';')[0];
       return CAT_PT[v] || (v.charAt(0).toUpperCase() + v.slice(1).replace(/_/g,' '));
@@ -489,7 +597,10 @@ const CHIPS = [
   ['⛽','Postos','posto de gasolina'], ['🔧','Oficinas','oficina mecanica'], ['🚗','Concessionárias','concessionaria'],
   ['🏦','Bancos','banco'], ['⚖️','Advocacia','advogado'], ['🏠','Imobiliárias','imobiliaria'],
   ['👕','Roupas','loja de roupas'], ['👟','Calçados','calcados'], ['📱','Celulares','celular'],
-  ['🏗️','Construção','material de construcao'], ['📦','Atacado','atacado'], ['🚚','Transportadoras','transportadora']
+  ['🏗️','Construção','material de construcao'], ['📦','Atacado','atacado'], ['🚚','Transportadoras','transportadora'],
+  ['🚜','Fazendas','fazenda'], ['🌾','Agropecuária','agropecuaria'], ['🐄','Produtores','produtor rural'],
+  ['🏭','Indústrias','industria'], ['❄️','Frigoríficos','frigorifico'], ['🌱','Cooperativas','cooperativa'],
+  ['🍷','Vinícolas','vinicola'], ['🪵','Madeireiras','madeireira'], ['🏢','Construtoras','construtora']
 ];
 
 function buildChips(){
@@ -612,10 +723,12 @@ function buildQuery(niche, b){
       `nwr["craft"](${bbox});`,
       `nwr["office"](${bbox});`,
       `nwr["healthcare"](${bbox});`,
-      `nwr["amenity"~"^(restaurant|fast_food|cafe|bar|pub|nightclub|ice_cream|pharmacy|dentist|clinic|doctors|veterinary|hospital|bank|fuel|car_wash|car_rental|driving_school|language_school|kindergarten|school|college|university|coworking_space|marketplace|cinema|theatre)$"](${bbox});`,
-      `nwr["leisure"~"^(fitness_centre|sports_centre)$"](${bbox});`,
+      `nwr["amenity"~"^(restaurant|fast_food|cafe|bar|pub|nightclub|ice_cream|pharmacy|dentist|clinic|doctors|veterinary|hospital|bank|fuel|car_wash|car_rental|driving_school|language_school|music_school|kindergarten|school|college|university|coworking_space|marketplace|post_office|library|bureau_de_change|events_venue|cinema|theatre)$"](${bbox});`,
+      `nwr["leisure"~"^(fitness_centre|sports_centre|spa|horse_riding)$"](${bbox});`,
       `nwr["tourism"~"^(hotel|guest_house|motel)$"](${bbox});`,
-      `nwr["man_made"="works"](${bbox});`
+      `nwr["man_made"~"^(works|silo)$"](${bbox});`,
+      `nwr["place"="farm"](${bbox});`,
+      `nwr["landuse"~"^(farmyard|plant_nursery|aquaculture|vineyard|orchard|quarry)$"](${bbox});`
     );
   }
   return `[out:json][timeout:50];(${parts.join('')});out center ${MAX_RESULTS};`;
