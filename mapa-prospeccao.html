@@ -224,8 +224,8 @@
         <button id="btnLoc" class="grow">📍 Minha localização</button>
         <button id="btnCsv" class="grow" disabled>⬇️ Exportar CSV</button>
       </div>
-      <label class="auto"><input type="checkbox" id="autoBusca"> 🧭 Busca inteligente ao mover o mapa <span>(rastreia enquanto você navega)</span></label>
-      <div id="status">Pronto. Escolha um nicho e uma área para começar.</div>
+      <label class="auto"><input type="checkbox" id="autoBusca" checked> 🧭 Mostrar automaticamente ao navegar <span>(com nicho: rastreia o nicho · sem nicho: mostra tudo da área ao dar zoom)</span></label>
+      <div id="status">Pronto! Dê zoom na sua cidade e o mapa mostra tudo. Digite um nicho (ex.: barbearia) para filtrar só ele.</div>
 
       <details id="cfgFonte">
         <summary>⚙️ Fonte de dados &amp; contatos <span id="srcTag">OpenStreetMap</span></summary>
@@ -246,7 +246,7 @@
     </nav>
 
     <div id="paneRes" class="pane active">
-      <div class="empty">Nenhuma busca ainda.<br>Ex.: nicho <b>barbearia</b> + área <b>Uberlândia</b>.</div>
+      <div class="empty">Nenhuma busca ainda.<br><br>1) Dê <b>zoom</b> na sua cidade → aparece tudo da área.<br>2) Ou digite um <b>nicho</b> (ex.: barbearia) e busque.<br>3) Ou informe uma <b>área</b> (ex.: Uberlândia) e busque.</div>
     </div>
 
     <div id="paneRota" class="pane">
@@ -704,18 +704,20 @@ function toggleSat(){
 }
 
 function onMoveEnd(){
-  if (lastNiche || results.length) $('#btnArea').hidden = false;
+  if (lastNiche || results.length || $('#nicho').value.trim()) $('#btnArea').hidden = false;
   if (!$('#autoBusca').checked || busy) return;
-  const niche = lastNiche || $('#nicho').value.trim();
-  if (!niche) return;
   const b = map.getBounds();
   const span = (b.getNorth() - b.getSouth()) * (b.getEast() - b.getWest());
-  if (span > 2.5){
-    status('🧭 Aproxime o zoom para a busca inteligente rastrear a área.', '');
-    return;
+  const niche = $('#nicho').value.trim();
+  if (niche){
+    // Com nicho digitado: rastreia esse nicho na vista atual
+    if (span > 2.5){ if (span < 9) status(`🧭 Aproxime o zoom para rastrear “${esc(niche)}” aqui.`, ''); return; }
+  } else {
+    // Sem nicho: mostra TUDO que existe na área conforme você dá zoom
+    if (span > 0.6){ if (span < 5) status('🧭 Aproxime mais o zoom para ver tudo que existe nesta área.', ''); return; }
   }
   if (autoTimer) clearTimeout(autoTimer);
-  autoTimer = setTimeout(() => searchBounds(map.getBounds(), niche), 700);
+  autoTimer = setTimeout(() => searchBounds(map.getBounds(), niche || null), 700);
 }
 
 function setTab(t){
@@ -822,7 +824,7 @@ async function searchBounds(bounds, niche){
   const span = (bounds.getNorth() - bounds.getSouth()) * (bounds.getEast() - bounds.getWest());
   const limit = usingG ? 12 : (niche ? 2.5 : 0.6);
   if (span > limit){
-    status('Área grande demais para essa busca — aproxime o zoom ou indique um bairro/cidade.', 'err');
+    status('🔎 Área muito grande. Dê zoom na cidade/bairro (o mapa já busca sozinho ao navegar) ou preencha o campo “Área”.', 'err');
     return;
   }
   lastNiche = niche || '';
