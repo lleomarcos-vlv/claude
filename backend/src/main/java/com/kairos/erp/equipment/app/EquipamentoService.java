@@ -42,6 +42,11 @@ public class EquipamentoService {
     }
 
     @Transactional(readOnly = true)
+    public List<Equipamento> listar() {
+        return equipamentos.findByTenantIdOrderByCriadoEmDesc(TenantContext.require());
+    }
+
+    @Transactional(readOnly = true)
     public List<EquipamentoEvento> historico(String equipamentoId) {
         buscar(equipamentoId); // garante existência + isolamento de tenant
         return eventos.findByEquipamentoIdOrderBySequenciaAsc(equipamentoId);

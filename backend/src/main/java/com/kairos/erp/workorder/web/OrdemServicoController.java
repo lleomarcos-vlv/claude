@@ -69,4 +69,9 @@ public class OrdemServicoController {
     public OsResponse buscar(@PathVariable String id) {
         return OsResponse.of(service.buscar(id));
     }
+
+    @GetMapping
+    public java.util.List<OsResponse> listar() {
+        return service.listar().stream().map(OsResponse::of).toList();
+    }
 }

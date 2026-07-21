@@ -55,6 +55,11 @@ public class EquipamentoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(EquipamentoResponse.of(e));
     }
 
+    @GetMapping
+    public List<EquipamentoResponse> listar() {
+        return service.listar().stream().map(EquipamentoResponse::of).toList();
+    }
+
     @GetMapping("/{id}")
     public EquipamentoResponse buscar(@PathVariable String id) {
         return EquipamentoResponse.of(service.buscar(id));

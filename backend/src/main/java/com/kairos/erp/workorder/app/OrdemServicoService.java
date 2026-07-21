@@ -66,6 +66,11 @@ public class OrdemServicoService {
     }
 
     @Transactional(readOnly = true)
+    public List<OrdemServico> listar() {
+        return ordens.findByTenantIdOrderByAbertaEmDesc(TenantContext.require());
+    }
+
+    @Transactional(readOnly = true)
     public List<OrdemServicoItem> itensDa(String ordemServicoId) {
         buscar(ordemServicoId);
         return itens.findByOrdemServicoId(ordemServicoId);

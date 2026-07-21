@@ -84,11 +84,18 @@ Em caso de contradição entre documentos, **o Bible prevalece** (respeitadas as
 | 5 · Operação e Qualidade | 079–090 | ⬜ |
 | 6 · Negócio e Expansão | 091–100 | ⬜ |
 
-> **Fase 3 iniciada (21/07/2026).** Backend em Java 21/Spring Boot como monólito
-> modular (DDD). Fatia vertical entregue e **testada** (4 testes verdes): empresa
-> (tenant) → equipamento por Serial Number → item KSI → OS → baixa automática →
-> histórico vitalício. Ver `backend/` e ADRs 0001–0003. Código só avança sobre
-> arquitetura documentada (Constituição, Artigo VI.3).
+> **Fase 3 em andamento (21/07/2026).** Fatia vertical de ponta a ponta entregue,
+> **testada e executada ao vivo**:
+> - **Backend** (Java 21/Spring Boot, monólito modular DDD): empresa (tenant) →
+>   equipamento por Serial Number → item KSI → OS → baixa automática →
+>   histórico vitalício. **6 testes de integração verdes** + smoke test via HTTP
+>   (saldo 10→7, histórico REGISTRO+SERVICO). Flyway, Docker, CI. Ver `backend/`.
+> - **Frontend** (React 18 + TypeScript/Vite, doc 11): painel que consome a API
+>   (equipamentos, estoque/KSI, ordens de serviço). **Build de produção verde**.
+>   Ver `frontend/`.
+>
+> ADRs 0001–0003 registrados. Código só avança sobre arquitetura documentada
+> (Constituição, Artigo VI.3).
 
 ### Decisões novas (Fase 3)
 | # | Decisão | ADR |
