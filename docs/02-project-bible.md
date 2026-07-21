@@ -77,12 +77,25 @@ Em caso de contradição entre documentos, **o Bible prevalece** (respeitadas as
 ## 9. Estado do Roadmap (macro)
 | Fase | Etapas | Status |
 |---|---|---|
-| 1 · Descoberta e Requisitos | 001–020 | ⬜ |
-| 2 · Arquitetura e Fundações | 021–035 | ⬜ |
-| 3 · Construção do Produto | 036–060 | ⬜ |
+| 1 · Descoberta e Requisitos | 001–020 | 📗 Documentado (docs 04–06) |
+| 2 · Arquitetura e Fundações | 021–035 | 📗 Documentado (docs 07–09) |
+| 3 · Construção do Produto | 036–060 | 🟡 Em andamento — backend walking skeleton (036–041) |
 | 4 · Inteligência/Segurança/Estoque | 061–078 | ⬜ |
 | 5 · Operação e Qualidade | 079–090 | ⬜ |
 | 6 · Negócio e Expansão | 091–100 | ⬜ |
+
+> **Fase 3 iniciada (21/07/2026).** Backend em Java 21/Spring Boot como monólito
+> modular (DDD). Fatia vertical entregue e **testada** (4 testes verdes): empresa
+> (tenant) → equipamento por Serial Number → item KSI → OS → baixa automática →
+> histórico vitalício. Ver `backend/` e ADRs 0001–0003. Código só avança sobre
+> arquitetura documentada (Constituição, Artigo VI.3).
+
+### Decisões novas (Fase 3)
+| # | Decisão | ADR |
+|---|---|---|
+| D-006 | Monólito modular DDD → microsserviços sob demanda | ADR-0001 |
+| D-007 | Multi-tenancy row-level com contexto de tenant | ADR-0002 |
+| D-008 | Skeleton: Flyway + H2(dev/test)/PostgreSQL(prod); auth adiada | ADR-0003 |
 
 ## 10. Diagramas — Mapa de Contextos (DDD, visão inicial)
 ```
