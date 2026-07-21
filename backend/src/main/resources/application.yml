@@ -1,0 +1,36 @@
+# Configuração base — Drone Kairós ERP (backend)
+# Perfil padrão: H2 em modo PostgreSQL (roda em qualquer lugar, inclusive testes).
+# Perfil "postgres": banco PostgreSQL real (produção) — ver application-postgres.yml.
+spring:
+  application:
+    name: kairos-erp
+  datasource:
+    url: jdbc:h2:mem:kairos;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate        # o schema é criado pelo Flyway; o JPA apenas valida
+    open-in-view: false
+    properties:
+      hibernate.format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+kairos:
+  api:
+    tenant-header: X-Tenant-Id
