@@ -177,6 +177,20 @@
     border:2.5px solid #fff; box-shadow:0 1px 6px rgba(0,0,0,.4);
   }
 
+  /* Fonte de dados (Google Places) */
+  #cfgFonte{margin-top:9px; border:1px solid var(--line); border-radius:10px; background:#f8fafc}
+  #cfgFonte summary{cursor:pointer; padding:8px 10px; font-weight:600; font-size:12.5px; color:#334155; list-style:none; display:flex; align-items:center; gap:6px}
+  #cfgFonte summary::-webkit-details-marker{display:none}
+  #cfgFonte[open] summary{border-bottom:1px solid var(--line)}
+  #srcTag{margin-left:auto; font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px; background:#e2e8f0; color:#475569}
+  #srcTag.on{background:#dcfce7; color:#166534}
+  .cfg-body{padding:9px 10px; display:flex; flex-direction:column; gap:6px}
+  .cfg-hint{font-size:11.5px; line-height:1.45; color:#546a8a; margin:0}
+  .cfg-body input[type=password]{width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px}
+  .cfg-body a{color:#2563eb; font-size:12px; text-decoration:none}
+  .cfg-body a:hover{text-decoration:underline}
+  .links .rate{color:#b45309; font-weight:600}
+
   /* ---------- Mobile ---------- */
   @media (max-width:760px){
     #app{flex-direction:column-reverse}
@@ -212,6 +226,18 @@
       </div>
       <label class="auto"><input type="checkbox" id="autoBusca"> 🧭 Busca inteligente ao mover o mapa <span>(rastreia enquanto você navega)</span></label>
       <div id="status">Pronto. Escolha um nicho e uma área para começar.</div>
+
+      <details id="cfgFonte">
+        <summary>⚙️ Fonte de dados &amp; contatos <span id="srcTag">OpenStreetMap</span></summary>
+        <div class="cfg-body">
+          <p class="cfg-hint">Sem chave: <b>OpenStreetMap</b> (grátis). Com uma chave do <b>Google Places</b>, a busca passa a trazer telefone, site, nota e endereço de quase todos os locais.</p>
+          <label for="gkey">Chave Google Places (opcional)</label>
+          <input id="gkey" type="password" placeholder="cole aqui sua API key" autocomplete="off" spellcheck="false">
+          <label class="auto"><input type="checkbox" id="useGoogle"> Usar Google Places nas buscas por nicho</label>
+          <a href="https://console.cloud.google.com/google/maps-apis/start" target="_blank" rel="noopener">🔑 Onde gerar a chave (Google Cloud) →</a>
+          <p class="cfg-hint">A chave fica salva só neste navegador. Ative a <b>“Places API (New)”</b> no Google Cloud e restrinja a chave ao seu domínio.</p>
+        </div>
+      </details>
     </div>
 
     <nav class="tabs">
@@ -260,6 +286,8 @@ const OVERPASS = [
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
 const MAX_RESULTS = 800;
 const STORAGE_KEY = 'prospeccao.rota.v1';
+const GKEY_STORE  = 'prospeccao.gkey';
+const GPLACES     = 'https://places.googleapis.com/v1/places:searchText';
 
 /* Nichos conhecidos → tags OSM ('chave=valor' exato, 'chave~regex' parcial) */
 const PRESETS = {
@@ -490,6 +518,7 @@ function gmapsLink(lat, lng){
 
 function linksHtml(r){
   const out = [];
+  if (r.rating) out.push(`<span class="rate">⭐ ${esc(r.rating)}${r.reviews ? ` (${esc(r.reviews)})` : ''}</span>`);
   if (r.phone) out.push(`<a href="tel:${esc(r.phone)}">📞 ${esc(r.phone)}</a>`);
   const wa = r.phone && waLink(r.phone);
   if (wa) out.push(`<a href="${esc(wa)}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
@@ -501,6 +530,7 @@ function linksHtml(r){
 
 /* ================= State ================= */
 let map, cluster, routeLayer, routeLine, baseMapa, baseSat, sat = false;
+let gkey = '', useGoogle = false;
 let results = [];
 let rota = loadRota();
 let lastNiche = '';
@@ -583,8 +613,41 @@ function init(){
     }
   });
 
+  // Fonte de dados: Google Places (opcional)
+  gkey = localStorage.getItem(GKEY_STORE) || '';
+  $('#gkey').value = gkey;
+  $('#useGoogle').checked = !!gkey;
+  useGoogle = !!gkey;
+  updateSrcTag();
+  const applyKey = () => {
+    gkey = $('#gkey').value.trim();
+    localStorage.setItem(GKEY_STORE, gkey);
+    if (gkey && !$('#useGoogle').checked) $('#useGoogle').checked = true;
+    useGoogle = $('#useGoogle').checked && !!gkey;
+    updateSrcTag();
+    status(gkey ? '🔑 Chave salva — buscas por nicho usarão o Google Places (telefone, site e nota).'
+                : 'Chave removida. Usando OpenStreetMap (grátis).', 'ok');
+  };
+  $('#gkey').addEventListener('change', applyKey);
+  $('#useGoogle').addEventListener('change', () => {
+    if ($('#useGoogle').checked && !$('#gkey').value.trim()){
+      $('#useGoogle').checked = false;
+      status('Cole uma chave do Google Places primeiro.', 'err');
+      return;
+    }
+    useGoogle = $('#useGoogle').checked && !!gkey;
+    updateSrcTag();
+  });
+
   renderRota();
   setTimeout(() => { $('#hintClick').style.opacity = '0'; $('#hintClick').style.transition = 'opacity 1s'; }, 9000);
+}
+
+function updateSrcTag(){
+  const tag = $('#srcTag');
+  const on = useGoogle && !!gkey;
+  tag.textContent = on ? 'Google Places' : 'OpenStreetMap';
+  tag.classList.toggle('on', on);
 }
 
 /* Categorias rápidas — cada chip preenche o nicho e busca na vista atual */
@@ -755,8 +818,9 @@ async function fetchOverpass(query){
 }
 
 async function searchBounds(bounds, niche){
+  const usingG = useGoogle && !!gkey && !!niche;       // "Tudo da área" (sem nicho) sempre usa OSM
   const span = (bounds.getNorth() - bounds.getSouth()) * (bounds.getEast() - bounds.getWest());
-  const limit = niche ? 2.5 : 0.6;
+  const limit = usingG ? 12 : (niche ? 2.5 : 0.6);
   if (span > limit){
     status('Área grande demais para essa busca — aproxime o zoom ou indique um bairro/cidade.', 'err');
     return;
@@ -766,25 +830,94 @@ async function searchBounds(bounds, niche){
   busy = true;
   $('#btnArea').hidden = true;
   $('#btnBuscar').disabled = $('#btnTudo').disabled = true;
-  status(niche ? `Rastreando “${esc(niche)}” na área…` : 'Rastreando todos os estabelecimentos da área…', '', true);
+  const src = usingG ? 'Google Places' : 'OpenStreetMap';
+  status(niche ? `Rastreando “${esc(niche)}” na área via ${src}…` : 'Rastreando todos os estabelecimentos da área…', '', true);
 
   try {
-    const js = await fetchOverpass(buildQuery(niche, bounds));
-    results = parseElements(js);
+    if (usingG){
+      results = await searchGoogle(bounds, niche);
+    } else {
+      const js = await fetchOverpass(buildQuery(niche, bounds));
+      results = parseElements(js);
+    }
     renderResults();
     setTab('res');
     if (!results.length){
       status('Nada encontrado nessa área. Tente outro termo (ex.: “salão de beleza”) ou amplie a área.', 'err');
     } else {
       const cap = results.length >= MAX_RESULTS ? ' (limite atingido — reduza a área para ver todos)' : '';
-      status(`✅ ${results.length} estabelecimento(s) encontrados${cap}.`, 'ok');
+      const extra = usingG ? ' com dados do Google' : '';
+      status(`✅ ${results.length} estabelecimento(s) encontrados${extra}${cap}.`, 'ok');
     }
   } catch (e){
-    status('Falha ao consultar o OpenStreetMap (servidor ocupado ou área muito grande). Tente de novo em instantes.', 'err');
+    if (usingG){
+      status('Falha no Google Places: ' + esc(e.message || 'erro') + '. Verifique a chave, se a “Places API (New)” está ativa e as restrições da chave.', 'err');
+    } else {
+      status('Falha ao consultar o OpenStreetMap (servidor ocupado ou área muito grande). Tente de novo em instantes.', 'err');
+    }
   } finally {
     $('#btnBuscar').disabled = $('#btnTudo').disabled = false;
     setTimeout(() => { busy = false; }, 400); // evita o auto disparar sobre o próprio fitBounds
   }
+}
+
+/* Busca via Google Places API (New) — Text Search restrito ao retângulo visível */
+async function searchGoogle(bounds, niche){
+  const fields = [
+    'places.id','places.displayName','places.formattedAddress','places.location',
+    'places.nationalPhoneNumber','places.internationalPhoneNumber','places.websiteUri',
+    'places.rating','places.userRatingCount','places.primaryTypeDisplayName','nextPageToken'
+  ].join(',');
+  const base = {
+    textQuery: niche, languageCode: 'pt-BR', regionCode: 'BR', maxResultCount: 20,
+    locationRestriction: { rectangle: {
+      low:  { latitude: bounds.getSouth(), longitude: bounds.getWest() },
+      high: { latitude: bounds.getNorth(), longitude: bounds.getEast() }
+    }}
+  };
+  const out = [];
+  let pageToken = null, pages = 0;
+  do {
+    const payload = pageToken ? { ...base, pageToken } : base;
+    let js;
+    try {
+      const res = await fetch(GPLACES, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': gkey, 'X-Goog-FieldMask': fields },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok){
+        let msg = 'HTTP ' + res.status;
+        try { const e = await res.json(); msg = e.error?.message || msg; } catch {}
+        throw new Error(msg);
+      }
+      js = await res.json();
+    } catch (e){
+      if (pages === 0) throw e;   // erro já na 1ª página é fatal
+      break;                      // páginas seguintes: mantém o que já veio
+    }
+    for (const p of (js.places || [])){
+      const loc = p.location || {};
+      if (loc.latitude == null || loc.longitude == null) continue;
+      out.push({
+        id: 'gplace/' + (p.id || `${loc.latitude},${loc.longitude}`),
+        name: p.displayName?.text || '',
+        cat: p.primaryTypeDisplayName?.text || (niche.charAt(0).toUpperCase() + niche.slice(1)),
+        phone: p.nationalPhoneNumber || p.internationalPhoneNumber || '',
+        website: p.websiteUri || '', insta: null,
+        addr: p.formattedAddress || '', city: '',
+        rating: p.rating || null, reviews: p.userRatingCount || null,
+        lat: loc.latitude, lng: loc.longitude
+      });
+    }
+    pageToken = js.nextPageToken || null;
+    pages++;
+  } while (pageToken && pages < 3);   // até ~60 resultados por busca
+
+  const seen = new Set(), uniq = [];
+  for (const r of out){ if (seen.has(r.id)) continue; seen.add(r.id); uniq.push(r); }
+  uniq.sort((a, b) => (a.name || 'zzzz').localeCompare(b.name || 'zzzz', 'pt-BR'));
+  return uniq;
 }
 
 function parseElements(js){
@@ -883,7 +1016,7 @@ function toggleSave(r){
   else {
     rota.push({ id: r.id, name: r.name || '(Sem nome)', cat: r.cat, phone: r.phone || '',
                 website: r.website || '', insta: r.insta || '', addr: r.addr || '', city: r.city || '',
-                lat: r.lat, lng: r.lng });
+                rating: r.rating || '', reviews: r.reviews || '', lat: r.lat, lng: r.lng });
     status(`✅ “${esc(r.name || 'Local')}” salvo na rota (${rota.length} parada(s)).`, 'ok');
   }
   saveRotaStore(); renderRota();
@@ -1004,10 +1137,10 @@ function abrirRotaGmaps(){
 /* ================= Export CSV ================= */
 function exportCsv(list, prefix){
   if (!list.length){ status('Nada para exportar ainda.', 'err'); return; }
-  const cols = ['Nome','Categoria','Telefone','WhatsApp','Site','Instagram','Endereço','Cidade','Latitude','Longitude','Google Maps'];
+  const cols = ['Nome','Categoria','Telefone','WhatsApp','Site','Instagram','Nota','Avaliações','Endereço','Cidade','Latitude','Longitude','Google Maps'];
   const rows = list.map(r => [
     r.name || '(Sem nome)', r.cat, r.phone, (r.phone && waLink(r.phone)) || '',
-    r.website, r.insta || '', r.addr, r.city, r.lat, r.lng, gmapsLink(r.lat, r.lng)
+    r.website, r.insta || '', r.rating ?? '', r.reviews ?? '', r.addr, r.city, r.lat, r.lng, gmapsLink(r.lat, r.lng)
   ]);
   const csv = '﻿' + [cols, ...rows]
     .map(row => row.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'))
