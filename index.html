@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NicheData AI - Prospectador & Extrator por Nicho</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        if (window.tailwind) tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden selection:bg-brand-500 selection:text-slate-950">
+
+    <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-extrabold text-xl shadow-lg shadow-brand-500/20">
+                    ⚡
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        NicheData <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 font-semibold">AI Search Pro</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Extrator Inteligente de Dados e Leads por Qualquer Nicho</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="switchTab('niche')" id="tabBtnNiche" class="px-3.5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-slate-950 transition flex items-center gap-2 shadow-md shadow-brand-600/20">
+                    <span>⚡ Extrator por Nicho & IA</span>
+                </button>
+                <button onclick="switchTab('osc')" id="tabBtnOsc" class="px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-2">
+                    <span>🏢 Extrator Específico de OSCs (IPEA)</span>
+                </button>
+                <button onclick="openDeduplicateModal()" class="px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition hidden sm:flex items-center gap-2">
+                    <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>Deduplicar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 space-y-8">
+
+        <!-- TAB 1: BUSCA POR NICHO -->
+        <div id="tabContentNiche" class="space-y-8">
+            <!-- Search & Mining Control Panel -->
+            <section class="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-6">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                            <span>⚡ Extrator Inteligente por Nicho</span>
+                        </h2>
+                        <p class="text-sm text-slate-400 mt-1">Selecione no catálogo ou digite qualquer nicho comercial, setor público, ONGs ou serviços.</p>
+                    </div>
+                    <div id="exclusionBadge" class="hidden text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                        <span>🛡️</span> <span id="exclusionText">0 registros na lista de exclusão</span>
+                    </div>
+                </div>
+
+                <!-- Search Inputs Grid -->
+                <form id="searchForm" onsubmit="handleSearch(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <!-- Nicho Input com Seletor / Dropdown -->
+                        <div class="md:col-span-5 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label for="nicheInput" class="text-xs font-bold uppercase tracking-wider text-slate-300">Nicho / Segmento</label>
+                                <button type="button" onclick="toggleNicheCatalog()" class="text-xs text-brand-400 hover:underline font-semibold flex items-center gap-1">
+                                    <span>📚 Alternar Catálogo de Nichos</span>
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">🔍</span>
+                                <input type="text" id="nicheInput" required placeholder="Ex: Clínicas Veterinárias, Escolas de Idiomas..."
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                            </div>
+                        </div>
+
+                        <!-- Localização Input -->
+                        <div class="md:col-span-4 space-y-1.5">
+                            <label for="locationInput" class="text-xs font-bold uppercase tracking-wider text-slate-300">Localização / Cidade / UF</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">📍</span>
+                                <input type="text" id="locationInput" placeholder="Ex: São Paulo - SP, Curitiba, Brasil..."
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                            </div>
+                        </div>
+
+                        <!-- Quantidade por Lote Expandida -->
+                        <div class="md:col-span-3 space-y-1.5">
+                            <label for="limitSelect" class="text-xs font-bold uppercase tracking-wider text-slate-300">Qtd. por Busca</label>
+                            <select id="limitSelect" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                                <option value="15">15 Resultados</option>
+                                <option value="25" selected>25 Resultados</option>
+                                <option value="50">50 Resultados (Ampliado)</option>
+                                <option value="75">75 Resultados (Alta Escala)</option>
+                                <option value="100">100 Resultados (Lote Máximo)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Painel Catálogo de Nichos por Categoria -->
+                    <div id="nicheCatalogPanel" class="mt-4 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-400 flex items-center gap-1.5">
+                                ⚡ Nichos Predefinidos (Clique para Selecionar Instantaneamente)
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="nicheFilterInput" oninput="filterNichesInCatalog()" placeholder="Filtrar nichos..." class="px-2.5 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-brand-500 w-40">
+                            </div>
+                        </div>
+
+                        <div id="nicheCategoriesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto pr-1">
+                            <!-- Dynamic Niche Catalog -->
+                        </div>
+                    </div>
+
+                    <!-- Painel de Configuração da IA (Chave de API) -->
+                    <div id="apiConfigPanel" class="hidden mt-4 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-400 flex items-center gap-1.5">
+                                🔑 Busca com IA Real (Google Gemini)
+                            </span>
+                            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="text-xs text-brand-400 hover:underline font-semibold">Obter chave grátis →</a>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Para buscar dados <strong class="text-slate-200">reais e atualizados</strong> da web, cole sua chave de API gratuita do Google AI Studio abaixo.
+                            A chave é salva <strong class="text-slate-200">apenas no seu navegador</strong> (localStorage) e nunca é enviada a nenhum outro servidor.
+                            Sem chave, o botão "Buscar" roda em <strong class="text-amber-400">modo demonstração</strong> com dados de exemplo.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <label for="apiKeyInput" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Chave de API (API Key)</label>
+                                <input type="password" id="apiKeyInput" placeholder="Cole sua Google Gemini API Key aqui..."
+                                    class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label for="modelSelect" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Modelo</label>
+                                <input list="modelOptions" id="modelSelect" value="gemini-2.5-flash"
+                                    class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                                <datalist id="modelOptions">
+                                    <option value="gemini-2.5-flash"></option>
+                                    <option value="gemini-2.5-pro"></option>
+                                    <option value="gemini-2.0-flash"></option>
+                                    <option value="gemini-flash-latest"></option>
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 pt-1">
+                            <button type="button" onclick="saveApiKey()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 text-xs font-bold rounded-lg transition">Salvar Chave</button>
+                            <button type="button" onclick="clearApiKey()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition">Remover Chave</button>
+                            <span id="apiKeyStatus" class="text-xs font-medium text-slate-400"></span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800/80">
+                        <div class="flex items-center gap-3 text-xs text-slate-400">
+                            <span class="flex items-center gap-2">
+                                <span id="apiStatusDot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                                <span id="apiStatusText">Modo demonstração — configure sua chave de IA</span>
+                            </span>
+                            <button type="button" onclick="toggleApiConfig()" class="text-brand-400 hover:underline font-semibold flex items-center gap-1">
+                                <span>⚙️ Configurar Busca com IA</span>
+                            </button>
+                        </div>
+
+                        <button type="submit" id="searchBtn" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-slate-950 font-bold rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <span id="searchBtnText">Buscar e Extrair Registros</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <!-- TAB 2: EXTRATOR ESPECÍFICO DE OSCs (IPEA) -->
+        <div id="tabContentOsc" class="space-y-8 hidden">
+            <section class="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-6">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                            <span>🏢 Extrator Oficial de OSCs (Base IPEA / Mapa das OSCs)</span>
+                        </h2>
+                        <p class="text-sm text-slate-400 mt-1">Gere instantaneamente lotes de Organizações da Sociedade Civil brasileiras com CNPJ, Natureza Jurídica e UF pronta para Excel.</p>
+                    </div>
+                    <div class="text-xs bg-brand-500/10 text-brand-400 border border-brand-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                        <span>⚡</span> <span>Conexão direta com base oficial</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-1.5">
+                        <label for="oscLimit" class="text-xs font-bold uppercase tracking-wider text-slate-300">Quantidade de Registros</label>
+                        <select id="oscLimit" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500">
+                            <option value="100">100 Registros</option>
+                            <option value="500">500 Registros</option>
+                            <option value="1000" selected>1.000 Registros</option>
+                            <option value="2500">2.500 Registros (Lote Alto)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label for="oscUf" class="text-xs font-bold uppercase tracking-wider text-slate-300">Filtrar por UF (Opcional)</label>
+                        <select id="oscUf" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500">
+                            <option value="">Todas as UFs (Nacional)</option>
+                            <option value="SP">São Paulo (SP)</option>
+                            <option value="RJ">Rio de Janeiro (RJ)</option>
+                            <option value="MG">Minas Gerais (MG)</option>
+                            <option value="RS">Rio Grande do Sul (RS)</option>
+                            <option value="PR">Paraná (PR)</option>
+                            <option value="BA">Bahia (BA)</option>
+                            <option value="SC">Santa Catarina (SC)</option>
+                            <option value="GO">Goiás (GO)</option>
+                            <option value="DF">Distrito Federal (DF)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="generateOscData()" id="oscBtn" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-brand-600 hover:from-emerald-400 hover:to-brand-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+                            <span>🚀 Gerar Lote de OSCs (Amostra)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Script code box instructions -->
+                <div class="mt-6 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-400">💡 Como funciona o Extrator de OSCs</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        O botão acima gera uma <strong class="text-slate-100">amostra de demonstração</strong> para você testar o fluxo e a exportação.
+                        Para baixar a base <strong class="text-slate-100">oficial e real</strong> do Mapa das OSCs do IPEA, use o script Python do guia abaixo — ele conecta diretamente à base pública.
+                    </p>
+                    <div class="flex gap-3 pt-2">
+                        <button onclick="viewPythonScriptInfo()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition flex items-center gap-2">
+                            <span>📄 Ver Código Python / Guia Passo a Passo</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Stats & Table Header Bar -->
+        <section class="space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                <div class="flex items-center gap-6">
+                    <div>
+                        <span class="text-xs text-slate-400 font-medium">Total de Registros Extraídos</span>
+                        <h3 id="statTotal" class="text-2xl font-bold text-white">0</h3>
+                    </div>
+                    <div class="h-8 w-px bg-slate-800"></div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-medium">Com Contato / Tel</span>
+                        <h3 id="statContacts" class="text-2xl font-bold text-emerald-400">0</h3>
+                    </div>
+                    <div class="h-8 w-px bg-slate-800"></div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-medium">Com Website/Email</span>
+                        <h3 id="statWeb" class="text-2xl font-bold text-sky-400">0</h3>
+                    </div>
+                </div>
+
+                <!-- Search inside results & Table tools -->
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <input type="text" id="tableSearch" oninput="filterTable()" placeholder="Filtrar nesta lista..."
+                        class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 w-full md:w-48">
+
+                    <button onclick="clearAllData()" class="px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 rounded-xl transition shrink-0">
+                        Limpar Tudo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Table Container -->
+            <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900/90 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+                                <th class="p-4 w-12 text-center">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" class="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0 cursor-pointer">
+                                </th>
+                                <th class="p-4">#</th>
+                                <th class="p-4">Nome / Razão Social</th>
+                                <th class="p-4">Segmento / Nicho</th>
+                                <th class="p-4">Localização / Cidade</th>
+                                <th class="p-4">Telefone / WhatsApp</th>
+                                <th class="p-4">E-mail / Website</th>
+                                <th class="p-4">CNPJ / ID</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                            <!-- Rows injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table Footer -->
+                <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+                    <div id="selectionCounter">
+                        Nenhum item selecionado
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportSelected()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-lg transition" id="btnExportSel">
+                            Exportar Selecionados
+                        </button>
+                        <button onclick="copyToClipboard()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-lg transition">
+                            Copiar Tabela (Clipboard)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Export Options Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
+                <div class="text-2xl">📊</div>
+                <h4 class="font-bold text-white text-sm">Exportar para Excel (.CSV)</h4>
+                <p class="text-xs text-slate-400">Gera um arquivo CSV formatado com codificação UTF-8 e separador de ponto e vírgula (`;`), pronto para abertura direta no Microsoft Excel do Brasil.</p>
+                <button onclick="exportData('csv')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs transition">
+                    Baixar CSV
+                </button>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
+                <div class="text-2xl">⚙️</div>
+                <h4 class="font-bold text-white text-sm">Exportar para JSON</h4>
+                <p class="text-xs text-slate-400">Exporta a estrutura de dados bruta contendo todas as propriedades, ideal para integração com CRMs, APIs ou automações no N8N/Zapier.</p>
+                <button onclick="exportData('json')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition">
+                    Baixar JSON
+                </button>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
+                <div class="text-2xl">🧹</div>
+                <h4 class="font-bold text-white text-sm">Controle de Duplicados</h4>
+                <p class="text-xs text-slate-400">Carregue um arquivo CSV de prospecções anteriores. O sistema ignorará automaticamente qualquer nome, CNPJ ou Telefone repetido.</p>
+                <button onclick="openDeduplicateModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition">
+                    Gerenciar Deduplicação
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="dedupModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-5 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base">Subir Planilha para Evitar Duplicados</h3>
+                <button onclick="closeDeduplicateModal()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Selecione o arquivo CSV salvo em buscas passadas. O sistema lerá os CNPJs, telefones e nomes para garantir que seus novos downloads contenham <strong>apenas registros inéditos</strong>.
+            </p>
+            <div class="border-2 border-dashed border-slate-700 hover:border-brand-500 rounded-2xl p-6 text-center space-y-3 bg-slate-900/50 transition cursor-pointer" onclick="document.getElementById('csvFileInput').click()">
+                <div class="text-3xl text-brand-400">📁</div>
+                <p class="text-xs font-semibold text-slate-300">Clique para selecionar seu CSV anterior</p>
+                <p class="text-[10px] text-slate-500">Formato .CSV com separadores por ; ou ,</p>
+                <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+            </div>
+            <div id="dedupStatus" class="text-xs text-emerald-400 font-medium hidden"></div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeDeduplicateModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-700">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="leadDetailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-lg w-full p-6 rounded-3xl space-y-5 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 id="leadDetailTitle" class="font-bold text-white text-base">Detalhes do Registro</h3>
+                <button onclick="closeLeadModal()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <div id="leadDetailContent" class="space-y-3 text-xs text-slate-300"></div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button onclick="closeLeadModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-700">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Python Script Modal -->
+    <div id="pythonScriptModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-2xl w-full p-6 rounded-3xl space-y-4 border border-slate-700 shadow-2xl max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base">Código Python Oficial (Base IPEA)</h3>
+                <button onclick="closePythonModal()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <p class="text-xs text-slate-300">Copie o código abaixo para rodar no Google Colab ou no seu terminal Python:</p>
+            <div class="flex-1 overflow-y-auto bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-400 select-all">
+<pre id="pythonCodeText">import urllib.request
+import csv
+import io
+
+URL_FONTE = "https://mapaosc.ipea.gov.br/download/20260522_MOSC_baseDivulgacao.csv"
+ARQUIVO_SAIDA = "planilha_osc_1000_registros.csv"
+META_REGISTROS = 1000
+
+print(f"Buscando {META_REGISTROS} registros no servidor IPEA...")
+req = urllib.request.Request(URL_FONTE, headers={'User-Agent': 'Mozilla/5.0'})
+
+try:
+    with urllib.request.urlopen(req) as resp:
+        txt_stream = io.TextIOWrapper(resp, encoding='utf-8', errors='ignore')
+        reader = csv.reader(txt_stream, delimiter=';')
+        next(reader)
+
+        with open(ARQUIVO_SAIDA, mode='w', newline='', encoding='utf-8-sig') as f:
+            writer = csv.writer(f, delimiter=';')
+            writer.writerow(['CNPJ', 'RAZÃO SOCIAL', 'NATUREZA JURÍDICA', 'UF'])
+
+            count = 0
+            for row in reader:
+                if len(row) > 4:
+                    writer.writerow([row[0], row[1], row[2], row[4]])
+                    count += 1
+                    if count >= META_REGISTROS:
+                        break
+            print(f"Sucesso! {count} registros salvos em {ARQUIVO_SAIDA}")
+except Exception as e:
+    print(f"Erro ao processar: {e}")</pre>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button onclick="copyPythonCode()" class="px-4 py-2 bg-brand-600 text-slate-950 font-bold text-xs rounded-xl hover:bg-brand-500">Copiar Código</button>
+                <button onclick="closePythonModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-700">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white border border-slate-700 px-5 py-3.5 rounded-2xl shadow-2xl transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-3 z-50 text-xs font-medium max-w-sm">
+        <span id="toastIcon" class="text-brand-400 text-base shrink-0">✓</span>
+        <span id="toastMsg">Mensagem</span>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        let extractedLeads = [];
+        let excludedSet = new Set();
+        let selectedIndices = new Set();
+
+        // Chaves de armazenamento local
+        const LS_LEADS = 'niche_extracted_leads';
+        const LS_EXCLUDED = 'niche_excluded_keys';
+        const LS_API_KEY = 'niche_gemini_api_key';
+        const LS_MODEL = 'niche_gemini_model';
+
+        // ---------- Configuração da API de IA ----------
+        function getApiKey() {
+            return (localStorage.getItem(LS_API_KEY) || '').trim();
+        }
+
+        function getModel() {
+            return (localStorage.getItem(LS_MODEL) || 'gemini-2.5-flash').trim();
+        }
+
+        function saveApiKey() {
+            const keyEl = document.getElementById('apiKeyInput');
+            const modelEl = document.getElementById('modelSelect');
+            const key = (keyEl?.value || '').trim();
+            const model = (modelEl?.value || 'gemini-2.5-flash').trim();
+
+            localStorage.setItem(LS_API_KEY, key);
+            localStorage.setItem(LS_MODEL, model);
+            updateApiStatus();
+
+            if (key) {
+                showToast('Chave salva! A busca agora usa IA real do Google Gemini.', '🔑');
+            } else {
+                showToast('Nenhuma chave informada. Modo demonstração ativo.', 'ℹ️');
+            }
+        }
+
+        function clearApiKey() {
+            localStorage.removeItem(LS_API_KEY);
+            const keyEl = document.getElementById('apiKeyInput');
+            if (keyEl) keyEl.value = '';
+            updateApiStatus();
+            showToast('Chave removida. Modo demonstração ativo.', 'ℹ️');
+        }
+
+        function toggleApiConfig() {
+            const panel = document.getElementById('apiConfigPanel');
+            if (panel) panel.classList.toggle('hidden');
+        }
+
+        function updateApiStatus() {
+            const hasKey = !!getApiKey();
+            const dot = document.getElementById('apiStatusDot');
+            const text = document.getElementById('apiStatusText');
+            const status = document.getElementById('apiKeyStatus');
+
+            if (dot) {
+                dot.className = `w-2 h-2 rounded-full animate-pulse ${hasKey ? 'bg-emerald-500' : 'bg-amber-500'}`;
+            }
+            if (text) {
+                text.innerText = hasKey
+                    ? 'Busca com IA real ativada (Google Gemini)'
+                    : 'Modo demonstração — configure sua chave de IA';
+            }
+            if (status) {
+                status.innerText = hasKey
+                    ? `✓ Ativo • modelo: ${getModel()}`
+                    : 'Nenhuma chave configurada.';
+                status.className = `text-xs font-medium ${hasKey ? 'text-emerald-400' : 'text-slate-400'}`;
+            }
+        }
+
+        function switchTab(tab) {
+            const btnNiche = document.getElementById('tabBtnNiche');
+            const btnOsc = document.getElementById('tabBtnOsc');
+            const contentNiche = document.getElementById('tabContentNiche');
+            const contentOsc = document.getElementById('tabContentOsc');
+
+            if (tab === 'niche') {
+                btnNiche.className = "px-3.5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-slate-950 transition flex items-center gap-2 shadow-md shadow-brand-600/20";
+                btnOsc.className = "px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-2";
+                contentNiche.classList.remove('hidden');
+                contentOsc.classList.add('hidden');
+            } else {
+                btnOsc.className = "px-3.5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-slate-950 transition flex items-center gap-2 shadow-md shadow-brand-600/20";
+                btnNiche.className = "px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-2";
+                contentOsc.classList.remove('hidden');
+                contentNiche.classList.add('hidden');
+            }
+        }
+
+        async function generateOscData() {
+            const limit = parseInt(document.getElementById('oscLimit').value) || 1000;
+            const ufFilter = document.getElementById('oscUf').value;
+            const btn = document.getElementById('oscBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="inline-block animate-spin mr-2">⏳</span> Gerando lote de OSCs...`;
+
+            try {
+                // Amostra de demonstração para testar o fluxo e a exportação.
+                await new Promise(r => setTimeout(r, 900));
+
+                const sampleOscNames = [
+                    "Associação Comunitária de Apoio à Infância",
+                    "Instituto de Preservação Ambiental e Reflorestamento Verde",
+                    "Fundação de Apoio aos Portadores de Deficiência",
+                    "Centro de Integração Social e Cidadania",
+                    "ONG Amigos dos Animais Abandonados",
+                    "Sociedade Beneficente de Combate à Fome",
+                    "Liga Esportiva Comunitária Juvenil",
+                    "Cooperativa de Trabalho Cultural e Artístico"
+                ];
+
+                const ufCities = {
+                    SP: "São Paulo", RJ: "Rio de Janeiro", MG: "Belo Horizonte", RS: "Porto Alegre",
+                    PR: "Curitiba", BA: "Salvador", SC: "Florianópolis", GO: "Goiânia", DF: "Brasília"
+                };
+                const sampleUfs = Object.keys(ufCities);
+                let added = 0;
+
+                for (let i = 0; i < limit; i++) {
+                    const uf = ufFilter || sampleUfs[Math.floor(Math.random() * sampleUfs.length)];
+                    const cidade = ufCities[uf] || 'Cidade';
+                    const name = sampleOscNames[Math.floor(Math.random() * sampleOscNames.length)] + ` (Exemplo ${i + 1})`;
+                    const cnpj = `${pad(Math.floor(10 + Math.random() * 89), 2)}.${pad(Math.floor(100 + Math.random() * 899), 3)}.${pad(Math.floor(100 + Math.random() * 899), 3)}/0001-${pad(Math.floor(10 + Math.random() * 89), 2)}`;
+
+                    const newItem = {
+                        id: makeId(i),
+                        nome: name,
+                        segmento: "OSC / Terceiro Setor",
+                        localizacao: `${cidade} - ${uf}`,
+                        telefone: `(${Math.floor(11 + Math.random() * 88)}) 9${Math.floor(1000 + Math.random() * 8999)}-${Math.floor(1000 + Math.random() * 8999)}`,
+                        email_site: `contato@osc-exemplo${i + 1}.org.br`,
+                        cnpj: cnpj,
+                        detalhes: "Registro de DEMONSTRAÇÃO. Use o script Python do guia para obter a base oficial real do IPEA."
+                    };
+
+                    extractedLeads.unshift(newItem);
+                    added++;
+                }
+
+                saveData();
+                renderTable();
+                updateStats();
+                switchTab('niche'); // Retorna para a tabela para ver os resultados
+
+                showToast(`${added} OSCs de exemplo geradas. Para dados reais, use o script Python do guia.`, "🏢");
+            } catch (e) {
+                console.error(e);
+                showToast("Erro ao gerar registros de OSCs.", "❌");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>🚀 Gerar Lote de OSCs (Amostra)</span>`;
+            }
+        }
+
+        function viewPythonScriptInfo() {
+            document.getElementById('pythonScriptModal').classList.remove('hidden');
+        }
+
+        function closePythonModal() {
+            document.getElementById('pythonScriptModal').classList.add('hidden');
+        }
+
+        function copyPythonCode() {
+            const code = document.getElementById('pythonCodeText').innerText;
+            copyText(code);
+            showToast("Código Python copiado para a área de transferência!", "📋");
+        }
+
+        const NICHE_CATALOG = [
+            {
+                categoria: "🌱 Terceiro Setor & ONGs",
+                nichos: [
+                    "OSCs e ONGs de Proteção Animal",
+                    "OSCs Ambientais e Reflorestamento",
+                    "Organizações de Assistência Social e Combate à Fome",
+                    "Instituições de Apoio a Pessoas com Deficiência (APAEs)",
+                    "Associações Culturais e Artísticas",
+                    "Entidades Esportivas Comunitárias",
+                    "Projetos de Educação e Alfabetização Infantil"
+                ]
+            },
+            {
+                categoria: "🩺 Saúde & Bem-Estar",
+                nichos: [
+                    "Clínicas Odontológicas e Ortodontia",
+                    "Clínicas Veterinárias e Hospitais 24h",
+                    "Consultórios de Fisioterapia e Pilates",
+                    "Clínicas de Psicologia e Cuidado Mental",
+                    "Laboratórios de Análises Clínicas",
+                    "Academias de Ginástica e Crossfit",
+                    "Espaços de Estética e Harmonização"
+                ]
+            },
+            {
+                categoria: "🎓 Educação & Treinamentos",
+                nichos: [
+                    "Escolas e Academias de Dança",
+                    "Escolas de Idiomas",
+                    "Cursos Profissionalizantes e Técnicos",
+                    "Escolas Particulares Infantis e Creches",
+                    "Escolas de Música e Canto",
+                    "Centros de Treinamento Corporativo"
+                ]
+            },
+            {
+                categoria: "🏢 B2B & Serviços Profissionais",
+                nichos: [
+                    "Fornecedores de Embalagens Sustentáveis",
+                    "Escritórios de Contabilidade e BPO Financeiro",
+                    "Escritórios de Advocacia B2B",
+                    "Agências de Marketing e Tráfego Pago",
+                    "Empresas de Segurança Privada e Portaria",
+                    "Consultorias de RH e Recrutamento",
+                    "Empresas de Limpeza Conservação Urbana"
+                ]
+            },
+            {
+                categoria: "🛒 Comércio & Prestadores",
+                nichos: [
+                    "Autopeças e Oficinas Mecânicas",
+                    "Lojas de Material de Construção",
+                    "Distribuidoras de Bebidas e Alimentos",
+                    "Pet Shops e Banho e Tosa",
+                    "Restaurantes e Buffets para Eventos",
+                    "Instaladores de Ar Condicionado e HVAC"
+                ]
+            },
+            {
+                categoria: "⚡ Energia, Engenharia & TI",
+                nichos: [
+                    "Empresas de Energia Solar Fotovoltaica",
+                    "Empresas de Automação Industrial",
+                    "Desenvolvedoras de Software e Sistemas",
+                    "Construtoras e Incorporadoras Imobiliárias",
+                    "Provedores de Internet Fibra Óptica"
+                ]
+            }
+        ];
+
+        function saveData() {
+            try {
+                localStorage.setItem(LS_LEADS, JSON.stringify(extractedLeads));
+                localStorage.setItem(LS_EXCLUDED, JSON.stringify(Array.from(excludedSet)));
+            } catch(e) {
+                console.error("Erro ao salvar dados no localStorage:", e);
+            }
+        }
+
+        function loadSavedData() {
+            try {
+                const savedLeads = localStorage.getItem(LS_LEADS);
+                if (savedLeads) {
+                    extractedLeads = JSON.parse(savedLeads);
+                }
+                const savedExcluded = localStorage.getItem(LS_EXCLUDED);
+                if (savedExcluded) {
+                    const keysArr = JSON.parse(savedExcluded);
+                    excludedSet = new Set(keysArr);
+                    updateExclusionBadge();
+                }
+            } catch(e) {
+                console.error("Erro ao carregar dados do localStorage:", e);
+            }
+        }
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+            renderNicheCatalog();
+            renderTable();
+            updateStats();
+
+            // Preenche os campos de configuração da IA com valores salvos
+            const keyEl = document.getElementById('apiKeyInput');
+            const modelEl = document.getElementById('modelSelect');
+            if (keyEl) keyEl.value = getApiKey();
+            if (modelEl) modelEl.value = getModel();
+            updateApiStatus();
+        });
+
+        async function handleSearch(event) {
+            if (event) event.preventDefault();
+
+            const niche = document.getElementById('nicheInput').value.trim();
+            const location = document.getElementById('locationInput').value.trim();
+            const limit = parseInt(document.getElementById('limitSelect').value) || 25;
+
+            if (!niche) {
+                showToast("Por favor, selecione ou digite um nicho.", "⚠️");
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const usingAI = !!getApiKey();
+                const rawLeads = usingAI
+                    ? await fetchNicheLeadsViaGemini(niche, location, limit)
+                    : await generateDemoLeads(niche, location, limit);
+
+                let addedCount = 0;
+                let skippedCount = 0;
+
+                rawLeads.forEach(lead => {
+                    const cnpjKey = (lead.cnpj || '').toLowerCase().replace(/\D/g, '');
+                    const phoneKey = (lead.telefone || '').toLowerCase().replace(/\D/g, '');
+                    const nameKey = (lead.nome || '').toLowerCase().trim();
+
+                    const isExcluded = (cnpjKey && cnpjKey.length > 5 && excludedSet.has(cnpjKey)) ||
+                                       (phoneKey && phoneKey.length > 6 && excludedSet.has(phoneKey)) ||
+                                       (nameKey && excludedSet.has(nameKey));
+
+                    const isDuplicate = extractedLeads.some(existing =>
+                        (cnpjKey && cnpjKey.length > 5 && (existing.cnpj || '').replace(/\D/g, '') === cnpjKey) ||
+                        (nameKey && (existing.nome || '').toLowerCase().trim() === nameKey)
+                    );
+
+                    if (!isExcluded && !isDuplicate) {
+                        extractedLeads.unshift(lead);
+                        addedCount++;
+                    } else {
+                        skippedCount++;
+                    }
+                });
+
+                saveData();
+                renderTable();
+                updateStats();
+
+                const demoNote = usingAI ? '' : ' (modo demonstração)';
+                if (addedCount > 0) {
+                    showToast(`${addedCount} registros extraídos${demoNote}! ${skippedCount > 0 ? `(${skippedCount} duplicados ignorados)` : ''}`, "🎉");
+                } else if (skippedCount > 0) {
+                    showToast(`Busca concluída! ${skippedCount} resultados já constavam ou foram filtrados.`, "ℹ️");
+                } else {
+                    showToast("Nenhum registro retornado. Tente refinar sua busca.", "⚠️");
+                }
+            } catch (error) {
+                console.error("Erro na busca:", error);
+                showToast(error.message || "Ocorreu um erro ao buscar os dados. Tente novamente.", "❌");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Busca real usando a API do Google Gemini com Google Search (grounding).
+        async function fetchNicheLeadsViaGemini(niche, location, limit) {
+            const apiKey = getApiKey();
+            const model = getModel();
+
+            const systemPrompt = `Você é um robô prospectador e extrator de dados de mercado especialista em pesquisas B2B/B2C.
+Sua missão é pesquisar na Web dados REAIS e atualizados sobre o nicho solicitado e retornar uma lista estruturada contendo até EXATAMENTE ${limit} entidades/organizações/empresas distintas.
+
+Campos obrigatórios para cada entidade:
+- nome: Nome oficial da organização/empresa ou razão social.
+- segmento: Sub-nicho ou ramo exato.
+- localizacao: Cidade / Estado (UF).
+- telefone: Telefone ou WhatsApp de contato comercial (com DDD).
+- email_site: Website principal ou e-mail de contato.
+- cnpj_id: CNPJ (se for entidade brasileira) ou ID de cadastro público (se não houver, coloque 'Não informado').
+- detalhes: Breve resumo do que faz ou endereço simplificado.
+
+RESPONDA EXCLUSIVAMENTE EM FORMATO JSON VÁLIDO (um array), sem texto antes ou depois, no seguinte formato:
+[
+  {
+    "nome": "Exemplo Ltda",
+    "segmento": "Nicho",
+    "localizacao": "Cidade - UF",
+    "telefone": "(11) 99999-9999",
+    "email_site": "contato@exemplo.com.br",
+    "cnpj_id": "00.000.000/0001-00",
+    "detalhes": "Endereço ou resumo"
+  }
+]`;
+
+            const userQuery = `Encontre uma lista exaustiva e completa de até ${limit} entidades/empresas/organizações reais do nicho '${niche}' localizadas em '${location || 'Brasil'}'. Traga os dados mais recentes possíveis com telefone, localização (cidade/UF) e website ou email.`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: userQuery }] }],
+                tools: [{ google_search: {} }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            let response;
+            try {
+                response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (netErr) {
+                throw new Error("Falha de conexão com a API do Gemini. Verifique sua internet.");
+            }
+
+            if (!response.ok) {
+                let detail = '';
+                try {
+                    const errJson = await response.json();
+                    detail = errJson?.error?.message || '';
+                } catch (_) { /* ignore */ }
+
+                if (response.status === 400 || response.status === 403) {
+                    throw new Error(`Chave de API inválida ou sem permissão (${response.status}). Verifique sua chave em Configurar Busca com IA. ${detail}`.trim());
+                }
+                if (response.status === 404) {
+                    throw new Error(`Modelo "${model}" não encontrado (404). Escolha outro modelo em Configurar Busca com IA.`);
+                }
+                if (response.status === 429) {
+                    throw new Error("Limite de requisições atingido (429). Aguarde um instante e tente novamente.");
+                }
+                throw new Error(`Erro ${response.status} na API do Gemini. ${detail}`.trim());
+            }
+
+            const result = await response.json();
+            const candidate = result?.candidates?.[0];
+            const parts = candidate?.content?.parts || [];
+            const textOutput = parts.map(p => p.text || '').join('\n').trim();
+
+            if (!textOutput) {
+                throw new Error("A IA não retornou dados. Tente refinar o nicho ou a localização.");
+            }
+
+            const leads = parseLeadsFromText(textOutput);
+            if (leads.length === 0) {
+                throw new Error("Não foi possível interpretar a resposta da IA. Tente novamente ou reduza a quantidade.");
+            }
+            return leads;
+        }
+
+        function parseLeadsFromText(text) {
+            // Remove cercas de código markdown, se houver
+            let cleaned = String(text).replace(/```json/gi, '').replace(/```/g, '').trim();
+            const jsonMatch = cleaned.match(/\[\s*\{[\s\S]*\}\s*\]/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : cleaned;
+
+            try {
+                const parsed = JSON.parse(jsonStr);
+                if (!Array.isArray(parsed)) return [];
+                return parsed.map((item, idx) => ({
+                    id: makeId(idx),
+                    nome: item.nome || item.razao_social || 'Não informado',
+                    segmento: item.segmento || 'Geral',
+                    localizacao: item.localizacao || item.cidade || 'Brasil',
+                    telefone: item.telefone || item.whatsapp || 'Não informado',
+                    email_site: item.email_site || item.website || item.email || 'Não informado',
+                    cnpj: item.cnpj_id || item.cnpj || 'Não informado',
+                    detalhes: item.detalhes || ''
+                }));
+            } catch (e) {
+                console.warn("Falha no JSON parse da resposta da IA.", e);
+                return [];
+            }
+        }
+
+        // Gera dados de DEMONSTRAÇÃO quando não há chave de API configurada,
+        // para que o botão "Buscar" nunca fique quebrado.
+        async function generateDemoLeads(niche, location, limit) {
+            await new Promise(r => setTimeout(r, 700));
+
+            const cap = Math.min(Math.max(limit, 1), 100);
+            const loc = location || "São Paulo - SP";
+            const dominios = ["com.br", "com", "net.br", "org.br"];
+            const ddds = [11, 21, 31, 41, 47, 48, 51, 61, 62, 71, 81, 85];
+            const prefixos = ["Grupo", "Central", "Rede", "Casa", "Espaço", "Instituto", "Studio", "Prime", "Top", "Nova", "Alpha", "Master"];
+            const sufixos = ["Ltda", "ME", "EIRELI", "& Cia", "Express", "Brasil", "Premium", "Oficial"];
+
+            const baseNome = niche.replace(/\b(de|da|do|das|dos|e)\b/gi, '').trim() || "Empresa";
+            const palavras = baseNome.split(/\s+/).filter(Boolean);
+            const nucleo = palavras.slice(0, 2).join(' ') || "Negócios";
+
+            const leads = [];
+            for (let i = 0; i < cap; i++) {
+                const prefixo = prefixos[i % prefixos.length];
+                const sufixo = sufixos[Math.floor(Math.random() * sufixos.length)];
+                const nome = `${prefixo} ${nucleo} ${sufixo} ${i + 1}`;
+                const ddd = ddds[Math.floor(Math.random() * ddds.length)];
+                const slug = slugify(`${prefixo}${nucleo}${i + 1}`);
+                const dom = dominios[Math.floor(Math.random() * dominios.length)];
+
+                leads.push({
+                    id: makeId(i),
+                    nome: nome,
+                    segmento: niche,
+                    localizacao: loc,
+                    telefone: `(${ddd}) 9${pad(Math.floor(Math.random() * 9999), 4)}-${pad(Math.floor(Math.random() * 9999), 4)}`,
+                    email_site: `contato@${slug}.${dom}`,
+                    cnpj: `${pad(Math.floor(Math.random() * 99), 2)}.${pad(Math.floor(Math.random() * 999), 3)}.${pad(Math.floor(Math.random() * 999), 3)}/0001-${pad(Math.floor(Math.random() * 99), 2)}`,
+                    detalhes: `Registro de DEMONSTRAÇÃO gerado para o nicho "${niche}". Configure sua chave de API do Google Gemini para obter dados reais.`
+                });
+            }
+            return leads;
+        }
+
+        function renderNicheCatalog() {
+            const container = document.getElementById('nicheCategoriesContainer');
+            const filterTerm = (document.getElementById('nicheFilterInput')?.value || '').toLowerCase().trim();
+
+            if (!container) return;
+
+            let html = '';
+            NICHE_CATALOG.forEach(cat => {
+                const matchingNichos = cat.nichos.filter(n => !filterTerm || n.toLowerCase().includes(filterTerm) || cat.categoria.toLowerCase().includes(filterTerm));
+
+                if (matchingNichos.length > 0) {
+                    html += `
+                        <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-2">
+                            <h5 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">${escapeHtml(cat.categoria)}</h5>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${matchingNichos.map(n => `
+                                    <button type="button" onclick="selectNicheFromCatalog('${escapeAttr(n)}')"
+                                        class="text-left text-[11px] bg-slate-900 hover:bg-brand-500/20 hover:text-brand-300 border border-slate-800 hover:border-brand-500/40 text-slate-300 px-2.5 py-1 rounded-lg transition">
+                                        ${escapeHtml(n)}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html || `<p class="text-xs text-slate-500 col-span-full py-4 text-center">Nenhum nicho encontrado com o filtro inserido.</p>`;
+        }
+
+        function selectNicheFromCatalog(nicheName) {
+            document.getElementById('nicheInput').value = nicheName;
+            showToast(`Nicho selecionado: ${nicheName}`, "🎯");
+        }
+
+        function filterNichesInCatalog() {
+            renderNicheCatalog();
+        }
+
+        function toggleNicheCatalog() {
+            const panel = document.getElementById('nicheCatalogPanel');
+            if (panel) panel.classList.toggle('hidden');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('resultsTableBody');
+            const term = (document.getElementById('tableSearch')?.value || '').toLowerCase().trim();
+
+            if (!tbody) return;
+
+            const filtered = extractedLeads.filter(item => {
+                return (item.nome || '').toLowerCase().includes(term) ||
+                       (item.segmento || '').toLowerCase().includes(term) ||
+                       (item.localizacao || '').toLowerCase().includes(term) ||
+                       (item.cnpj || '').toLowerCase().includes(term) ||
+                       (item.telefone || '').toLowerCase().includes(term);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="p-12 text-center text-slate-500 space-y-3">
+                            <div class="text-4xl">🔎</div>
+                            <p class="text-sm font-medium">Nenhum registro encontrado ${term ? 'para "' + escapeHtml(term) + '"' : ''}.</p>
+                        </td>
+                    </tr>
+                `;
+                updateSelectionCounter();
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((item, idx) => {
+                const isSelected = selectedIndices.has(item.id);
+                const hasTel = item.telefone && item.telefone !== 'Não informado';
+                const hasWeb = item.email_site && item.email_site !== 'Não informado';
+
+                return `
+                    <tr class="hover:bg-slate-900/80 transition ${isSelected ? 'bg-brand-500/10' : ''}">
+                        <td class="p-4 text-center">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelect('${escapeAttr(String(item.id))}')" class="rounded border-slate-700 bg-slate-900 text-brand-500 cursor-pointer">
+                        </td>
+                        <td class="p-4 font-mono text-slate-500 text-[11px]">${idx + 1}</td>
+                        <td class="p-4 font-bold text-white max-w-xs truncate">${escapeHtml(item.nome)}</td>
+                        <td class="p-4 text-slate-300">
+                            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] font-semibold">${escapeHtml(item.segmento)}</span>
+                        </td>
+                        <td class="p-4 text-slate-300 font-medium">${escapeHtml(item.localizacao)}</td>
+                        <td class="p-4 font-mono ${hasTel ? 'text-emerald-400 font-semibold' : 'text-slate-500'}">
+                            ${escapeHtml(item.telefone)}
+                        </td>
+                        <td class="p-4 ${hasWeb ? 'text-sky-400 font-medium' : 'text-slate-500'} max-w-xs truncate">
+                            ${escapeHtml(item.email_site)}
+                        </td>
+                        <td class="p-4 font-mono text-slate-400 text-[11px]">${escapeHtml(item.cnpj)}</td>
+                        <td class="p-4 text-right whitespace-nowrap">
+                            <button onclick="viewLeadDetail('${escapeAttr(String(item.id))}')" class="px-2.5 py-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md transition">Ver</button>
+                            <button onclick="removeLead('${escapeAttr(String(item.id))}')" class="px-2 py-1 text-[11px] text-rose-400 hover:bg-rose-500/10 rounded-md transition ml-1">✕</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateSelectionCounter();
+        }
+
+        function filterTable() {
+            renderTable();
+        }
+
+        function updateStats() {
+            const elTotal = document.getElementById('statTotal');
+            const elContacts = document.getElementById('statContacts');
+            const elWeb = document.getElementById('statWeb');
+
+            if (elTotal) elTotal.innerText = extractedLeads.length;
+
+            if (elContacts) {
+                const withTel = extractedLeads.filter(l => l.telefone && l.telefone !== 'Não informado').length;
+                elContacts.innerText = withTel;
+            }
+
+            if (elWeb) {
+                const withWeb = extractedLeads.filter(l => l.email_site && l.email_site !== 'Não informado').length;
+                elWeb.innerText = withWeb;
+            }
+        }
+
+        function updateExclusionBadge() {
+            const badge = document.getElementById('exclusionBadge');
+            const text = document.getElementById('exclusionText');
+            if (badge && text) {
+                if (excludedSet.size > 0) {
+                    text.innerText = `${excludedSet.size} chaves na lista de exclusão/deduplicação`;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+
+        function toggleSelect(id) {
+            if (selectedIndices.has(id)) {
+                selectedIndices.delete(id);
+            } else {
+                selectedIndices.add(id);
+            }
+            renderTable();
+        }
+
+        function toggleSelectAll() {
+            const checkbox = document.getElementById('selectAllCheckbox');
+            if (checkbox && checkbox.checked) {
+                extractedLeads.forEach(item => selectedIndices.add(item.id));
+            } else {
+                selectedIndices.clear();
+            }
+            renderTable();
+        }
+
+        function updateSelectionCounter() {
+            const el = document.getElementById('selectionCounter');
+            if (!el) return;
+            const count = selectedIndices.size;
+            el.innerText = count === 0
+                ? "Nenhum item selecionado"
+                : `${count} de ${extractedLeads.length} itens selecionados`;
+        }
+
+        function removeLead(id) {
+            extractedLeads = extractedLeads.filter(l => String(l.id) !== String(id));
+            selectedIndices.delete(id);
+            saveData();
+            renderTable();
+            updateStats();
+            showToast("Registro removido.", "ℹ️");
+        }
+
+        function clearAllData() {
+            if (extractedLeads.length === 0) return;
+            extractedLeads = [];
+            selectedIndices.clear();
+            saveData();
+            renderTable();
+            updateStats();
+            showToast("Lista limpa com sucesso.", "🧹");
+        }
+
+        function viewLeadDetail(id) {
+            const lead = extractedLeads.find(l => String(l.id) === String(id));
+            if (!lead) return;
+
+            document.getElementById('leadDetailTitle').innerText = lead.nome;
+            document.getElementById('leadDetailContent').innerHTML = `
+                <div class="space-y-2 bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                    <p><strong class="text-slate-400">Razão Social / Nome:</strong> <span class="text-white">${escapeHtml(lead.nome)}</span></p>
+                    <p><strong class="text-slate-400">Nicho / Segmento:</strong> <span class="text-brand-400">${escapeHtml(lead.segmento)}</span></p>
+                    <p><strong class="text-slate-400">Localização:</strong> <span class="text-white">${escapeHtml(lead.localizacao)}</span></p>
+                    <p><strong class="text-slate-400">Telefone:</strong> <span class="text-emerald-400 font-mono">${escapeHtml(lead.telefone)}</span></p>
+                    <p><strong class="text-slate-400">Website / Email:</strong> <span class="text-sky-400 font-mono">${escapeHtml(lead.email_site)}</span></p>
+                    <p><strong class="text-slate-400">CNPJ / Registro:</strong> <span class="text-slate-300 font-mono">${escapeHtml(lead.cnpj)}</span></p>
+                    ${lead.detalhes ? `<p class="pt-2 border-t border-slate-800"><strong class="text-slate-400">Resumo / Notas:</strong> <br><span class="text-slate-300">${escapeHtml(lead.detalhes)}</span></p>` : ''}
+                </div>
+            `;
+            document.getElementById('leadDetailModal').classList.remove('hidden');
+        }
+
+        function closeLeadModal() {
+            document.getElementById('leadDetailModal').classList.add('hidden');
+        }
+
+        function exportData(type) {
+            if (extractedLeads.length === 0) {
+                showToast("Nenhum dado para exportar.", "⚠️");
+                return;
+            }
+
+            if (type === 'csv') {
+                let csvContent = "﻿NOME;SEGMENTO;LOCALIZACAO;TELEFONE;EMAIL_WEBSITE;CNPJ_ID;DETALHES\n";
+                extractedLeads.forEach(l => {
+                    csvContent += `"${cleanCSV(l.nome)}";"${cleanCSV(l.segmento)}";"${cleanCSV(l.localizacao)}";"${cleanCSV(l.telefone)}";"${cleanCSV(l.email_site)}";"${cleanCSV(l.cnpj)}";"${cleanCSV(l.detalhes)}"\n`;
+                });
+
+                downloadFile(csvContent, `leads_nicho_extraidos_${nowStamp()}.csv`, 'text/csv;charset=utf-8;');
+                showToast("Planilha CSV baixada com sucesso!", "📊");
+            } else if (type === 'json') {
+                const jsonStr = JSON.stringify(extractedLeads, null, 2);
+                downloadFile(jsonStr, `leads_nicho_${nowStamp()}.json`, 'application/json');
+                showToast("Arquivo JSON exportado!", "⚙️");
+            }
+        }
+
+        function exportSelected() {
+            if (selectedIndices.size === 0) {
+                showToast("Selecione pelo menos um item na tabela.", "⚠️");
+                return;
+            }
+
+            const items = extractedLeads.filter(l => selectedIndices.has(l.id));
+            let csvContent = "﻿NOME;SEGMENTO;LOCALIZACAO;TELEFONE;EMAIL_WEBSITE;CNPJ_ID;DETALHES\n";
+            items.forEach(l => {
+                csvContent += `"${cleanCSV(l.nome)}";"${cleanCSV(l.segmento)}";"${cleanCSV(l.localizacao)}";"${cleanCSV(l.telefone)}";"${cleanCSV(l.email_site)}";"${cleanCSV(l.cnpj)}";"${cleanCSV(l.detalhes)}"\n`;
+            });
+
+            downloadFile(csvContent, `leads_selecionados_${nowStamp()}.csv`, 'text/csv;charset=utf-8;');
+            showToast(`${items.length} itens selecionados exportados!`, "✓");
+        }
+
+        function copyToClipboard() {
+            if (extractedLeads.length === 0) {
+                showToast("Nenhum dado para copiar.", "⚠️");
+                return;
+            }
+            let text = "Nome\tSegmento\tLocalização\tTelefone\tEmail/Site\tCNPJ/ID\n";
+            extractedLeads.forEach(l => {
+                text += `${l.nome}\t${l.segmento}\t${l.localizacao}\t${l.telefone}\t${l.email_site}\t${l.cnpj}\n`;
+            });
+
+            copyText(text);
+            showToast("Dados copiados para a área de transferência!", "📋");
+        }
+
+        function downloadFile(content, fileName, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function openDeduplicateModal() {
+            document.getElementById('dedupModal').classList.remove('hidden');
+        }
+
+        function closeDeduplicateModal() {
+            document.getElementById('dedupModal').classList.add('hidden');
+        }
+
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = String(text).split(/\r?\n/);
+                let count = 0;
+
+                lines.forEach((line, idx) => {
+                    if (idx === 0 || !line.trim()) return;
+                    const cols = line.split(/;|,/);
+                    cols.forEach(col => {
+                        const cleanVal = col.replace(/"/g, '').trim();
+                        if (cleanVal.length > 3) {
+                            const key = cleanVal.toLowerCase().replace(/\D/g, '');
+                            if (key && key.length > 5) excludedSet.add(key);
+                            excludedSet.add(cleanVal.toLowerCase());
+                            count++;
+                        }
+                    });
+                });
+
+                saveData();
+                updateExclusionBadge();
+
+                const status = document.getElementById('dedupStatus');
+                status.innerText = `✓ Planilha lida com sucesso! ${count} identificadores adicionados à lista de exclusão.`;
+                status.classList.remove('hidden');
+
+                showToast(`Deduplicação ativada com ${count} chaves!`, "🛡️");
+            };
+            reader.readAsText(file);
+        }
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('searchBtn');
+            const txt = document.getElementById('searchBtnText');
+
+            if (!btn || !txt) return;
+
+            if (isLoading) {
+                btn.disabled = true;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+                txt.innerHTML = `<span class="inline-block animate-spin mr-2">⏳</span> Extraindo dados...`;
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                txt.innerHTML = `Buscar e Extrair Registros`;
+            }
+        }
+
+        let toastTimer = null;
+        function showToast(msg, icon = "✓") {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMsg');
+            const iconEl = document.getElementById('toastIcon');
+
+            if (!toast || !msgEl || !iconEl) return;
+
+            msgEl.innerText = msg;
+            iconEl.innerText = icon;
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3800);
+        }
+
+        // ---------- Utilitários ----------
+        let idCounter = 0;
+        function makeId(offset) {
+            // ID único e estável, sem depender só de Date.now() em laços rápidos
+            idCounter += 1;
+            return `${Date.now()}_${idCounter}_${offset || 0}`;
+        }
+
+        function nowStamp() {
+            return new Date().toISOString().replace(/[:.]/g, '-');
+        }
+
+        function pad(num, size) {
+            let s = String(Math.abs(Math.floor(num)));
+            while (s.length < size) s = '0' + s;
+            return s;
+        }
+
+        function slugify(str) {
+            return String(str)
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '')
+                .slice(0, 24) || 'empresa';
+        }
+
+        function copyText(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { document.execCommand('copy'); } catch (_) {}
+            document.body.removeChild(textarea);
+        }
+
+        function cleanCSV(str) {
+            if (!str) return '';
+            return String(str).replace(/"/g, '""').replace(/\r?\n/g, ' ');
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Escapa para uso dentro de atributos com aspas simples (onclick='...')
+        function escapeAttr(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/'/g, "&#039;")
+                .replace(/"/g, "&quot;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>
