@@ -1,0 +1,32 @@
+{
+  "name": "estacao-trabalho-prospeccao",
+  "version": "1.0.0",
+  "description": "Estação de Trabalho completa para prospecção comercial local (Electron + Express + SQLite)",
+  "author": "Estação de Trabalho",
+  "license": "MIT",
+  "main": "main.js",
+  "type": "commonjs",
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js",
+    "setup": "node scripts/postinstall.js",
+    "start": "electron .",
+    "web": "node server.js",
+    "server": "node server.js",
+    "seed": "node database/seed.js",
+    "backup": "node -e \"require('./services/backupService').criarBackup().then(f=>console.log('Backup:',f))\"",
+    "test": "node tests/run.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^2.0.1",
+    "pdfkit": "^0.15.1",
+    "sql.js": "^1.13.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^43.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

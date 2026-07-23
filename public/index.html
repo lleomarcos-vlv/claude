@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estação de Trabalho</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ===================== Sidebar ===================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <img src="/assets/logo.svg" alt="Logo" />
+        <div>
+          <div class="title" id="sbTitle">Estação</div>
+          <div class="subtitle">de Trabalho</div>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <div class="nav-item" data-view="dashboard">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-view="clientes">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Clientes Fixos</span>
+          <span class="count" id="cntClientes">0</span>
+        </div>
+        <div class="nav-item" data-view="prospeccao">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Prospectando</span>
+          <span class="count" id="cntProspeccao">0</span>
+        </div>
+        <div class="nav-item" data-view="pesquisa">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <span>Pesquisa Automática</span>
+        </div>
+        <div class="nav-item" data-view="revisao">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Revisão</span>
+          <span class="count" id="cntRevisao">0</span>
+        </div>
+        <div class="nav-item" data-view="nichos">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>Nichos</span>
+          <span class="count" id="cntNichos">0</span>
+        </div>
+        <div class="nav-item" data-view="historico">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+          <span>Histórico</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="user-box">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div>
+            <div class="name" id="userName">—</div>
+            <div class="role">Sessão ativa</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-block" id="btnSenha" style="margin-bottom:8px">Alterar senha</button>
+        <button class="btn btn-sm btn-danger btn-block" id="btnLogout">Sair</button>
+      </div>
+    </aside>
+
+    <!-- ===================== Main ===================== -->
+    <div class="main">
+      <header class="topbar">
+        <button class="btn btn-icon menu-toggle" id="menuToggle" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="spacer"></div>
+        <button class="btn btn-sm" id="btnBackup" title="Gerar backup do banco">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Backup
+        </button>
+      </header>
+
+      <main class="content" id="view">
+        <!-- As views são renderizadas aqui pelo app.js -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Contêineres globais -->
+  <div class="toasts" id="toasts"></div>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Carregando...</div>
+    <div class="progress hidden" id="loadingProgress"><span></span></div>
+  </div>
+  <div id="modalRoot"></div>
+
+  <!-- Scripts (ordem importa) -->
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/views/dashboard.js"></script>
+  <script src="/js/views/clientes.js"></script>
+  <script src="/js/views/prospeccao.js"></script>
+  <script src="/js/views/pesquisa.js"></script>
+  <script src="/js/views/revisao.js"></script>
+  <script src="/js/views/nichos.js"></script>
+  <script src="/js/views/historico.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
