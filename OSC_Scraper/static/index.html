@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OSC Scraper — Mapa das OSCs (IPEA)</title>
+  <style>
+    :root {
+      --bg: #0f172a; --panel: #1e293b; --panel2: #263449;
+      --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+      --green: #22c55e; --amber: #f59e0b; --red: #ef4444; --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+    }
+    header {
+      padding: 20px 28px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    header h1 { font-size: 20px; margin: 0; font-weight: 700; }
+    header .sub { color: var(--muted); font-size: 13px; }
+    .badge {
+      margin-left: auto; padding: 6px 14px; border-radius: 999px;
+      font-size: 13px; font-weight: 600; background: var(--panel2);
+      border: 1px solid var(--border); text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .badge.running { color: var(--green); border-color: var(--green); }
+    .badge.paused  { color: var(--amber); border-color: var(--amber); }
+    .badge.error, .badge.stopping { color: var(--red); border-color: var(--red); }
+    .badge.done    { color: var(--accent); border-color: var(--accent); }
+    main { padding: 24px 28px; max-width: 1100px; margin: 0 auto; }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    button {
+      padding: 11px 18px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--panel); color: var(--text); font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: .15s;
+    }
+    button:hover:not(:disabled) { background: var(--panel2); border-color: var(--accent); }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    button.primary { background: var(--accent); color: #06283d; border-color: var(--accent); }
+    button.danger  { border-color: var(--red); color: var(--red); }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px; margin-bottom: 24px;
+    }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px;
+    }
+    .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase;
+      letter-spacing: .05em; margin-bottom: 6px; }
+    .card .value { font-size: 26px; font-weight: 700; }
+    .card .value.small { font-size: 16px; font-weight: 600; }
+    .progress-wrap {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px; margin-bottom: 20px;
+    }
+    .bar { height: 16px; border-radius: 999px; background: var(--panel2);
+      overflow: hidden; margin: 12px 0 8px; }
+    .bar > span { display: block; height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      transition: width .4s ease; }
+    .rowinfo { display: flex; justify-content: space-between; color: var(--muted);
+      font-size: 13px; flex-wrap: wrap; gap: 8px; }
+    .export { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .export a { color: var(--accent); text-decoration: none; font-size: 13px; }
+    footer { color: var(--muted); font-size: 12px; padding: 16px 28px;
+      border-top: 1px solid var(--border); }
+    .last { font-family: ui-monospace, monospace; color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>OSC Scraper</h1>
+      <div class="sub">Mapa das Organizações da Sociedade Civil — IPEA</div>
+    </div>
+    <span id="state" class="badge">—</span>
+  </header>
+
+  <main>
+    <div class="controls">
+      <button id="btn-start" class="primary">▶ Iniciar</button>
+      <button id="btn-pause">⏸ Pausar</button>
+      <button id="btn-resume">⏵ Continuar</button>
+      <button id="btn-stop" class="danger">■ Parar</button>
+      <button id="btn-xlsx">⬇ Exportar Excel</button>
+      <button id="btn-csv">⬇ Exportar CSV</button>
+      <button id="btn-json">⬇ Exportar JSON</button>
+    </div>
+
+    <div class="grid">
+      <div class="card"><div class="label">Encontradas</div>
+        <div class="value" id="found">0</div></div>
+      <div class="card"><div class="label">Processadas</div>
+        <div class="value" id="processed">0</div></div>
+      <div class="card"><div class="label">No banco</div>
+        <div class="value" id="total">0</div></div>
+      <div class="card"><div class="label">Velocidade</div>
+        <div class="value small"><span id="speed">0</span> /min</div></div>
+      <div class="card"><div class="label">Tempo restante</div>
+        <div class="value small" id="eta">—</div></div>
+      <div class="card"><div class="label">Erros</div>
+        <div class="value small" id="errors">0</div></div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="rowinfo">
+        <span>Progresso: <strong id="percent">0%</strong></span>
+        <span>Partições: <strong id="partitions">0 / 0</strong></span>
+        <span>Decorrido: <strong id="elapsed">0s</strong></span>
+      </div>
+      <div class="bar"><span id="barfill"></span></div>
+      <div class="rowinfo">
+        <span>Partição atual: <span id="partition" class="last">—</span></span>
+        <span>Última OSC: <span id="lastosc" class="last">—</span></span>
+      </div>
+    </div>
+
+    <div class="progress-wrap export">
+      <strong>Downloads:</strong>
+      <a href="/api/download/xlsx" target="_blank">OSCs.xlsx</a>
+      <a href="/api/download/csv" target="_blank">OSCs.csv</a>
+      <a href="/api/download/json" target="_blank">OSCs.json</a>
+      <span id="msg" style="color: var(--muted); margin-left:auto;"></span>
+    </div>
+  </main>
+
+  <footer>
+    Coleta de dados públicos • salvamento incremental em SQLite • retomável.
+    Gere os arquivos com os botões de exportação a qualquer momento.
+  </footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    async function post(url) {
+      try {
+        const r = await fetch(url, { method: 'POST' });
+        return await r.json();
+      } catch (e) { flash('Erro: ' + e.message); }
+    }
+    function flash(text) {
+      $('msg').textContent = text;
+      setTimeout(() => { $('msg').textContent = ''; }, 4000);
+    }
+
+    $('btn-start').onclick  = async () => { await post('/api/start');  flash('Coleta iniciada.'); };
+    $('btn-pause').onclick  = async () => { await post('/api/pause');  };
+    $('btn-resume').onclick = async () => { await post('/api/resume'); };
+    $('btn-stop').onclick   = async () => { await post('/api/stop');   flash('Parando…'); };
+    $('btn-xlsx').onclick   = async () => { flash('Gerando Excel…'); const r = await post('/api/export?fmt=xlsx'); flash('Excel gerado (' + (r?.exported?.xlsx ?? 0) + ' linhas).'); };
+    $('btn-csv').onclick    = async () => { flash('Gerando CSV…');   const r = await post('/api/export?fmt=csv');  flash('CSV gerado (' + (r?.exported?.csv ?? 0) + ' linhas).'); };
+    $('btn-json').onclick   = async () => { flash('Gerando JSON…');  const r = await post('/api/export?fmt=json'); flash('JSON gerado (' + (r?.exported?.json ?? 0) + ' registros).'); };
+
+    function render(s) {
+      const badge = $('state');
+      badge.textContent = s.state;
+      badge.className = 'badge ' + s.state;
+      $('found').textContent = s.found ?? 0;
+      $('processed').textContent = s.processed ?? 0;
+      $('total').textContent = s.total ?? 0;
+      $('speed').textContent = s.speed_per_min ?? 0;
+      $('eta').textContent = s.eta ?? '—';
+      $('errors').textContent = s.errors ?? 0;
+      $('percent').textContent = (s.percent ?? 0) + '%';
+      $('partitions').textContent = (s.partitions_done ?? 0) + ' / ' + (s.partitions_total ?? 0);
+      $('elapsed').textContent = s.elapsed ?? '0s';
+      $('partition').textContent = s.current_partition || '—';
+      $('lastosc').textContent = s.last_osc || '—';
+      $('barfill').style.width = Math.min(100, s.percent ?? 0) + '%';
+    }
+
+    // Streaming de status (SSE) com fallback para polling.
+    function connect() {
+      try {
+        const es = new EventSource('/api/stream');
+        es.onmessage = (e) => render(JSON.parse(e.data));
+        es.onerror = () => { es.close(); setTimeout(poll, 2000); };
+      } catch (e) { poll(); }
+    }
+    async function poll() {
+      try {
+        const r = await fetch('/api/status');
+        render(await r.json());
+      } catch (e) {}
+      setTimeout(poll, 2000);
+    }
+    connect();
+  </script>
+</body>
+</html>

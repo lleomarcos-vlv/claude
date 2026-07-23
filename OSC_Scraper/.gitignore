@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Dados e saída gerados em tempo de execução
+data/*.sqlite
+data/*.sqlite-*
+data/cache/
+output/*.xlsx
+output/*.csv
+output/*.json
+logs/*.log
+
+# Preserva a estrutura de pastas
+!output/.gitkeep
+!logs/.gitkeep
+!data/.gitkeep
+
+# Sistema
+.DS_Store
+Thumbs.db
