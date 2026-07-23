@@ -243,29 +243,43 @@ const osm = (() => {
 
 /* ------------------------------------------- OSM: coleta (providers) */
 const providers = (() => {
-  const P = {
-    nominatimUrls: ['https://nominatim.openstreetmap.org/search'],
-    overpassUrls: ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'],
-    timeoutMs: 30000, delayMs: 1100, maxPadrao: 50, maxAbsoluto: 300,
-  };
+  const TIMEOUT = 30000, DELAY = 1100, MAXP = 50, MAXA = 300;
   const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-  async function fetchTimeout(url, opts = {}, ms = P.timeoutMs) {
+  async function fetchTimeout(url, opts = {}, ms = TIMEOUT) {
     const ctrl = new AbortController();
     const id = setTimeout(() => ctrl.abort(), ms);
     try { return await fetch(url, { ...opts, signal: ctrl.signal }); }
     finally { clearTimeout(id); }
   }
+  /** Servidores ativos de um tipo ('nominatim' | 'overpass'), na ordem configurada. */
+  function serversAtivos(tipo) {
+    const db = Store.get();
+    const cfg = (db && db.config && db.config.pesquisa) || {};
+    return (cfg[tipo] || []).filter((s) => s.ativo && s.url);
+  }
+  /** Monta a URL final anexando parâmetros e, se houver, a chave de API. */
+  function comChave(baseUrl, server, params) {
+    let u = baseUrl;
+    if (params) u += (u.includes('?') ? '&' : '?') + params;
+    if (server.apiKey && server.keyParam) u += (u.includes('?') ? '&' : '?') + encodeURIComponent(server.keyParam) + '=' + encodeURIComponent(server.apiKey);
+    return u;
+  }
+  async function geocodeEm(server, consulta) {
+    const url = comChave(server.url, server, 'format=json&limit=1&addressdetails=1&countrycodes=br&q=' + encodeURIComponent(consulta));
+    const resp = await fetchTimeout(url, { headers: { 'Accept-Language': 'pt-BR' } });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const dados = await resp.json();
+    if (!Array.isArray(dados) || !dados.length) throw new Error('cidade não encontrada');
+    return dados[0];
+  }
   async function geocodificarCidade(cidade, estado) {
+    const servers = serversAtivos('nominatim');
+    if (!servers.length) throw new Error('Nenhum servidor de geocodificação ativo. Abra "⚙ Servidores" e ative ou adicione um.');
     const consulta = [cidade, estado, 'Brasil'].filter(Boolean).join(', ');
     let ultimo;
-    for (const base of P.nominatimUrls) {
-      const url = `${base}?format=jsonv2&limit=1&addressdetails=1&countrycodes=br&q=${encodeURIComponent(consulta)}`;
+    for (const s of servers) {
       try {
-        const resp = await fetchTimeout(url, { headers: { 'Accept-Language': 'pt-BR' } });
-        if (!resp.ok) throw new Error(`Nominatim HTTP ${resp.status}`);
-        const dados = await resp.json();
-        if (!Array.isArray(dados) || !dados.length) throw new Error('Cidade não encontrada na base OpenStreetMap');
-        const lugar = dados[0];
+        const lugar = await geocodeEm(s, consulta);
         const bb = (lugar.boundingbox || []).map(Number);
         const bbox = [bb[0], bb[2], bb[1], bb[3]];
         let areaId;
@@ -274,23 +288,33 @@ const providers = (() => {
         return { areaId, bbox, displayName: lugar.display_name, lat: Number(lugar.lat), lon: Number(lugar.lon) };
       } catch (e) { ultimo = e; }
     }
-    throw new Error(`Não foi possível localizar a cidade "${consulta}" nas fontes abertas: ${ultimo ? ultimo.message : 'sem resposta'}`);
+    throw new Error(`Não foi possível localizar a cidade "${consulta}" nas fontes ativas: ${ultimo ? ultimo.message : 'sem resposta'}`);
+  }
+  async function overpassEm(server, ql) {
+    const url = comChave(server.url, server, '');
+    const resp = await fetchTimeout(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(ql) });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const dados = await resp.json();
+    return dados.elements || [];
   }
   async function consultarOverpass(ql) {
+    const servers = serversAtivos('overpass');
+    if (!servers.length) throw new Error('Nenhum servidor Overpass ativo. Abra "⚙ Servidores" e ative ou adicione um.');
     let ultimo;
-    for (const base of P.overpassUrls) {
-      try {
-        const resp = await fetchTimeout(base, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'data=' + encodeURIComponent(ql),
-        });
-        if (!resp.ok) throw new Error(`Overpass HTTP ${resp.status}`);
-        const dados = await resp.json();
-        return dados.elements || [];
-      } catch (e) { ultimo = e; await delay(500); }
+    for (const s of servers) {
+      try { return await overpassEm(s, ql); }
+      catch (e) { ultimo = e; await delay(500); }
     }
     throw new Error(`Servidores Overpass indisponíveis: ${ultimo ? ultimo.message : 'sem resposta'}`);
+  }
+  /** Testes de conectividade (usados no gerenciador de servidores). */
+  async function testarGeocode(server) {
+    const lugar = await geocodeEm(server, 'São Paulo, SP, Brasil');
+    return { ok: !!lugar, msg: lugar ? ('OK — ' + String(lugar.display_name || 'resposta recebida').slice(0, 60)) : 'sem resultado' };
+  }
+  async function testarOverpass(server) {
+    const els = await overpassEm(server, '[out:json][timeout:15];node["amenity"="cafe"](-23.561,-46.656,-23.55,-46.645);out 1;');
+    return { ok: true, msg: 'OK — respondeu (amostra: ' + els.length + ')' };
   }
   function extrairTelefone(t) { return t['contact:phone'] || t.phone || t['contact:mobile'] || t['contact:whatsapp'] || ''; }
   function categoriaDe(t) { return t.shop || t.amenity || t.craft || t.office || t.leisure || t.tourism || t.healthcare || ''; }
@@ -331,11 +355,11 @@ const providers = (() => {
     return lista;
   }
   async function coletar({ cidade, estado, nicho, max, demo }, nichoDef) {
-    const limite = Math.min(max || P.maxPadrao, P.maxAbsoluto);
+    const limite = Math.min(max || MAXP, MAXA);
     if (demo) return { resultados: gerarDemo(cidade, estado, nicho, limite), fonte: 'demonstracao', mensagem: 'Modo demonstração ativo — resultados de exemplo (não reais).' };
     const local = await geocodificarCidade(cidade, estado);
-    await delay(P.delayMs);
-    const timeoutSeg = Math.floor(P.timeoutMs / 1000);
+    await delay(DELAY);
+    const timeoutSeg = Math.floor(TIMEOUT / 1000);
     const def = nichoDef || { nome: nicho, termos: [nicho] };
     const ql = local.areaId ? osm.montarConsultaArea(def, local.areaId, timeoutSeg, limite * 3) : osm.montarConsultaBBox(def, local.bbox, timeoutSeg, limite * 3);
     const elementos = await consultarOverpass(ql);
@@ -343,7 +367,7 @@ const providers = (() => {
     const mapeados = elementos.map((el) => mapear(el, ctx)).filter(Boolean);
     return { resultados: mapeados, fonte: 'openstreetmap', mensagem: `Coletados ${mapeados.length} registros no OpenStreetMap (${local.displayName}).` };
   }
-  return { coletar, gerarDemo };
+  return { coletar, gerarDemo, testarGeocode, testarOverpass };
 })();
 
 /* -------------------------------------------- Camada de dados (localStorage) */
@@ -351,6 +375,21 @@ const Store = (() => {
   const KEY = 'estacaoTrabalhoDB_v1';
   let db = null;
   function seedNichos() { return (window.__NICHOS__ || []).map((n, i) => ({ id: i + 1, nome: n.nome, categoria: n.categoria, termos: n.termos || [], osm: n.osm || [] })); }
+  function configPadrao() {
+    return {
+      pesquisa: {
+        seq: 100,
+        nominatim: [
+          { id: 1, nome: 'OpenStreetMap (Nominatim)', url: 'https://nominatim.openstreetmap.org/search', keyParam: '', apiKey: '', ativo: true, builtin: true },
+        ],
+        overpass: [
+          { id: 1, nome: 'overpass-api.de (oficial)', url: 'https://overpass-api.de/api/interpreter', keyParam: '', apiKey: '', ativo: true, builtin: true },
+          { id: 2, nome: 'kumi.systems', url: 'https://overpass.kumi.systems/api/interpreter', keyParam: '', apiKey: '', ativo: true, builtin: true },
+          { id: 3, nome: 'private.coffee', url: 'https://overpass.private.coffee/api/interpreter', keyParam: '', apiKey: '', ativo: true, builtin: true },
+        ],
+      },
+    };
+  }
   function novoDB() {
     return {
       versao: 1,
@@ -358,13 +397,14 @@ const Store = (() => {
       logado: false,
       seq: { clientes: 0, prospeccao: 0, pesquisas: 0, resultados: 0, historico: 0 },
       clientes: [], prospeccao: [], pesquisas: [], resultados: [],
-      nichos: seedNichos(), historico: [],
+      nichos: seedNichos(), historico: [], config: configPadrao(),
     };
   }
   function carregar() {
     try { const raw = localStorage.getItem(KEY); if (raw) db = JSON.parse(raw); } catch (_) { db = null; }
     if (!db || !db.seq || !db.usuario) { db = novoDB(); salvar(); }
     if (!db.nichos || !db.nichos.length) { db.nichos = seedNichos(); salvar(); }
+    if (!db.config || !db.config.pesquisa || !db.config.pesquisa.overpass) { db.config = configPadrao(); salvar(); }
     return db;
   }
   function salvar() {
@@ -381,6 +421,50 @@ const Store = (() => {
     return db;
   }
   return { carregar, salvar, get: () => db, novoDB, exportarJSON, importarJSON };
+})();
+
+/* ------------------------------------------- Config: servidores de pesquisa */
+const Config = (() => {
+  function pes() { return Store.get().config.pesquisa; }
+  function listar(tipo) { return (pes()[tipo] || []).slice(); }
+  function adicionar(tipo, dados) {
+    const c = pes();
+    if (!c[tipo]) c[tipo] = [];
+    const id = ++c.seq;
+    c[tipo].push({ id, nome: (dados.nome || '').trim() || ('Servidor ' + id), url: (dados.url || '').trim(), keyParam: (dados.keyParam || '').trim(), apiKey: (dados.apiKey || '').trim(), ativo: true, builtin: false });
+    Store.salvar();
+    return id;
+  }
+  function atualizar(tipo, id, dados) {
+    const s = (pes()[tipo] || []).find((x) => x.id === Number(id));
+    if (!s) return { ok: false, erro: 'Servidor não encontrado.' };
+    if (dados.nome !== undefined) s.nome = String(dados.nome).trim() || s.nome;
+    if (dados.url !== undefined && !s.builtin) s.url = String(dados.url).trim();
+    if (dados.keyParam !== undefined) s.keyParam = String(dados.keyParam).trim();
+    if (dados.apiKey !== undefined) s.apiKey = String(dados.apiKey).trim();
+    Store.salvar();
+    return { ok: true };
+  }
+  function remover(tipo, id) {
+    const c = pes();
+    const s = (c[tipo] || []).find((x) => x.id === Number(id));
+    if (!s) return { ok: false, erro: 'Servidor não encontrado.' };
+    if (s.builtin) return { ok: false, erro: 'Servidores padrão não podem ser removidos — apenas desativados.' };
+    c[tipo] = c[tipo].filter((x) => x.id !== Number(id));
+    Store.salvar();
+    return { ok: true };
+  }
+  function toggle(tipo, id, ativo) {
+    const s = (pes()[tipo] || []).find((x) => x.id === Number(id));
+    if (s) { s.ativo = !!ativo; Store.salvar(); }
+  }
+  async function testar(tipo, server) {
+    try {
+      const r = tipo === 'nominatim' ? await providers.testarGeocode(server) : await providers.testarOverpass(server);
+      return { ok: true, msg: r.msg };
+    } catch (e) { return { ok: false, msg: e.message || 'falhou' }; }
+  }
+  return { listar, adicionar, atualizar, remover, toggle, testar };
 })();
 
 /* ---------------------------------------------------------------- Histórico */

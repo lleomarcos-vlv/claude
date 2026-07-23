@@ -26,7 +26,8 @@ o arquivo, tudo continua lá.
 - **Prospectando** — funil com status, probabilidade de fechamento, filtros e “mover para Clientes”.
 - **Pesquisa Automática** — coleta empresas em fontes públicas e gratuitas
   (OpenStreetMap: Nominatim + Overpass). Requer internet; há um **Modo
-  demonstração** para testar offline.
+  demonstração** para testar offline. Em **⚙ Servidores** você pode **adicionar
+  seus próprios servidores e uma chave de API** (ver abaixo).
 - **Revisão** — revisar, mover em lote para prospecção, descartar ou excluir resultados.
 - **Nichos** — base pesquisável com **272 nichos** prontos, organizados por categoria.
 - **Histórico** — auditoria de logins, importações, exclusões, alterações e pesquisas.
@@ -44,6 +45,26 @@ o arquivo, tudo continua lá.
 - **Exportar**: botões **Excel**, **CSV** e **PDF** geram o arquivo na hora.
   O Excel é um `.xlsx` real; o PDF usa a janela de impressão (escolha
   “Salvar como PDF”).
+
+### Servidores de pesquisa (com chave de API)
+
+Na tela **Pesquisa Automática**, o botão **⚙ Servidores** abre um gerenciador onde você pode:
+
+- **Geocodificação** (encontrar a cidade): além do OpenStreetMap padrão, adicionar
+  serviços **compatíveis com Nominatim** — inclui um atalho para o **LocationIQ**
+  (mais estável, com limites maiores), bastando colar sua **API key**.
+- **Overpass** (buscar as empresas): já vêm **3 servidores públicos globais**
+  (overpass-api.de, kumi.systems, private.coffee). Você pode adicionar outros
+  (públicos ou privados) e, se o seu exigir, uma **chave de API**.
+
+Cada servidor pode ser **ativado/desativado**, **testado** (botão *Testar*),
+**editado** ou **removido**. A pesquisa tenta os servidores **ativos na ordem**,
+de cima para baixo, até um responder — então adicionar mais servidores aumenta a
+taxa de sucesso. Tudo fica salvo no navegador.
+
+> Como a chave é enviada: para cada servidor você informa o **parâmetro** (ex.:
+> `key` no LocationIQ, ou `token` num Overpass privado) e a **chave**; o sistema
+> anexa `&parâmetro=chave` à URL da requisição.
 
 ### Backup e restauração
 

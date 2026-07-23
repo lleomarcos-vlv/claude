@@ -1292,29 +1292,43 @@ const osm = (() => {
 
 /* ------------------------------------------- OSM: coleta (providers) */
 const providers = (() => {
-  const P = {
-    nominatimUrls: ['https://nominatim.openstreetmap.org/search'],
-    overpassUrls: ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'],
-    timeoutMs: 30000, delayMs: 1100, maxPadrao: 50, maxAbsoluto: 300,
-  };
+  const TIMEOUT = 30000, DELAY = 1100, MAXP = 50, MAXA = 300;
   const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-  async function fetchTimeout(url, opts = {}, ms = P.timeoutMs) {
+  async function fetchTimeout(url, opts = {}, ms = TIMEOUT) {
     const ctrl = new AbortController();
     const id = setTimeout(() => ctrl.abort(), ms);
     try { return await fetch(url, { ...opts, signal: ctrl.signal }); }
     finally { clearTimeout(id); }
   }
+  /** Servidores ativos de um tipo ('nominatim' | 'overpass'), na ordem configurada. */
+  function serversAtivos(tipo) {
+    const db = Store.get();
+    const cfg = (db && db.config && db.config.pesquisa) || {};
+    return (cfg[tipo] || []).filter((s) => s.ativo && s.url);
+  }
+  /** Monta a URL final anexando parâmetros e, se houver, a chave de API. */
+  function comChave(baseUrl, server, params) {
+    let u = baseUrl;
+    if (params) u += (u.includes('?') ? '&' : '?') + params;
+    if (server.apiKey && server.keyParam) u += (u.includes('?') ? '&' : '?') + encodeURIComponent(server.keyParam) + '=' + encodeURIComponent(server.apiKey);
+    return u;
+  }
+  async function geocodeEm(server, consulta) {
+    const url = comChave(server.url, server, 'format=json&limit=1&addressdetails=1&countrycodes=br&q=' + encodeURIComponent(consulta));
+    const resp = await fetchTimeout(url, { headers: { 'Accept-Language': 'pt-BR' } });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const dados = await resp.json();
+    if (!Array.isArray(dados) || !dados.length) throw new Error('cidade não encontrada');
+    return dados[0];
+  }
   async function geocodificarCidade(cidade, estado) {
+    const servers = serversAtivos('nominatim');
+    if (!servers.length) throw new Error('Nenhum servidor de geocodificação ativo. Abra "⚙ Servidores" e ative ou adicione um.');
     const consulta = [cidade, estado, 'Brasil'].filter(Boolean).join(', ');
     let ultimo;
-    for (const base of P.nominatimUrls) {
-      const url = `${base}?format=jsonv2&limit=1&addressdetails=1&countrycodes=br&q=${encodeURIComponent(consulta)}`;
+    for (const s of servers) {
       try {
-        const resp = await fetchTimeout(url, { headers: { 'Accept-Language': 'pt-BR' } });
-        if (!resp.ok) throw new Error(`Nominatim HTTP ${resp.status}`);
-        const dados = await resp.json();
-        if (!Array.isArray(dados) || !dados.length) throw new Error('Cidade não encontrada na base OpenStreetMap');
-        const lugar = dados[0];
+        const lugar = await geocodeEm(s, consulta);
         const bb = (lugar.boundingbox || []).map(Number);
         const bbox = [bb[0], bb[2], bb[1], bb[3]];
         let areaId;
@@ -1323,23 +1337,33 @@ const providers = (() => {
         return { areaId, bbox, displayName: lugar.display_name, lat: Number(lugar.lat), lon: Number(lugar.lon) };
       } catch (e) { ultimo = e; }
     }
-    throw new Error(`Não foi possível localizar a cidade "${consulta}" nas fontes abertas: ${ultimo ? ultimo.message : 'sem resposta'}`);
+    throw new Error(`Não foi possível localizar a cidade "${consulta}" nas fontes ativas: ${ultimo ? ultimo.message : 'sem resposta'}`);
+  }
+  async function overpassEm(server, ql) {
+    const url = comChave(server.url, server, '');
+    const resp = await fetchTimeout(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(ql) });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const dados = await resp.json();
+    return dados.elements || [];
   }
   async function consultarOverpass(ql) {
+    const servers = serversAtivos('overpass');
+    if (!servers.length) throw new Error('Nenhum servidor Overpass ativo. Abra "⚙ Servidores" e ative ou adicione um.');
     let ultimo;
-    for (const base of P.overpassUrls) {
-      try {
-        const resp = await fetchTimeout(base, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'data=' + encodeURIComponent(ql),
-        });
-        if (!resp.ok) throw new Error(`Overpass HTTP ${resp.status}`);
-        const dados = await resp.json();
-        return dados.elements || [];
-      } catch (e) { ultimo = e; await delay(500); }
+    for (const s of servers) {
+      try { return await overpassEm(s, ql); }
+      catch (e) { ultimo = e; await delay(500); }
     }
     throw new Error(`Servidores Overpass indisponíveis: ${ultimo ? ultimo.message : 'sem resposta'}`);
+  }
+  /** Testes de conectividade (usados no gerenciador de servidores). */
+  async function testarGeocode(server) {
+    const lugar = await geocodeEm(server, 'São Paulo, SP, Brasil');
+    return { ok: !!lugar, msg: lugar ? ('OK — ' + String(lugar.display_name || 'resposta recebida').slice(0, 60)) : 'sem resultado' };
+  }
+  async function testarOverpass(server) {
+    const els = await overpassEm(server, '[out:json][timeout:15];node["amenity"="cafe"](-23.561,-46.656,-23.55,-46.645);out 1;');
+    return { ok: true, msg: 'OK — respondeu (amostra: ' + els.length + ')' };
   }
   function extrairTelefone(t) { return t['contact:phone'] || t.phone || t['contact:mobile'] || t['contact:whatsapp'] || ''; }
   function categoriaDe(t) { return t.shop || t.amenity || t.craft || t.office || t.leisure || t.tourism || t.healthcare || ''; }
@@ -1380,11 +1404,11 @@ const providers = (() => {
     return lista;
   }
   async function coletar({ cidade, estado, nicho, max, demo }, nichoDef) {
-    const limite = Math.min(max || P.maxPadrao, P.maxAbsoluto);
+    const limite = Math.min(max || MAXP, MAXA);
     if (demo) return { resultados: gerarDemo(cidade, estado, nicho, limite), fonte: 'demonstracao', mensagem: 'Modo demonstração ativo — resultados de exemplo (não reais).' };
     const local = await geocodificarCidade(cidade, estado);
-    await delay(P.delayMs);
-    const timeoutSeg = Math.floor(P.timeoutMs / 1000);
+    await delay(DELAY);
+    const timeoutSeg = Math.floor(TIMEOUT / 1000);
     const def = nichoDef || { nome: nicho, termos: [nicho] };
     const ql = local.areaId ? osm.montarConsultaArea(def, local.areaId, timeoutSeg, limite * 3) : osm.montarConsultaBBox(def, local.bbox, timeoutSeg, limite * 3);
     const elementos = await consultarOverpass(ql);
@@ -1392,7 +1416,7 @@ const providers = (() => {
     const mapeados = elementos.map((el) => mapear(el, ctx)).filter(Boolean);
     return { resultados: mapeados, fonte: 'openstreetmap', mensagem: `Coletados ${mapeados.length} registros no OpenStreetMap (${local.displayName}).` };
   }
-  return { coletar, gerarDemo };
+  return { coletar, gerarDemo, testarGeocode, testarOverpass };
 })();
 
 /* -------------------------------------------- Camada de dados (localStorage) */
@@ -1400,6 +1424,21 @@ const Store = (() => {
   const KEY = 'estacaoTrabalhoDB_v1';
   let db = null;
   function seedNichos() { return (window.__NICHOS__ || []).map((n, i) => ({ id: i + 1, nome: n.nome, categoria: n.categoria, termos: n.termos || [], osm: n.osm || [] })); }
+  function configPadrao() {
+    return {
+      pesquisa: {
+        seq: 100,
+        nominatim: [
+          { id: 1, nome: 'OpenStreetMap (Nominatim)', url: 'https://nominatim.openstreetmap.org/search', keyParam: '', apiKey: '', ativo: true, builtin: true },
+        ],
+        overpass: [
+          { id: 1, nome: 'overpass-api.de (oficial)', url: 'https://overpass-api.de/api/interpreter', keyParam: '', apiKey: '', ativo: true, builtin: true },
+          { id: 2, nome: 'kumi.systems', url: 'https://overpass.kumi.systems/api/interpreter', keyParam: '', apiKey: '', ativo: true, builtin: true },
+          { id: 3, nome: 'private.coffee', url: 'https://overpass.private.coffee/api/interpreter', keyParam: '', apiKey: '', ativo: true, builtin: true },
+        ],
+      },
+    };
+  }
   function novoDB() {
     return {
       versao: 1,
@@ -1407,13 +1446,14 @@ const Store = (() => {
       logado: false,
       seq: { clientes: 0, prospeccao: 0, pesquisas: 0, resultados: 0, historico: 0 },
       clientes: [], prospeccao: [], pesquisas: [], resultados: [],
-      nichos: seedNichos(), historico: [],
+      nichos: seedNichos(), historico: [], config: configPadrao(),
     };
   }
   function carregar() {
     try { const raw = localStorage.getItem(KEY); if (raw) db = JSON.parse(raw); } catch (_) { db = null; }
     if (!db || !db.seq || !db.usuario) { db = novoDB(); salvar(); }
     if (!db.nichos || !db.nichos.length) { db.nichos = seedNichos(); salvar(); }
+    if (!db.config || !db.config.pesquisa || !db.config.pesquisa.overpass) { db.config = configPadrao(); salvar(); }
     return db;
   }
   function salvar() {
@@ -1430,6 +1470,50 @@ const Store = (() => {
     return db;
   }
   return { carregar, salvar, get: () => db, novoDB, exportarJSON, importarJSON };
+})();
+
+/* ------------------------------------------- Config: servidores de pesquisa */
+const Config = (() => {
+  function pes() { return Store.get().config.pesquisa; }
+  function listar(tipo) { return (pes()[tipo] || []).slice(); }
+  function adicionar(tipo, dados) {
+    const c = pes();
+    if (!c[tipo]) c[tipo] = [];
+    const id = ++c.seq;
+    c[tipo].push({ id, nome: (dados.nome || '').trim() || ('Servidor ' + id), url: (dados.url || '').trim(), keyParam: (dados.keyParam || '').trim(), apiKey: (dados.apiKey || '').trim(), ativo: true, builtin: false });
+    Store.salvar();
+    return id;
+  }
+  function atualizar(tipo, id, dados) {
+    const s = (pes()[tipo] || []).find((x) => x.id === Number(id));
+    if (!s) return { ok: false, erro: 'Servidor não encontrado.' };
+    if (dados.nome !== undefined) s.nome = String(dados.nome).trim() || s.nome;
+    if (dados.url !== undefined && !s.builtin) s.url = String(dados.url).trim();
+    if (dados.keyParam !== undefined) s.keyParam = String(dados.keyParam).trim();
+    if (dados.apiKey !== undefined) s.apiKey = String(dados.apiKey).trim();
+    Store.salvar();
+    return { ok: true };
+  }
+  function remover(tipo, id) {
+    const c = pes();
+    const s = (c[tipo] || []).find((x) => x.id === Number(id));
+    if (!s) return { ok: false, erro: 'Servidor não encontrado.' };
+    if (s.builtin) return { ok: false, erro: 'Servidores padrão não podem ser removidos — apenas desativados.' };
+    c[tipo] = c[tipo].filter((x) => x.id !== Number(id));
+    Store.salvar();
+    return { ok: true };
+  }
+  function toggle(tipo, id, ativo) {
+    const s = (pes()[tipo] || []).find((x) => x.id === Number(id));
+    if (s) { s.ativo = !!ativo; Store.salvar(); }
+  }
+  async function testar(tipo, server) {
+    try {
+      const r = tipo === 'nominatim' ? await providers.testarGeocode(server) : await providers.testarOverpass(server);
+      return { ok: true, msg: r.msg };
+    } catch (e) { return { ok: false, msg: e.message || 'falhou' }; }
+  }
+  return { listar, adicionar, atualizar, remover, toggle, testar };
 })();
 
 /* ---------------------------------------------------------------- Histórico */
@@ -2385,9 +2469,9 @@ window.Views.pesquisa = (() => {
   async function render(el) {
     container = el;
     const pre = sessionStorage.getItem('nichoPreselecionado') || '';
-    el.innerHTML = `<div class="alert alert-info"><strong>Fontes gratuitas e abertas.</strong> A pesquisa utiliza o <strong>OpenStreetMap</strong> (Nominatim + Overpass API) — dados públicos, gratuitos e legais. Requer conexão com a internet. Se estiver offline, marque <strong>Modo demonstração</strong> para testar o fluxo com dados de exemplo.</div>
+    el.innerHTML = `<div class="alert alert-info"><strong>Fontes gratuitas e abertas.</strong> A pesquisa utiliza o <strong>OpenStreetMap</strong> (Nominatim + Overpass API) — dados públicos, gratuitos e legais. Requer conexão com a internet. Você pode adicionar mais servidores (e até uma <strong>chave de API</strong>, como o LocationIQ) no botão <strong>⚙ Servidores</strong>. Sem internet, marque <strong>Modo demonstração</strong>.</div>
       <div class="grid-2">
-        <div class="panel"><div class="panel-head"><h3>Nova Pesquisa</h3></div><div class="panel-body"><form id="formPesquisa">
+        <div class="panel"><div class="panel-head"><h3>Nova Pesquisa</h3><div class="spacer"></div><button type="button" class="btn btn-sm" id="btnServidores">⚙ Servidores</button></div><div class="panel-body"><form id="formPesquisa">
           <div class="field"><label>Cidade *</label><input type="text" id="qCidade" placeholder="Ex.: Serra Azul" required /></div>
           <div class="grid-2"><div class="field"><label>Estado (UF)</label><select id="qEstado"><option value="">—</option>${UFS.map((u) => `<option>${u}</option>`).join('')}</select></div>
             <div class="field"><label>Quantidade máxima</label><input type="number" id="qMax" value="50" min="1" max="300" /></div></div>
@@ -2401,6 +2485,7 @@ window.Views.pesquisa = (() => {
     carregarSugestoes('');
     el.querySelector('#qNicho').addEventListener('input', UI.debounce((e) => carregarSugestoes(e.target.value.trim()), 300));
     el.querySelector('#formPesquisa').addEventListener('submit', executar);
+    el.querySelector('#btnServidores').addEventListener('click', abrirServidores);
   }
   async function carregarSugestoes(termo) {
     const box = container.querySelector('#nichoSug');
@@ -2580,6 +2665,100 @@ window.Views.historico = (() => {
   return { render };
 })();
 
+/* ------------------------------------------- Servidores de pesquisa (modal) */
+function abrirServidores() {
+  const { overlay } = UI.abrirModal({ titulo: 'Servidores de pesquisa', tamanho: 'lg', corpo: '<div id="srvBody"></div>' });
+  const body = overlay.querySelector('#srvBody');
+  const AJUDA = {
+    nominatim: 'Encontram a cidade (geocodificação). O padrão é o OpenStreetMap. Você pode adicionar um serviço <strong>compatível com Nominatim</strong> e com <strong>chave de API</strong> — por exemplo o <strong>LocationIQ</strong> (mais estável, com limites maiores).',
+    overpass: 'Buscam as empresas do nicho. Já vêm 3 servidores públicos globais. Adicione outros (públicos ou privados) e, se o seu exigir, uma <strong>chave de API</strong>.<br><span class="small muted">Sugestões públicas: overpass.kumi.systems · overpass.private.coffee · maps.mail.ru/osm/tools/overpass/api/interpreter · overpass.osm.jp/api/interpreter</span>',
+  };
+  function linha(tipo, s) {
+    const chave = s.apiKey ? ' <span class="badge" title="Chave de API configurada">🔑 chave</span>' : '';
+    return `<div class="srv-row" data-id="${s.id}" data-tipo="${tipo}" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" class="srvAtivo" ${s.ativo ? 'checked' : ''} title="Ativo" style="width:auto" />
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600">${UI.esc(s.nome)}${chave} ${s.builtin ? '<span class="small muted">(padrão)</span>' : ''}</div>
+        <div class="small muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${UI.esc(s.url)}</div>
+        <div class="small srvResult" style="min-height:14px"></div>
+      </div>
+      <button class="btn btn-sm srvTestar" type="button">Testar</button>
+      <button class="btn btn-sm srvEditar" type="button">Editar</button>
+      ${s.builtin ? '' : '<button class="btn btn-sm btn-danger srvRemover" type="button">Remover</button>'}
+    </div>`;
+  }
+  function secao(tipo, titulo) {
+    const itens = Config.listar(tipo).map((s) => linha(tipo, s)).join('') || '<div class="small muted">Nenhum servidor.</div>';
+    const preset = tipo === 'nominatim' ? '<button class="btn btn-sm" type="button" data-preset="locationiq">+ LocationIQ (com chave)</button>' : '';
+    return `<div class="panel" style="margin-bottom:14px"><div class="panel-head"><h3>${titulo}</h3></div><div class="panel-body">
+      <p class="small muted" style="margin-top:0">${AJUDA[tipo]}</p>
+      <div class="srvLista" data-tipo="${tipo}">${itens}</div>
+      <div class="flex gap mt" style="flex-wrap:wrap;align-items:flex-end">
+        <div class="field" style="flex:1;min-width:140px;margin:0"><label>Nome</label><input type="text" class="addNome" placeholder="Ex.: Meu servidor" /></div>
+        <div class="field" style="flex:2;min-width:220px;margin:0"><label>URL do servidor</label><input type="text" class="addUrl" placeholder="https://..." /></div>
+        <div class="field" style="width:120px;margin:0"><label>Parâm. da chave</label><input type="text" class="addKeyParam" placeholder="key" /></div>
+        <div class="field" style="flex:1;min-width:140px;margin:0"><label>Chave de API</label><input type="text" class="addKey" placeholder="(opcional)" /></div>
+        <button class="btn btn-primary addBtn" type="button" data-tipo="${tipo}">Adicionar</button>
+        ${preset}
+      </div></div></div>`;
+  }
+  function render() {
+    body.innerHTML = `<p class="small muted" style="margin-top:0">A pesquisa tenta os servidores <strong>ativos</strong> na ordem (de cima para baixo) até um responder. Tudo fica salvo neste navegador.</p>
+      ${secao('nominatim', 'Geocodificação (encontrar a cidade)')}
+      ${secao('overpass', 'Overpass (buscar as empresas)')}`;
+    wire();
+  }
+  function wire() {
+    body.querySelectorAll('.srv-row').forEach((row) => {
+      const tipo = row.dataset.tipo, id = Number(row.dataset.id);
+      row.querySelector('.srvAtivo').addEventListener('change', (e) => Config.toggle(tipo, id, e.target.checked));
+      const rem = row.querySelector('.srvRemover');
+      if (rem) rem.addEventListener('click', () => { const r = Config.remover(tipo, id); if (!r.ok) UI.toast(r.erro, 'error'); render(); });
+      row.querySelector('.srvEditar').addEventListener('click', async () => {
+        const s = Config.listar(tipo).find((x) => x.id === id);
+        const dados = await UI.formModal({ titulo: 'Editar servidor', tamanho: '', okLabel: 'Salvar', valores: s, campos: [
+          { name: 'nome', label: 'Nome', type: 'text', full: true },
+          { name: 'url', label: 'URL' + (s.builtin ? ' (padrão — não editável)' : ''), type: 'text', full: true },
+          { name: 'keyParam', label: 'Parâmetro da chave (ex.: key)', type: 'text' },
+          { name: 'apiKey', label: 'Chave de API', type: 'text' },
+        ] });
+        if (!dados) return;
+        Config.atualizar(tipo, id, dados);
+        UI.toast('Servidor atualizado.', 'success');
+        render();
+      });
+      row.querySelector('.srvTestar').addEventListener('click', async () => {
+        const s = Config.listar(tipo).find((x) => x.id === id);
+        const out = row.querySelector('.srvResult');
+        out.textContent = 'Testando...'; out.style.color = 'var(--text-mute)';
+        const r = await Config.testar(tipo, s);
+        out.textContent = (r.ok ? '✓ ' : '✗ ') + r.msg;
+        out.style.color = r.ok ? 'var(--success)' : 'var(--danger)';
+      });
+    });
+    body.querySelectorAll('.addBtn').forEach((btn) => btn.addEventListener('click', () => {
+      const tipo = btn.dataset.tipo, cont = btn.closest('.panel-body');
+      const url = cont.querySelector('.addUrl').value.trim();
+      if (!url) { UI.toast('Informe a URL do servidor.', 'warning'); return; }
+      Config.adicionar(tipo, { nome: cont.querySelector('.addNome').value, url, keyParam: cont.querySelector('.addKeyParam').value, apiKey: cont.querySelector('.addKey').value });
+      UI.toast('Servidor adicionado.', 'success');
+      render();
+    }));
+    const preset = body.querySelector('[data-preset="locationiq"]');
+    if (preset) preset.addEventListener('click', async () => {
+      const dados = await UI.formModal({ titulo: 'Adicionar LocationIQ', tamanho: '', okLabel: 'Adicionar', valores: { url: 'https://us1.locationiq.com/v1/search' }, campos: [
+        { name: 'apiKey', label: 'Sua chave (API key) do LocationIQ', type: 'text', required: true, full: true },
+        { name: 'url', label: 'Endpoint (us1 ou eu1)', type: 'text', full: true },
+      ] });
+      if (!dados) return;
+      Config.adicionar('nominatim', { nome: 'LocationIQ', url: dados.url || 'https://us1.locationiq.com/v1/search', keyParam: 'key', apiKey: dados.apiKey });
+      UI.toast('LocationIQ adicionado.', 'success');
+      render();
+    });
+  }
+  render();
+}
+
 /* ================================================================== App */
 const App = (() => {
   const TITULOS = { dashboard: 'Dashboard', clientes: 'Clientes Fixos', prospeccao: 'Prospectando', pesquisa: 'Pesquisa Automática', revisao: 'Revisão', nichos: 'Nichos', historico: 'Histórico' };
@@ -2703,7 +2882,7 @@ function configurarLogin() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  window.UI = UI; window.API = API; window.App = App; window.Store = Store;
+  window.UI = UI; window.API = API; window.App = App; window.Store = Store; window.Config = Config;
   Store.carregar();
   configurarLogin();
   if (Store.get().logado) mostrarApp();
