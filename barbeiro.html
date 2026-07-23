@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Barbearia do Daniel — Painel do Barbeiro</title>
+<script id="app-config" type="application/json">{
+  "shopId": "barbearia-do-daniel-7k2q",
+  "vertical": "barber",
+  "shopName": "Barbearia do Daniel",
+  "ownerName": "Daniel",
+  "ownerTitle": "Barbeiro",
+  "icon": "💈",
+  "ctaIcon": "✂️",
+  "cta": "Cortar cabelo",
+  "ctaHeadline": "Bora dar um trato no visual?",
+  "tagline": "Corte na régua, barba na navalha.",
+  "whatsapp": "",
+  "address": "",
+  "photo": "",
+  "theme": {
+    "bg": "#000000",
+    "bg2": "#0B0B0B",
+    "card": "#141414",
+    "border": "#2A2A2A",
+    "text": "#F5EFE6",
+    "dim": "#9C948A",
+    "primary": "#D9A441",
+    "primaryDark": "#B8862F",
+    "onPrimary": "#1C1508",
+    "accent": "#F0C066",
+    "chip": "#1C1C1C",
+    "ok": "#59B87F",
+    "okBg": "#10241A",
+    "warn": "#E0A831",
+    "warnBg": "#2A2410",
+    "danger": "#E06056",
+    "dangerBg": "#2A1512"
+  },
+  "hours": {
+    "openDays": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "start": "09:00",
+    "end": "19:00",
+    "slotMinutes": 30,
+    "daysAhead": 14
+  },
+  "services": [
+    {
+      "id": "corte",
+      "name": "Corte de cabelo",
+      "emoji": "✂️",
+      "price": 35,
+      "duration": 30
+    },
+    {
+      "id": "barba",
+      "name": "Barba",
+      "emoji": "🧔",
+      "price": 25,
+      "duration": 30
+    },
+    {
+      "id": "corte-barba",
+      "name": "Corte + Barba",
+      "emoji": "💈",
+      "price": 55,
+      "duration": 60
+    },
+    {
+      "id": "sobrancelha",
+      "name": "Sobrancelha",
+      "emoji": "✨",
+      "price": 10,
+      "duration": 15
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "Pomada modeladora",
+      "emoji": "🧴",
+      "price": 35,
+      "commission": 20
+    },
+    {
+      "id": "p2",
+      "name": "Óleo para barba",
+      "emoji": "🧔",
+      "price": 28,
+      "commission": 20
+    },
+    {
+      "id": "p3",
+      "name": "Shampoo anticaspa",
+      "emoji": "🧼",
+      "price": 32,
+      "commission": 15
+    }
+  ],
+  "barbers": [
+    {
+      "id": "b-daniel",
+      "name": "Daniel",
+      "emoji": "💈",
+      "commission": 50,
+      "active": true
+    }
+  ],
+  "autoReminder": {
+    "enabled": false,
+    "minutes": 60
+  },
+  "payments": {
+    "mercadopago": {
+      "enabled": false,
+      "link": ""
+    }
+  },
+  "features": {
+    "products": true,
+    "loyalty": true,
+    "hotel": false,
+    "certificate": false,
+    "pet": false,
+    "barbers": true,
+    "broadcast": true,
+    "autoReminder": true,
+    "mercadopago": true
+  },
+  "loyaltyEvery": 10,
+  "pickupFee": 0
+}</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#000000; --bg2:#0B0B0B; --card:#141414; --border:#2A2A2A;
+  --text:#F5EFE6; --dim:#9C948A; --primary:#D9A441; --primaryDark:#B8862F;
+  --onPrimary:#1C1508; --accent:#F0C066; --chip:#1C1C1C;
+  --ok:#59B87F; --okBg:#10241A; --warn:#E0A831; --warnBg:#2A2410;
+  --danger:#E06056; --dangerBg:#2A1512;
+}
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  line-height: 1.45;
+}
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+input, select, textarea {
+  font: inherit; color: var(--text);
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 13px;
+  width: 100%;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+input[type="checkbox"] { width: auto; accent-color: var(--primary); }
+label.fld { display: block; font-size: 13px; color: var(--dim); font-weight: 600; margin: 12px 0 5px; }
+a { color: var(--accent); }
+
+.wrap { max-width: 520px; margin: 0 auto; padding: 14px 14px 110px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.35);
+}
+.card h2 { font-size: 17px; margin-bottom: 10px; }
+.muted { color: var(--dim); font-size: 13px; }
+.small { font-size: 12px; }
+.row { display: flex; gap: 10px; align-items: center; }
+.row > .grow { flex: 1; }
+.right { margin-left: auto; }
+.center { text-align: center; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--primary); color: var(--onPrimary);
+  border-radius: 14px; padding: 13px 18px;
+  font-weight: 700; font-size: 15px;
+  transition: transform .06s ease, filter .15s;
+  text-decoration: none;
+}
+.btn:active { transform: scale(.97); }
+.btn.block { width: 100%; }
+.btn.big { padding: 16px 20px; font-size: 17px; border-radius: 16px; }
+.btn.ghost { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+.btn.soft { background: var(--chip); color: var(--text); }
+.btn.ok { background: var(--ok); color: #fff; }
+.btn.danger { background: var(--dangerBg); color: var(--danger); }
+.btn.sm { padding: 8px 12px; font-size: 13px; border-radius: 10px; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--chip); border: 1px solid var(--border);
+  border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 600;
+}
+.chip.ok { background: var(--okBg); color: var(--ok); border-color: transparent; }
+.chip.warn { background: var(--warnBg); color: var(--warn); border-color: transparent; }
+.chip.danger { background: var(--dangerBg); color: var(--danger); border-color: transparent; }
+
+.badge {
+  background: var(--danger); color: #fff; border-radius: 999px;
+  font-size: 11px; font-weight: 800; min-width: 18px; height: 18px;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0 5px;
+}
+
+/* cabeçalho com foto */
+.header { display: flex; align-items: center; gap: 14px; padding: 18px 4px 14px; }
+.avatar {
+  width: 74px; height: 74px; border-radius: 50%;
+  border: 3px solid var(--primary);
+  object-fit: cover; background: var(--chip);
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  flex: none;
+}
+.header h1 { font-size: 21px; line-height: 1.2; }
+.header .sub { color: var(--dim); font-size: 13px; margin-top: 3px; }
+.sync-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--dim); margin-top: 6px; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); }
+.sync-dot.online { background: var(--ok); }
+.sync-dot.local { background: var(--warn); }
+
+/* faixas de aviso */
+.banner {
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 10px;
+  background: var(--warnBg); border: 1px solid var(--border);
+  font-size: 14px; display: flex; gap: 10px; align-items: flex-start;
+}
+.banner .emoji { font-size: 20px; line-height: 1; }
+
+/* seletor de dias (fita horizontal) */
+.days { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; }
+.days::-webkit-scrollbar { display: none; }
+.day {
+  flex: none; width: 64px; padding: 10px 4px; text-align: center;
+  background: var(--bg2); border: 1.5px solid var(--border); border-radius: 14px;
+}
+.day .wd { font-size: 11px; color: var(--dim); text-transform: uppercase; font-weight: 700; }
+.day .dn { font-size: 19px; font-weight: 800; margin-top: 2px; }
+.day.sel { background: var(--primary); border-color: var(--primary); }
+.day.sel .wd, .day.sel .dn { color: var(--onPrimary); }
+.day.off { opacity: .35; }
+
+/* grade de horários */
+.slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.slot {
+  padding: 11px 4px; text-align: center; border-radius: 12px;
+  background: var(--bg2); border: 1.5px solid var(--border);
+  font-weight: 700; font-size: 14px;
+}
+.slot.sel { background: var(--primary); color: var(--onPrimary); border-color: var(--primary); }
+.slot.busy { opacity: .3; text-decoration: line-through; pointer-events: none; }
+
+/* lista de serviços */
+.svc {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  background: var(--bg2); border: 1.5px solid var(--border); border-radius: 14px;
+  padding: 13px; margin-bottom: 9px;
+}
+.svc.sel { border-color: var(--primary); box-shadow: 0 0 0 1.5px var(--primary) inset; }
+.svc .emoji { font-size: 26px; }
+.svc .nm { font-weight: 700; font-size: 15px; }
+.svc .inf { color: var(--dim); font-size: 12.5px; margin-top: 2px; }
+.svc .pr { margin-left: auto; font-weight: 800; color: var(--accent); white-space: nowrap; }
+
+/* opções em pílulas (tamanho do pet etc.) */
+.opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.opt {
+  background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 10px 14px; font-weight: 700; font-size: 14px;
+}
+.opt.sel { background: var(--primary); color: var(--onPrimary); border-color: var(--primary); }
+
+/* modal */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.72);
+  display: flex; align-items: flex-end; justify-content: center; z-index: 60;
+  animation: fade .18s ease;
+}
+@keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+.modal {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 22px 22px 0 0; width: 100%; max-width: 520px;
+  max-height: 88vh; overflow-y: auto; padding: 20px 18px 26px;
+  animation: up .22s ease;
+}
+@keyframes up { from { transform: translateY(40px); opacity: .4 } to { transform: none; opacity: 1 } }
+.modal h3 { font-size: 18px; margin-bottom: 12px; }
+@media (min-width: 560px) {
+  .modal-bg { align-items: center; }
+  .modal { border-radius: 22px; }
+}
+
+/* toasts */
+#toasts { position: fixed; top: 12px; left: 0; right: 0; z-index: 90; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.toast {
+  background: var(--card); color: var(--text); border: 1px solid var(--primary);
+  border-radius: 14px; padding: 11px 16px; font-size: 14px; font-weight: 600;
+  max-width: 92%; box-shadow: 0 8px 30px rgba(0,0,0,.55);
+  opacity: 0; transform: translateY(-12px); transition: all .3s ease;
+}
+.toast.show { opacity: 1; transform: none; }
+.toast.ok { border-color: var(--ok); }
+.toast.danger { border-color: var(--danger); }
+
+/* abas fixas no rodapé (painel) */
+.tabs {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: var(--card); border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; padding: 6px 4px calc(8px + env(safe-area-inset-bottom));
+}
+.tab { flex: 1; text-align: center; padding: 6px 2px; border-radius: 12px; position: relative; color: var(--dim); }
+.tab .ic { font-size: 21px; display: block; }
+.tab .lb { font-size: 10.5px; font-weight: 700; margin-top: 1px; display: block; }
+.tab.sel { color: var(--text); background: var(--chip); }
+.tab .badge { position: absolute; top: 0; right: 14%; }
+
+/* linhas da agenda do painel */
+.ag-row { display: flex; gap: 10px; align-items: stretch; margin-bottom: 8px; }
+.ag-time { flex: none; width: 52px; text-align: right; font-weight: 800; font-size: 13.5px; color: var(--dim); padding-top: 12px; }
+.ag-body { flex: 1; min-width: 0; }
+.ag-free {
+  border: 1.5px dashed var(--border); border-radius: 12px; padding: 10px 12px;
+  color: var(--dim); font-size: 13px; display: flex; align-items: center; width: 100%; text-align: left;
+}
+.ag-card { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 14px; padding: 11px 12px; }
+.ag-card.pendente { border-color: var(--warn); }
+.ag-card .nm { font-weight: 800; font-size: 15px; }
+.ag-card .inf { color: var(--dim); font-size: 12.5px; margin: 2px 0 8px; }
+.ag-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.ag-actions select { width: auto; padding: 7px 10px; font-size: 12.5px; border-radius: 10px; }
+
+.hero {
+  background: linear-gradient(135deg, var(--primary), var(--primaryDark));
+  color: var(--onPrimary); border-radius: 20px; padding: 18px; margin-bottom: 14px;
+}
+.hero .eta { font-size: 26px; font-weight: 900; margin: 2px 0; }
+.hero .muted2 { opacity: .8; font-size: 13px; font-weight: 600; }
+
+.list-item { display: flex; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.list-item:last-child { border-bottom: none; }
+
+.stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; flex: 1; text-align: center; }
+.stat .v { font-size: 19px; font-weight: 900; color: var(--accent); }
+.stat .l { font-size: 11px; color: var(--dim); font-weight: 700; text-transform: uppercase; }
+
+.steps { display: flex; gap: 6px; margin-bottom: 14px; }
+.steps i { flex: 1; height: 4px; border-radius: 4px; background: var(--border); }
+.steps i.on { background: var(--primary); }
+
+.fixed-cta {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+  padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, var(--bg) 40%);
+  max-width: 520px; margin: 0 auto;
+}
+
+/* específicos do painel */
+.ph-header { display:flex; align-items:center; gap:12px; padding:14px 4px 10px; }
+.ph-header .avatar { width:52px; height:52px; font-size:26px; border-width:2px; }
+.ph-header h1 { font-size:17px; }
+.cert-canvas { width:100%; border-radius:12px; border:1px solid var(--border); }
+.prog { height:8px; background:var(--border); border-radius:8px; overflow:hidden; margin-top:6px; }
+.prog i { display:block; height:100%; background:var(--primary); border-radius:8px; }
+
+/* interruptor liga/desliga */
+.switch { position: relative; display: inline-block; width: 50px; height: 28px; flex: none; }
+.switch input { display: none; }
+.switch .sl { position: absolute; inset: 0; background: var(--chip); border: 1.5px solid var(--border); border-radius: 999px; transition: .2s; }
+.switch .sl::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 2.5px; background: var(--dim); border-radius: 50%; transition: .2s; }
+.switch input:checked + .sl { background: var(--primary); border-color: var(--primary); }
+.switch input:checked + .sl::before { transform: translateX(21px); background: var(--onPrimary); }
+.row-between { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.b-tag { display:inline-flex; align-items:center; gap:5px; background:var(--chip); border:1px solid var(--border); border-radius:999px; padding:3px 9px; font-size:11.5px; font-weight:700; color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="ph-header">
+    <div id="avatar" class="avatar"></div>
+    <div class="grow">
+      <h1 id="shopName"></h1>
+      <div class="sync-pill"><span id="syncDot" class="sync-dot"></span><span id="syncLabel">conectando…</span></div>
+    </div>
+    <span class="chip" id="roleChip"></span>
+  </div>
+  <div id="view"></div>
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div id="modalRoot"></div>
+
+<script>
+/* ============================================================
+   MOTOR COMPARTILHADO — utilidades, dados e sincronização
+   Sincroniza em tempo real:
+   1. mesma aba/navegador  -> BroadcastChannel + localStorage (funciona offline)
+   2. outros aparelhos     -> broker MQTT público via internet (wifi com internet)
+   ============================================================ */
+
+const CFG = JSON.parse(document.getElementById('app-config').textContent);
+(function () {
+  const q = new URLSearchParams(location.search).get('loja');
+  if (q) CFG.shopId = q.trim();
+})();
+
+/* ---------- utilidades ---------- */
+const $  = (sel, el) => (el || document).querySelector(sel);
+const $$ = (sel, el) => Array.from((el || document).querySelectorAll(sel));
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function digits(s) { return String(s || '').replace(/\D+/g, ''); }
+function phoneBR(s) {
+  let d = digits(s);
+  if (!d) return '';
+  if (d.startsWith('0')) d = d.replace(/^0+/, '');
+  if (d.length === 10 || d.length === 11) d = '55' + d;
+  return d;
+}
+function fmtPhone(s) {
+  const d = digits(s).replace(/^55/, '');
+  if (d.length === 11) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+  if (d.length === 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+  return s || '';
+}
+function money(v) {
+  return 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+const WD  = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+const WDF = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function todayStr() { return dateToStr(new Date()); }
+function dateToStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function strToDate(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function addDays(s, n) { const d = strToDate(s); d.setDate(d.getDate() + n); return dateToStr(d); }
+function dateLabel(s) { const d = strToDate(s); return WD[d.getDay()] + ', ' + String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); }
+function dateLabelLong(s) { const d = strToDate(s); return WDF[d.getDay()] + ', dia ' + d.getDate() + ' de ' + MESES[d.getMonth()]; }
+function timeToMin(t) { const p = String(t).split(':'); return (+p[0]) * 60 + (+p[1] || 0); }
+function minToTime(m) { return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); }
+function bookingMoment(b) { const d = strToDate(b.date); d.setMinutes(timeToMin(b.time)); return d.getTime(); }
+function humanETA(ms) {
+  const min = Math.round(ms / 60000);
+  if (min <= 0) return 'agora';
+  if (min < 60) return 'em ' + min + ' min';
+  const h = Math.floor(min / 60), m = min % 60;
+  if (h < 24) return 'em ' + h + 'h' + (m ? String(m).padStart(2, '0') : '');
+  const dias = Math.round(h / 24);
+  return 'em ' + dias + (dias === 1 ? ' dia' : ' dias');
+}
+function deviceId() {
+  let id = localStorage.getItem('agendapp-device');
+  if (!id) { id = uid(); localStorage.setItem('agendapp-device', id); }
+  return id;
+}
+const DEVICE = deviceId();
+
+function waLink(phone, text) {
+  const p = phoneBR(phone);
+  const t = encodeURIComponent(text || '');
+  return p ? 'https://wa.me/' + p + '?text=' + t : 'https://wa.me/?text=' + t;
+}
+function openWa(phone, text) { window.open(waLink(phone, text), '_blank'); }
+
+/* ---------- toasts + som ---------- */
+function toast(msg, kind) {
+  let box = $('#toasts');
+  if (!box) { box = document.createElement('div'); box.id = 'toasts'; document.body.appendChild(box); }
+  const t = document.createElement('div');
+  t.className = 'toast ' + (kind || '');
+  t.innerHTML = msg;
+  box.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 4200);
+}
+function ding() {
+  try {
+    const ctx = ding.ctx || (ding.ctx = new (window.AudioContext || window.webkitAudioContext)());
+    [[880, 0], [1174, .18]].forEach(([f, dt]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = f; o.type = 'sine';
+      g.gain.setValueAtTime(.0001, ctx.currentTime + dt);
+      g.gain.exponentialRampToValueAtTime(.25, ctx.currentTime + dt + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + dt + .35);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime + dt); o.stop(ctx.currentTime + dt + .4);
+    });
+    if (navigator.vibrate) navigator.vibrate(180);
+  } catch (e) {}
+}
+
+/* ---------- estado (dados da loja) ---------- */
+const Store = {
+  key: 'agendapp:' + CFG.shopId,
+  state: null,
+  listeners: [],
+
+  blank() { return { v: 1, config: { updatedAt: 0 }, bookings: [], announcements: [], blockedDates: [], products: [], sales: [], barbers: [] }; },
+
+  load() {
+    try { this.state = Object.assign(this.blank(), JSON.parse(localStorage.getItem(this.key) || '{}')); }
+    catch (e) { this.state = this.blank(); }
+    ['bookings', 'announcements', 'blockedDates', 'products', 'sales', 'barbers'].forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
+    if (!this.state.config) this.state.config = { updatedAt: 0 };
+    return this.state;
+  },
+
+  raw() { return localStorage.getItem(this.key) || ''; },
+
+  save() {
+    const corte = addDays(todayStr(), -60);
+    this.state.bookings = this.state.bookings.filter(b => b.date >= corte);
+    localStorage.setItem(this.key, JSON.stringify(this.state));
+  },
+
+  /* mescla dois estados: vence quem tem updatedAt maior, registro a registro */
+  mergeStates(a, b) {
+    const out = this.blank();
+    out.config = ((b.config && b.config.updatedAt) || 0) > ((a.config && a.config.updatedAt) || 0) ? b.config : (a.config || { updatedAt: 0 });
+    ['bookings', 'announcements', 'blockedDates', 'products', 'sales', 'barbers'].forEach(k => {
+      const map = {};
+      (a[k] || []).concat(b[k] || []).forEach(r => {
+        if (!r || !r.id) return;
+        const cur = map[r.id];
+        if (!cur || (r.updatedAt || r.createdAt || 0) >= (cur.updatedAt || cur.createdAt || 0)) map[r.id] = r;
+      });
+      out[k] = Object.values(map).sort((x, y) => (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
+    });
+    return out;
+  },
+
+  /* aplica um estado vindo de fora (outra aba / outro aparelho) */
+  applyRemote(remote) {
+    if (!remote || typeof remote !== 'object') return;
+    const merged = this.mergeStates(this.state, remote);
+    const mergedStr = JSON.stringify(merged);
+    const changedLocal = mergedStr !== JSON.stringify(this.state);
+    const remoteMissing = mergedStr !== JSON.stringify(this.mergeStates(remote, remote));
+    if (changedLocal) {
+      const before = this.state;
+      this.state = merged;
+      this.save();
+      this.listeners.forEach(fn => fn(before));
+    }
+    if (remoteMissing) Sync.schedulePublish();
+  },
+
+  /* mutação local: altera, salva, notifica e publica */
+  mutate(fn) {
+    fn(this.state);
+    this.save();
+    this.listeners.forEach(l => l(null));
+    Sync.broadcastLocal();
+    Sync.schedulePublish();
+  },
+
+  onChange(fn) { this.listeners.push(fn); },
+
+  /* configuração efetiva = padrão do arquivo + ajustes feitos no painel */
+  cfg() {
+    const o = this.state.config || {};
+    const c = Object.assign({}, CFG, o);
+    c.hours = Object.assign({}, CFG.hours, o.hours || {});
+    c.services = (o.services && o.services.length) ? o.services : CFG.services;
+    c.autoReminder = Object.assign({}, CFG.autoReminder, o.autoReminder || {});
+    c.payments = Object.assign({}, CFG.payments, o.payments || {});
+    c.payments.mercadopago = Object.assign({}, (CFG.payments || {}).mercadopago, (o.payments || {}).mercadopago || {});
+    return c;
+  },
+
+  products() {
+    const map = {};
+    (CFG.products || []).forEach(p => map[p.id] = Object.assign({}, p));
+    (this.state.products || []).forEach(p => map[p.id] = p);
+    return Object.values(map).filter(p => p.active !== false);
+  },
+
+  /* barbeiros: padrão do arquivo sobreposto pelos ajustes do painel */
+  barbers() {
+    const map = {};
+    (CFG.barbers || []).forEach(b => map[b.id] = Object.assign({}, b));
+    (this.state.barbers || []).forEach(b => map[b.id] = b);
+    return Object.values(map).filter(b => b.active !== false);
+  },
+  barberById(id) {
+    if (!id) return null;
+    return (this.state.barbers || []).find(b => b.id === id)
+      || (CFG.barbers || []).find(b => b.id === id) || null;
+  },
+
+  activeAnnouncements() {
+    const hoje = todayStr();
+    return (this.state.announcements || [])
+      .filter(a => a.active !== false && (!a.until || a.until >= hoje))
+      .sort((x, y) => (y.createdAt || 0) - (x.createdAt || 0));
+  },
+
+  activeBookings() { return this.state.bookings.filter(b => b.status !== 'cancelado' && b.type !== 'hotel'); },
+  hotelRequests()  { return this.state.bookings.filter(b => b.type === 'hotel'); }
+};
+Store.load();
+
+/* ---------- horários ---------- */
+const Slots = {
+  isOpen(dateStr) {
+    const c = Store.cfg();
+    if ((Store.state.blockedDates || []).some(b => b.id === dateStr && b.active !== false)) return false;
+    return c.hours.openDays.indexOf(strToDate(dateStr).getDay()) !== -1;
+  },
+  blockedReason(dateStr) {
+    const b = (Store.state.blockedDates || []).find(x => x.id === dateStr && x.active !== false);
+    return b ? (b.reason || 'Fechado') : null;
+  },
+  /* lista de horários do dia com situação de cada um */
+  grid(dateStr) {
+    const c = Store.cfg();
+    const list = [];
+    const start = timeToMin(c.hours.start), end = timeToMin(c.hours.end), step = c.hours.slotMinutes || 30;
+    for (let m = start; m + step <= end; m += step) list.push({ time: minToTime(m), min: m });
+    const dayBookings = Store.activeBookings().filter(b => b.date === dateStr);
+    const now = new Date();
+    const isToday = dateStr === todayStr();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    list.forEach(s => {
+      s.past = isToday && s.min <= nowMin;
+      s.booking = dayBookings.find(b => {
+        const bs = timeToMin(b.time), be = bs + (b.duration || step);
+        return s.min >= bs && s.min < be;
+      }) || null;
+      s.startsBooking = !!(s.booking && timeToMin(s.booking.time) === s.min);
+    });
+    return list;
+  },
+  /* horários livres onde cabe um serviço de `dur` minutos */
+  freeFor(dateStr, dur) {
+    if (!this.isOpen(dateStr)) return [];
+    const c = Store.cfg();
+    const step = c.hours.slotMinutes || 30;
+    const need = Math.max(1, Math.ceil((dur || step) / step));
+    const g = this.grid(dateStr);
+    const out = [];
+    for (let i = 0; i < g.length; i++) {
+      if (g[i].past || g[i].booking) continue;
+      let ok = true;
+      for (let j = 1; j < need; j++) {
+        if (!g[i + j] || g[i + j].booking) { ok = false; break; }
+      }
+      const endMin = g[i].min + (dur || step);
+      if (endMin > timeToMin(c.hours.end)) ok = false;
+      if (ok) out.push(g[i].time);
+    }
+    return out;
+  },
+  isFree(dateStr, time, dur) { return this.freeFor(dateStr, dur).indexOf(time) !== -1; }
+};
+
+/* ---------- sincronização em tempo real ---------- */
+const Sync = {
+  status: 'local',           // local | conectando | online
+  statusListeners: [],
+  mqttClient: null,
+  channel: null,
+  lastRaw: '',
+  publishTimer: null,
+  topic: 'agendapp/v2/' + CFG.shopId,
+
+  onStatus(fn) { this.statusListeners.push(fn); fn(this.status); },
+  setStatus(s) { this.status = s; this.statusListeners.forEach(fn => fn(s)); },
+
+  init() {
+    this.lastRaw = Store.raw();
+    /* mesma máquina: BroadcastChannel */
+    try {
+      this.channel = new BroadcastChannel('agendapp-' + CFG.shopId);
+      this.channel.onmessage = ev => { if (ev.data && ev.data.state) Store.applyRemote(ev.data.state); };
+    } catch (e) {}
+    /* mesma máquina: evento de storage + vigia (funciona até em file://) */
+    window.addEventListener('storage', ev => { if (ev.key === Store.key) this.pollLocal(); });
+    setInterval(() => this.pollLocal(), 2500);
+    /* outros aparelhos: MQTT via internet */
+    this.connectMqtt();
+  },
+
+  pollLocal() {
+    const raw = Store.raw();
+    if (raw === this.lastRaw) return;
+    this.lastRaw = raw;
+    try { Store.applyRemote(JSON.parse(raw)); } catch (e) {}
+  },
+
+  broadcastLocal() {
+    this.lastRaw = Store.raw();
+    try { this.channel && this.channel.postMessage({ state: Store.state }); } catch (e) {}
+  },
+
+  loadMqttLib(cb) {
+    if (window.mqtt) return cb(true);
+    const urls = [
+      'https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js',
+      'https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'
+    ];
+    (function next(i) {
+      if (i >= urls.length) return cb(false);
+      const s = document.createElement('script');
+      s.src = urls[i];
+      s.onload = () => cb(!!window.mqtt);
+      s.onerror = () => next(i + 1);
+      document.head.appendChild(s);
+    })(0);
+  },
+
+  connectMqtt() {
+    const self = this;
+    this.setStatus('conectando');
+    this.loadMqttLib(ok => {
+      if (!ok) { self.setStatus('local'); setTimeout(() => self.connectMqtt(), 60000); return; }
+      const brokers = ['wss://broker.emqx.io:8084/mqtt', 'wss://test.mosquitto.org:8081'];
+      let idx = 0, connected = false;
+
+      function tryBroker() {
+        if (idx >= brokers.length) { self.setStatus('local'); setTimeout(() => { idx = 0; tryBroker(); }, 45000); return; }
+        const url = brokers[idx];
+        let settled = false;
+        const c = window.mqtt.connect(url, {
+          clientId: 'agp_' + DEVICE + '_' + Math.random().toString(16).slice(2, 6),
+          clean: true, connectTimeout: 9000, reconnectPeriod: 6000, keepalive: 45
+        });
+        self.mqttClient = c;
+        const giveUp = setTimeout(() => {
+          if (!connected && !settled) { settled = true; try { c.end(true); } catch (e) {} idx++; tryBroker(); }
+        }, 11000);
+        c.on('connect', () => {
+          connected = true; settled = true; clearTimeout(giveUp);
+          self.setStatus('online');
+          c.subscribe(self.topic, { qos: 0 });
+          self.schedulePublish();
+        });
+        c.on('message', (t, payload) => {
+          try {
+            const msg = JSON.parse(payload.toString());
+            if (msg && msg.state) Store.applyRemote(msg.state);
+          } catch (e) {}
+        });
+        c.on('close', () => { if (connected) self.setStatus('conectando'); });
+        c.on('error', () => {
+          if (!connected && !settled) { settled = true; clearTimeout(giveUp); try { c.end(true); } catch (e) {} idx++; tryBroker(); }
+        });
+      }
+      tryBroker();
+    });
+  },
+
+  schedulePublish() {
+    clearTimeout(this.publishTimer);
+    this.publishTimer = setTimeout(() => this.publishNow(), 450);
+  },
+
+  publishNow() {
+    this.lastRaw = Store.raw();
+    if (!this.mqttClient || this.status !== 'online') return;
+    try {
+      this.mqttClient.publish(this.topic, JSON.stringify({ origin: DEVICE, at: Date.now(), state: Store.state }), { retain: true, qos: 0 });
+    } catch (e) {}
+  }
+};
+
+/* ---------- aparência ---------- */
+(function applyTheme() {
+  const t = CFG.theme || {};
+  const root = document.documentElement;
+  Object.keys(t).forEach(k => root.style.setProperty('--' + k, t[k]));
+  document.title = document.title.replace('__NOME__', CFG.shopName);
+  const fav = document.createElement('link');
+  fav.rel = 'icon';
+  fav.href = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">' + (CFG.icon || '📅') + '</text></svg>');
+  document.head.appendChild(fav);
+  const meta = document.createElement('meta');
+  meta.name = 'theme-color';
+  meta.content = t.bg || '#000';
+  document.head.appendChild(meta);
+})();
+
+/* redesenha relógios/contagens de tempo em tempos em tempos */
+setInterval(() => { document.dispatchEvent(new CustomEvent('tick')); }, 30000);
+
+</script>
+
+<script>
+/* ============================ PAINEL DO DONO ============================ */
+const IS_PET = CFG.vertical === 'pet';
+const FEAT = CFG.features || {};
+let tab = 'agenda';
+let agDate = todayStr();
+
+/* ---------- infra de modal ---------- */
+function openModal(html) {
+  const root = $('#modalRoot');
+  root.innerHTML = '<div class="modal-bg"><div class="modal">' + html + '</div></div>';
+  $('.modal-bg', root).addEventListener('click', ev => { if (ev.target.classList.contains('modal-bg')) closeModal(); });
+  return root;
+}
+function closeModal() { $('#modalRoot').innerHTML = ''; }
+
+/* ---------- textos de WhatsApp ---------- */
+function msgLembrete(b) {
+  const c = Store.cfg();
+  if (IS_PET && b.pet && b.pet.name)
+    return 'Olá, ' + b.name + '! 🐾 Passando para lembrar: amanhã (' + dateLabel(b.date) + ') às ' + b.time +
+      ' o(a) ' + b.pet.name + ' tem ' + b.serviceName + ' aqui na ' + c.shopName +
+      (b.pet.pickup ? ' — nós buscamos em casa 🚗' : '') + '. Qualquer imprevisto é só avisar! 💚';
+  return 'Olá, ' + b.name + '! ' + (c.icon || '') + ' Passando para lembrar do seu horário amanhã (' + dateLabel(b.date) + ') às ' + b.time +
+    ' — ' + b.serviceName + ' na ' + c.shopName + '. Qualquer imprevisto é só avisar. Até lá! 😉';
+}
+/* lembrete de véspera do horário (1h / 30min antes) */
+function msgLembreteHoje(b) {
+  const c = Store.cfg();
+  const falta = Math.max(0, Math.round((bookingMoment(b) - Date.now()) / 60000));
+  const quando = falta >= 60 ? 'daqui a pouco' : ('em ~' + falta + ' min');
+  let m = 'Olá, ' + b.name + '! ' + (c.icon || '💈') + ' Seu horário na ' + c.shopName + ' é HOJE às ' + b.time +
+    ' (' + quando + ') — ' + b.serviceName + '. Já já é a sua vez, pode vir chegando! 😉';
+  const mp = c.payments && c.payments.mercadopago;
+  if (mp && mp.enabled && mp.link) m += '\n\nSe preferir já deixar pago, é só usar o link: ' + mp.link;
+  return m;
+}
+/* cobrança via Mercado Pago (opcional) */
+function msgCobranca(b) {
+  const c = Store.cfg();
+  const mp = c.payments && c.payments.mercadopago;
+  const link = mp && mp.link ? mp.link : '';
+  return 'Olá, ' + b.name + '! Sobre o seu ' + b.serviceName + ' na ' + c.shopName + ' — ' +
+    'o valor é ' + money(b.price) + '.' + (link ? '\n\n💳 Pague pelo Mercado Pago aqui: ' + link : '') +
+    '\n\nQualquer dúvida é só chamar. Obrigado! 🙏';
+}
+function msgFidelidade(cl) {
+  const c = Store.cfg();
+  if (IS_PET) return 'Olá, ' + cl.name + '! 🎁 O(a) ' + (cl.pets[0] || 'seu pet') + ' completou ' + cl.visits +
+    ' serviços aqui na ' + c.shopName + '! Como cliente fiel, você ganhou um mimo especial no próximo banho. Agende quando quiser! 🐾💚';
+  return 'Olá, ' + cl.name + '! 🎁 Você completou ' + cl.visits + ' visitas na ' + c.shopName +
+    '! Cliente fiel merece mimo: na próxima vez tem cortesia especial esperando por você. Até breve! ' + (c.icon || '');
+}
+function msgSaudade(cl) {
+  const c = Store.cfg();
+  if (IS_PET) return 'Oi, ' + cl.name + '! Sentimos falta do(a) ' + (cl.pets[0] || 'seu pet') + ' por aqui 🥺🐾 Que tal agendar um banho? A ' + c.shopName + ' te espera!';
+  return 'Oi, ' + cl.name + '! Já faz um tempinho, hein? 😄 Bora dar um trato no visual? A ' + c.shopName + ' te espera — é só escolher o horário no app!';
+}
+
+/* ---------- notificação de novos agendamentos ---------- */
+const known = new Set(Store.state.bookings.map(b => b.id));
+Store.onChange(() => {
+  Store.state.bookings.forEach(b => {
+    if (known.has(b.id)) return;
+    known.add(b.id);
+    if (b.deviceId !== DEVICE && b.status !== 'cancelado') {
+      ding();
+      if (b.type === 'hotel') toast('🏨 Novo pedido de hospedagem: <b>' + esc(b.name) + '</b>', 'ok');
+      else toast('🔔 Novo agendamento: <b>' + esc(b.name) + '</b> — ' + esc(b.serviceName) + ', ' + dateLabel(b.date) + ' às ' + b.time, 'ok');
+    }
+  });
+  /* nas abas com formulário (avisos/ajustes) não recarrega a tela — o dono pode estar digitando */
+  if (tab === 'avisos' || tab === 'ajustes') { renderHeader(); renderTabs(); }
+  else render();
+});
+
+/* ---------- agregação de clientes ---------- */
+function clientsAgg() {
+  const map = {};
+  Store.state.bookings.forEach(b => {
+    if (b.status === 'cancelado') return;
+    const key = phoneBR(b.phone) || b.name.toLowerCase();
+    if (!map[key]) map[key] = { name: b.name, phone: b.phone, visits: 0, lastDate: '', pets: [], key };
+    const cl = map[key];
+    cl.name = b.name; cl.phone = b.phone || cl.phone;
+    if (b.type !== 'hotel' && (b.status === 'concluido' || (b.status === 'confirmado' && b.date <= todayStr()))) {
+      cl.visits++;
+      if (b.date > cl.lastDate) cl.lastDate = b.date;
+    }
+    if (b.pet && b.pet.name && cl.pets.indexOf(b.pet.name) === -1) cl.pets.push(b.pet.name);
+  });
+  return Object.values(map).sort((a, b) => b.visits - a.visits);
+}
+function remindersDue() {
+  const amanha = addDays(todayStr(), 1);
+  return Store.activeBookings().filter(b => b.date === amanha && !b.reminderAt);
+}
+
+/* ---------- comissão dos barbeiros ---------- */
+function barberStats(barberId, monthStr) {
+  const b = Store.barberById(barberId);
+  const pct = b ? (+b.commission || 0) : 0;
+  let svcCom = 0, svcCount = 0, revenue = 0, prodCom = 0;
+  Store.state.bookings.forEach(bk => {
+    if (bk.barberId !== barberId) return;
+    if (bk.status !== 'concluido') return;
+    if (monthStr && (bk.date || '').slice(0, 7) !== monthStr) return;
+    revenue += (+bk.price || 0);
+    svcCom += (+bk.price || 0) * pct / 100;
+    svcCount++;
+  });
+  (Store.state.sales || []).forEach(v => {
+    if (v.barberId !== barberId) return;
+    if (monthStr && (v.date || '').slice(0, 7) !== monthStr) return;
+    prodCom += (+v.commission || 0);
+  });
+  return { pct, svcCom, svcCount, revenue, prodCom, total: svcCom + prodCom };
+}
+function barberOptions(selectedId) {
+  return '<option value="">Sem barbeiro</option>' + Store.barbers().map(b =>
+    '<option value="' + esc(b.id) + '" ' + (b.id === selectedId ? 'selected' : '') + '>' +
+    esc((b.emoji || '💈') + ' ' + b.name) + '</option>').join('');
+}
+
+/* ================= ABA AGENDA ================= */
+function nextClient() {
+  const now = Date.now();
+  return Store.activeBookings()
+    .filter(b => b.status !== 'concluido' && bookingMoment(b) + (b.duration || 30) * 60000 > now)
+    .sort((a, b) => bookingMoment(a) - bookingMoment(b))[0] || null;
+}
+function viewAgenda() {
+  const c = Store.cfg();
+  const barbers = Store.barbers();
+  const mpOn = c.payments && c.payments.mercadopago && c.payments.mercadopago.enabled && c.payments.mercadopago.link;
+  let h = '';
+
+  /* próximo cliente */
+  const nx = nextClient();
+  if (nx) {
+    const eta = humanETA(bookingMoment(nx) - Date.now());
+    h += '<div class="hero"><div class="muted2">PRÓXIMO ' + (IS_PET ? 'PET' : 'CLIENTE') + '</div>' +
+      '<div class="eta">' + esc(nx.name) + (nx.pet && nx.pet.name ? ' · ' + esc(nx.pet.name) : '') + '</div>' +
+      '<div style="font-weight:700">' + esc(nx.emoji || '') + ' ' + esc(nx.serviceName) + ' — ' + dateLabel(nx.date) + ' às ' + nx.time + '</div>' +
+      '<div class="muted2" style="margin-top:2px">chega <b>' + eta + '</b>' + (nx.status === 'pendente' ? ' · ⚠️ ainda não confirmado' : '') +
+      (nx.barberId && Store.barberById(nx.barberId) ? ' · 💈 ' + esc(Store.barberById(nx.barberId).name) : '') + '</div>' +
+      '<div class="row" style="margin-top:10px">' +
+        '<a class="btn soft sm" target="_blank" href="' + waLink(nx.phone, 'Olá, ' + nx.name + '! Aqui é da ' + c.shopName + ' 😀') + '">💬 WhatsApp</a>' +
+        '<a class="btn soft sm" href="tel:+' + phoneBR(nx.phone) + '">📞 Ligar</a>' +
+      '</div></div>';
+  }
+
+  /* resumo do dia */
+  const doDia = Store.activeBookings().filter(b => b.date === agDate);
+  const receita = doDia.filter(b => b.status !== 'cancelado').reduce((s, b) => s + (+b.price || 0), 0);
+  const pend = Store.activeBookings().filter(b => b.status === 'pendente' && b.date >= todayStr());
+  h += '<div class="row" style="margin-bottom:12px">' +
+    '<div class="stat"><div class="v">' + doDia.length + '</div><div class="l">no dia</div></div>' +
+    '<div class="stat"><div class="v">' + money(receita) + '</div><div class="l">previsto</div></div>' +
+    '<div class="stat"><div class="v">' + pend.length + '</div><div class="l">a confirmar</div></div></div>';
+
+  /* pendentes de confirmação */
+  if (pend.length) {
+    h += '<div class="card" style="border-color:var(--warn)"><h2>⏳ Aguardando sua confirmação</h2>' +
+      pend.slice(0, 6).map(b =>
+        '<div class="list-item"><div class="grow"><b>' + esc(b.name) + '</b>' +
+        '<div class="muted small">' + esc(b.serviceName) + ' · ' + dateLabel(b.date) + ' às ' + b.time + '</div></div>' +
+        '<button class="btn ok sm" data-conf="' + b.id + '">✅ Confirmar</button></div>').join('') + '</div>';
+  }
+
+  /* ações do dia */
+  h += '<div class="row" style="margin-bottom:12px">' +
+    '<button class="btn soft sm grow" id="btnDivulgar">📣 Divulgar horários livres</button>' +
+    '<button class="btn soft sm" id="btnBloquear">🚫 Fechar dia</button></div>';
+
+  /* fita de dias */
+  h += '<div class="days">';
+  for (let i = 0; i < (c.hours.daysAhead || 14); i++) {
+    const ds = addDays(todayStr(), i);
+    const d = strToDate(ds);
+    const n = Store.activeBookings().filter(b => b.date === ds).length;
+    h += '<button class="day ' + (agDate === ds ? 'sel' : '') + (Slots.isOpen(ds) ? '' : ' off') + '" data-day="' + ds + '">' +
+      '<span class="wd">' + WD[d.getDay()] + '</span><span class="dn">' + d.getDate() + '</span>' +
+      (n ? '<span class="wd">' + n + ' ✓</span>' : '<span class="wd">&nbsp;</span>') + '</button>';
+  }
+  h += '</div>';
+
+  /* agenda do dia */
+  const motivo = Slots.blockedReason(agDate);
+  if (motivo) {
+    h += '<div class="banner"><span class="emoji">🚫</span><div><b>Dia fechado</b> — ' + esc(motivo) +
+      '<div style="margin-top:8px"><button class="btn sm soft" id="btnReabrir">Reabrir este dia</button></div></div></div>';
+  } else if (!Slots.isOpen(agDate)) {
+    h += '<div class="banner"><span class="emoji">😴</span><div>' + dateLabelLong(agDate) + ' — dia sem expediente (ajuste em ⚙️).</div></div>';
+  } else {
+    h += '<div class="card"><h2>' + dateLabelLong(agDate) + '</h2>' +
+      Slots.grid(agDate).map(s => {
+        let body;
+        if (s.booking && !s.startsBooking) return '';
+        if (s.booking) {
+          const b = s.booking;
+          const bb = b.barberId ? Store.barberById(b.barberId) : null;
+          const petInfo = b.pet ? '<div class="inf">🐾 ' + esc(b.pet.name) + ' (' + esc(b.pet.species) + ', porte ' + esc(b.pet.size) + ')' +
+            (b.pet.pickup ? ' · 🚗 buscar: ' + esc(b.pet.address || 'endereço a combinar') : '') +
+            (b.pet.perfume ? ' · 🌸 com perfume' : '') +
+            (b.pet.notes ? '<br>📝 ' + esc(b.pet.notes) : '') + '</div>' : '';
+          body = '<div class="ag-card ' + b.status + '">' +
+            '<div class="row"><span class="nm">' + esc(b.name) + '</span><span class="right">' + statusChipP(b) + '</span></div>' +
+            '<div class="inf">' + esc(b.emoji || '') + ' ' + esc(b.serviceName) + ' · ' + money(b.price) + ' · ' + (b.duration || 30) + ' min · ' + fmtPhone(b.phone) +
+            (bb ? ' · 💈 ' + esc(bb.name) : '') + '</div>' +
+            petInfo +
+            '<div class="ag-actions">' +
+              (b.status === 'pendente' ? '<button class="btn ok sm" data-conf="' + b.id + '">✅ Confirmar</button>' : '') +
+              (b.status === 'confirmado' && b.date <= todayStr() ? '<button class="btn sm" data-done="' + b.id + '">🏁 Concluir</button>' : '') +
+              (barbers.length ? '<select data-barber="' + b.id + '" title="Barbeiro responsável">' + barberOptions(b.barberId) + '</select>' : '') +
+              (mpOn && b.status !== 'concluido' ? '<button class="btn soft sm" data-charge="' + b.id + '">💳 Cobrar</button>' : '') +
+              '<a class="btn soft sm" target="_blank" href="' + waLink(b.phone, 'Olá, ' + b.name + '! Aqui é da ' + c.shopName + ' 😀') + '">💬</a>' +
+              (b.status !== 'concluido' ? '<button class="btn danger sm" data-cancel="' + b.id + '">✕</button>' : '') +
+            '</div></div>';
+        } else if (s.past) {
+          body = '<div class="ag-free" style="opacity:.4">—</div>';
+        } else {
+          body = '<button class="ag-free" data-fit="' + s.time + '">Livre · toque para encaixar +</button>';
+        }
+        return '<div class="ag-row"><div class="ag-time">' + s.time + '</div><div class="ag-body">' + body + '</div></div>';
+      }).join('') + '</div>';
+  }
+
+  /* hospedagem (petshop) */
+  if (FEAT.hotel) {
+    const reqs = Store.hotelRequests().filter(b => b.status !== 'cancelado' && b.hotel && b.hotel.checkout >= todayStr());
+    if (reqs.length) {
+      h += '<div class="card"><h2>🏨 Hospedagem</h2>' + reqs.map(b =>
+        '<div class="list-item"><div class="grow"><b>' + esc(b.pet && b.pet.name ? b.pet.name : b.name) + '</b> · tutor ' + esc(b.name) +
+        '<div class="muted small">' + dateLabel(b.hotel.checkin) + ' → ' + dateLabel(b.hotel.checkout) +
+        (b.hotel.notes ? ' · 📝 ' + esc(b.hotel.notes) : '') + '</div>' +
+        '<div style="margin-top:4px">' + statusChipP(b) + (b.hotel.priceQuoted ? ' <b style="color:var(--accent)">' + money(b.hotel.priceQuoted) + '</b>' : '') + '</div></div>' +
+        '<div>' +
+          (b.status === 'pendente' ? '<button class="btn ok sm" data-hotel-ok="' + b.id + '">💰 Cotar</button> ' : '') +
+          '<a class="btn soft sm" target="_blank" href="' + waLink(b.phone, 'Olá, ' + b.name + '! Sobre a hospedagem do(a) ' + ((b.pet && b.pet.name) || 'seu pet') + '…') + '">💬</a> ' +
+          '<button class="btn danger sm" data-cancel="' + b.id + '">✕</button>' +
+        '</div></div>').join('') + '</div>';
+    }
+  }
+
+  $('#view').innerHTML = h;
+
+  /* eventos */
+  $$('#view [data-day]').forEach(b => b.onclick = () => { agDate = b.dataset.day; render(); });
+  $$('#view [data-conf]').forEach(b => b.onclick = () => setStatus(b.dataset.conf, 'confirmado', '✅ Confirmado! O cliente já vê no app dele.'));
+  $$('#view [data-done]').forEach(b => b.onclick = () => concluir(b.dataset.done));
+  $$('#view [data-cancel]').forEach(b => b.onclick = () => {
+    if (confirm('Cancelar este agendamento?')) setStatus(b.dataset.cancel, 'cancelado', 'Cancelado.');
+  });
+  $$('#view [data-fit]').forEach(b => b.onclick = () => modalEncaixe(agDate, b.dataset.fit));
+  $$('#view [data-barber]').forEach(sel => sel.onchange = () => {
+    const bk = Store.state.bookings.find(x => x.id === sel.dataset.barber);
+    if (!bk) return;
+    Store.mutate(s => { bk.barberId = sel.value || null; bk.updatedAt = Date.now(); });
+    const bb = Store.barberById(sel.value);
+    toast(bb ? ('💈 ' + esc(bb.name) + ' vai atender ' + esc(bk.name)) : 'Barbeiro removido do agendamento.', 'ok');
+  });
+  $$('#view [data-charge]').forEach(b => b.onclick = () => {
+    const bk = Store.state.bookings.find(x => x.id === b.dataset.charge);
+    if (bk) openWa(bk.phone, msgCobranca(bk));
+  });
+  $$('#view [data-hotel-ok]').forEach(b => b.onclick = () => {
+    const bk = Store.state.bookings.find(x => x.id === b.dataset.hotelOk);
+    const v = prompt('Valor total da hospedagem (R$):', '');
+    if (v == null) return;
+    const num = parseFloat(String(v).replace(',', '.')) || 0;
+    Store.mutate(s => { bk.hotel.priceQuoted = num; bk.price = num; bk.status = 'confirmado'; bk.updatedAt = Date.now(); });
+    toast('🏨 Hospedagem confirmada por ' + money(num) + '. O tutor já vê no app.', 'ok');
+    openWa(bk.phone, 'Olá, ' + bk.name + '! A hospedagem do(a) ' + ((bk.pet && bk.pet.name) || 'seu pet') + ' de ' + dateLabel(bk.hotel.checkin) + ' a ' + dateLabel(bk.hotel.checkout) + ' fica ' + money(num) + '. Confirmado? 🐾');
+  });
+  const rb = $('#btnReabrir'); if (rb) rb.onclick = () => {
+    Store.mutate(s => { const x = s.blockedDates.find(d => d.id === agDate); if (x) { x.active = false; x.updatedAt = Date.now(); } });
+  };
+  $('#btnDivulgar').onclick = modalDivulgar;
+  $('#btnBloquear').onclick = () => {
+    const motivo = prompt('Fechar o dia ' + dateLabel(agDate) + '. Motivo (aparece para os clientes):', 'Agenda fechada');
+    if (motivo == null) return;
+    Store.mutate(s => {
+      const x = s.blockedDates.find(d => d.id === agDate);
+      if (x) { x.active = true; x.reason = motivo; x.updatedAt = Date.now(); }
+      else s.blockedDates.push({ id: agDate, reason: motivo, active: true, updatedAt: Date.now() });
+    });
+    toast('🚫 Dia fechado para novos agendamentos.');
+  };
+}
+function statusChipP(b) {
+  if (b.status === 'pendente')  return '<span class="chip warn">⏳ pendente</span>';
+  if (b.status === 'confirmado')return '<span class="chip ok">✅ confirmado</span>';
+  if (b.status === 'concluido') return '<span class="chip ok">🏁 concluído</span>';
+  return '<span class="chip danger">cancelado</span>';
+}
+function setStatus(id, st, msg) {
+  const b = Store.state.bookings.find(x => x.id === id);
+  if (!b) return;
+  Store.mutate(s => { b.status = st; b.updatedAt = Date.now(); if (st === 'concluido') b.doneAt = Date.now(); });
+  if (msg) toast(msg, st === 'cancelado' ? 'danger' : 'ok');
+}
+/* concluir: se há barbeiros e nenhum foi escolhido, pergunta para calcular a comissão certinho */
+function concluir(id) {
+  const b = Store.state.bookings.find(x => x.id === id);
+  if (!b) return;
+  const barbers = Store.barbers();
+  if (barbers.length && !b.barberId) {
+    openModal('<h3>🏁 Concluir atendimento</h3>' +
+      '<div class="muted small" style="margin-bottom:10px">Quem atendeu <b>' + esc(b.name) + '</b>? Assim a comissão entra na conta do barbeiro certo.</div>' +
+      '<label class="fld">Barbeiro</label><select id="coBarber">' + barberOptions(b.barberId) + '</select>' +
+      '<div class="row" style="margin-top:16px"><button class="btn ghost grow" onclick="closeModal()">Cancelar</button>' +
+      '<button class="btn grow" id="coOk">🏁 Concluir</button></div>');
+    $('#coOk').onclick = () => {
+      const bid = $('#coBarber').value || null;
+      Store.mutate(s => { b.barberId = bid; b.status = 'concluido'; b.doneAt = Date.now(); b.updatedAt = Date.now(); });
+      closeModal();
+      const bb = Store.barberById(bid);
+      const st = bid ? barberStats(bid, todayStr().slice(0, 7)) : null;
+      toast('🏁 Concluído!' + (bb ? ' Comissão de ' + esc(bb.name) + ': ' + money((+b.price || 0) * (+bb.commission || 0) / 100) : ''), 'ok');
+    };
+    return;
+  }
+  setStatus(id, 'concluido', '🏁 Atendimento concluído.');
+}
+
+/* encaixe manual pelo dono */
+function modalEncaixe(date, time) {
+  const c = Store.cfg();
+  const barbers = Store.barbers();
+  openModal('<h3>➕ Encaixar às ' + time + ' · ' + dateLabel(date) + '</h3>' +
+    '<label class="fld">Nome</label><input id="eNome" placeholder="Nome do cliente">' +
+    '<label class="fld">WhatsApp (opcional)</label><input id="eFone" inputmode="tel" placeholder="(11) 99999-0000">' +
+    (IS_PET ? '<label class="fld">Nome do pet</label><input id="ePet" placeholder="Ex.: Thor">' : '') +
+    '<label class="fld">Serviço</label><select id="eSvc">' +
+      c.services.map(s => '<option value="' + esc(s.id) + '">' + esc(s.emoji || '') + ' ' + esc(s.name) + '</option>').join('') + '</select>' +
+    (barbers.length ? '<label class="fld">Barbeiro</label><select id="eBarber">' + barberOptions(null) + '</select>' : '') +
+    '<div class="row" style="margin-top:16px"><button class="btn ghost grow" onclick="closeModal()">Cancelar</button>' +
+    '<button class="btn grow" id="eOk">Encaixar</button></div>');
+  $('#eOk').onclick = () => {
+    const nome = $('#eNome').value.trim();
+    if (!nome) { toast('Escreva o nome.', 'danger'); return; }
+    const s = c.services.find(x => x.id === $('#eSvc').value);
+    const price = s.priceBySize ? (s.priceBySize.M || 0) : (s.price || 0);
+    Store.mutate(st => st.bookings.push({
+      id: uid(), type: 'servico', name: nome, phone: $('#eFone').value.trim(),
+      serviceId: s.id, serviceName: s.name, emoji: s.emoji || '',
+      price, duration: s.duration || c.hours.slotMinutes,
+      date, time, status: 'confirmado',
+      barberId: $('#eBarber') ? ($('#eBarber').value || null) : null,
+      pet: IS_PET ? { name: ($('#ePet').value || '').trim(), species: 'cão', size: 'M' } : null,
+      deviceId: DEVICE, source: 'painel', createdAt: Date.now(), updatedAt: Date.now()
+    }));
+    closeModal();
+    toast('✅ Encaixado!', 'ok');
+  };
+}
+
+/* chamada de horários livres */
+function modalDivulgar() {
+  const c = Store.cfg();
+  function textoPara(ds) {
+    const livres = Slots.freeFor(ds, c.hours.slotMinutes).slice(0, 10);
+    if (!livres.length) return null;
+    const dia = ds === todayStr() ? 'HOJE' : (ds === addDays(todayStr(), 1) ? 'AMANHÃ' : dateLabel(ds));
+    return (c.icon || '📣') + ' A agenda da ' + c.shopName + ' abriu! Horários livres ' + dia + ': ' +
+      livres.join(', ') + '. Responda aqui ou agende pelo app. Corre que acaba! 🔥';
+  }
+  openModal('<h3>📣 Divulgar horários livres</h3>' +
+    '<label class="fld">Para qual dia?</label><div class="opts" id="dvDia">' +
+      '<button class="opt sel" data-v="' + todayStr() + '">Hoje</button>' +
+      '<button class="opt" data-v="' + addDays(todayStr(), 1) + '">Amanhã</button></div>' +
+    '<label class="fld">Mensagem (pode editar)</label><textarea id="dvTxt" rows="5"></textarea>' +
+    '<div class="row" style="margin-top:14px">' +
+      '<button class="btn soft grow" id="dvCopy">📋 Copiar</button>' +
+      '<button class="btn grow" id="dvWa">💬 WhatsApp</button></div>' +
+    '<button class="btn ghost block sm" id="dvPub" style="margin-top:10px">📲 Publicar como aviso no app dos clientes</button>' +
+    '<button class="btn ghost block sm" style="margin-top:8px" onclick="closeModal()">Fechar</button>');
+  let dia = todayStr();
+  function upd() {
+    const t = textoPara(dia);
+    $('#dvTxt').value = t || 'Nenhum horário livre neste dia. 🎉 Agenda cheia!';
+  }
+  $$('#dvDia button').forEach(b => b.onclick = () => {
+    dia = b.dataset.v; $$('#dvDia button').forEach(x => x.classList.toggle('sel', x === b)); upd();
+  });
+  upd();
+  $('#dvCopy').onclick = () => { navigator.clipboard.writeText($('#dvTxt').value).then(() => toast('📋 Copiado! Cole no status ou nos grupos.')); };
+  $('#dvWa').onclick = () => openWa('', $('#dvTxt').value);
+  $('#dvPub').onclick = () => {
+    Store.mutate(s => s.announcements.push({
+      id: uid(), emoji: '🔥', text: $('#dvTxt').value, until: dia, active: true,
+      createdAt: Date.now(), updatedAt: Date.now()
+    }));
+    closeModal();
+    toast('📲 Aviso publicado no app dos clientes!', 'ok');
+  };
+}
+
+/* ================= ABA CLIENTES ================= */
+function viewClientes() {
+  const c = Store.cfg();
+  const due = remindersDue();
+  let h = '';
+
+  /* lembretes de amanhã */
+  h += '<div class="card"><h2>🔔 Lembretes de amanhã</h2>' +
+    '<div class="muted small" style="margin-bottom:8px">Com 1 dia de antecedência o app prepara a mensagem — toque para enviar no WhatsApp.</div>' +
+    (due.length ? due.map(b =>
+      '<div class="list-item"><div class="grow"><b>' + esc(b.name) + '</b>' +
+      '<div class="muted small">' + esc(b.serviceName) + (b.pet && b.pet.name ? ' · 🐾 ' + esc(b.pet.name) : '') + ' · amanhã às ' + b.time + '</div></div>' +
+      '<button class="btn ok sm" data-remind="' + b.id + '">💬 Enviar</button></div>').join('')
+      : '<div class="muted">Nenhum lembrete pendente para amanhã. 👌</div>') +
+    (Store.activeBookings().some(b => b.date === addDays(todayStr(), 1) && b.reminderAt)
+      ? '<div class="muted small" style="margin-top:8px">✅ Lembretes já enviados hoje ficam fora da lista.</div>' : '') +
+    '</div>';
+
+  /* fidelidade / lista de clientes */
+  const cls = clientsAgg();
+  const n = c.loyaltyEvery || 5;
+  h += '<div class="card"><h2>' + (IS_PET ? '🐾 Tutores e pets' : '👥 Seus clientes') + '</h2>';
+  if (!cls.length) h += '<div class="muted">Os clientes aparecem aqui depois do primeiro agendamento.</div>';
+  else h += cls.map(cl => {
+    const stamps = cl.visits % n;
+    const reward = cl.visits > 0 && stamps === 0;
+    const inactive = cl.lastDate && cl.lastDate < addDays(todayStr(), -30);
+    return '<div class="list-item"><div class="grow"><b>' + esc(cl.name) + '</b>' +
+      (cl.pets.length ? ' <span class="muted small">🐾 ' + esc(cl.pets.join(', ')) + '</span>' : '') +
+      '<div class="muted small">' + cl.visits + ' visita' + (cl.visits === 1 ? '' : 's') +
+      (cl.lastDate ? ' · última: ' + dateLabel(cl.lastDate) : '') + '</div>' +
+      (FEAT.loyalty ? '<div class="prog"><i style="width:' + Math.round((reward ? n : stamps) / n * 100) + '%"></i></div>' +
+        '<div class="muted small">' + (reward ? '🎁 completou o cartão fidelidade!' : (stamps + '/' + n + ' para o brinde')) + '</div>' : '') +
+      '</div><div>' +
+      (reward && FEAT.loyalty ? '<button class="btn ok sm" data-fiel="' + esc(cl.key) + '">🎁</button> ' : '') +
+      (inactive ? '<button class="btn soft sm" data-volta="' + esc(cl.key) + '" title="Chamar de volta">🥺</button> ' : '') +
+      '<a class="btn soft sm" target="_blank" href="' + waLink(cl.phone, 'Olá, ' + cl.name + '! Aqui é da ' + c.shopName + ' 😀') + '">💬</a>' +
+      '</div></div>';
+  }).join('');
+  h += '</div>';
+
+  /* certidão de nascimento */
+  if (FEAT.certificate) {
+    h += '<div class="card"><h2>📜 Certidão de nascimento do pet</h2>' +
+      '<div class="muted small" style="margin-bottom:10px">Um mimo que encanta os tutores: gere uma certidão linda com foto para imprimir ou mandar no WhatsApp.</div>' +
+      '<button class="btn block" id="btnCert">📜 Criar certidão</button></div>';
+  }
+
+  $('#view').innerHTML = h;
+
+  $$('#view [data-remind]').forEach(btn => btn.onclick = () => {
+    const b = Store.state.bookings.find(x => x.id === btn.dataset.remind);
+    openWa(b.phone, msgLembrete(b));
+    Store.mutate(s => { b.reminderAt = Date.now(); b.updatedAt = Date.now(); });
+    toast('💬 Lembrete aberto no WhatsApp — é só enviar.');
+  });
+  $$('#view [data-fiel]').forEach(btn => btn.onclick = () => {
+    const cl = clientsAgg().find(x => x.key === btn.dataset.fiel);
+    openWa(cl.phone, msgFidelidade(cl));
+  });
+  $$('#view [data-volta]').forEach(btn => btn.onclick = () => {
+    const cl = clientsAgg().find(x => x.key === btn.dataset.volta);
+    openWa(cl.phone, msgSaudade(cl));
+  });
+  const bc = $('#btnCert'); if (bc) bc.onclick = modalCert;
+}
+
+/* aviso automático de lembretes ao abrir o painel */
+function autoReminders() {
+  const due = remindersDue();
+  if (!due.length) return;
+  openModal('<h3>🔔 ' + due.length + ' lembrete' + (due.length > 1 ? 's' : '') + ' para amanhã</h3>' +
+    '<div class="muted small" style="margin-bottom:10px">Mensagens prontas — toque para enviar no WhatsApp de cada cliente:</div>' +
+    due.map(b => '<div class="list-item"><div class="grow"><b>' + esc(b.name) + '</b><div class="muted small">' + b.time + ' · ' + esc(b.serviceName) + '</div></div>' +
+      '<button class="btn ok sm" data-arem="' + b.id + '">💬 Enviar</button></div>').join('') +
+    '<button class="btn ghost block" style="margin-top:12px" onclick="closeModal()">Deixar para depois</button>');
+  $$('#modalRoot [data-arem]').forEach(btn => btn.onclick = () => {
+    const b = Store.state.bookings.find(x => x.id === btn.dataset.arem);
+    openWa(b.phone, msgLembrete(b));
+    Store.mutate(s => { b.reminderAt = Date.now(); b.updatedAt = Date.now(); });
+    btn.textContent = '✅';
+    btn.disabled = true;
+  });
+}
+
+/* ============= LEMBRETE AUTOMÁTICO (1h / 30min antes) ============= */
+const AutoReminder = {
+  timer: null,
+  queue: [],
+
+  start() {
+    if (this.timer) return;
+    this.tick();
+    this.timer = setInterval(() => this.tick(), 40000);
+  },
+  requestPermission() {
+    try {
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    } catch (e) {}
+  },
+  tick() {
+    const c = Store.cfg();
+    const ar = c.autoReminder || {};
+    if (!ar.enabled) return;
+    const mins = +ar.minutes || 60;
+    const now = Date.now();
+    Store.activeBookings().forEach(b => {
+      if (b.type === 'hotel') return;
+      if (b.status !== 'confirmado' && b.status !== 'pendente') return;
+      if (b.autoRemindAt) return;
+      const start = bookingMoment(b);
+      const diff = start - now;
+      if (diff > 0 && diff <= mins * 60000) this.fire(b);
+    });
+  },
+  fire(b) {
+    /* marca para não repetir */
+    Store.mutate(s => { const x = s.bookings.find(k => k.id === b.id); if (x) { x.autoRemindAt = Date.now(); x.updatedAt = Date.now(); } });
+    ding();
+    const falta = Math.max(0, Math.round((bookingMoment(b) - Date.now()) / 60000));
+    toast('🔔 Hora do lembrete: <b>' + esc(b.name) + '</b> às ' + b.time + ' (faltam ~' + falta + ' min)', 'ok');
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('🔔 Lembrete de horário', { body: b.name + ' — ' + b.serviceName + ' às ' + b.time + ' (em ~' + falta + ' min)' });
+      }
+    } catch (e) {}
+    this.queue.push(b.id);
+    this.showQueue();
+  },
+  showQueue() {
+    if (!this.queue.length) return;
+    const items = this.queue.map(id => Store.state.bookings.find(x => x.id === id)).filter(Boolean);
+    if (!items.length) { this.queue = []; return; }
+    openModal('<h3>🔔 Lembrete automático</h3>' +
+      '<div class="muted small" style="margin-bottom:10px">Está quase na hora destes clientes. Toque em <b>Enviar</b> para disparar o lembrete no WhatsApp:</div>' +
+      items.map(b => {
+        const falta = Math.max(0, Math.round((bookingMoment(b) - Date.now()) / 60000));
+        return '<div class="list-item"><div class="grow"><b>' + esc(b.name) + '</b>' +
+          '<div class="muted small">' + esc(b.serviceName) + ' · hoje às ' + b.time + ' · faltam ~' + falta + ' min</div></div>' +
+          '<button class="btn ok sm" data-arsend="' + b.id + '">💬 Enviar</button></div>';
+      }).join('') +
+      '<button class="btn ghost block" style="margin-top:12px" id="arClose">Fechar</button>');
+    $$('#modalRoot [data-arsend]').forEach(btn => btn.onclick = () => {
+      const b = Store.state.bookings.find(x => x.id === btn.dataset.arsend);
+      if (b) openWa(b.phone, msgLembreteHoje(b));
+      btn.textContent = '✅';
+      btn.disabled = true;
+    });
+    $('#arClose').onclick = () => { this.queue = []; closeModal(); };
+  }
+};
+
+/* ---------- certidão de nascimento (canvas) ---------- */
+function modalCert() {
+  openModal('<h3>📜 Certidão de nascimento</h3>' +
+    '<label class="fld">Nome do pet</label><input id="cNome" placeholder="Ex.: Thor Silva">' +
+    '<div class="row"><div class="grow"><label class="fld">Espécie</label><select id="cEsp"><option>Cão</option><option>Gato</option></select></div>' +
+    '<div class="grow"><label class="fld">Sexo</label><select id="cSexo"><option>Macho</option><option>Fêmea</option></select></div></div>' +
+    '<label class="fld">Raça</label><input id="cRaca" placeholder="Ex.: SRD (vira-lata caramelo)">' +
+    '<label class="fld">Data de nascimento</label><input type="date" id="cNasc">' +
+    '<label class="fld">Nome do tutor(a)</label><input id="cTutor" placeholder="Ex.: Maria Souza">' +
+    '<label class="fld">Cidade</label><input id="cCidade" placeholder="Ex.: São Paulo — SP">' +
+    '<label class="fld">Foto do pet (opcional)</label><input type="file" id="cFoto" accept="image/*">' +
+    '<button class="btn block" id="cGerar" style="margin-top:14px">✨ Gerar certidão</button>' +
+    '<div id="cOut" style="margin-top:14px"></div>');
+  let fotoImg = null;
+  $('#cFoto').onchange = ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    const img = new Image();
+    img.onload = () => { fotoImg = img; };
+    img.src = URL.createObjectURL(f);
+  };
+  $('#cGerar').onclick = () => {
+    const nome = $('#cNome').value.trim();
+    if (!nome) { toast('Escreva o nome do pet.', 'danger'); return; }
+    const dados = {
+      nome, especie: $('#cEsp').value, sexo: $('#cSexo').value,
+      raca: $('#cRaca').value.trim() || 'SRD', nasc: $('#cNasc').value,
+      tutor: $('#cTutor').value.trim(), cidade: $('#cCidade').value.trim()
+    };
+    const url = desenharCertidao(dados, fotoImg);
+    $('#cOut').innerHTML = '<img class="cert-canvas" src="' + url + '">' +
+      '<div class="row" style="margin-top:10px">' +
+      '<a class="btn grow" download="certidao-' + nome.toLowerCase().replace(/\s+/g, '-') + '.png" href="' + url + '">⬇️ Baixar imagem</a>' +
+      '<button class="btn soft grow" id="cPrint">🖨️ Imprimir</button></div>';
+    $('#cPrint').onclick = () => {
+      const w = window.open('', '_blank');
+      w.document.write('<img src="' + url + '" style="width:100%" onload="setTimeout(()=>{print()},300)">');
+      w.document.close();
+    };
+  };
+}
+function desenharCertidao(d, foto) {
+  const c = Store.cfg();
+  const W = 1080, H = 1400;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  x.fillStyle = '#FBF3E4'; x.fillRect(0, 0, W, H);
+  x.fillStyle = 'rgba(210,170,110,.12)';
+  for (let i = 0; i < 40; i++) { x.font = '38px serif'; x.fillText('🐾', (i * 173) % W, ((i * 271) % H) + 30); }
+  const prim = (CFG.theme && CFG.theme.primary) || '#B8862F';
+  x.strokeStyle = prim; x.lineWidth = 10; x.strokeRect(36, 36, W - 72, H - 72);
+  x.lineWidth = 3; x.strokeRect(56, 56, W - 112, H - 112);
+  x.textAlign = 'center';
+  x.fillStyle = '#6B4E1E';
+  x.font = '600 34px Georgia, serif';
+  x.fillText((c.shopName || '').toUpperCase(), W / 2, 140);
+  x.fillStyle = '#3C2E14';
+  x.font = '800 64px Georgia, serif';
+  x.fillText('Certidão de Nascimento', W / 2, 230);
+  x.font = '30px Georgia, serif';
+  x.fillStyle = '#6B4E1E';
+  x.fillText('— ' + (d.especie === 'Gato' ? '🐱' : '🐶') + ' —', W / 2, 285);
+  let y = 360;
+  if (foto) {
+    const r = 130; y = 620;
+    x.save(); x.beginPath(); x.arc(W / 2, 470, r, 0, Math.PI * 2); x.clip();
+    const s = Math.max(r * 2 / foto.width, r * 2 / foto.height);
+    x.drawImage(foto, W / 2 - foto.width * s / 2, 470 - foto.height * s / 2, foto.width * s, foto.height * s);
+    x.restore();
+    x.beginPath(); x.arc(W / 2, 470, r + 6, 0, Math.PI * 2); x.strokeStyle = prim; x.lineWidth = 8; x.stroke();
+  }
+  x.fillStyle = '#2A2010';
+  x.font = 'italic 900 78px Georgia, serif';
+  x.fillText(d.nome, W / 2, y + 60);
+  x.font = '30px Georgia, serif';
+  x.fillStyle = '#4A3A1C';
+  const linhas = [
+    d.especie + ' · ' + d.sexo + ' · ' + d.raca,
+    d.nasc ? 'Nascido(a) em ' + dateLabelLong(d.nasc) : '',
+    d.tutor ? 'Filho(a) de coração de ' + d.tutor : '',
+    d.cidade || ''
+  ].filter(Boolean);
+  linhas.forEach((l, i) => x.fillText(l, W / 2, y + 140 + i * 56));
+  x.font = 'italic 26px Georgia, serif';
+  x.fillStyle = '#6B4E1E';
+  x.fillText('Certificamos, com muito amor, que este pet faz parte da nossa família.', W / 2, H - 220);
+  x.strokeStyle = '#6B4E1E'; x.lineWidth = 2;
+  x.beginPath(); x.moveTo(W / 2 - 200, H - 150); x.lineTo(W / 2 + 200, H - 150); x.stroke();
+  x.font = '26px Georgia, serif';
+  x.fillText(c.shopName, W / 2, H - 115);
+  const hoje = new Date();
+  x.font = '22px Georgia, serif';
+  x.fillText((d.cidade ? d.cidade + ', ' : '') + hoje.getDate() + ' de ' + MESES[hoje.getMonth()] + ' de ' + hoje.getFullYear(), W / 2, H - 80);
+  return cv.toDataURL('image/png');
+}
+
+/* ================= ABA BARBEIROS / COMISSÃO ================= */
+function viewEquipe() {
+  const barbers = Store.barbers();
+  const mes = todayStr().slice(0, 7);
+  const totalMes = barbers.reduce((s, b) => s + barberStats(b.id, mes).total, 0);
+  let h = '<div class="row" style="margin-bottom:12px">' +
+    '<div class="stat"><div class="v">' + barbers.length + '</div><div class="l">barbeiros</div></div>' +
+    '<div class="stat"><div class="v">' + money(totalMes) + '</div><div class="l">comissões no mês</div></div></div>';
+
+  h += '<div class="card"><h2>💈 Equipe e comissões</h2>' +
+    '<div class="muted small" style="margin-bottom:10px">Cadastre cada barbeiro com a sua porcentagem. A comissão é <b>calculada sozinha</b> a partir dos atendimentos concluídos e das vendas de produtos no mês.</div>';
+  if (!barbers.length) {
+    h += '<div class="muted">Nenhum barbeiro cadastrado ainda.</div>';
+  } else {
+    h += barbers.map(b => {
+      const st = barberStats(b.id, mes);
+      return '<div class="list-item"><span style="font-size:24px">' + esc(b.emoji || '💈') + '</span>' +
+        '<div class="grow"><b>' + esc(b.name) + '</b> <span class="b-tag">' + (+b.commission || 0) + '%</span>' +
+        '<div class="muted small">' + st.svcCount + ' atend. · ' + money(st.revenue) + ' em serviços' +
+        (st.prodCom ? ' · produtos ' + money(st.prodCom) : '') + '</div>' +
+        '<div class="muted small">Comissão do mês: <b style="color:var(--accent)">' + money(st.total) + '</b></div></div>' +
+        '<div>' +
+          '<a class="btn soft sm" target="_blank" href="' + waLink(b.phone || '', 'Olá, ' + b.name + '! Seu acerto de comissões da ' + esc(Store.cfg().shopName) + ' no mês está em ' + money(st.total) + ' até agora. 💈') + '">💬</a> ' +
+          '<button class="btn soft sm" data-editb="' + esc(b.id) + '">✏️</button></div></div>';
+    }).join('');
+  }
+  h += '<button class="btn block" id="bAdd" style="margin-top:12px">➕ Adicionar barbeiro</button></div>';
+
+  /* detalhamento dos atendimentos do mês por barbeiro */
+  const concl = Store.state.bookings.filter(b => b.status === 'concluido' && (b.date || '').slice(0, 7) === mes)
+    .sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 12);
+  if (concl.length) {
+    h += '<div class="card"><h2>🧾 Atendimentos concluídos no mês</h2>' + concl.map(b => {
+      const bb = b.barberId ? Store.barberById(b.barberId) : null;
+      const com = bb ? (+b.price || 0) * (+bb.commission || 0) / 100 : 0;
+      return '<div class="list-item"><div class="grow"><b>' + esc(b.name) + '</b> <span class="muted small">' + esc(b.serviceName) + '</span>' +
+        '<div class="muted small">' + dateLabel(b.date) + ' · ' + money(b.price) + ' · ' + (bb ? '💈 ' + esc(bb.name) : '<span style="color:var(--warn)">sem barbeiro</span>') + '</div></div>' +
+        (bb ? '<span class="chip ok">+' + money(com) + '</span>' : '<button class="btn soft sm" data-assign="' + b.id + '">Atribuir</button>') + '</div>';
+    }).join('') + '</div>';
+  }
+
+  $('#view').innerHTML = h;
+  $('#bAdd').onclick = () => modalBarbeiro(null);
+  $$('#view [data-editb]').forEach(btn => btn.onclick = () => modalBarbeiro(btn.dataset.editb));
+  $$('#view [data-assign]').forEach(btn => btn.onclick = () => {
+    const b = Store.state.bookings.find(x => x.id === btn.dataset.assign);
+    if (b) modalAtribuir(b);
+  });
+}
+function modalAtribuir(b) {
+  openModal('<h3>💈 Quem atendeu?</h3>' +
+    '<div class="muted small" style="margin-bottom:10px">' + esc(b.name) + ' · ' + esc(b.serviceName) + ' · ' + dateLabel(b.date) + '</div>' +
+    '<label class="fld">Barbeiro</label><select id="atBarber">' + barberOptions(b.barberId) + '</select>' +
+    '<div class="row" style="margin-top:16px"><button class="btn ghost grow" onclick="closeModal()">Cancelar</button>' +
+    '<button class="btn grow" id="atOk">Salvar</button></div>');
+  $('#atOk').onclick = () => {
+    const bid = $('#atBarber').value || null;
+    Store.mutate(s => { const x = s.bookings.find(k => k.id === b.id); if (x) { x.barberId = bid; x.updatedAt = Date.now(); } });
+    closeModal();
+    toast('💈 Atendimento atribuído.', 'ok');
+  };
+}
+function modalBarbeiro(id) {
+  const b = id ? (Store.barbers().find(x => x.id === id) || Store.barberById(id)) : { emoji: '💈', name: '', commission: 50, phone: '' };
+  openModal('<h3>' + (id ? '✏️ Editar barbeiro' : '➕ Novo barbeiro') + '</h3>' +
+    '<div class="row"><div style="width:90px"><label class="fld">Emoji</label><input id="brEmoji" value="' + esc(b.emoji || '💈') + '"></div>' +
+    '<div class="grow"><label class="fld">Nome</label><input id="brNome" value="' + esc(b.name || '') + '" placeholder="Ex.: Daniel"></div></div>' +
+    '<label class="fld">Comissão sobre serviços (%)</label><input id="brCom" inputmode="numeric" value="' + (b.commission != null ? b.commission : 50) + '">' +
+    '<label class="fld">WhatsApp do barbeiro (opcional)</label><input id="brFone" inputmode="tel" value="' + esc(b.phone || '') + '" placeholder="(11) 99999-0000">' +
+    '<div class="muted small" style="margin-top:8px">💡 A comissão é aplicada automaticamente no valor de cada serviço concluído por este barbeiro.</div>' +
+    '<div class="row" style="margin-top:16px">' +
+    (id ? '<button class="btn danger" id="brDel">🗑️</button>' : '') +
+    '<button class="btn ghost grow" onclick="closeModal()">Cancelar</button>' +
+    '<button class="btn grow" id="brOk">Salvar</button></div>');
+  $('#brOk').onclick = () => {
+    const nome = $('#brNome').value.trim();
+    if (!nome) { toast('Escreva o nome do barbeiro.', 'danger'); return; }
+    const novo = {
+      id: id || uid(), emoji: $('#brEmoji').value.trim() || '💈', name: nome,
+      commission: Math.max(0, Math.min(100, parseFloat($('#brCom').value) || 0)),
+      phone: $('#brFone').value.trim(), active: true, updatedAt: Date.now()
+    };
+    Store.mutate(s => {
+      const i = s.barbers.findIndex(x => x.id === novo.id);
+      if (i >= 0) s.barbers[i] = novo; else s.barbers.push(novo);
+    });
+    closeModal();
+    toast('💈 Barbeiro salvo! Comissão de ' + novo.commission + '% já valendo.', 'ok');
+  };
+  const del = $('#brDel');
+  if (del) del.onclick = () => {
+    if (!confirm('Remover este barbeiro? Os atendimentos passados continuam registrados.')) return;
+    Store.mutate(s => {
+      const i = s.barbers.findIndex(x => x.id === id);
+      const tomb = { id, active: false, updatedAt: Date.now(), name: b.name, emoji: b.emoji, commission: b.commission, phone: b.phone || '' };
+      if (i >= 0) s.barbers[i] = tomb; else s.barbers.push(tomb);
+    });
+    closeModal();
+    toast('Barbeiro removido.');
+  };
+}
+
+/* ================= ABA PRODUTOS ================= */
+function viewProdutos() {
+  const c = Store.cfg();
+  const list = Store.products();
+  const mes = todayStr().slice(0, 7);
+  const vendasMes = (Store.state.sales || []).filter(v => (v.date || '').slice(0, 7) === mes);
+  const comissao = vendasMes.reduce((s, v) => s + (v.commission || 0), 0);
+  const total = vendasMes.reduce((s, v) => s + (v.total || 0), 0);
+
+  let h = '<div class="row" style="margin-bottom:12px">' +
+    '<div class="stat"><div class="v">' + money(comissao) + '</div><div class="l">comissão no mês</div></div>' +
+    '<div class="stat"><div class="v">' + money(total) + '</div><div class="l">vendido no mês</div></div></div>';
+
+  h += '<div class="card"><h2>🛍️ Produtos que você indica</h2>' +
+    '<div class="muted small" style="margin-bottom:10px">Ofereça na cadeira e ganhe comissão. Os produtos aparecem também no app do cliente.</div>' +
+    (list.length ? list.map(p =>
+      '<div class="list-item"><span style="font-size:24px">' + esc(p.emoji || '🛍️') + '</span>' +
+      '<div class="grow"><b>' + esc(p.name) + '</b>' +
+      '<div class="muted small">' + money(p.price) + ' · comissão ' + (p.commission || 0) + '% (' + money(p.price * (p.commission || 0) / 100) + ')</div></div>' +
+      '<div><button class="btn ok sm" data-sell="' + esc(p.id) + '">💰 Vendi</button> ' +
+      '<button class="btn soft sm" data-adv="' + esc(p.id) + '">📣</button> ' +
+      '<button class="btn soft sm" data-edit="' + esc(p.id) + '">✏️</button></div></div>').join('')
+      : '<div class="muted">Nenhum produto ainda.</div>') +
+    '<div class="row" style="margin-top:12px"><button class="btn grow" id="pAdd">➕ Novo produto</button>' +
+    '<button class="btn soft grow" id="pCat">📣 Divulgar catálogo</button></div></div>';
+
+  const vendas = (Store.state.sales || []).slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 8);
+  if (vendas.length) {
+    h += '<div class="card"><h2>🧾 Últimas vendas</h2>' + vendas.map(v => {
+      const bb = v.barberId ? Store.barberById(v.barberId) : null;
+      return '<div class="list-item"><div class="grow"><b>' + esc(v.productName) + '</b>' +
+        '<div class="muted small">' + dateLabel(v.date) + ' · ' + money(v.total) + (bb ? ' · 💈 ' + esc(bb.name) : '') + '</div></div>' +
+        '<span class="chip ok">+' + money(v.commission) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  $('#view').innerHTML = h;
+
+  $$('#view [data-sell]').forEach(b => b.onclick = () => {
+    const p = Store.products().find(x => x.id === b.dataset.sell);
+    const barbers = Store.barbers();
+    if (barbers.length) { modalVenda(p); return; }
+    Store.mutate(s => s.sales.push({
+      id: uid(), productId: p.id, productName: p.emoji + ' ' + p.name,
+      total: p.price, commission: p.price * (p.commission || 0) / 100,
+      date: todayStr(), createdAt: Date.now(), updatedAt: Date.now()
+    }));
+    toast('💰 Venda registrada! Comissão: ' + money(p.price * (p.commission || 0) / 100), 'ok');
+  });
+  $$('#view [data-adv]').forEach(b => b.onclick = () => {
+    const p = Store.products().find(x => x.id === b.dataset.adv);
+    openWa('', p.emoji + ' ' + p.name + ' por só ' + money(p.price) + ' aqui na ' + c.shopName + '! Garanta o seu no próximo horário ou responda aqui. 😉');
+  });
+  $$('#view [data-edit]').forEach(b => b.onclick = () => modalProduto(b.dataset.edit));
+  $('#pAdd').onclick = () => modalProduto(null);
+  $('#pCat').onclick = () => {
+    const linhas = Store.products().map(p => p.emoji + ' ' + p.name + ' — ' + money(p.price)).join('\n');
+    openWa('', '🛍️ Produtos disponíveis na ' + c.shopName + ':\n\n' + linhas + '\n\nReserve o seu! 😉');
+  };
+}
+function modalVenda(p) {
+  openModal('<h3>💰 Registrar venda</h3>' +
+    '<div class="muted small" style="margin-bottom:10px">' + esc(p.emoji + ' ' + p.name) + ' · ' + money(p.price) + '</div>' +
+    '<label class="fld">Quem vendeu? (a comissão vai para este barbeiro)</label><select id="veBarber">' + barberOptions(null) + '</select>' +
+    '<div class="row" style="margin-top:16px"><button class="btn ghost grow" onclick="closeModal()">Cancelar</button>' +
+    '<button class="btn grow" id="veOk">Registrar</button></div>');
+  $('#veOk').onclick = () => {
+    Store.mutate(s => s.sales.push({
+      id: uid(), productId: p.id, productName: p.emoji + ' ' + p.name,
+      total: p.price, commission: p.price * (p.commission || 0) / 100,
+      barberId: $('#veBarber').value || null,
+      date: todayStr(), createdAt: Date.now(), updatedAt: Date.now()
+    }));
+    closeModal();
+    toast('💰 Venda registrada! Comissão: ' + money(p.price * (p.commission || 0) / 100), 'ok');
+  };
+}
+function modalProduto(id) {
+  const p = id ? Store.products().find(x => x.id === id) : { emoji: '🧴', name: '', price: '', commission: 20 };
+  openModal('<h3>' + (id ? '✏️ Editar produto' : '➕ Novo produto') + '</h3>' +
+    '<div class="row"><div style="width:90px"><label class="fld">Emoji</label><input id="prEmoji" value="' + esc(p.emoji || '') + '"></div>' +
+    '<div class="grow"><label class="fld">Nome</label><input id="prNome" value="' + esc(p.name || '') + '" placeholder="Ex.: Pomada modeladora"></div></div>' +
+    '<div class="row"><div class="grow"><label class="fld">Preço (R$)</label><input id="prPreco" inputmode="decimal" value="' + (p.price || '') + '"></div>' +
+    '<div class="grow"><label class="fld">Comissão (%)</label><input id="prCom" inputmode="numeric" value="' + (p.commission || 0) + '"></div></div>' +
+    '<div class="row" style="margin-top:16px">' +
+    (id ? '<button class="btn danger" id="prDel">🗑️</button>' : '') +
+    '<button class="btn ghost grow" onclick="closeModal()">Cancelar</button>' +
+    '<button class="btn grow" id="prOk">Salvar</button></div>');
+  $('#prOk').onclick = () => {
+    const nome = $('#prNome').value.trim();
+    const preco = parseFloat(String($('#prPreco').value).replace(',', '.')) || 0;
+    if (!nome || !preco) { toast('Preencha nome e preço.', 'danger'); return; }
+    const novo = {
+      id: id || uid(), emoji: $('#prEmoji').value.trim() || '🛍️', name: nome, price: preco,
+      commission: parseFloat($('#prCom').value) || 0, active: true, updatedAt: Date.now()
+    };
+    Store.mutate(s => {
+      const i = s.products.findIndex(x => x.id === novo.id);
+      if (i >= 0) s.products[i] = novo; else s.products.push(novo);
+    });
+    closeModal();
+  };
+  const del = $('#prDel');
+  if (del) del.onclick = () => {
+    Store.mutate(s => {
+      const i = s.products.findIndex(x => x.id === id);
+      const tomb = { id, active: false, updatedAt: Date.now(), name: p.name, price: p.price, emoji: p.emoji, commission: p.commission };
+      if (i >= 0) s.products[i] = tomb; else s.products.push(tomb);
+    });
+    closeModal();
+  };
+}
+
+/* ================= ABA COMUNICADOS ================= */
+function viewComunicados() {
+  const list = Store.activeAnnouncements();
+  const blocked = (Store.state.blockedDates || []).filter(b => b.active !== false && b.id >= todayStr()).sort((a, b) => a.id < b.id ? -1 : 1);
+  let h = '<div class="card"><h2>📤 Disparo de mensagens</h2>' +
+    '<div class="muted small" style="margin-bottom:8px">Envie a mesma mensagem para vários clientes no WhatsApp — promoções, recados, novidades.</div>' +
+    '<button class="btn block" id="btnDisparo">📤 Novo disparo</button></div>';
+
+  h += '<div class="card"><h2>📣 Novo comunicado</h2>' +
+    '<div class="muted small" style="margin-bottom:8px">Aparece em destaque no app de todos os clientes.</div>' +
+    '<div class="row"><div style="width:90px"><label class="fld">Emoji</label><input id="anEmoji" value="📣"></div>' +
+    '<div class="grow"><label class="fld">Mostrar até (opcional)</label><input type="date" id="anAte" min="' + todayStr() + '"></div></div>' +
+    '<label class="fld">Mensagem</label><textarea id="anTxt" rows="3" placeholder="Ex.: Semana que vem atendo só até 15h."></textarea>' +
+    '<button class="btn block" id="anOk" style="margin-top:12px">📲 Publicar aviso</button></div>';
+
+  h += '<div class="card"><h2>✈️ Modo viagem / férias</h2>' +
+    '<div class="muted small" style="margin-bottom:8px">Fecha a agenda no período e avisa os clientes automaticamente.</div>' +
+    '<div class="row"><div class="grow"><label class="fld">De</label><input type="date" id="viDe" min="' + todayStr() + '"></div>' +
+    '<div class="grow"><label class="fld">Até</label><input type="date" id="viAte" min="' + todayStr() + '"></div></div>' +
+    '<button class="btn block" id="viOk" style="margin-top:12px">✈️ Ativar modo viagem</button></div>';
+
+  if (list.length) {
+    h += '<div class="card"><h2>Avisos ativos</h2>' + list.map(a =>
+      '<div class="list-item"><span style="font-size:22px">' + esc(a.emoji || '📣') + '</span>' +
+      '<div class="grow">' + esc(a.text) + (a.until ? '<div class="muted small">até ' + dateLabel(a.until) + '</div>' : '') + '</div>' +
+      '<button class="btn danger sm" data-rm="' + a.id + '">🗑️</button></div>').join('') + '</div>';
+  }
+  if (blocked.length) {
+    h += '<div class="card"><h2>🚫 Dias fechados</h2>' + blocked.map(b =>
+      '<div class="list-item"><div class="grow"><b>' + dateLabel(b.id) + '</b> <span class="muted small">' + esc(b.reason || '') + '</span></div>' +
+      '<button class="btn soft sm" data-open="' + b.id + '">Reabrir</button></div>').join('') + '</div>';
+  }
+  $('#view').innerHTML = h;
+
+  $('#btnDisparo').onclick = modalDisparo;
+  $('#anOk').onclick = () => {
+    const t = $('#anTxt').value.trim();
+    if (!t) { toast('Escreva a mensagem.', 'danger'); return; }
+    Store.mutate(s => s.announcements.push({
+      id: uid(), emoji: $('#anEmoji').value.trim() || '📣', text: t,
+      until: $('#anAte').value || '', active: true, createdAt: Date.now(), updatedAt: Date.now()
+    }));
+    toast('📲 Aviso publicado!', 'ok');
+  };
+  $('#viOk').onclick = () => {
+    const de = $('#viDe').value, ate = $('#viAte').value;
+    if (!de || !ate || ate < de) { toast('Escolha as duas datas.', 'danger'); return; }
+    Store.mutate(s => {
+      for (let d = de; d <= ate; d = addDays(d, 1)) {
+        const x = s.blockedDates.find(v => v.id === d);
+        if (x) { x.active = true; x.reason = 'Viagem'; x.updatedAt = Date.now(); }
+        else s.blockedDates.push({ id: d, reason: 'Viagem', active: true, updatedAt: Date.now() });
+      }
+      s.announcements.push({
+        id: uid(), emoji: '✈️',
+        text: 'Estarei fora de ' + dateLabel(de) + ' até ' + dateLabel(ate) + '. A agenda volta ao normal depois disso!',
+        until: ate, active: true, createdAt: Date.now(), updatedAt: Date.now()
+      });
+    });
+    toast('✈️ Modo viagem ativado — agenda fechada no período.', 'ok');
+  };
+  $$('#view [data-rm]').forEach(b => b.onclick = () => Store.mutate(s => {
+    const a = s.announcements.find(x => x.id === b.dataset.rm);
+    if (a) { a.active = false; a.updatedAt = Date.now(); }
+  }));
+  $$('#view [data-open]').forEach(b => b.onclick = () => Store.mutate(s => {
+    const d = s.blockedDates.find(x => x.id === b.dataset.open);
+    if (d) { d.active = false; d.updatedAt = Date.now(); }
+  }));
+}
+
+/* disparo de mensagens em massa (WhatsApp, um toque por cliente) */
+function modalDisparo() {
+  const c = Store.cfg();
+  function audiencia(tipo) {
+    const cls = clientsAgg().filter(cl => phoneBR(cl.phone));
+    if (tipo === 'inativos') return cls.filter(cl => cl.lastDate && cl.lastDate < addDays(todayStr(), -30));
+    if (tipo === 'amanha') {
+      const am = addDays(todayStr(), 1);
+      const ids = {};
+      Store.activeBookings().filter(b => b.date === am).forEach(b => { ids[phoneBR(b.phone) || b.name.toLowerCase()] = true; });
+      return cls.filter(cl => ids[phoneBR(cl.phone) || cl.name.toLowerCase()]);
+    }
+    return cls;
+  }
+  openModal('<h3>📤 Disparo de mensagens</h3>' +
+    '<label class="fld">Para quem?</label><div class="opts" id="dsAud">' +
+      '<button class="opt sel" data-v="todos">Todos</button>' +
+      '<button class="opt" data-v="inativos">Sumidos (30+ dias)</button>' +
+      '<button class="opt" data-v="amanha">Agenda de amanhã</button></div>' +
+    '<label class="fld">Mensagem <span class="muted small">(use {nome} para personalizar)</span></label>' +
+    '<textarea id="dsTxt" rows="4" placeholder="Ex.: Oi {nome}! Essa semana tem promoção de corte + barba na ' + esc(c.shopName) + '. Bora agendar? 💈"></textarea>' +
+    '<div id="dsCount" class="muted small" style="margin-top:8px"></div>' +
+    '<div class="row" style="margin-top:12px"><button class="btn soft grow" id="dsCopy">📋 Copiar texto</button>' +
+    '<button class="btn grow" id="dsPrep">📤 Preparar envios</button></div>' +
+    '<div id="dsList" style="margin-top:12px"></div>' +
+    '<button class="btn ghost block sm" style="margin-top:10px" onclick="closeModal()">Fechar</button>');
+  let aud = 'todos';
+  function upd() {
+    const n = audiencia(aud).length;
+    $('#dsCount').innerHTML = '👥 <b>' + n + '</b> cliente' + (n === 1 ? '' : 's') + ' com WhatsApp neste grupo.';
+  }
+  $$('#dsAud button').forEach(b => b.onclick = () => { aud = b.dataset.v; $$('#dsAud button').forEach(x => x.classList.toggle('sel', x === b)); upd(); $('#dsList').innerHTML = ''; });
+  upd();
+  $('#dsCopy').onclick = () => { navigator.clipboard.writeText($('#dsTxt').value).then(() => toast('📋 Texto copiado.')); };
+  $('#dsPrep').onclick = () => {
+    const txt = $('#dsTxt').value.trim();
+    if (!txt) { toast('Escreva a mensagem.', 'danger'); return; }
+    const alvo = audiencia(aud);
+    if (!alvo.length) { toast('Nenhum cliente com WhatsApp neste grupo.', 'danger'); return; }
+    $('#dsList').innerHTML = '<div class="muted small" style="margin:6px 0 8px">Toque em cada um para abrir o WhatsApp já com a mensagem. Marque conforme envia:</div>' +
+      alvo.map(cl => {
+        const msg = txt.replace(/\{nome\}/gi, (cl.name || '').split(' ')[0] || cl.name || '');
+        return '<div class="list-item"><div class="grow"><b>' + esc(cl.name) + '</b><div class="muted small">' + fmtPhone(cl.phone) + '</div></div>' +
+          '<a class="btn ok sm" target="_blank" data-dssent href="' + waLink(cl.phone, msg) + '">💬 Enviar</a></div>';
+      }).join('');
+    $$('#dsList [data-dssent]').forEach(a => a.addEventListener('click', () => { a.textContent = '✅ Enviado'; a.classList.remove('ok'); a.classList.add('soft'); }));
+    toast('📤 ' + alvo.length + ' mensagem(ns) prontas — envie uma a uma.', 'ok');
+  };
+}
+
+/* ================= ABA AJUSTES ================= */
+function viewAjustes() {
+  const c = Store.cfg();
+  const dias = [0, 1, 2, 3, 4, 5, 6];
+  const ar = c.autoReminder || { enabled: false, minutes: 60 };
+  const mp = (c.payments && c.payments.mercadopago) || { enabled: false, link: '' };
+  let h = '<div class="card"><h2>🪪 Perfil</h2>' +
+    '<div class="row" style="margin-bottom:6px"><div id="ajAvatar" class="avatar"></div>' +
+    '<div class="grow"><label class="fld" style="margin-top:0">Foto de perfil</label><input type="file" id="ajFoto" accept="image/*"></div></div>' +
+    '<label class="fld">Nome do estabelecimento</label><input id="ajNome" value="' + esc(c.shopName) + '">' +
+    '<label class="fld">Seu nome</label><input id="ajDono" value="' + esc(c.ownerName) + '">' +
+    '<label class="fld">Frase de apresentação</label><input id="ajTag" value="' + esc(c.tagline || '') + '">' +
+    '<label class="fld">WhatsApp do estabelecimento</label><input id="ajWa" inputmode="tel" value="' + esc(c.whatsapp || '') + '">' +
+    '<label class="fld">Endereço</label><input id="ajEnd" value="' + esc(c.address || '') + '">' +
+    '<button class="btn block" id="ajSalvar" style="margin-top:12px">💾 Salvar perfil</button></div>';
+
+  /* ---- lembrete automático ---- */
+  h += '<div class="card"><h2>🔔 Lembrete automático</h2>' +
+    '<div class="muted small" style="margin-bottom:10px">O painel avisa você (com som e alerta) quando falta pouco para o horário e já prepara a mensagem do cliente no WhatsApp. Funciona com o painel aberto.</div>' +
+    '<div class="row-between"><div><b>Ativar lembretes automáticos</b><div class="muted small">liga/desliga o envio</div></div>' +
+      '<label class="switch"><input type="checkbox" id="arOn" ' + (ar.enabled ? 'checked' : '') + '><span class="sl"></span></label></div>' +
+    '<label class="fld">Avisar com quanta antecedência?</label><div class="opts" id="arMin">' +
+      '<button class="opt ' + (+ar.minutes === 30 ? 'sel' : '') + '" data-v="30">30 minutos antes</button>' +
+      '<button class="opt ' + (+ar.minutes === 60 ? 'sel' : '') + '" data-v="60">1 hora antes</button></div>' +
+    '<button class="btn block" id="arSave" style="margin-top:12px">💾 Salvar lembrete automático</button></div>';
+
+  /* ---- pagamentos / mercado pago ---- */
+  h += '<div class="card"><h2>💳 Pagamentos — Mercado Pago <span class="muted small">(opcional)</span></h2>' +
+    '<div class="muted small" style="margin-bottom:10px">Ative para mostrar um botão <b>💳 Cobrar</b> nos agendamentos e enviar o link de pagamento pelo WhatsApp. Cole aqui o seu link de pagamento do Mercado Pago.</div>' +
+    '<div class="row-between"><div><b>Ativar Mercado Pago</b><div class="muted small">recurso adicional</div></div>' +
+      '<label class="switch"><input type="checkbox" id="mpOn" ' + (mp.enabled ? 'checked' : '') + '><span class="sl"></span></label></div>' +
+    '<label class="fld">Link de pagamento do Mercado Pago</label><input id="mpLink" value="' + esc(mp.link || '') + '" placeholder="https://mpago.la/...">' +
+    '<div class="muted small" style="margin-top:6px">Crie em Mercado Pago → “Link de pagamento” e cole aqui. Também pode usar um link do seu PIX/cobrança.</div>' +
+    '<button class="btn block" id="mpSave" style="margin-top:12px">💾 Salvar pagamentos</button></div>';
+
+  h += '<div class="card"><h2>🕐 Horário de funcionamento</h2>' +
+    '<label class="fld">Dias abertos</label><div class="opts" id="ajDias">' +
+    dias.map(d => '<button class="opt ' + (c.hours.openDays.indexOf(d) !== -1 ? 'sel' : '') + '" data-d="' + d + '">' + WD[d] + '</button>').join('') + '</div>' +
+    '<div class="row"><div class="grow"><label class="fld">Abre às</label><input type="time" id="ajIni" value="' + c.hours.start + '"></div>' +
+    '<div class="grow"><label class="fld">Fecha às</label><input type="time" id="ajFim" value="' + c.hours.end + '"></div></div>' +
+    '<div class="row"><div class="grow"><label class="fld">Duração de cada horário</label><select id="ajSlot">' +
+      [15, 20, 30, 40, 45, 60, 90].map(m => '<option value="' + m + '" ' + (c.hours.slotMinutes === m ? 'selected' : '') + '>' + m + ' min</option>').join('') + '</select></div>' +
+    '<div class="grow"><label class="fld">Agenda aberta por</label><select id="ajDias2">' +
+      [7, 14, 21, 30].map(d => '<option value="' + d + '" ' + ((c.hours.daysAhead || 14) === d ? 'selected' : '') + '>' + d + ' dias</option>').join('') + '</select></div></div>' +
+    '<button class="btn block" id="ajSalvarH" style="margin-top:12px">💾 Salvar horários</button></div>';
+
+  h += '<div class="card"><h2>' + (IS_PET ? '🛁 Serviços do petshop' : '✂️ Serviços e preços') + '</h2><div id="ajSvcs">' +
+    c.services.map(s => svcRow(s)).join('') + '</div>' +
+    '<button class="btn soft block sm" id="ajAddSvc">➕ Adicionar serviço</button>' +
+    '<button class="btn block" id="ajSalvarS" style="margin-top:10px">💾 Salvar serviços</button></div>';
+
+  if (IS_PET) {
+    h += '<div class="card"><h2>🚗 Leva-e-traz e fidelidade</h2>' +
+      '<div class="row"><div class="grow"><label class="fld">Taxa do leva-e-traz (R$)</label><input id="ajTaxa" inputmode="decimal" value="' + (c.pickupFee || 0) + '"></div>' +
+      '<div class="grow"><label class="fld">Brinde a cada quantos serviços?</label><input id="ajFiel" inputmode="numeric" value="' + (c.loyaltyEvery || 5) + '"></div></div>' +
+      '<button class="btn block" id="ajSalvarX" style="margin-top:12px">💾 Salvar</button></div>';
+  } else if (FEAT.loyalty) {
+    h += '<div class="card"><h2>🎁 Fidelidade</h2>' +
+      '<label class="fld">Brinde a cada quantas visitas?</label><input id="ajFiel" inputmode="numeric" value="' + (c.loyaltyEvery || 5) + '">' +
+      '<button class="btn block" id="ajSalvarX" style="margin-top:12px">💾 Salvar</button></div>';
+  }
+
+  h += '<div class="card"><h2>🔗 Conexão com o app do cliente</h2>' +
+    '<div class="muted small">Código desta loja (os dois apps precisam do mesmo código para se enxergarem):</div>' +
+    '<div class="row" style="margin-top:8px"><input readonly value="' + esc(CFG.shopId) + '" id="ajCod"><button class="btn soft sm" id="ajCopy">📋</button></div>' +
+    '<div class="muted small" style="margin-top:8px">No mesmo aparelho a sincronização é instantânea. Entre aparelhos diferentes, os dois precisam de internet (o wifi da barbearia serve) — o pareamento é automático pelo código.</div></div>';
+
+  h += '<div class="card"><h2>⚠️ Zona de perigo</h2>' +
+    '<button class="btn danger block" id="ajReset">🗑️ Apagar todos os dados desta loja</button></div>';
+
+  $('#view').innerHTML = h;
+
+  const av = $('#ajAvatar');
+  if (c.photo) av.innerHTML = '<img src="' + c.photo + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+  else av.textContent = c.icon || '📅';
+
+  let novaFoto = null;
+  $('#ajFoto').onchange = ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    resizePhoto(f, 256, url => {
+      novaFoto = url;
+      av.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+      toast('Foto pronta — toque em 💾 Salvar perfil.');
+    });
+  };
+  $('#ajSalvar').onclick = () => {
+    Store.mutate(s => {
+      s.config = Object.assign({}, s.config, {
+        shopName: $('#ajNome').value.trim() || c.shopName,
+        ownerName: $('#ajDono').value.trim() || c.ownerName,
+        tagline: $('#ajTag').value.trim(),
+        whatsapp: $('#ajWa').value.trim(),
+        address: $('#ajEnd').value.trim(),
+        photo: novaFoto || c.photo || '',
+        updatedAt: Date.now()
+      });
+    });
+    toast('💾 Perfil salvo — o app dos clientes já foi atualizado!', 'ok');
+  };
+
+  /* lembrete automático */
+  let arMin = +ar.minutes || 60;
+  $$('#arMin button').forEach(b => b.onclick = () => { arMin = +b.dataset.v; $$('#arMin button').forEach(x => x.classList.toggle('sel', x === b)); });
+  $('#arOn').onchange = () => { if ($('#arOn').checked) AutoReminder.requestPermission(); };
+  $('#arSave').onclick = () => {
+    const on = $('#arOn').checked;
+    Store.mutate(s => {
+      s.config = Object.assign({}, s.config, {
+        autoReminder: { enabled: on, minutes: arMin },
+        updatedAt: Date.now()
+      });
+    });
+    if (on) { AutoReminder.requestPermission(); AutoReminder.start(); }
+    toast(on ? '🔔 Lembrete automático ligado (' + arMin + ' min antes).' : '🔕 Lembrete automático desligado.', 'ok');
+  };
+
+  /* mercado pago */
+  $('#mpSave').onclick = () => {
+    const on = $('#mpOn').checked;
+    const link = $('#mpLink').value.trim();
+    if (on && !link) { toast('Cole o link de pagamento do Mercado Pago.', 'danger'); return; }
+    Store.mutate(s => {
+      const pay = Object.assign({}, s.config.payments);
+      pay.mercadopago = { enabled: on, link: link };
+      s.config = Object.assign({}, s.config, { payments: pay, updatedAt: Date.now() });
+    });
+    toast(on ? '💳 Mercado Pago ativado — botão “Cobrar” liberado na agenda.' : '💳 Mercado Pago desativado.', 'ok');
+  };
+
+  $$('#ajDias button').forEach(b => b.onclick = () => b.classList.toggle('sel'));
+  $('#ajSalvarH').onclick = () => {
+    const open = $$('#ajDias button').filter(b => b.classList.contains('sel')).map(b => +b.dataset.d);
+    if (!open.length) { toast('Escolha pelo menos um dia.', 'danger'); return; }
+    Store.mutate(s => {
+      s.config = Object.assign({}, s.config, {
+        hours: { openDays: open, start: $('#ajIni').value || '09:00', end: $('#ajFim').value || '19:00',
+                 slotMinutes: +$('#ajSlot').value, daysAhead: +$('#ajDias2').value },
+        updatedAt: Date.now()
+      });
+    });
+    toast('💾 Horários salvos!', 'ok');
+  };
+  $('#ajAddSvc').onclick = () => {
+    $('#ajSvcs').insertAdjacentHTML('beforeend', svcRow({ id: uid(), emoji: '✨', name: '', duration: c.hours.slotMinutes }));
+    bindSvcRemove();
+  };
+  bindSvcRemove();
+  $('#ajSalvarS').onclick = () => {
+    const rows = $$('#ajSvcs .svc-row');
+    const list = [];
+    rows.forEach(r => {
+      const nome = $('.sv-nome', r).value.trim();
+      if (!nome) return;
+      const s = {
+        id: r.dataset.id, name: nome,
+        emoji: $('.sv-emoji', r).value.trim() || '✨',
+        duration: +$('.sv-dur', r).value || c.hours.slotMinutes
+      };
+      if (IS_PET) {
+        s.priceBySize = {
+          P: parseFloat(String($('.sv-p', r).value).replace(',', '.')) || 0,
+          M: parseFloat(String($('.sv-m', r).value).replace(',', '.')) || 0,
+          G: parseFloat(String($('.sv-g', r).value).replace(',', '.')) || 0
+        };
+      } else {
+        s.price = parseFloat(String($('.sv-preco', r).value).replace(',', '.')) || 0;
+      }
+      list.push(s);
+    });
+    if (!list.length) { toast('Cadastre pelo menos um serviço.', 'danger'); return; }
+    Store.mutate(st => { st.config = Object.assign({}, st.config, { services: list, updatedAt: Date.now() }); });
+    toast('💾 Serviços salvos!', 'ok');
+  };
+  const sx = $('#ajSalvarX');
+  if (sx) sx.onclick = () => {
+    Store.mutate(s => {
+      s.config = Object.assign({}, s.config, {
+        pickupFee: $('#ajTaxa') ? (parseFloat(String($('#ajTaxa').value).replace(',', '.')) || 0) : c.pickupFee,
+        loyaltyEvery: Math.max(2, +$('#ajFiel').value || 5),
+        updatedAt: Date.now()
+      });
+    });
+    toast('💾 Salvo!', 'ok');
+  };
+  $('#ajCopy').onclick = () => navigator.clipboard.writeText(CFG.shopId).then(() => toast('📋 Código copiado.'));
+  $('#ajReset').onclick = () => {
+    if (!confirm('Apagar TODOS os agendamentos, avisos e ajustes desta loja? Não dá para desfazer.')) return;
+    if (!confirm('Tem certeza mesmo?')) return;
+    Store.state = Store.blank();
+    Store.state.config.updatedAt = Date.now();
+    Store.save();
+    Sync.broadcastLocal();
+    Sync.schedulePublish();
+    render();
+    toast('🗑️ Dados apagados.');
+  };
+}
+function svcRow(s) {
+  const precos = IS_PET
+    ? '<div class="row" style="margin-top:6px">' +
+      '<input class="sv-p" inputmode="decimal" placeholder="P R$" value="' + (s.priceBySize ? s.priceBySize.P : '') + '">' +
+      '<input class="sv-m" inputmode="decimal" placeholder="M R$" value="' + (s.priceBySize ? s.priceBySize.M : '') + '">' +
+      '<input class="sv-g" inputmode="decimal" placeholder="G R$" value="' + (s.priceBySize ? s.priceBySize.G : '') + '"></div>'
+    : '';
+  return '<div class="svc-row" data-id="' + esc(s.id) + '" style="border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px">' +
+    '<div class="row"><input class="sv-emoji" style="width:64px" value="' + esc(s.emoji || '') + '">' +
+    '<input class="sv-nome grow" placeholder="Nome do serviço" value="' + esc(s.name || '') + '">' +
+    '<button class="btn danger sm sv-del">🗑️</button></div>' +
+    '<div class="row" style="margin-top:6px">' +
+    (IS_PET ? '' : '<input class="sv-preco" inputmode="decimal" placeholder="Preço R$" value="' + (s.price != null ? s.price : '') + '">') +
+    '<select class="sv-dur">' + [15, 20, 30, 40, 45, 60, 90, 120].map(m =>
+      '<option value="' + m + '" ' + ((s.duration || 30) === m ? 'selected' : '') + '>' + m + ' min</option>').join('') + '</select></div>' +
+    precos + '</div>';
+}
+function bindSvcRemove() {
+  $$('#ajSvcs .sv-del').forEach(b => b.onclick = () => b.closest('.svc-row').remove());
+}
+function resizePhoto(file, size, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size;
+    const x = cv.getContext('2d');
+    const s = Math.max(size / img.width, size / img.height);
+    x.drawImage(img, (size - img.width * s) / 2, (size - img.height * s) / 2, img.width * s, img.height * s);
+    cb(cv.toDataURL('image/jpeg', .82));
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+/* ================= navegação ================= */
+function tabsDef() {
+  const t = [{ id: 'agenda', ic: '📅', lb: 'Agenda' }];
+  t.push({ id: 'clientes', ic: IS_PET ? '🐾' : '👥', lb: IS_PET ? 'Tutores' : 'Clientes' });
+  if (FEAT.barbers && !IS_PET) t.push({ id: 'equipe', ic: '💈', lb: 'Barbeiros' });
+  if (FEAT.products) t.push({ id: 'produtos', ic: '🛍️', lb: 'Produtos' });
+  t.push({ id: 'avisos', ic: '📣', lb: 'Avisos' });
+  t.push({ id: 'ajustes', ic: '⚙️', lb: 'Ajustes' });
+  return t;
+}
+function renderTabs() {
+  const due = remindersDue().length + Store.activeBookings().filter(b => b.status === 'pendente' && b.date >= todayStr()).length;
+  $('#tabs').innerHTML = tabsDef().map(t =>
+    '<button class="tab ' + (tab === t.id ? 'sel' : '') + '" data-tab="' + t.id + '">' +
+    (t.id === 'clientes' && remindersDue().length ? '<span class="badge">' + remindersDue().length + '</span>' : '') +
+    (t.id === 'agenda' && due ? '' : '') +
+    '<span class="ic">' + t.ic + '</span><span class="lb">' + t.lb + '</span></button>').join('');
+  $$('#tabs .tab').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0, 0); });
+}
+function renderHeader() {
+  const c = Store.cfg();
+  $('#shopName').textContent = c.shopName;
+  $('#roleChip').textContent = (CFG.icon || '') + ' ' + (CFG.ownerTitle || 'Painel');
+  const av = $('#avatar');
+  if (c.photo) av.innerHTML = '<img src="' + c.photo + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+  else av.textContent = c.icon || '📅';
+}
+function render() {
+  renderHeader();
+  renderTabs();
+  if (tab === 'agenda') viewAgenda();
+  else if (tab === 'clientes') viewClientes();
+  else if (tab === 'equipe') viewEquipe();
+  else if (tab === 'produtos') viewProdutos();
+  else if (tab === 'avisos') viewComunicados();
+  else viewAjustes();
+}
+
+document.addEventListener('tick', () => { if (tab === 'agenda') viewAgenda(); });
+
+Sync.onStatus(s => {
+  const dot = $('#syncDot'), lb = $('#syncLabel');
+  if (s === 'online') { dot.className = 'sync-dot online'; lb.textContent = 'tempo real conectado'; }
+  else if (s === 'conectando') { dot.className = 'sync-dot'; lb.textContent = 'conectando…'; }
+  else { dot.className = 'sync-dot local'; lb.textContent = 'modo local (sem internet)'; }
+});
+
+render();
+Sync.init();
+setTimeout(autoReminders, 1200);
+AutoReminder.start();
+</script>
+</body>
+</html>
