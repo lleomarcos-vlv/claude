@@ -1,0 +1,2715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estação de Trabalho — Prospecção Comercial</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%2256%22%20height%3D%2256%22%20rx%3D%2214%22%20fill%3D%22%234361ee%22%2F%3E%3Cpath%20d%3D%22M20%2040%20L28%2030%20L36%2036%20L46%2022%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E" />
+  <style>
+/* ==========================================================================
+   Estação de Trabalho — Tema escuro moderno
+   ========================================================================== */
+:root {
+  --bg: #0f1226;
+  --bg-2: #151935;
+  --panel: #1b2044;
+  --panel-2: #222a55;
+  --panel-3: #2b3468;
+  --border: #2c3566;
+  --text: #e8ecff;
+  --text-dim: #9aa3d0;
+  --text-mute: #6b74a8;
+  --primary: #4361ee;
+  --primary-2: #4895ef;
+  --primary-hover: #3a53d0;
+  --success: #2dd4a7;
+  --danger: #f43f5e;
+  --warning: #f7b955;
+  --info: #56b4ff;
+  --whatsapp: #25d366;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --sidebar-w: 250px;
+  --transition: 180ms ease;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--primary-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--panel-3); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 9px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: var(--transition); white-space: nowrap;
+}
+.btn:hover { background: var(--panel-3); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--primary); border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-success { background: var(--success); border-color: var(--success); color: #06281f; }
+.btn-danger  { background: var(--danger); border-color: var(--danger); }
+.btn-whatsapp { background: var(--whatsapp); border-color: var(--whatsapp); color: #05320f; }
+.btn-ghost { background: transparent; }
+.btn-sm { padding: 6px 10px; font-size: 12px; }
+.btn-icon { padding: 7px; }
+.btn-block { width: 100%; justify-content: center; }
+
+/* ---------- Formulários ---------- */
+label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; font-weight: 600; }
+input, select, textarea {
+  width: 100%; background: var(--bg-2); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 10px 12px; font-size: 13px; font-family: inherit; transition: var(--transition);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 97, 238, .18);
+}
+textarea { resize: vertical; min-height: 72px; }
+.field { margin-bottom: 14px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.badge {
+  display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px;
+  font-weight: 700; background: var(--panel-3); color: var(--text-dim);
+}
+.badge.novo { background: rgba(86,180,255,.15); color: var(--info); }
+.badge.contatado { background: rgba(247,185,85,.15); color: var(--warning); }
+.badge.negociando, .badge.proposta { background: rgba(72,149,239,.18); color: var(--primary-2); }
+.badge.fechado { background: rgba(45,212,167,.15); color: var(--success); }
+.badge.perdido { background: rgba(244,63,94,.15); color: var(--danger); }
+
+/* ==========================================================================
+   Tela de Login
+   ========================================================================== */
+.login-wrap {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(1200px 600px at 20% -10%, #263173 0, transparent 60%),
+              radial-gradient(1000px 500px at 100% 100%, #17324f 0, transparent 55%),
+              var(--bg);
+  padding: 20px;
+}
+.login-card {
+  width: 100%; max-width: 400px; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow);
+  padding: 36px 32px;
+}
+.login-logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 26px; }
+.login-logo img { width: 64px; height: 64px; margin-bottom: 12px; }
+.login-logo h1 { font-size: 20px; margin: 0; }
+.login-logo p { color: var(--text-mute); font-size: 12px; margin: 4px 0 0; }
+.login-error {
+  background: rgba(244,63,94,.12); color: #ffd0d8; border: 1px solid rgba(244,63,94,.35);
+  border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; margin-bottom: 14px; display: none;
+}
+.login-error.show { display: block; }
+.login-hint { text-align: center; color: var(--text-mute); font-size: 11px; margin-top: 18px; }
+
+/* ==========================================================================
+   Layout principal (App)
+   ========================================================================== */
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w); background: var(--bg-2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 30;
+  transition: transform var(--transition);
+}
+.sidebar-head { padding: 20px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+.sidebar-head img { width: 38px; height: 38px; }
+.sidebar-head .title { font-size: 15px; font-weight: 800; }
+.sidebar-head .subtitle { font-size: 10px; color: var(--text-mute); }
+.nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: var(--radius-sm);
+  color: var(--text-dim); cursor: pointer; font-weight: 600; margin-bottom: 3px; transition: var(--transition);
+}
+.nav-item:hover { background: var(--panel); color: var(--text); }
+.nav-item.active { background: var(--primary); color: #fff; box-shadow: var(--shadow-sm); }
+.nav-item .ico { width: 20px; height: 20px; flex-shrink: 0; }
+.nav-item .count { margin-left: auto; font-size: 11px; background: rgba(255,255,255,.14); padding: 1px 8px; border-radius: 999px; }
+.sidebar-foot { padding: 14px; border-top: 1px solid var(--border); }
+.user-box { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--primary);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff;
+}
+.user-box .name { font-size: 13px; font-weight: 700; }
+.user-box .role { font-size: 11px; color: var(--text-mute); }
+
+.main {
+  flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-width: 0;
+}
+.topbar {
+  height: 62px; background: rgba(21,25,53,.85); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px;
+  padding: 0 22px; position: sticky; top: 0; z-index: 20;
+}
+.topbar h2 { font-size: 17px; margin: 0; }
+.topbar .spacer { flex: 1; }
+.menu-toggle { display: none; }
+
+.content { padding: 22px; flex: 1; }
+
+/* ---------- Cards e stats ---------- */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; margin-bottom: 22px; }
+.card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow-sm);
+}
+.stat-card { display: flex; align-items: center; gap: 14px; }
+.stat-ico {
+  width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  background: rgba(67,97,238,.15); color: var(--primary-2);
+}
+.stat-ico svg { width: 26px; height: 26px; }
+.stat-val { font-size: 26px; font-weight: 800; line-height: 1; }
+.stat-label { font-size: 12px; color: var(--text-mute); margin-top: 4px; }
+
+.panel {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 20px;
+}
+.panel-head { padding: 16px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.panel-head h3 { margin: 0; font-size: 15px; }
+.panel-head .spacer { flex: 1; }
+.panel-body { padding: 16px 18px; }
+
+/* ---------- Toolbar (filtros/busca) ---------- */
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.toolbar .search { position: relative; flex: 1; min-width: 200px; }
+.toolbar .search input { padding-left: 34px; }
+.toolbar .search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-mute); }
+.toolbar select, .toolbar input { max-width: 190px; }
+
+/* ---------- Tabelas ---------- */
+.table-wrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.data th, table.data td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.data th {
+  background: var(--bg-2); color: var(--text-dim); font-size: 11px; text-transform: uppercase;
+  letter-spacing: .04em; cursor: pointer; user-select: none; position: sticky; top: 0;
+}
+table.data th.sortable:hover { color: var(--text); }
+table.data tbody tr { transition: background var(--transition); }
+table.data tbody tr:hover { background: var(--panel-2); }
+table.data td.actions { white-space: nowrap; }
+table.data td.wrap { white-space: normal; max-width: 260px; }
+.row-actions { display: inline-flex; gap: 6px; }
+.empty { text-align: center; color: var(--text-mute); padding: 40px 20px; }
+.empty svg { width: 46px; height: 46px; opacity: .5; margin-bottom: 10px; }
+.checkbox-cell { width: 34px; text-align: center; }
+input[type="checkbox"] { width: auto; accent-color: var(--primary); cursor: pointer; }
+
+/* ---------- Paginação ---------- */
+.pager { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--border); }
+.pager .info { color: var(--text-mute); font-size: 12px; }
+.pager .spacer { flex: 1; }
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(6,8,20,.66); backdrop-filter: blur(3px);
+  display: flex; align-items: flex-start; justify-content: center; z-index: 100; padding: 40px 16px; overflow-y: auto;
+  animation: fade .16s ease;
+}
+.modal {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow);
+  width: 100%; max-width: 640px; animation: pop .18s ease;
+}
+.modal.lg { max-width: 900px; }
+.modal-head { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; }
+.modal-head h3 { margin: 0; font-size: 16px; }
+.modal-head .close { margin-left: auto; cursor: pointer; color: var(--text-mute); background: none; border: none; font-size: 22px; line-height: 1; }
+.modal-body { padding: 20px; max-height: 66vh; overflow-y: auto; }
+.modal-foot { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* ---------- Toasts ---------- */
+.toasts { position: fixed; right: 20px; bottom: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
+.toast {
+  min-width: 260px; max-width: 380px; background: var(--panel-2); border: 1px solid var(--border);
+  border-left: 4px solid var(--primary); border-radius: var(--radius-sm); padding: 12px 14px;
+  box-shadow: var(--shadow); display: flex; gap: 10px; align-items: flex-start; animation: slideIn .2s ease;
+}
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
+.toast .msg { font-size: 13px; }
+.toast .t-title { font-weight: 700; margin-bottom: 2px; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Loading / Progress ---------- */
+.loading-overlay {
+  position: fixed; inset: 0; background: rgba(6,8,20,.6); z-index: 150;
+  display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+}
+.loading-overlay.show { display: flex; }
+.spinner {
+  width: 46px; height: 46px; border: 4px solid var(--panel-3); border-top-color: var(--primary);
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: var(--text-dim); font-weight: 600; }
+.progress { height: 8px; background: var(--panel-3); border-radius: 999px; overflow: hidden; width: 280px; }
+.progress > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--primary), var(--primary-2)); transition: width .2s ease; }
+
+.spin-inline { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin .8s linear infinite; }
+
+/* ---------- Diversos ---------- */
+.muted { color: var(--text-mute); }
+.small { font-size: 12px; }
+.mono { font-family: 'Consolas', monospace; }
+.flex { display: flex; }
+.gap { gap: 10px; }
+.mt { margin-top: 14px; }
+.hidden { display: none !important; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px; font-size: 12px; margin: 3px; cursor: pointer; }
+.chip:hover { background: var(--panel-3); }
+.chip .cat { color: var(--text-mute); font-size: 10px; }
+.alert { border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; margin-bottom: 14px; }
+.alert-info { background: rgba(86,180,255,.1); border: 1px solid rgba(86,180,255,.3); color: #cfe8ff; }
+.alert-warn { background: rgba(247,185,85,.1); border: 1px solid rgba(247,185,85,.3); color: #ffe6bf; }
+
+.prob-bar { width: 90px; height: 7px; background: var(--panel-3); border-radius: 999px; overflow: hidden; display: inline-block; vertical-align: middle; }
+.prob-bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--warning), var(--success)); }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .menu-toggle { display: inline-flex; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+
+/* Ajustes da versão HTML único */
+.login-logo .brand-logo{width:64px;height:64px;margin-bottom:12px;display:inline-block}
+.sidebar-head .brand-logo{width:38px;height:38px;display:inline-block}
+.brand-logo svg{width:100%;height:100%;display:block}
+
+  </style>
+</head>
+<body>
+
+  <!-- ============================ Tela de Login ============================ -->
+  <div class="login-wrap" id="loginScreen" style="display:none">
+    <form class="login-card" id="loginForm" autocomplete="on">
+      <div class="login-logo">
+        <span class="brand-logo"><svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="etg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4895ef"/><stop offset="1" stop-color="#4361ee"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="14" fill="url(#etg)"/><path d="M20 40 L28 30 L36 36 L46 22" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="22" r="3.6" fill="#fff"/><circle cx="20" cy="40" r="3.2" fill="#fff"/><rect x="18" y="46" width="28" height="3.4" rx="1.7" fill="#ffffff" opacity="0.85"/></svg></span>
+        <h1>Estação de Trabalho</h1>
+        <p>Prospecção Comercial Inteligente</p>
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <div class="field">
+        <label for="login">Login</label>
+        <input type="text" id="login" name="login" placeholder="Seu usuário" required autofocus autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" placeholder="Sua senha" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="btnEntrar">Entrar</button>
+      <p class="login-hint">Primeiro acesso? Utilize <strong>admin / admin123</strong> e altere a senha depois.<br>Seus dados ficam salvos neste navegador.</p>
+    </form>
+  </div>
+
+  <!-- ============================ Aplicativo ============================ -->
+  <div id="appScreen" style="display:none">
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+          <span class="brand-logo"><svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="etg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4895ef"/><stop offset="1" stop-color="#4361ee"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="14" fill="url(#etg)"/><path d="M20 40 L28 30 L36 36 L46 22" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="22" r="3.6" fill="#fff"/><circle cx="20" cy="40" r="3.2" fill="#fff"/><rect x="18" y="46" width="28" height="3.4" rx="1.7" fill="#ffffff" opacity="0.85"/></svg></span>
+          <div>
+            <div class="title" id="sbTitle">Estação</div>
+            <div class="subtitle">de Trabalho</div>
+          </div>
+        </div>
+        <nav class="nav" id="nav">
+          <div class="nav-item" data-view="dashboard">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            <span>Dashboard</span>
+          </div>
+          <div class="nav-item" data-view="clientes">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Clientes Fixos</span><span class="count" id="cntClientes">0</span>
+          </div>
+          <div class="nav-item" data-view="prospeccao">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>Prospectando</span><span class="count" id="cntProspeccao">0</span>
+          </div>
+          <div class="nav-item" data-view="pesquisa">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <span>Pesquisa Automática</span>
+          </div>
+          <div class="nav-item" data-view="revisao">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span>Revisão</span><span class="count" id="cntRevisao">0</span>
+          </div>
+          <div class="nav-item" data-view="nichos">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            <span>Nichos</span><span class="count" id="cntNichos">0</span>
+          </div>
+          <div class="nav-item" data-view="historico">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+            <span>Histórico</span>
+          </div>
+        </nav>
+        <div class="sidebar-foot">
+          <div class="user-box">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <div><div class="name" id="userName">—</div><div class="role">Sessão ativa</div></div>
+          </div>
+          <button class="btn btn-sm btn-block" id="btnSenha" style="margin-bottom:8px">Alterar senha</button>
+          <button class="btn btn-sm btn-danger btn-block" id="btnLogout">Sair</button>
+        </div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <button class="btn btn-icon menu-toggle" id="menuToggle" aria-label="Menu">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h2 id="pageTitle">Dashboard</h2>
+          <div class="spacer"></div>
+          <button class="btn btn-sm" id="btnBackup" title="Backup e restauração dos dados">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Backup
+          </button>
+        </header>
+        <main class="content" id="view"></main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contêineres globais -->
+  <div class="toasts" id="toasts"></div>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Carregando...</div>
+    <div class="progress hidden" id="loadingProgress"><span></span></div>
+  </div>
+  <div id="modalRoot"></div>
+
+  <!-- ============================ Scripts ============================ -->
+  <script>
+/* Biblioteca de planilhas (xlsx/csv) — 100% offline */
+/* ============================================================================
+ * sheetlib.js — Leitura e escrita de planilhas (.xlsx e .csv) 100% em
+ * JavaScript puro, SEM dependências. Funciona offline dentro de um único HTML.
+ *
+ *   - crc32()                  : checksum para o ZIP
+ *   - inflateRaw()             : descompactação DEFLATE (para LER .xlsx)
+ *   - unzip()                  : lê um arquivo ZIP (.xlsx é um ZIP)
+ *   - lerXlsx(bytes)           : -> matriz de linhas (array de arrays)
+ *   - lerCsv(texto)            : -> matriz de linhas
+ *   - escreverXlsx(aoa, nome)  : -> Uint8Array de um .xlsx real (ZIP "store")
+ *
+ * A leitura de .xlsx cobre o formato moderno do Excel/LibreOffice/Google
+ * Sheets (Office Open XML). Arquivos .xls antigos (binário BIFF) não são
+ * suportados — nesse caso oriente salvar como .xlsx ou .csv.
+ * ========================================================================== */
+(function (root) {
+  'use strict';
+
+  // -------------------------------------------------------------------------
+  // CRC-32 (usado na escrita do ZIP)
+  // -------------------------------------------------------------------------
+  const CRC_TABLE = (function () {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+
+  function crc32(buf) {
+    let c = 0xffffffff;
+    for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  }
+
+  // -------------------------------------------------------------------------
+  // INFLATE (DEFLATE raw) — portado de "tiny-inflate" (Devon Govett, MIT).
+  // Descomprime os fluxos internos do .xlsx (método 8 do ZIP).
+  // -------------------------------------------------------------------------
+  function Tree() {
+    this.table = new Uint16Array(16);
+    this.trans = new Uint16Array(288);
+  }
+
+  function InflateData(source, dest) {
+    this.s = source;
+    this.i = 0;
+    this.t = 0;
+    this.bitcount = 0;
+    this.dest = dest;
+    this.destLen = 0;
+    this.ltree = new Tree();
+    this.dtree = new Tree();
+  }
+
+  const sltree = new Tree();
+  const sdtree = new Tree();
+
+  const length_bits = new Uint8Array(30);
+  const length_base = new Uint16Array(30);
+  const dist_bits = new Uint8Array(30);
+  const dist_base = new Uint16Array(30);
+
+  const clcidx = new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
+
+  const code_tree = new Tree();
+  const lengths = new Uint8Array(288 + 32);
+
+  function tinf_build_bits_base(bits, base, delta, first) {
+    let i, sum;
+    for (i = 0; i < delta; ++i) bits[i] = 0;
+    for (i = 0; i < 30 - delta; ++i) bits[i + delta] = (i / delta) | 0;
+    for (sum = first, i = 0; i < 30; ++i) {
+      base[i] = sum;
+      sum += 1 << bits[i];
+    }
+  }
+
+  function tinf_build_fixed_trees(lt, dt) {
+    let i;
+    for (i = 0; i < 7; ++i) lt.table[i] = 0;
+    lt.table[7] = 24;
+    lt.table[8] = 152;
+    lt.table[9] = 112;
+    for (i = 0; i < 24; ++i) lt.trans[i] = 256 + i;
+    for (i = 0; i < 144; ++i) lt.trans[24 + i] = i;
+    for (i = 0; i < 8; ++i) lt.trans[24 + 144 + i] = 280 + i;
+    for (i = 0; i < 112; ++i) lt.trans[24 + 144 + 8 + i] = 144 + i;
+    for (i = 0; i < 5; ++i) dt.table[i] = 0;
+    dt.table[5] = 32;
+    for (i = 0; i < 32; ++i) dt.trans[i] = i;
+  }
+
+  const offs = new Uint16Array(16);
+
+  function tinf_build_tree(t, lengths, off, num) {
+    let i, sum;
+    for (i = 0; i < 16; ++i) t.table[i] = 0;
+    for (i = 0; i < num; ++i) t.table[lengths[off + i]]++;
+    t.table[0] = 0;
+    for (sum = 0, i = 0; i < 16; ++i) {
+      offs[i] = sum;
+      sum += t.table[i];
+    }
+    for (i = 0; i < num; ++i) {
+      if (lengths[off + i]) t.trans[offs[lengths[off + i]]++] = i;
+    }
+  }
+
+  function tinf_getbit(d) {
+    if (!d.bitcount--) {
+      d.t = d.s[d.i++];
+      d.bitcount = 7;
+    }
+    const bit = d.t & 1;
+    d.t >>>= 1;
+    return bit;
+  }
+
+  function tinf_read_bits(d, num, base) {
+    if (!num) return base;
+    while (d.bitcount < 24) {
+      d.t |= d.s[d.i++] << d.bitcount;
+      d.bitcount += 8;
+    }
+    const val = d.t & (0xffff >>> (16 - num));
+    d.t >>>= num;
+    d.bitcount -= num;
+    return val + base;
+  }
+
+  function tinf_decode_symbol(d, t) {
+    while (d.bitcount < 24) {
+      d.t |= d.s[d.i++] << d.bitcount;
+      d.bitcount += 8;
+    }
+    let sum = 0, cur = 0, len = 0, tag = d.t;
+    do {
+      cur = 2 * cur + (tag & 1);
+      tag >>>= 1;
+      ++len;
+      sum += t.table[len];
+      cur -= t.table[len];
+    } while (cur >= 0);
+    d.t = tag;
+    d.bitcount -= len;
+    return t.trans[sum + cur];
+  }
+
+  function tinf_decode_trees(d, lt, dt) {
+    let hlit, hdist, hclen, i, num, length;
+    hlit = tinf_read_bits(d, 5, 257);
+    hdist = tinf_read_bits(d, 5, 1);
+    hclen = tinf_read_bits(d, 4, 4);
+    for (i = 0; i < 19; ++i) lengths[i] = 0;
+    for (i = 0; i < hclen; ++i) {
+      const clen = tinf_read_bits(d, 3, 0);
+      lengths[clcidx[i]] = clen;
+    }
+    tinf_build_tree(code_tree, lengths, 0, 19);
+    for (num = 0; num < hlit + hdist;) {
+      const sym = tinf_decode_symbol(d, code_tree);
+      switch (sym) {
+        case 16:
+          const prev = lengths[num - 1];
+          for (length = tinf_read_bits(d, 2, 3); length; --length) lengths[num++] = prev;
+          break;
+        case 17:
+          for (length = tinf_read_bits(d, 3, 3); length; --length) lengths[num++] = 0;
+          break;
+        case 18:
+          for (length = tinf_read_bits(d, 7, 11); length; --length) lengths[num++] = 0;
+          break;
+        default:
+          lengths[num++] = sym;
+          break;
+      }
+    }
+    tinf_build_tree(lt, lengths, 0, hlit);
+    tinf_build_tree(dt, lengths, hlit, hdist);
+  }
+
+  function tinf_inflate_block_data(d, lt, dt) {
+    while (1) {
+      let sym = tinf_decode_symbol(d, lt);
+      if (sym === 256) return; // TINF_OK
+      if (sym < 256) {
+        d.dest[d.destLen++] = sym;
+      } else {
+        let length, dist, offset, i;
+        sym -= 257;
+        length = tinf_read_bits(d, length_bits[sym], length_base[sym]);
+        dist = tinf_decode_symbol(d, dt);
+        offset = d.destLen - tinf_read_bits(d, dist_bits[dist], dist_base[dist]);
+        for (i = offset; i < offset + length; ++i) d.dest[d.destLen++] = d.dest[i];
+      }
+    }
+  }
+
+  function tinf_inflate_uncompressed_block(d) {
+    let length, invlength;
+    while (d.bitcount > 8) {
+      d.i--;
+      d.bitcount -= 8;
+    }
+    length = d.s[d.i + 1];
+    length = 256 * length + d.s[d.i];
+    invlength = d.s[d.i + 3];
+    invlength = 256 * invlength + d.s[d.i + 2];
+    if (length !== (~invlength & 0x0000ffff)) return -3; // TINF_DATA_ERROR
+    d.i += 4;
+    for (let i = length; i; --i) d.dest[d.destLen++] = d.s[d.i++];
+    d.bitcount = 0;
+    return 0;
+  }
+
+  let treesReady = false;
+  function tinf_init() {
+    if (treesReady) return;
+    tinf_build_fixed_trees(sltree, sdtree);
+    tinf_build_bits_base(length_bits, length_base, 4, 3);
+    tinf_build_bits_base(dist_bits, dist_base, 2, 1);
+    length_bits[28] = 0;
+    length_base[28] = 258;
+    treesReady = true;
+  }
+
+  /** Descomprime DEFLATE cru. `expectedSize` deve ser o tamanho descomprimido. */
+  function inflateRaw(source, expectedSize) {
+    tinf_init();
+    const dest = new Uint8Array(expectedSize);
+    const d = new InflateData(source, dest);
+    let bfinal, btype, res;
+    do {
+      bfinal = tinf_getbit(d);
+      btype = tinf_read_bits(d, 2, 0);
+      if (btype === 0) res = tinf_inflate_uncompressed_block(d);
+      else if (btype === 1) { tinf_inflate_block_data(d, sltree, sdtree); res = 0; }
+      else if (btype === 2) { tinf_decode_trees(d, d.ltree, d.dtree); tinf_inflate_block_data(d, d.ltree, d.dtree); res = 0; }
+      else res = -3;
+      if (res !== 0) throw new Error('Falha ao descomprimir (DEFLATE).');
+    } while (!bfinal);
+    return d.destLen === dest.length ? dest : dest.subarray(0, d.destLen);
+  }
+
+  // -------------------------------------------------------------------------
+  // Leitura de ZIP
+  // -------------------------------------------------------------------------
+  function u16(dv, p) { return dv.getUint16(p, true); }
+  function u32(dv, p) { return dv.getUint32(p, true); }
+
+  /** Descompacta um ZIP e devolve { nome: Uint8Array }. */
+  function unzip(bytes) {
+    const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    // Procura o End Of Central Directory (assinatura 0x06054b50) a partir do fim.
+    let eocd = -1;
+    for (let p = bytes.length - 22; p >= 0; p--) {
+      if (u32(dv, p) === 0x06054b50) { eocd = p; break; }
+    }
+    if (eocd < 0) throw new Error('Arquivo não é um .xlsx/ZIP válido.');
+    const cdCount = u16(dv, eocd + 10);
+    let cdOffset = u32(dv, eocd + 16);
+    const arquivos = {};
+    let p = cdOffset;
+    for (let n = 0; n < cdCount; n++) {
+      if (u32(dv, p) !== 0x02014b50) break;
+      const metodo = u16(dv, p + 10);
+      const compSize = u32(dv, p + 20);
+      const uncompSize = u32(dv, p + 24);
+      const nameLen = u16(dv, p + 28);
+      const extraLen = u16(dv, p + 30);
+      const commentLen = u16(dv, p + 32);
+      const localOff = u32(dv, p + 42);
+      const nome = utf8Decode(bytes.subarray(p + 46, p + 46 + nameLen));
+      // Cabeçalho local para achar o início real dos dados.
+      const lNameLen = u16(dv, localOff + 26);
+      const lExtraLen = u16(dv, localOff + 28);
+      const dataStart = localOff + 30 + lNameLen + lExtraLen;
+      const comp = bytes.subarray(dataStart, dataStart + compSize);
+      let dados;
+      if (metodo === 0) dados = comp.slice();
+      else if (metodo === 8) dados = inflateRaw(comp, uncompSize);
+      else throw new Error('Compressão ZIP não suportada (método ' + metodo + ').');
+      arquivos[nome] = dados;
+      p += 46 + nameLen + extraLen + commentLen;
+    }
+    return arquivos;
+  }
+
+  // -------------------------------------------------------------------------
+  // UTF-8 e entidades XML
+  // -------------------------------------------------------------------------
+  function utf8Decode(bytes) {
+    if (typeof TextDecoder !== 'undefined') return new TextDecoder('utf-8').decode(bytes);
+    // Fallback (Node antigo).
+    return Buffer.from(bytes).toString('utf8');
+  }
+  function utf8Encode(str) {
+    if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(str);
+    return new Uint8Array(Buffer.from(str, 'utf8'));
+  }
+
+  function decodeEntidades(s) {
+    if (s.indexOf('&') === -1) return s;
+    return s
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+      .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+      .replace(/&amp;/g, '&');
+  }
+  function encodeEntidades(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // -------------------------------------------------------------------------
+  // Parsing do XLSX -> matriz (array de arrays)
+  // -------------------------------------------------------------------------
+  function colParaIndice(ref) {
+    // "AB12" -> índice 0-based da coluna AB
+    const letras = ref.replace(/[0-9]+/g, '');
+    let n = 0;
+    for (let i = 0; i < letras.length; i++) {
+      n = n * 26 + (letras.charCodeAt(i) - 64);
+    }
+    return n - 1;
+  }
+
+  function extrairSharedStrings(xml) {
+    const strings = [];
+    if (!xml) return strings;
+    const reSi = /<si\b[^>]*>([\s\S]*?)<\/si>/g;
+    let m;
+    while ((m = reSi.exec(xml))) {
+      const bloco = m[1];
+      let texto = '';
+      const reT = /<t\b[^>]*>([\s\S]*?)<\/t>/g;
+      let mt;
+      let achou = false;
+      while ((mt = reT.exec(bloco))) { texto += mt[1]; achou = true; }
+      if (!achou) {
+        // <t/> vazio ou sem conteúdo
+        texto = '';
+      }
+      strings.push(decodeEntidades(texto));
+    }
+    return strings;
+  }
+
+  function parseWorksheet(xml, shared) {
+    const linhas = [];
+    const reRow = /<row\b[^>]*>([\s\S]*?)<\/row>|<row\b[^>]*\/>/g;
+    let mr;
+    while ((mr = reRow.exec(xml))) {
+      const conteudo = mr[1] || '';
+      const linha = [];
+      const reCell = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g;
+      let mc;
+      while ((mc = reCell.exec(conteudo))) {
+        const attrs = mc[1] || '';
+        const inner = mc[2] || '';
+        const refM = /r="([A-Z]+\d+)"/.exec(attrs);
+        const col = refM ? colParaIndice(refM[1]) : linha.length;
+        const tM = /t="([^"]+)"/.exec(attrs);
+        const tipo = tM ? tM[1] : 'n';
+        let valor = '';
+        if (tipo === 's') {
+          const vM = /<v\b[^>]*>([\s\S]*?)<\/v>/.exec(inner);
+          if (vM) valor = shared[Number(vM[1])] != null ? shared[Number(vM[1])] : '';
+        } else if (tipo === 'inlineStr') {
+          const tsM = /<t\b[^>]*>([\s\S]*?)<\/t>/.exec(inner);
+          valor = tsM ? decodeEntidades(tsM[1]) : '';
+        } else if (tipo === 'str') {
+          const vM = /<v\b[^>]*>([\s\S]*?)<\/v>/.exec(inner);
+          valor = vM ? decodeEntidades(vM[1]) : '';
+        } else {
+          const vM = /<v\b[^>]*>([\s\S]*?)<\/v>/.exec(inner);
+          valor = vM ? decodeEntidades(vM[1]) : '';
+        }
+        while (linha.length < col) linha.push('');
+        linha[col] = valor;
+      }
+      linhas.push(linha);
+    }
+    return linhas;
+  }
+
+  /** Lê bytes de um .xlsx e devolve a primeira planilha como matriz de linhas. */
+  function lerXlsx(bytes) {
+    const arq = unzip(bytes);
+    const sharedXml = arq['xl/sharedStrings.xml'] ? utf8Decode(arq['xl/sharedStrings.xml']) : '';
+    const shared = extrairSharedStrings(sharedXml);
+
+    // Descobre a primeira planilha via workbook.xml + rels (com fallback).
+    let alvo = 'xl/worksheets/sheet1.xml';
+    try {
+      if (arq['xl/workbook.xml'] && arq['xl/_rels/workbook.xml.rels']) {
+        const wb = utf8Decode(arq['xl/workbook.xml']);
+        const rels = utf8Decode(arq['xl/_rels/workbook.xml.rels']);
+        const sheetM = /<sheet\b[^>]*r:id="([^"]+)"[^>]*\/>|<sheet\b[^>]*r:id="([^"]+)"[^>]*>/.exec(wb);
+        const rid = sheetM ? (sheetM[1] || sheetM[2]) : null;
+        if (rid) {
+          const relRe = new RegExp('<Relationship\\b[^>]*Id="' + rid + '"[^>]*Target="([^"]+)"', 'i');
+          const relM = relRe.exec(rels);
+          if (relM) {
+            let target = relM[1].replace(/^\/?xl\//, '').replace(/^\//, '');
+            alvo = 'xl/' + target.replace(/^xl\//, '');
+          }
+        }
+      }
+    } catch (_) { /* usa fallback */ }
+
+    if (!arq[alvo]) {
+      // Procura qualquer worksheet.
+      const chave = Object.keys(arq).find((k) => /^xl\/worksheets\/sheet\d+\.xml$/.test(k));
+      if (chave) alvo = chave;
+    }
+    if (!arq[alvo]) throw new Error('Planilha não encontrada dentro do .xlsx.');
+    const wsXml = utf8Decode(arq[alvo]);
+    return parseWorksheet(wsXml, shared);
+  }
+
+  // -------------------------------------------------------------------------
+  // Leitura de CSV (separador ; ou ,) com suporte a aspas
+  // -------------------------------------------------------------------------
+  function lerCsv(texto) {
+    if (texto.charCodeAt(0) === 0xfeff) texto = texto.slice(1); // remove BOM
+    // Detecta separador na primeira linha (fora de aspas).
+    const primeiraLinha = texto.split(/\r?\n/)[0] || '';
+    let sep = ';';
+    const ponto = (primeiraLinha.match(/;/g) || []).length;
+    const virg = (primeiraLinha.match(/,/g) || []).length;
+    const tab = (primeiraLinha.match(/\t/g) || []).length;
+    if (tab > ponto && tab > virg) sep = '\t';
+    else if (virg > ponto) sep = ',';
+
+    const linhas = [];
+    let campo = '';
+    let linha = [];
+    let dentroAspas = false;
+    for (let i = 0; i < texto.length; i++) {
+      const c = texto[i];
+      if (dentroAspas) {
+        if (c === '"') {
+          if (texto[i + 1] === '"') { campo += '"'; i++; }
+          else dentroAspas = false;
+        } else campo += c;
+      } else {
+        if (c === '"') dentroAspas = true;
+        else if (c === sep) { linha.push(campo); campo = ''; }
+        else if (c === '\n') { linha.push(campo); linhas.push(linha); linha = []; campo = ''; }
+        else if (c === '\r') { /* ignora */ }
+        else campo += c;
+      }
+    }
+    if (campo !== '' || linha.length) { linha.push(campo); linhas.push(linha); }
+    // Remove linhas totalmente vazias.
+    return linhas.filter((l) => l.some((v) => String(v).trim() !== ''));
+  }
+
+  // -------------------------------------------------------------------------
+  // Escrita de ZIP (método STORE, sem compressão) — .xlsx real
+  // -------------------------------------------------------------------------
+  function zipStore(entradas) {
+    // entradas: [{ nome, dados: Uint8Array }]
+    const partes = [];
+    const central = [];
+    let offset = 0;
+
+    for (const e of entradas) {
+      const nomeBytes = utf8Encode(e.nome);
+      const crc = crc32(e.dados);
+      const tam = e.dados.length;
+
+      const lh = new Uint8Array(30 + nomeBytes.length);
+      const lv = new DataView(lh.buffer);
+      lv.setUint32(0, 0x04034b50, true);
+      lv.setUint16(4, 20, true);        // versão
+      lv.setUint16(6, 0, true);         // flags
+      lv.setUint16(8, 0, true);         // método = store
+      lv.setUint16(10, 0, true);        // hora
+      lv.setUint16(12, 0x21, true);     // data (1980)
+      lv.setUint32(14, crc, true);
+      lv.setUint32(18, tam, true);      // comp size
+      lv.setUint32(22, tam, true);      // uncomp size
+      lv.setUint16(26, nomeBytes.length, true);
+      lv.setUint16(28, 0, true);        // extra len
+      lh.set(nomeBytes, 30);
+
+      partes.push(lh, e.dados);
+
+      const ch = new Uint8Array(46 + nomeBytes.length);
+      const cv = new DataView(ch.buffer);
+      cv.setUint32(0, 0x02014b50, true);
+      cv.setUint16(4, 20, true);
+      cv.setUint16(6, 20, true);
+      cv.setUint16(8, 0, true);
+      cv.setUint16(10, 0, true);
+      cv.setUint16(12, 0, true);
+      cv.setUint16(14, 0x21, true);
+      cv.setUint32(16, crc, true);
+      cv.setUint32(20, tam, true);
+      cv.setUint32(24, tam, true);
+      cv.setUint16(28, nomeBytes.length, true);
+      cv.setUint16(30, 0, true);
+      cv.setUint16(32, 0, true);
+      cv.setUint16(34, 0, true);
+      cv.setUint16(36, 0, true);
+      cv.setUint32(38, 0, true);
+      cv.setUint32(42, offset, true);
+      ch.set(nomeBytes, 46);
+      central.push(ch);
+
+      offset += lh.length + tam;
+    }
+
+    let centralSize = 0;
+    for (const c of central) centralSize += c.length;
+    const centralOffset = offset;
+
+    const eocd = new Uint8Array(22);
+    const ev = new DataView(eocd.buffer);
+    ev.setUint32(0, 0x06054b50, true);
+    ev.setUint16(8, central.length, true);
+    ev.setUint16(10, central.length, true);
+    ev.setUint32(12, centralSize, true);
+    ev.setUint32(16, centralOffset, true);
+
+    const todas = partes.concat(central, [eocd]);
+    let total = 0;
+    for (const p of todas) total += p.length;
+    const out = new Uint8Array(total);
+    let pos = 0;
+    for (const p of todas) { out.set(p, pos); pos += p.length; }
+    return out;
+  }
+
+  function cellRef(col, row) {
+    let s = '';
+    col += 1;
+    while (col > 0) {
+      const r = (col - 1) % 26;
+      s = String.fromCharCode(65 + r) + s;
+      col = Math.floor((col - 1) / 26);
+    }
+    return s + row;
+  }
+
+  /** Gera um .xlsx real a partir de uma matriz de linhas. */
+  function escreverXlsx(aoa) {
+    let linhasXml = '';
+    for (let r = 0; r < aoa.length; r++) {
+      const linha = aoa[r] || [];
+      let celulas = '';
+      for (let c = 0; c < linha.length; c++) {
+        const v = linha[c];
+        if (v === null || v === undefined || v === '') continue;
+        const ref = cellRef(c, r + 1);
+        if (typeof v === 'number' && isFinite(v)) {
+          celulas += `<c r="${ref}"><v>${v}</v></c>`;
+        } else {
+          celulas += `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${encodeEntidades(v)}</t></is></c>`;
+        }
+      }
+      linhasXml += `<row r="${r + 1}">${celulas}</row>`;
+    }
+
+    const sheetXml =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      `<sheetData>${linhasXml}</sheetData></worksheet>`;
+
+    const workbookXml =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' +
+      'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      '<sheets><sheet name="Dados" sheetId="1" r:id="rId1"/></sheets></workbook>';
+
+    const workbookRels =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
+      '</Relationships>';
+
+    const rootRels =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+      '</Relationships>';
+
+    const contentTypes =
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+      '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+      '</Types>';
+
+    const entradas = [
+      { nome: '[Content_Types].xml', dados: utf8Encode(contentTypes) },
+      { nome: '_rels/.rels', dados: utf8Encode(rootRels) },
+      { nome: 'xl/workbook.xml', dados: utf8Encode(workbookXml) },
+      { nome: 'xl/_rels/workbook.xml.rels', dados: utf8Encode(workbookRels) },
+      { nome: 'xl/worksheets/sheet1.xml', dados: utf8Encode(sheetXml) },
+    ];
+    return zipStore(entradas);
+  }
+
+  const API = { crc32, inflateRaw, unzip, lerXlsx, lerCsv, escreverXlsx, utf8Decode, utf8Encode };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  else root.SheetLib = API;
+})(typeof self !== 'undefined' ? self : this);
+
+  </script>
+  <script>
+/* Base de nichos comerciais (272 nichos) */
+window.__NICHOS__ = [{"nome":"Padarias","categoria":"Alimentação","termos":["padaria","panificadora"],"osm":[{"k":"shop","v":"bakery","regex":false}]},{"nome":"Confeitarias","categoria":"Alimentação","termos":["confeitaria","doceria","bolos"],"osm":[{"k":"shop","v":"pastry","regex":false},{"k":"shop","v":"confectionery","regex":false}]},{"nome":"Açougues","categoria":"Alimentação","termos":["acougue","carnes"],"osm":[{"k":"shop","v":"butcher","regex":false}]},{"nome":"Peixarias","categoria":"Alimentação","termos":["peixaria","pescados"],"osm":[{"k":"shop","v":"seafood","regex":false}]},{"nome":"Hortifrutis","categoria":"Alimentação","termos":["hortifruti","sacolao","quitanda"],"osm":[{"k":"shop","v":"greengrocer","regex":false}]},{"nome":"Supermercados","categoria":"Alimentação","termos":["supermercado","super"],"osm":[{"k":"shop","v":"supermarket","regex":false}]},{"nome":"Mercados","categoria":"Alimentação","termos":["mercado","mercearia"],"osm":[{"k":"shop","v":"convenience","regex":false},{"k":"shop","v":"general","regex":false}]},{"nome":"Mercearias","categoria":"Alimentação","termos":["mercearia","mercadinho"],"osm":[{"k":"shop","v":"convenience","regex":false}]},{"nome":"Empórios","categoria":"Alimentação","termos":["emporio","delicatessen"],"osm":[{"k":"shop","v":"deli","regex":false}]},{"nome":"Adegas e Bebidas","categoria":"Alimentação","termos":["adega","bebidas","distribuidora de bebidas"],"osm":[{"k":"shop","v":"beverages","regex":false},{"k":"shop","v":"wine","regex":false}]},{"nome":"Casas de Doces","categoria":"Alimentação","termos":["doces","balas","chocolates"],"osm":[{"k":"shop","v":"confectionery","regex":false},{"k":"shop","v":"chocolate","regex":false}]},{"nome":"Laticínios","categoria":"Alimentação","termos":["laticinios","queijos","frios"],"osm":[{"k":"shop","v":"cheese","regex":false},{"k":"shop","v":"dairy","regex":false}]},{"nome":"Cafeterias","categoria":"Alimentação","termos":["cafe","cafeteria","coffee"],"osm":[{"k":"amenity","v":"cafe","regex":false},{"k":"shop","v":"coffee","regex":false}]},{"nome":"Restaurantes","categoria":"Alimentação","termos":["restaurante"],"osm":[{"k":"amenity","v":"restaurant","regex":false}]},{"nome":"Lanchonetes","categoria":"Alimentação","termos":["lanchonete","lanches","fast food"],"osm":[{"k":"amenity","v":"fast_food","regex":false}]},{"nome":"Pizzarias","categoria":"Alimentação","termos":["pizzaria","pizza"],"osm":[{"k":"amenity","v":"restaurant","regex":false},{"k":"cuisine","v":"pizza","regex":false}]},{"nome":"Hamburguerias","categoria":"Alimentação","termos":["hamburgueria","burger"],"osm":[{"k":"cuisine","v":"burger","regex":false}]},{"nome":"Churrascarias","categoria":"Alimentação","termos":["churrascaria","churrasco"],"osm":[{"k":"cuisine","v":"barbecue","regex":false}]},{"nome":"Sorveterias","categoria":"Alimentação","termos":["sorveteria","sorvete","gelateria"],"osm":[{"k":"amenity","v":"ice_cream","regex":false},{"k":"shop","v":"ice_cream","regex":false}]},{"nome":"Bares","categoria":"Alimentação","termos":["bar","boteco","pub"],"osm":[{"k":"amenity","v":"bar","regex":false},{"k":"amenity","v":"pub","regex":false}]},{"nome":"Distribuidoras de Alimentos","categoria":"Alimentação","termos":["distribuidora de alimentos","atacadao","atacado"],"osm":[{"k":"shop","v":"wholesale","regex":false}]},{"nome":"Casas de Sucos","categoria":"Alimentação","termos":["casa de sucos","sucos","acai"],"osm":[]},{"nome":"Marmitarias","categoria":"Alimentação","termos":["marmitaria","marmitex","comida caseira"],"osm":[]},{"nome":"Food Trucks","categoria":"Alimentação","termos":["food truck"],"osm":[]},{"nome":"Casas de Massas","categoria":"Alimentação","termos":["massas","pastel","pastelaria"],"osm":[]},{"nome":"Tabacarias","categoria":"Alimentação","termos":["tabacaria"],"osm":[{"k":"shop","v":"tobacco","regex":false}]},{"nome":"Farmácias","categoria":"Saúde","termos":["farmacia","drogaria"],"osm":[{"k":"amenity","v":"pharmacy","regex":false}]},{"nome":"Clínicas","categoria":"Saúde","termos":["clinica"],"osm":[{"k":"amenity","v":"clinic","regex":false},{"k":"healthcare","v":"clinic","regex":false}]},{"nome":"Consultórios Médicos","categoria":"Saúde","termos":["medico","consultorio"],"osm":[{"k":"amenity","v":"doctors","regex":false},{"k":"healthcare","v":"doctor","regex":false}]},{"nome":"Dentistas","categoria":"Saúde","termos":["dentista","odontologia"],"osm":[{"k":"amenity","v":"dentist","regex":false},{"k":"healthcare","v":"dentist","regex":false}]},{"nome":"Hospitais","categoria":"Saúde","termos":["hospital"],"osm":[{"k":"amenity","v":"hospital","regex":false}]},{"nome":"Laboratórios","categoria":"Saúde","termos":["laboratorio","analises clinicas"],"osm":[{"k":"healthcare","v":"laboratory","regex":false}]},{"nome":"Fisioterapeutas","categoria":"Saúde","termos":["fisioterapia","fisioterapeuta"],"osm":[{"k":"healthcare","v":"physiotherapist","regex":false}]},{"nome":"Psicólogos","categoria":"Saúde","termos":["psicologo","psicologia"],"osm":[{"k":"healthcare","v":"psychotherapist","regex":false}]},{"nome":"Nutricionistas","categoria":"Saúde","termos":["nutricionista","nutricao"],"osm":[{"k":"healthcare","v":"nutrition_counselling","regex":false}]},{"nome":"Óticas","categoria":"Saúde","termos":["otica","oculos"],"osm":[{"k":"shop","v":"optician","regex":false}]},{"nome":"Clínicas de Estética","categoria":"Saúde","termos":["estetica","clinica de estetica"],"osm":[{"k":"shop","v":"beauty","regex":false}]},{"nome":"Fonoaudiólogos","categoria":"Saúde","termos":["fonoaudiologo","fonoaudiologia"],"osm":[{"k":"healthcare","v":"speech_therapist","regex":false}]},{"nome":"Terapias Alternativas","categoria":"Saúde","termos":["acupuntura","terapia","quiropraxia"],"osm":[{"k":"healthcare","v":"alternative","regex":false}]},{"nome":"Produtos Naturais","categoria":"Saúde","termos":["produtos naturais","suplementos"],"osm":[{"k":"shop","v":"health_food","regex":false},{"k":"shop","v":"herbalist","regex":false}]},{"nome":"Ortopedias e Materiais Médicos","categoria":"Saúde","termos":["ortopedia","materiais medicos"],"osm":[{"k":"shop","v":"medical_supply","regex":false}]},{"nome":"Podólogos","categoria":"Saúde","termos":["podologo","podologia"],"osm":[]},{"nome":"Salões de Beleza","categoria":"Beleza","termos":["salao de beleza","cabeleireiro"],"osm":[{"k":"shop","v":"hairdresser","regex":false}]},{"nome":"Barbearias","categoria":"Beleza","termos":["barbearia","barber"],"osm":[{"k":"shop","v":"hairdresser","regex":false},{"k":"shop","v":"barber","regex":false}]},{"nome":"Manicures e Nail Designers","categoria":"Beleza","termos":["manicure","nail","unhas"],"osm":[{"k":"shop","v":"nails","regex":false}]},{"nome":"Estúdios de Tatuagem","categoria":"Beleza","termos":["tatuagem","tattoo"],"osm":[{"k":"shop","v":"tattoo","regex":false}]},{"nome":"Perfumarias e Cosméticos","categoria":"Beleza","termos":["perfumaria","cosmeticos"],"osm":[{"k":"shop","v":"cosmetics","regex":false},{"k":"shop","v":"perfumery","regex":false}]},{"nome":"Casas de Massagem","categoria":"Beleza","termos":["massagem","massoterapia"],"osm":[{"k":"shop","v":"massage","regex":false}]},{"nome":"Depilação","categoria":"Beleza","termos":["depilacao"],"osm":[]},{"nome":"Spas","categoria":"Beleza","termos":["spa","day spa"],"osm":[{"k":"leisure","v":"spa","regex":false}]},{"nome":"Oficinas Mecânicas","categoria":"Automotivo","termos":["oficina","mecanica","auto center"],"osm":[{"k":"shop","v":"car_repair","regex":false}]},{"nome":"Auto Elétricas","categoria":"Automotivo","termos":["auto eletrica","eletrica automotiva"],"osm":[{"k":"shop","v":"car_repair","regex":false},{"k":"service:vehicle:electrical","v":"yes","regex":false}]},{"nome":"Autopeças","categoria":"Automotivo","termos":["autopecas","pecas automotivas"],"osm":[{"k":"shop","v":"car_parts","regex":false}]},{"nome":"Borracharias","categoria":"Automotivo","termos":["borracharia","pneus"],"osm":[{"k":"shop","v":"tyres","regex":false}]},{"nome":"Concessionárias e Lojas de Carros","categoria":"Automotivo","termos":["concessionaria","revenda de carros","veiculos"],"osm":[{"k":"shop","v":"car","regex":false}]},{"nome":"Lava-Rápidos","categoria":"Automotivo","termos":["lava rapido","lava jato","estetica automotiva"],"osm":[{"k":"amenity","v":"car_wash","regex":false}]},{"nome":"Lojas de Motos","categoria":"Automotivo","termos":["motos","motocicletas"],"osm":[{"k":"shop","v":"motorcycle","regex":false}]},{"nome":"Oficinas de Motos","categoria":"Automotivo","termos":["oficina de motos"],"osm":[{"k":"shop","v":"motorcycle_repair","regex":false}]},{"nome":"Postos de Combustível","categoria":"Automotivo","termos":["posto","combustivel"],"osm":[{"k":"amenity","v":"fuel","regex":false}]},{"nome":"Funilaria e Pintura","categoria":"Automotivo","termos":["funilaria","pintura automotiva"],"osm":[]},{"nome":"Insulfilm e Acessórios","categoria":"Automotivo","termos":["insulfilm","som automotivo","acessorios automotivos"],"osm":[]},{"nome":"Locadoras de Veículos","categoria":"Automotivo","termos":["locadora de veiculos","aluguel de carros"],"osm":[{"k":"amenity","v":"car_rental","regex":false}]},{"nome":"Guinchos e Reboques","categoria":"Automotivo","termos":["guincho","reboque"],"osm":[]},{"nome":"Lojas de Roupas","categoria":"Varejo","termos":["roupas","confeccoes","moda"],"osm":[{"k":"shop","v":"clothes","regex":false}]},{"nome":"Calçados","categoria":"Varejo","termos":["calcados","sapatos"],"osm":[{"k":"shop","v":"shoes","regex":false}]},{"nome":"Boutiques","categoria":"Varejo","termos":["boutique"],"osm":[{"k":"shop","v":"boutique","regex":false}]},{"nome":"Joalherias e Bijuterias","categoria":"Varejo","termos":["joalheria","joias","bijuteria"],"osm":[{"k":"shop","v":"jewelry","regex":false}]},{"nome":"Relojoarias","categoria":"Varejo","termos":["relojoaria","relogios"],"osm":[{"k":"shop","v":"watches","regex":false}]},{"nome":"Lojas de Variedades","categoria":"Varejo","termos":["variedades","1 99","utilidades"],"osm":[{"k":"shop","v":"variety_store","regex":false}]},{"nome":"Papelarias","categoria":"Varejo","termos":["papelaria"],"osm":[{"k":"shop","v":"stationery","regex":false}]},{"nome":"Livrarias","categoria":"Varejo","termos":["livraria","livros"],"osm":[{"k":"shop","v":"books","regex":false}]},{"nome":"Brinquedos","categoria":"Varejo","termos":["brinquedos","loja de brinquedos"],"osm":[{"k":"shop","v":"toys","regex":false}]},{"nome":"Presentes e Decoração","categoria":"Varejo","termos":["presentes","decoracao"],"osm":[{"k":"shop","v":"gift","regex":false},{"k":"shop","v":"interior_decoration","regex":false}]},{"nome":"Artigos Esportivos","categoria":"Varejo","termos":["esportes","artigos esportivos"],"osm":[{"k":"shop","v":"sports","regex":false}]},{"nome":"Bicicletarias","categoria":"Varejo","termos":["bicicletaria","bikes"],"osm":[{"k":"shop","v":"bicycle","regex":false}]},{"nome":"Óticas e Relojoarias","categoria":"Varejo","termos":["otica relojoaria"],"osm":[{"k":"shop","v":"optician","regex":false}]},{"nome":"Floriculturas","categoria":"Varejo","termos":["floricultura","flores"],"osm":[{"k":"shop","v":"florist","regex":false}]},{"nome":"Pet Shops","categoria":"Varejo","termos":["pet shop","petshop"],"osm":[{"k":"shop","v":"pet","regex":false}]},{"nome":"Agropecuárias","categoria":"Varejo","termos":["agropecuaria","agro","racoes"],"osm":[{"k":"shop","v":"agrarian","regex":false},{"k":"shop","v":"farm","regex":false}]},{"nome":"Lojas de Cosméticos","categoria":"Varejo","termos":["cosmeticos","maquiagem"],"osm":[{"k":"shop","v":"cosmetics","regex":false}]},{"nome":"Lojas de Departamento","categoria":"Varejo","termos":["loja de departamento"],"osm":[{"k":"shop","v":"department_store","regex":false}]},{"nome":"Shopping e Galerias","categoria":"Varejo","termos":["shopping","galeria"],"osm":[{"k":"shop","v":"mall","regex":false}]},{"nome":"Armarinhos e Aviamentos","categoria":"Varejo","termos":["armarinho","aviamentos","tecidos"],"osm":[{"k":"shop","v":"fabric","regex":false},{"k":"shop","v":"sewing","regex":false}]},{"nome":"Brechós","categoria":"Varejo","termos":["brecho","usados"],"osm":[{"k":"shop","v":"second_hand","regex":false}]},{"nome":"Lojas de Bolsas e Acessórios","categoria":"Varejo","termos":["bolsas","acessorios"],"osm":[{"k":"shop","v":"bag","regex":false},{"k":"shop","v":"fashion_accessories","regex":false}]},{"nome":"Óculos e Acessórios","categoria":"Varejo","termos":["oculos de sol"],"osm":[]},{"nome":"Lojas de Festas e Embalagens","categoria":"Varejo","termos":["festas","embalagens","descartaveis"],"osm":[]},{"nome":"Tabacaria e Conveniência","categoria":"Varejo","termos":["conveniencia"],"osm":[]},{"nome":"Materiais de Construção","categoria":"Construção","termos":["material de construcao","construcao"],"osm":[{"k":"shop","v":"doityourself","regex":false},{"k":"shop","v":"hardware","regex":false},{"k":"shop","v":"trade","regex":false}]},{"nome":"Ferragens","categoria":"Construção","termos":["ferragem","ferramentas"],"osm":[{"k":"shop","v":"hardware","regex":false}]},{"nome":"Lojas de Tintas","categoria":"Construção","termos":["tintas"],"osm":[{"k":"shop","v":"paint","regex":false}]},{"nome":"Elétrica e Iluminação","categoria":"Construção","termos":["material eletrico","iluminacao"],"osm":[{"k":"shop","v":"electrical","regex":false},{"k":"shop","v":"lighting","regex":false}]},{"nome":"Vidraçarias","categoria":"Construção","termos":["vidracaria","vidros"],"osm":[{"k":"shop","v":"glaziery","regex":false},{"k":"craft","v":"glaziery","regex":false}]},{"nome":"Marmorarias","categoria":"Construção","termos":["marmoraria","granito","marmore"],"osm":[{"k":"craft","v":"stonemason","regex":false}]},{"nome":"Serralherias","categoria":"Construção","termos":["serralheria","esquadrias"],"osm":[{"k":"craft","v":"metal_construction","regex":false}]},{"nome":"Marcenarias","categoria":"Construção","termos":["marcenaria","moveis planejados"],"osm":[{"k":"craft","v":"carpenter","regex":false}]},{"nome":"Lojas de Móveis","categoria":"Construção","termos":["moveis","moveis planejados"],"osm":[{"k":"shop","v":"furniture","regex":false}]},{"nome":"Colchões","categoria":"Construção","termos":["colchoes","colchao"],"osm":[{"k":"shop","v":"bed","regex":false}]},{"nome":"Cozinhas e Utensílios","categoria":"Construção","termos":["utilidades domesticas","cozinha"],"osm":[{"k":"shop","v":"kitchen","regex":false},{"k":"shop","v":"houseware","regex":false}]},{"nome":"Cortinas e Persianas","categoria":"Construção","termos":["cortinas","persianas"],"osm":[{"k":"shop","v":"curtain","regex":false}]},{"nome":"Tapetes e Carpetes","categoria":"Construção","termos":["tapetes","carpetes"],"osm":[{"k":"shop","v":"carpet","regex":false}]},{"nome":"Vidraçaria e Esquadrias de Alumínio","categoria":"Construção","termos":["esquadrias de aluminio"],"osm":[{"k":"craft","v":"window_construction","regex":false}]},{"nome":"Jardinagem e Paisagismo","categoria":"Construção","termos":["jardinagem","paisagismo","garden"],"osm":[{"k":"shop","v":"garden_centre","regex":false}]},{"nome":"Piscinas","categoria":"Construção","termos":["piscinas","material para piscina"],"osm":[]},{"nome":"Ar-Condicionado e Refrigeração","categoria":"Construção","termos":["ar condicionado","refrigeracao","climatizacao"],"osm":[{"k":"craft","v":"hvac","regex":false}]},{"nome":"Molduras e Quadros","categoria":"Construção","termos":["molduras","quadros"],"osm":[{"k":"shop","v":"frame","regex":false}]},{"nome":"Loja de Pisos e Revestimentos","categoria":"Construção","termos":["pisos","revestimentos","ceramica"],"osm":[]},{"nome":"Advogados","categoria":"Serviços","termos":["advogado","advocacia","escritorio de advocacia"],"osm":[{"k":"office","v":"lawyer","regex":false}]},{"nome":"Contabilidades","categoria":"Serviços","termos":["contabilidade","contador","escritorio contabil"],"osm":[{"k":"office","v":"accountant","regex":false}]},{"nome":"Arquitetos","categoria":"Serviços","termos":["arquiteto","arquitetura"],"osm":[{"k":"office","v":"architect","regex":false}]},{"nome":"Engenharias","categoria":"Serviços","termos":["engenharia","engenheiro"],"osm":[{"k":"office","v":"engineer","regex":false},{"k":"office","v":"engineering","regex":false}]},{"nome":"Corretoras de Seguros","categoria":"Serviços","termos":["seguros","corretora de seguros"],"osm":[{"k":"office","v":"insurance","regex":false}]},{"nome":"Imobiliárias","categoria":"Serviços","termos":["imobiliaria","imoveis"],"osm":[{"k":"office","v":"estate_agent","regex":false},{"k":"shop","v":"estate_agent","regex":false}]},{"nome":"Despachantes","categoria":"Serviços","termos":["despachante"],"osm":[]},{"nome":"Cartórios","categoria":"Serviços","termos":["cartorio","tabeliao"],"osm":[{"k":"office","v":"notary","regex":false}]},{"nome":"Agências de Publicidade","categoria":"Serviços","termos":["publicidade","marketing","agencia de marketing"],"osm":[{"k":"office","v":"advertising_agency","regex":false}]},{"nome":"Agências de Viagens","categoria":"Serviços","termos":["agencia de viagens","turismo"],"osm":[{"k":"shop","v":"travel_agency","regex":false}]},{"nome":"Empresas de TI","categoria":"Serviços","termos":["tecnologia","software","ti","desenvolvimento"],"osm":[{"k":"office","v":"it","regex":false}]},{"nome":"Consultorias","categoria":"Serviços","termos":["consultoria"],"osm":[{"k":"office","v":"consulting","regex":false}]},{"nome":"Agências de Emprego e RH","categoria":"Serviços","termos":["agencia de emprego","recursos humanos","rh"],"osm":[{"k":"office","v":"employment_agency","regex":false}]},{"nome":"Transportadoras e Logística","categoria":"Serviços","termos":["transportadora","logistica","fretes"],"osm":[{"k":"office","v":"logistics","regex":false}]},{"nome":"Gráficas","categoria":"Serviços","termos":["grafica","impressao"],"osm":[{"k":"shop","v":"copyshop","regex":false},{"k":"craft","v":"printer","regex":false}]},{"nome":"Comunicação Visual","categoria":"Serviços","termos":["comunicacao visual","letreiros","adesivos"],"osm":[{"k":"craft","v":"sign_maker","regex":false}]},{"nome":"Chaveiros","categoria":"Serviços","termos":["chaveiro"],"osm":[{"k":"shop","v":"locksmith","regex":false},{"k":"craft","v":"key_cutter","regex":false}]},{"nome":"Lavanderias","categoria":"Serviços","termos":["lavanderia"],"osm":[{"k":"shop","v":"laundry","regex":false},{"k":"shop","v":"dry_cleaning","regex":false}]},{"nome":"Funerárias","categoria":"Serviços","termos":["funeraria"],"osm":[{"k":"shop","v":"funeral_directors","regex":false}]},{"nome":"Dedetizadoras","categoria":"Serviços","termos":["dedetizacao","controle de pragas"],"osm":[]},{"nome":"Empresas de Limpeza","categoria":"Serviços","termos":["limpeza","servicos de limpeza","diarista"],"osm":[]},{"nome":"Segurança e Monitoramento","categoria":"Serviços","termos":["seguranca","monitoramento","cameras","cftv"],"osm":[]},{"nome":"Assistência Técnica","categoria":"Serviços","termos":["assistencia tecnica","conserto"],"osm":[{"k":"craft","v":"electronics_repair","regex":false}]},{"nome":"Fotógrafos e Estúdios","categoria":"Serviços","termos":["fotografo","estudio fotografico","fotografia"],"osm":[{"k":"craft","v":"photographer","regex":false},{"k":"shop","v":"photo","regex":false}]},{"nome":"Serviços de Costura","categoria":"Serviços","termos":["costura","ajustes","alfaiataria"],"osm":[{"k":"craft","v":"tailor","regex":false},{"k":"shop","v":"tailor","regex":false}]},{"nome":"Sapateiros","categoria":"Serviços","termos":["sapateiro","conserto de calcados"],"osm":[{"k":"craft","v":"shoemaker","regex":false}]},{"nome":"Financeiras e Correspondentes","categoria":"Serviços","termos":["financeira","emprestimos","credito"],"osm":[{"k":"office","v":"financial","regex":false}]},{"nome":"Cabeamento e Redes","categoria":"Serviços","termos":["redes","cabeamento","provedor de internet"],"osm":[]},{"nome":"Eletricistas","categoria":"Reformas","termos":["eletricista"],"osm":[{"k":"craft","v":"electrician","regex":false}]},{"nome":"Encanadores","categoria":"Reformas","termos":["encanador","hidraulica"],"osm":[{"k":"craft","v":"plumber","regex":false}]},{"nome":"Pintores","categoria":"Reformas","termos":["pintor","pintura predial"],"osm":[{"k":"craft","v":"painter","regex":false}]},{"nome":"Pedreiros e Construção Civil","categoria":"Reformas","termos":["pedreiro","construcao civil"],"osm":[{"k":"craft","v":"builder","regex":false}]},{"nome":"Gesseiros e Drywall","categoria":"Reformas","termos":["gesso","drywall","gesseiro"],"osm":[{"k":"craft","v":"plasterer","regex":false}]},{"nome":"Estofadores e Tapeçarias","categoria":"Reformas","termos":["estofados","tapecaria","reforma de estofados"],"osm":[{"k":"craft","v":"upholsterer","regex":false}]},{"nome":"Jardineiros","categoria":"Reformas","termos":["jardineiro"],"osm":[{"k":"craft","v":"gardener","regex":false}]},{"nome":"Soldadores","categoria":"Reformas","termos":["solda","soldador"],"osm":[{"k":"craft","v":"welder","regex":false}]},{"nome":"Escolas","categoria":"Educação","termos":["escola","colegio"],"osm":[{"k":"amenity","v":"school","regex":false}]},{"nome":"Creches e Educação Infantil","categoria":"Educação","termos":["creche","berçario","educacao infantil"],"osm":[{"k":"amenity","v":"kindergarten","regex":false}]},{"nome":"Faculdades e Universidades","categoria":"Educação","termos":["faculdade","universidade"],"osm":[{"k":"amenity","v":"college","regex":false},{"k":"amenity","v":"university","regex":false}]},{"nome":"Cursos de Idiomas","categoria":"Educação","termos":["idiomas","ingles","escola de idiomas"],"osm":[{"k":"amenity","v":"language_school","regex":false}]},{"nome":"Autoescolas","categoria":"Educação","termos":["autoescola","cfc"],"osm":[{"k":"amenity","v":"driving_school","regex":false}]},{"nome":"Escolas de Música","categoria":"Educação","termos":["escola de musica","aulas de musica"],"osm":[{"k":"amenity","v":"music_school","regex":false}]},{"nome":"Cursos Profissionalizantes","categoria":"Educação","termos":["curso profissionalizante","curso tecnico"],"osm":[]},{"nome":"Reforço Escolar","categoria":"Educação","termos":["reforco escolar","aulas particulares"],"osm":[]},{"nome":"Escolas de Dança","categoria":"Educação","termos":["escola de danca","danca"],"osm":[{"k":"leisure","v":"dance","regex":false}]},{"nome":"Academias","categoria":"Esporte","termos":["academia","musculacao","fitness"],"osm":[{"k":"leisure","v":"fitness_centre","regex":false}]},{"nome":"Estúdios de Pilates","categoria":"Esporte","termos":["pilates"],"osm":[]},{"nome":"Crossfit e Funcional","categoria":"Esporte","termos":["crossfit","treinamento funcional"],"osm":[]},{"nome":"Escolas de Natação","categoria":"Esporte","termos":["natacao","escola de natacao"],"osm":[{"k":"leisure","v":"swimming_pool","regex":false}]},{"nome":"Quadras e Campos","categoria":"Esporte","termos":["quadra","campo de futebol","society"],"osm":[{"k":"leisure","v":"pitch","regex":false}]},{"nome":"Artes Marciais","categoria":"Esporte","termos":["jiu jitsu","karate","muay thai","academia de luta"],"osm":[]},{"nome":"Clubes e Associações","categoria":"Esporte","termos":["clube","associacao"],"osm":[{"k":"leisure","v":"sports_centre","regex":false}]},{"nome":"Cinemas","categoria":"Lazer","termos":["cinema"],"osm":[{"k":"amenity","v":"cinema","regex":false}]},{"nome":"Teatros e Casas de Show","categoria":"Lazer","termos":["teatro","casa de show"],"osm":[{"k":"amenity","v":"theatre","regex":false}]},{"nome":"Boliches e Diversões","categoria":"Lazer","termos":["boliche","diversoes"],"osm":[{"k":"leisure","v":"bowling_alley","regex":false}]},{"nome":"Buffets e Salões de Festa","categoria":"Lazer","termos":["buffet","salao de festa","espaco de eventos"],"osm":[]},{"nome":"Hotéis","categoria":"Turismo","termos":["hotel"],"osm":[{"k":"tourism","v":"hotel","regex":false}]},{"nome":"Pousadas","categoria":"Turismo","termos":["pousada"],"osm":[{"k":"tourism","v":"guest_house","regex":false}]},{"nome":"Motéis","categoria":"Turismo","termos":["motel"],"osm":[{"k":"tourism","v":"motel","regex":false}]},{"nome":"Hostels","categoria":"Turismo","termos":["hostel","albergue"],"osm":[{"k":"tourism","v":"hostel","regex":false}]},{"nome":"Chácaras e Espaços para Eventos","categoria":"Turismo","termos":["chacara","sitio","espaco para eventos"],"osm":[]},{"nome":"Museus e Galerias","categoria":"Turismo","termos":["museu","galeria de arte"],"osm":[{"k":"tourism","v":"museum","regex":false},{"k":"tourism","v":"gallery","regex":false}]},{"nome":"Lojas de Celulares e Telefonia","categoria":"Tecnologia","termos":["celular","telefonia","acessorios celular"],"osm":[{"k":"shop","v":"mobile_phone","regex":false}]},{"nome":"Informática","categoria":"Tecnologia","termos":["informatica","computadores"],"osm":[{"k":"shop","v":"computer","regex":false}]},{"nome":"Eletrônicos","categoria":"Tecnologia","termos":["eletronicos"],"osm":[{"k":"shop","v":"electronics","regex":false}]},{"nome":"Eletrodomésticos","categoria":"Tecnologia","termos":["eletrodomesticos"],"osm":[{"k":"shop","v":"appliance","regex":false}]},{"nome":"Games e Video Games","categoria":"Tecnologia","termos":["games","video game"],"osm":[{"k":"shop","v":"video_games","regex":false}]},{"nome":"Assistência de Celulares","categoria":"Tecnologia","termos":["assistencia de celular","conserto de celular"],"osm":[]},{"nome":"Provedores de Internet","categoria":"Tecnologia","termos":["provedor","internet","fibra"],"osm":[{"k":"office","v":"telecommunication","regex":false}]},{"nome":"Lojas de Instrumentos Musicais","categoria":"Cultura","termos":["instrumentos musicais","musica"],"osm":[{"k":"shop","v":"musical_instrument","regex":false}]},{"nome":"Lojas de Discos e Mídias","categoria":"Cultura","termos":["discos","vinil","cds"],"osm":[{"k":"shop","v":"music","regex":false}]},{"nome":"Artes e Materiais Artísticos","categoria":"Cultura","termos":["materiais de arte","artesanato"],"osm":[{"k":"shop","v":"art","regex":false},{"k":"shop","v":"craft","regex":false}]},{"nome":"Bancos","categoria":"Financeiro","termos":["banco","agencia bancaria"],"osm":[{"k":"amenity","v":"bank","regex":false}]},{"nome":"Casas Lotéricas","categoria":"Financeiro","termos":["loterica","loteria"],"osm":[{"k":"shop","v":"lottery","regex":false}]},{"nome":"Correios e Agências Postais","categoria":"Institucional","termos":["correios","agencia postal"],"osm":[{"k":"amenity","v":"post_office","regex":false}]},{"nome":"Cooperativas Agrícolas","categoria":"Agro","termos":["cooperativa","agricola"],"osm":[]},{"nome":"Máquinas e Implementos Agrícolas","categoria":"Agro","termos":["maquinas agricolas","implementos","tratores"],"osm":[]},{"nome":"Indústrias e Fábricas","categoria":"Indústria","termos":["industria","fabrica","metalurgica"],"osm":[]},{"nome":"Distribuidoras e Atacados","categoria":"Indústria","termos":["distribuidora","atacado","atacadista"],"osm":[{"k":"shop","v":"wholesale","regex":false}]},{"nome":"Embalagens Industriais","categoria":"Indústria","termos":["embalagens","plasticos","embalagem industrial"],"osm":[]},{"nome":"Clínicas Veterinárias","categoria":"Pet","termos":["veterinaria","veterinario","clinica veterinaria"],"osm":[{"k":"amenity","v":"veterinary","regex":false}]},{"nome":"Banho e Tosa","categoria":"Pet","termos":["banho e tosa","estetica animal"],"osm":[]},{"nome":"Igrejas e Templos","categoria":"Comunidade","termos":["igreja","templo"],"osm":[{"k":"amenity","v":"place_of_worship","regex":false}]},{"nome":"ONGs e Associações","categoria":"Comunidade","termos":["ong","associacao","instituto"],"osm":[{"k":"office","v":"ngo","regex":false},{"k":"office","v":"association","regex":false}]},{"nome":"Coworkings","categoria":"Negócios","termos":["coworking","escritorio compartilhado"],"osm":[{"k":"office","v":"coworking","regex":false}]},{"nome":"Cervejarias e Choperias","categoria":"Alimentação","termos":["cervejaria","choperia","chopp"],"osm":[{"k":"craft","v":"brewery","regex":false},{"k":"shop","v":"alcohol","regex":false}]},{"nome":"Vinícolas e Vinhos","categoria":"Alimentação","termos":["vinicola","vinhos"],"osm":[{"k":"craft","v":"winery","regex":false},{"k":"shop","v":"wine","regex":false}]},{"nome":"Comida Japonesa e Sushi","categoria":"Alimentação","termos":["sushi","japonesa","temaki"],"osm":[{"k":"cuisine","v":"japanese","regex":true}]},{"nome":"Comida Chinesa","categoria":"Alimentação","termos":["comida chinesa","yakisoba"],"osm":[{"k":"cuisine","v":"chinese","regex":false}]},{"nome":"Pastelarias","categoria":"Alimentação","termos":["pastelaria","pastel"],"osm":[]},{"nome":"Esfiharias","categoria":"Alimentação","termos":["esfiharia","esfiha","comida arabe"],"osm":[]},{"nome":"Casas de Bolo","categoria":"Alimentação","termos":["casa de bolo","bolos caseiros"],"osm":[]},{"nome":"Açaí e Sorvetes","categoria":"Alimentação","termos":["acai","acaiteria"],"osm":[]},{"nome":"Rotisserias","categoria":"Alimentação","termos":["rotisseria","comida pronta"],"osm":[]},{"nome":"Casas de Temperos","categoria":"Alimentação","termos":["temperos","condimentos","especiarias"],"osm":[]},{"nome":"Docerias","categoria":"Alimentação","termos":["doceria","brigadeiro","bem casado"],"osm":[]},{"nome":"Oftalmologistas","categoria":"Saúde","termos":["oftalmologista","oftalmologia"],"osm":[]},{"nome":"Dermatologistas","categoria":"Saúde","termos":["dermatologista","dermatologia"],"osm":[]},{"nome":"Pediatras","categoria":"Saúde","termos":["pediatra","pediatria"],"osm":[]},{"nome":"Ginecologistas","categoria":"Saúde","termos":["ginecologista","ginecologia"],"osm":[]},{"nome":"Cardiologistas","categoria":"Saúde","termos":["cardiologista","cardiologia"],"osm":[]},{"nome":"Ortodontia","categoria":"Saúde","termos":["ortodontia","aparelho dental"],"osm":[]},{"nome":"Clínicas de Vacinação","categoria":"Saúde","termos":["vacinas","imunizacao","clinica de vacinas"],"osm":[]},{"nome":"Home Care e Cuidadores","categoria":"Saúde","termos":["home care","cuidador de idosos","enfermagem"],"osm":[]},{"nome":"Planos de Saúde","categoria":"Saúde","termos":["plano de saude","convenio medico"],"osm":[]},{"nome":"Óticas e Optometria","categoria":"Saúde","termos":["optometria"],"osm":[{"k":"shop","v":"optician","regex":false}]},{"nome":"Design de Sobrancelhas","categoria":"Beleza","termos":["sobrancelhas","design de sobrancelha"],"osm":[]},{"nome":"Micropigmentação","categoria":"Beleza","termos":["micropigmentacao","dermopigmentacao"],"osm":[]},{"nome":"Bronzeamento","categoria":"Beleza","termos":["bronzeamento","bronze artificial"],"osm":[]},{"nome":"Clínicas de Emagrecimento","categoria":"Beleza","termos":["emagrecimento","estetica corporal"],"osm":[]},{"nome":"Vidros Automotivos","categoria":"Automotivo","termos":["vidros automotivos","parabrisa"],"osm":[]},{"nome":"Rastreamento Veicular","categoria":"Automotivo","termos":["rastreamento veicular","rastreador"],"osm":[]},{"nome":"Baterias Automotivas","categoria":"Automotivo","termos":["baterias","baterias automotivas"],"osm":[]},{"nome":"Escapamentos","categoria":"Automotivo","termos":["escapamentos","escapamento"],"osm":[]},{"nome":"Martelinho de Ouro","categoria":"Automotivo","termos":["martelinho de ouro","reparo de funilaria"],"osm":[]},{"nome":"Blindagem de Veículos","categoria":"Automotivo","termos":["blindagem","blindagem automotiva"],"osm":[]},{"nome":"Estacionamentos","categoria":"Automotivo","termos":["estacionamento"],"osm":[{"k":"amenity","v":"parking","regex":false},{"k":"amenity","v":"parking_entrance","regex":false}]},{"nome":"Lojas de Bebês e Enxoval","categoria":"Varejo","termos":["bebe","enxoval","moda infantil"],"osm":[{"k":"shop","v":"baby_goods","regex":false}]},{"nome":"Moda Íntima e Lingerie","categoria":"Varejo","termos":["lingerie","moda intima"],"osm":[]},{"nome":"Moda Praia","categoria":"Varejo","termos":["moda praia","biquini"],"osm":[]},{"nome":"Moda Fitness","categoria":"Varejo","termos":["moda fitness","roupa de academia"],"osm":[]},{"nome":"Lojas de Pesca e Camping","categoria":"Varejo","termos":["pesca","camping"],"osm":[{"k":"shop","v":"fishing","regex":false},{"k":"shop","v":"outdoor","regex":false}]},{"nome":"Lojas de Importados","categoria":"Varejo","termos":["importados","produtos importados"],"osm":[]},{"nome":"Lojas de Vinhos e Adegas","categoria":"Varejo","termos":["loja de vinhos"],"osm":[{"k":"shop","v":"wine","regex":false}]},{"nome":"Lojas de Suplementos","categoria":"Varejo","termos":["suplementos","whey","nutricao esportiva"],"osm":[]},{"nome":"Lojas de Semijoias","categoria":"Varejo","termos":["semijoias","folheados"],"osm":[]},{"nome":"Óticas e Relógios","categoria":"Varejo","termos":["relogios"],"osm":[{"k":"shop","v":"watches","regex":false}]},{"nome":"Madeireiras","categoria":"Construção","termos":["madeireira","madeiras"],"osm":[{"k":"shop","v":"trade","regex":false}]},{"nome":"Depósitos de Materiais","categoria":"Construção","termos":["deposito de materiais","deposito de construcao"],"osm":[]},{"nome":"Telhas e Coberturas","categoria":"Construção","termos":["telhas","coberturas","telhados"],"osm":[{"k":"craft","v":"roofer","regex":false}]},{"nome":"Energia Solar (Fotovoltaica)","categoria":"Construção","termos":["energia solar","fotovoltaica","placas solares"],"osm":[]},{"nome":"Automação e Portões Eletrônicos","categoria":"Construção","termos":["portao eletronico","automatizadores","automacao"],"osm":[]},{"nome":"Cercas e Alambrados","categoria":"Construção","termos":["cercas","alambrado","cerca eletrica"],"osm":[]},{"nome":"Impermeabilização","categoria":"Construção","termos":["impermeabilizacao"],"osm":[]},{"nome":"Locação de Equipamentos e Andaimes","categoria":"Construção","termos":["locacao de equipamentos","andaimes","betoneira"],"osm":[]},{"nome":"Terraplenagem","categoria":"Construção","termos":["terraplenagem","terraplanagem"],"osm":[]},{"nome":"Poços Artesianos","categoria":"Construção","termos":["poco artesiano","perfuracao de pocos"],"osm":[]},{"nome":"Persianas e Toldos","categoria":"Construção","termos":["toldos","persianas","coberturas retrateis"],"osm":[]},{"nome":"Casas de Câmbio","categoria":"Serviços","termos":["cambio","casa de cambio"],"osm":[{"k":"amenity","v":"bureau_de_change","regex":false}]},{"nome":"Correspondentes Bancários","categoria":"Serviços","termos":["correspondente bancario"],"osm":[]},{"nome":"Escritórios de Cobrança","categoria":"Serviços","termos":["cobranca","assessoria de cobranca"],"osm":[]},{"nome":"Tradução e Tradutores","categoria":"Serviços","termos":["traducao","tradutor juramentado"],"osm":[]},{"nome":"Cerimonial e Eventos","categoria":"Serviços","termos":["cerimonial","organizacao de eventos","assessoria de eventos"],"osm":[]},{"nome":"Decoração de Festas","categoria":"Serviços","termos":["decoracao de festas","festa"],"osm":[]},{"nome":"Aluguel de Trajes","categoria":"Serviços","termos":["aluguel de trajes","locacao de roupas","ternos"],"osm":[]},{"nome":"DJ e Sonorização","categoria":"Serviços","termos":["dj","sonorizacao","som para eventos"],"osm":[]},{"nome":"Filmagem e Produção","categoria":"Serviços","termos":["filmagem","produtora de video","audiovisual"],"osm":[]},{"nome":"Buffet Infantil","categoria":"Serviços","termos":["buffet infantil","festa infantil"],"osm":[]},{"nome":"Serigrafia e Estamparia","categoria":"Serviços","termos":["serigrafia","estamparia","silk"],"osm":[]},{"nome":"Chaveiro e Fechaduras","categoria":"Serviços","termos":["fechaduras","chaveiro auto"],"osm":[]},{"nome":"Escolas de Informática","categoria":"Educação","termos":["escola de informatica","curso de informatica"],"osm":[]},{"nome":"Cursinhos Pré-Vestibular","categoria":"Educação","termos":["pre vestibular","cursinho"],"osm":[]},{"nome":"Escolas Bilíngues","categoria":"Educação","termos":["escola bilingue"],"osm":[]},{"nome":"Agências de Marketing Digital","categoria":"Tecnologia","termos":["marketing digital","agencia digital","trafego pago"],"osm":[]},{"nome":"Desenvolvimento de Sites","categoria":"Tecnologia","termos":["criacao de sites","desenvolvimento web"],"osm":[]},{"nome":"Segurança Eletrônica e CFTV","categoria":"Tecnologia","termos":["cftv","cameras de seguranca","alarmes"],"osm":[]},{"nome":"Adestramento de Cães","categoria":"Pet","termos":["adestramento","adestrador"],"osm":[]},{"nome":"Hotéis para Pets","categoria":"Pet","termos":["hotel para caes","creche para pets"],"osm":[]},{"nome":"Aquarismo","categoria":"Pet","termos":["aquarismo","aquario","peixes ornamentais"],"osm":[]},{"nome":"Ferro-Velho e Sucata","categoria":"Indústria","termos":["ferro velho","sucata","reciclagem de metais"],"osm":[{"k":"shop","v":"scrap_yard","regex":false}]},{"nome":"Recicladoras","categoria":"Indústria","termos":["reciclagem","recicladora","cooperativa de reciclagem"],"osm":[]},{"nome":"Usinagem e Caldeiraria","categoria":"Indústria","termos":["usinagem","caldeiraria","tornearia"],"osm":[]},{"nome":"Fábricas de Móveis","categoria":"Indústria","termos":["fabrica de moveis","moveleira"],"osm":[]},{"nome":"Cerâmicas e Olarias","categoria":"Indústria","termos":["ceramica","olaria","tijolos"],"osm":[]},{"nome":"Confecções e Facções","categoria":"Indústria","termos":["confeccao","faccao","costura industrial"],"osm":[]}];
+  </script>
+  <script>
+/* Núcleo da aplicação (dados, dedupe, pesquisa, serviços, API local) */
+'use strict';
+/* ============================================================================
+ * Estação de Trabalho — versão HTML único (offline, dados no navegador).
+ *
+ * Toda a lógica que antes ficava no servidor (Node/Express/SQLite) foi
+ * reescrita para rodar 100% no navegador. Os dados são MEMORIZADOS no
+ * localStorage do navegador — permanecem salvos ao fechar e reabrir o arquivo.
+ * ========================================================================== */
+
+/* ------------------------------------------------------------------ Helpers */
+function _pad(n) { return String(n).padStart(2, '0'); }
+function agora() {
+  const d = new Date();
+  return `${d.getFullYear()}-${_pad(d.getMonth() + 1)}-${_pad(d.getDate())} ${_pad(d.getHours())}:${_pad(d.getMinutes())}:${_pad(d.getSeconds())}`;
+}
+function hoje() {
+  const d = new Date();
+  return `${d.getFullYear()}-${_pad(d.getMonth() + 1)}-${_pad(d.getDate())}`;
+}
+function hashSenha(s) {
+  let h = 5381;
+  s = String(s);
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return 'h' + h.toString(16);
+}
+
+/* ------------------------------------------------------ Normalização (norm) */
+const norm = (() => {
+  function semAcentos(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function normalizarTexto(t) {
+    return semAcentos(t).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  const RUIDO = new Set(['ltda', 'me', 'epp', 'eireli', 'sa', 's', 'a', 'cia', 'comercio', 'comercial', 'e', 'de', 'da', 'do', 'das', 'dos', 'the', 'and']);
+  function normalizarNome(nome) {
+    return normalizarTexto(nome).split(' ').filter((p) => p && !RUIDO.has(p)).join(' ');
+  }
+  function normalizarTelefone(t) {
+    let d = String(t || '').replace(/\D/g, '');
+    if (d.length > 11 && d.startsWith('55')) d = d.slice(2);
+    return d;
+  }
+  function telefoneParaWhatsapp(t) {
+    let d = String(t || '').replace(/\D/g, '');
+    if (!d) return '';
+    if (d.length >= 12) return d;
+    if (d.length === 10 || d.length === 11) return '55' + d;
+    return d;
+  }
+  function normalizarUrlBase(url) {
+    let s = String(url || '').trim().toLowerCase();
+    if (!s) return '';
+    s = s.replace(/^https?:\/\//, '').replace(/\/+$/, '').split(/[?#]/)[0];
+    return s;
+  }
+  function normalizarSite(site) { return normalizarUrlBase(site).replace(/^www\./, ''); }
+  function normalizarInstagram(insta) {
+    let s = String(insta || '').trim().toLowerCase();
+    if (!s) return '';
+    s = s.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/^instagram\.com\//, '').replace(/^@/, '').replace(/[/?#].*$/, '');
+    return s;
+  }
+  function normalizarEmail(e) { return String(e || '').trim().toLowerCase(); }
+  function normalizarEndereco(e) {
+    return normalizarTexto(e).replace(/\b(rua|r|avenida|av|travessa|tv|alameda|al|rodovia|rod|estrada|est|praca|pca)\b/g, '').replace(/\s+/g, ' ').trim();
+  }
+  return { semAcentos, normalizarTexto, normalizarNome, normalizarTelefone, telefoneParaWhatsapp, normalizarSite, normalizarUrlBase, normalizarInstagram, normalizarEmail, normalizarEndereco };
+})();
+
+/* ------------------------------------------------------- Similaridade (sim) */
+const sim = (() => {
+  function levenshtein(a, b) {
+    a = a || ''; b = b || '';
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    let ant = new Array(b.length + 1);
+    for (let j = 0; j <= b.length; j++) ant[j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      let atual = [i];
+      for (let j = 1; j <= b.length; j++) {
+        const custo = a[i - 1] === b[j - 1] ? 0 : 1;
+        atual[j] = Math.min(atual[j - 1] + 1, ant[j] + 1, ant[j - 1] + custo);
+      }
+      ant = atual;
+    }
+    return ant[b.length];
+  }
+  function similaridadeLevenshtein(a, b) {
+    a = norm.normalizarTexto(a); b = norm.normalizarTexto(b);
+    const m = Math.max(a.length, b.length);
+    if (m === 0) return 1;
+    return 1 - levenshtein(a, b) / m;
+  }
+  function tokens(t) { return new Set(norm.normalizarTexto(t).split(' ').filter(Boolean)); }
+  function similaridadeJaccard(a, b) {
+    const sa = tokens(a), sb = tokens(b);
+    if (sa.size === 0 && sb.size === 0) return 1;
+    let inter = 0;
+    for (const t of sa) if (sb.has(t)) inter++;
+    const uni = sa.size + sb.size - inter;
+    return uni === 0 ? 0 : inter / uni;
+  }
+  function similaridadeNome(a, b) {
+    const lev = similaridadeLevenshtein(a, b);
+    const jac = similaridadeJaccard(a, b);
+    return Math.max(lev, jac * 0.6 + lev * 0.4);
+  }
+  return { levenshtein, similaridadeLevenshtein, similaridadeJaccard, similaridadeNome };
+})();
+
+/* ------------------------------------------------------------- Deduplicação */
+const dedupe = (() => {
+  const LIMIAR_NOME = 0.9;
+  function extrair(reg) {
+    const nome = reg.nome || reg.empresa || '';
+    return {
+      nomeNorm: norm.normalizarNome(nome),
+      telefone: norm.normalizarTelefone(reg.telefone || reg.whatsapp || ''),
+      whatsapp: norm.normalizarTelefone(reg.whatsapp || ''),
+      site: norm.normalizarSite(reg.site || ''),
+      instagram: norm.normalizarInstagram(reg.instagram || ''),
+      email: norm.normalizarEmail(reg.email || ''),
+      cidade: norm.normalizarTexto(reg.cidade || ''),
+      endereco: norm.normalizarEndereco(reg.endereco || ''),
+    };
+  }
+  function temForte(id) { return !!(id.telefone || id.site || id.instagram || id.email); }
+  function gerarHash(reg) {
+    const id = extrair(reg);
+    return id.telefone || id.site || id.instagram || id.email || `${id.nomeNorm}|${id.cidade}`;
+  }
+  const COL_NOME = { clientes: 'nome', prospeccao: 'empresa', resultados: 'nome' };
+  function verificarDuplicado(candidato, opts = {}) {
+    const tabelas = opts.tabelas || ['clientes', 'prospeccao', 'resultados'];
+    const id = extrair(candidato);
+    const db = Store.get();
+    for (const tabela of tabelas) {
+      const registros = db[tabela] || [];
+      const cNome = COL_NOME[tabela];
+      // 1) Identificadores fortes.
+      for (const r of registros) {
+        if (id.telefone && norm.normalizarTelefone(r.telefone || '').includes(id.telefone)) return dup(tabela, r, 'identificador forte (telefone)');
+        if (id.site && String(r.site || '').toLowerCase().includes(id.site)) return dup(tabela, r, 'identificador forte (site)');
+        if (id.instagram && String(r.instagram || '').toLowerCase().includes(id.instagram)) return dup(tabela, r, 'identificador forte (instagram)');
+        if (id.email && norm.normalizarEmail(r.email || '') === id.email) return dup(tabela, r, 'identificador forte (email)');
+      }
+      // 2) Nome + cidade (só quando o candidato não tem identificador forte).
+      if (id.nomeNorm && !temForte(id)) {
+        for (const r of registros) {
+          const cidR = norm.normalizarTexto(r.cidade || '');
+          if (!(cidR === id.cidade || id.cidade === '')) continue;
+          const s = sim.similaridadeNome(candidato.nome || candidato.empresa || '', r[cNome] || '');
+          if (s >= LIMIAR_NOME) return dup(tabela, r, `nome similar (${(s * 100).toFixed(0)}%) na mesma cidade`);
+        }
+      }
+    }
+    return { duplicado: false };
+  }
+  function dup(tabela, r, motivo) { return { duplicado: true, motivo, tabela, id: r.id }; }
+  function deduplicarLista(lista) {
+    const vistos = new Set();
+    const unicos = [];
+    for (const item of lista) {
+      const h = gerarHash(item);
+      if (vistos.has(h)) continue;
+      const idItem = extrair(item);
+      let dupe = false;
+      if (!temForte(idItem)) {
+        for (const u of unicos) {
+          if (temForte(extrair(u))) continue;
+          if (norm.normalizarTexto(u.cidade || '') === norm.normalizarTexto(item.cidade || '') &&
+              sim.similaridadeNome(u.nome || u.empresa || '', item.nome || item.empresa || '') >= LIMIAR_NOME) { dupe = true; break; }
+        }
+      }
+      if (dupe) continue;
+      vistos.add(h);
+      unicos.push(item);
+    }
+    return unicos;
+  }
+  return { extrair, gerarHash, verificarDuplicado, deduplicarLista };
+})();
+
+/* --------------------------------------------------- Validação (sanitizar) */
+const val = (() => {
+  function texto(v, max = 2000) {
+    if (v === undefined || v === null) return '';
+    let s = String(v).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
+    if (s.length > max) s = s.slice(0, max);
+    return s;
+  }
+  function inteiro(v, padrao = 0, min = -Infinity, max = Infinity) {
+    const n = parseInt(v, 10);
+    if (Number.isNaN(n)) return padrao;
+    return Math.min(max, Math.max(min, n));
+  }
+  function emailValido(email) {
+    const e = texto(email, 254);
+    if (!e) return true;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  }
+  function dataOuVazio(v) {
+    const s = texto(v, 30);
+    if (!s) return '';
+    const d = new Date(s.length <= 10 ? s + 'T00:00:00' : s);
+    if (Number.isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}-${_pad(d.getMonth() + 1)}-${_pad(d.getDate())}`;
+  }
+  return { texto, inteiro, emailValido, dataOuVazio };
+})();
+
+/* ---------------------------------------------------- OSM: consultas (osm) */
+const osm = (() => {
+  function escapar(v) { return String(v).replace(/["\\]/g, '\\$&'); }
+  const FALLBACK = ['shop', 'amenity', 'craft', 'office', 'leisure', 'tourism'];
+  function linhasPorTags(lista, ref) {
+    const l = [];
+    for (const def of lista) {
+      if (def.v && def.regex) l.push(`  nwr["${escapar(def.k)}"~"${escapar(def.v)}",i](${ref});`);
+      else if (def.v) l.push(`  nwr["${escapar(def.k)}"="${escapar(def.v)}"](${ref});`);
+      else l.push(`  nwr["${escapar(def.k)}"](${ref});`);
+    }
+    return l;
+  }
+  function linhasPorNome(termos, ref) {
+    const alt = termos.map((t) => escapar(t)).join('|');
+    return FALLBACK.map((cat) => `  nwr["${cat}"]["name"~"${alt}",i](${ref});`);
+  }
+  function corpo(nicho, ref) {
+    if (nicho.osm && nicho.osm.length) return linhasPorTags(nicho.osm, ref).join('\n');
+    const termos = nicho.termos && nicho.termos.length ? nicho.termos : [nicho.nome];
+    return linhasPorNome(termos, ref).join('\n');
+  }
+  function montarConsultaArea(nicho, areaId, timeoutSeg, limite) {
+    return [`[out:json][timeout:${timeoutSeg}];`, `area(${areaId})->.a;`, '(', corpo(nicho, 'area.a'), ');', `out center tags ${limite};`].join('\n');
+  }
+  function montarConsultaBBox(nicho, bbox, timeoutSeg, limite) {
+    const ref = `${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}`;
+    return [`[out:json][timeout:${timeoutSeg}];`, '(', corpo(nicho, ref), ');', `out center tags ${limite};`].join('\n');
+  }
+  return { montarConsultaArea, montarConsultaBBox };
+})();
+
+/* ------------------------------------------- OSM: coleta (providers) */
+const providers = (() => {
+  const P = {
+    nominatimUrls: ['https://nominatim.openstreetmap.org/search'],
+    overpassUrls: ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'],
+    timeoutMs: 30000, delayMs: 1100, maxPadrao: 50, maxAbsoluto: 300,
+  };
+  const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function fetchTimeout(url, opts = {}, ms = P.timeoutMs) {
+    const ctrl = new AbortController();
+    const id = setTimeout(() => ctrl.abort(), ms);
+    try { return await fetch(url, { ...opts, signal: ctrl.signal }); }
+    finally { clearTimeout(id); }
+  }
+  async function geocodificarCidade(cidade, estado) {
+    const consulta = [cidade, estado, 'Brasil'].filter(Boolean).join(', ');
+    let ultimo;
+    for (const base of P.nominatimUrls) {
+      const url = `${base}?format=jsonv2&limit=1&addressdetails=1&countrycodes=br&q=${encodeURIComponent(consulta)}`;
+      try {
+        const resp = await fetchTimeout(url, { headers: { 'Accept-Language': 'pt-BR' } });
+        if (!resp.ok) throw new Error(`Nominatim HTTP ${resp.status}`);
+        const dados = await resp.json();
+        if (!Array.isArray(dados) || !dados.length) throw new Error('Cidade não encontrada na base OpenStreetMap');
+        const lugar = dados[0];
+        const bb = (lugar.boundingbox || []).map(Number);
+        const bbox = [bb[0], bb[2], bb[1], bb[3]];
+        let areaId;
+        if (lugar.osm_type === 'relation') areaId = 3600000000 + Number(lugar.osm_id);
+        else if (lugar.osm_type === 'way') areaId = 2400000000 + Number(lugar.osm_id);
+        return { areaId, bbox, displayName: lugar.display_name, lat: Number(lugar.lat), lon: Number(lugar.lon) };
+      } catch (e) { ultimo = e; }
+    }
+    throw new Error(`Não foi possível localizar a cidade "${consulta}" nas fontes abertas: ${ultimo ? ultimo.message : 'sem resposta'}`);
+  }
+  async function consultarOverpass(ql) {
+    let ultimo;
+    for (const base of P.overpassUrls) {
+      try {
+        const resp = await fetchTimeout(base, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(ql),
+        });
+        if (!resp.ok) throw new Error(`Overpass HTTP ${resp.status}`);
+        const dados = await resp.json();
+        return dados.elements || [];
+      } catch (e) { ultimo = e; await delay(500); }
+    }
+    throw new Error(`Servidores Overpass indisponíveis: ${ultimo ? ultimo.message : 'sem resposta'}`);
+  }
+  function extrairTelefone(t) { return t['contact:phone'] || t.phone || t['contact:mobile'] || t['contact:whatsapp'] || ''; }
+  function categoriaDe(t) { return t.shop || t.amenity || t.craft || t.office || t.leisure || t.tourism || t.healthcare || ''; }
+  function montarEndereco(t) { return [t['addr:street'], t['addr:housenumber'], t['addr:suburb'], t['addr:neighbourhood']].filter(Boolean).join(', '); }
+  function mapear(el, ctx) {
+    const t = el.tags || {};
+    const nome = t.name || t.operator || t.brand || '';
+    if (!nome) return null;
+    const lat = el.lat != null ? el.lat : el.center ? el.center.lat : null;
+    const lon = el.lon != null ? el.lon : el.center ? el.center.lon : null;
+    const tel = extrairTelefone(t);
+    return {
+      nome, telefone: tel, whatsapp: t['contact:whatsapp'] || tel || '',
+      instagram: norm.normalizarInstagram(t['contact:instagram'] || t.instagram || ''),
+      site: t['contact:website'] || t.website || t.url || '',
+      email: t['contact:email'] || t.email || '',
+      cidade: t['addr:city'] || ctx.cidade || '', estado: t['addr:state'] || ctx.estado || '',
+      endereco: montarEndereco(t), latitude: lat, longitude: lon,
+      categoria: categoriaDe(t) || ctx.nicho || '', horario: t.opening_hours || '',
+      avaliacao: null, qtd_avaliacoes: null, origem: 'OpenStreetMap',
+      url_origem: `https://www.openstreetmap.org/${el.type}/${el.id}`,
+    };
+  }
+  function gerarDemo(cidade, estado, nicho, max) {
+    const qtd = Math.min(max || 20, 25), ddd = '16', lista = [];
+    for (let i = 1; i <= qtd; i++) {
+      const num = String(90000000 + i * 137).slice(0, 8);
+      lista.push({
+        nome: `${nicho} Exemplo ${i} (DEMONSTRAÇÃO)`,
+        telefone: `(${ddd}) 9${num.slice(0, 4)}-${num.slice(4)}`, whatsapp: `55${ddd}9${num}`,
+        instagram: `${norm.normalizarTexto(nicho).replace(/\s/g, '')}exemplo${i}`,
+        site: `www.exemplo${i}.com.br`, email: `contato${i}@exemplo.com.br`,
+        cidade: cidade || 'Cidade Exemplo', estado: estado || '', endereco: `Rua Exemplo, ${100 + i}`,
+        latitude: null, longitude: null, categoria: nicho, horario: 'Seg-Sex 08:00-18:00',
+        avaliacao: null, qtd_avaliacoes: null, origem: 'Demonstração (dados de exemplo — não reais)', url_origem: '',
+      });
+    }
+    return lista;
+  }
+  async function coletar({ cidade, estado, nicho, max, demo }, nichoDef) {
+    const limite = Math.min(max || P.maxPadrao, P.maxAbsoluto);
+    if (demo) return { resultados: gerarDemo(cidade, estado, nicho, limite), fonte: 'demonstracao', mensagem: 'Modo demonstração ativo — resultados de exemplo (não reais).' };
+    const local = await geocodificarCidade(cidade, estado);
+    await delay(P.delayMs);
+    const timeoutSeg = Math.floor(P.timeoutMs / 1000);
+    const def = nichoDef || { nome: nicho, termos: [nicho] };
+    const ql = local.areaId ? osm.montarConsultaArea(def, local.areaId, timeoutSeg, limite * 3) : osm.montarConsultaBBox(def, local.bbox, timeoutSeg, limite * 3);
+    const elementos = await consultarOverpass(ql);
+    const ctx = { cidade, estado, nicho };
+    const mapeados = elementos.map((el) => mapear(el, ctx)).filter(Boolean);
+    return { resultados: mapeados, fonte: 'openstreetmap', mensagem: `Coletados ${mapeados.length} registros no OpenStreetMap (${local.displayName}).` };
+  }
+  return { coletar, gerarDemo };
+})();
+
+/* -------------------------------------------- Camada de dados (localStorage) */
+const Store = (() => {
+  const KEY = 'estacaoTrabalhoDB_v1';
+  let db = null;
+  function seedNichos() { return (window.__NICHOS__ || []).map((n, i) => ({ id: i + 1, nome: n.nome, categoria: n.categoria, termos: n.termos || [], osm: n.osm || [] })); }
+  function novoDB() {
+    return {
+      versao: 1,
+      usuario: { login: 'admin', nome: 'Administrador', senha: hashSenha('admin123') },
+      logado: false,
+      seq: { clientes: 0, prospeccao: 0, pesquisas: 0, resultados: 0, historico: 0 },
+      clientes: [], prospeccao: [], pesquisas: [], resultados: [],
+      nichos: seedNichos(), historico: [],
+    };
+  }
+  function carregar() {
+    try { const raw = localStorage.getItem(KEY); if (raw) db = JSON.parse(raw); } catch (_) { db = null; }
+    if (!db || !db.seq || !db.usuario) { db = novoDB(); salvar(); }
+    if (!db.nichos || !db.nichos.length) { db.nichos = seedNichos(); salvar(); }
+    return db;
+  }
+  function salvar() {
+    try { localStorage.setItem(KEY, JSON.stringify(db)); return true; }
+    catch (e) { try { UI.toast('Não foi possível salvar os dados (armazenamento cheio?).', 'error'); } catch (_) {} return false; }
+  }
+  function exportarJSON() { return JSON.stringify(db, null, 2); }
+  function importarJSON(texto) {
+    const novo = JSON.parse(texto);
+    if (!novo || !novo.seq || !novo.usuario) throw new Error('Arquivo de backup inválido.');
+    db = novo;
+    if (!db.nichos || !db.nichos.length) db.nichos = seedNichos();
+    salvar();
+    return db;
+  }
+  return { carregar, salvar, get: () => db, novoDB, exportarJSON, importarJSON };
+})();
+
+/* ---------------------------------------------------------------- Histórico */
+function registrarHistorico(tipo, descricao, detalhes) {
+  const db = Store.get();
+  db.historico.unshift({ id: ++db.seq.historico, tipo, descricao, detalhes: detalhes || null, usuario_login: db.usuario.login, criado_em: agora() });
+  if (db.historico.length > 5000) db.historico.length = 5000;
+  Store.salvar();
+}
+
+/* ----------------------------------------------- Ordenação / busca (helpers) */
+function cmp(a, b, dir) {
+  const na = Number(a), nb = Number(b);
+  let r;
+  if (a !== '' && b !== '' && !Number.isNaN(na) && !Number.isNaN(nb) && String(a).trim() !== '' && String(b).trim() !== '') r = na - nb;
+  else r = String(a == null ? '' : a).localeCompare(String(b == null ? '' : b), 'pt-BR', { sensitivity: 'base' });
+  return dir === 'DESC' ? -r : r;
+}
+function ordenar(arr, col, dir) { return arr.slice().sort((x, y) => cmp(x[col], y[col], dir)); }
+function contem(v, termo) { return String(v || '').toLowerCase().includes(termo); }
+
+/* -------------------------------------------------- Serviço: Clientes Fixos */
+const svcClientes = (() => {
+  const COLS = ['nome', 'cidade', 'telefone', 'email', 'data_cadastro', 'ultimo_contato', 'criado_em'];
+  function sanitizar(d) {
+    return {
+      nome: val.texto(d.nome, 200), telefone: val.texto(d.telefone, 40), whatsapp: val.texto(d.whatsapp, 40),
+      cidade: val.texto(d.cidade, 120), instagram: val.texto(d.instagram, 200), site: val.texto(d.site, 300),
+      email: val.texto(d.email, 254), observacoes: val.texto(d.observacoes, 5000),
+      data_cadastro: val.dataOuVazio(d.data_cadastro) || undefined, ultimo_contato: val.dataOuVazio(d.ultimo_contato) || null,
+    };
+  }
+  function listar({ search = '', sort = 'nome', order = 'ASC', page = 1, pageSize = 50 } = {}) {
+    const col = COLS.includes(sort) ? sort : 'nome';
+    const dir = String(order).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    let itens = Store.get().clientes.slice();
+    if (search) { const s = search.toLowerCase(); itens = itens.filter((c) => contem(c.nome, s) || contem(c.cidade, s) || contem(c.telefone, s) || contem(c.email, s) || contem(c.instagram, s)); }
+    const total = itens.length;
+    itens = ordenar(itens, col, dir);
+    page = Number(page) || 1; pageSize = Number(pageSize) || 50;
+    const off = (page - 1) * pageSize;
+    return { total, page, pageSize, itens: itens.slice(off, off + pageSize) };
+  }
+  function obter(id) { return Store.get().clientes.find((c) => c.id === Number(id)); }
+  function criar(dados, { forcar = false } = {}) {
+    const d = sanitizar(dados);
+    if (!d.nome) return { ok: false, erro: 'O nome é obrigatório.' };
+    if (!val.emailValido(d.email)) return { ok: false, erro: 'E-mail inválido.' };
+    if (!forcar) { const dup = dedupe.verificarDuplicado(d); if (dup.duplicado) return { ok: false, erro: `Registro duplicado (${dup.motivo}).`, duplicado: dup }; }
+    const db = Store.get();
+    const reg = { id: ++db.seq.clientes, ...d, data_cadastro: d.data_cadastro || hoje(), ultimo_contato: d.ultimo_contato || null, hash_dedupe: dedupe.gerarHash(d), criado_em: agora(), atualizado_em: agora() };
+    delete reg.data_cadastro_undefined;
+    db.clientes.push(reg);
+    registrarHistorico('alteracao', `Cliente criado: ${d.nome}`, { id: reg.id });
+    return { ok: true, id: reg.id };
+  }
+  function atualizar(id, dados) {
+    const atual = obter(id);
+    if (!atual) return { ok: false, erro: 'Cliente não encontrado.' };
+    const d = sanitizar(dados);
+    if (!d.nome) return { ok: false, erro: 'O nome é obrigatório.' };
+    if (!val.emailValido(d.email)) return { ok: false, erro: 'E-mail inválido.' };
+    Object.assign(atual, { nome: d.nome, telefone: d.telefone, whatsapp: d.whatsapp, cidade: d.cidade, instagram: d.instagram, site: d.site, email: d.email, observacoes: d.observacoes, ultimo_contato: d.ultimo_contato, hash_dedupe: dedupe.gerarHash(d), atualizado_em: agora() });
+    registrarHistorico('alteracao', `Cliente atualizado: ${d.nome}`, { id: atual.id });
+    Store.salvar();
+    return { ok: true };
+  }
+  function excluir(id) {
+    const db = Store.get();
+    const i = db.clientes.findIndex((c) => c.id === Number(id));
+    if (i < 0) return { ok: false, erro: 'Cliente não encontrado.' };
+    const nome = db.clientes[i].nome;
+    db.clientes.splice(i, 1);
+    registrarHistorico('exclusao', `Cliente excluído: ${nome}`, { id: Number(id) });
+    return { ok: true };
+  }
+  function todos() { return ordenar(Store.get().clientes, 'nome', 'ASC'); }
+  return { listar, obter, criar, atualizar, excluir, todos };
+})();
+
+/* ---------------------------------------------------- Serviço: Prospecção */
+const svcProspeccao = (() => {
+  const STATUS = ['Novo', 'Contatado', 'Negociando', 'Proposta', 'Fechado', 'Perdido'];
+  const COLS = ['empresa', 'cidade', 'estado', 'nicho', 'status', 'probabilidade', 'data', 'ultimo_contato'];
+  function sanitizar(d) {
+    let status = val.texto(d.status, 30) || 'Novo';
+    if (!STATUS.includes(status)) status = 'Novo';
+    return {
+      empresa: val.texto(d.empresa, 200), cidade: val.texto(d.cidade, 120), estado: val.texto(d.estado, 40),
+      nicho: val.texto(d.nicho, 120), telefone: val.texto(d.telefone, 40), whatsapp: val.texto(d.whatsapp, 40),
+      instagram: val.texto(d.instagram, 200), site: val.texto(d.site, 300), email: val.texto(d.email, 254),
+      responsavel: val.texto(d.responsavel, 120), status, origem: val.texto(d.origem, 120),
+      data: val.dataOuVazio(d.data) || undefined, ultimo_contato: val.dataOuVazio(d.ultimo_contato) || null,
+      probabilidade: val.inteiro(d.probabilidade, 0, 0, 100), observacoes: val.texto(d.observacoes, 5000),
+    };
+  }
+  function listar({ search = '', cidade = '', estado = '', nicho = '', status = '', probMin = '', sort = 'empresa', order = 'ASC', page = 1, pageSize = 50 } = {}) {
+    const col = COLS.includes(sort) ? sort : 'empresa';
+    const dir = String(order).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    let itens = Store.get().prospeccao.slice();
+    if (search) { const s = search.toLowerCase(); itens = itens.filter((p) => contem(p.empresa, s) || contem(p.cidade, s) || contem(p.telefone, s) || contem(p.email, s) || contem(p.responsavel, s)); }
+    if (cidade) itens = itens.filter((p) => String(p.cidade || '').toLowerCase() === cidade.toLowerCase());
+    if (estado) itens = itens.filter((p) => String(p.estado || '').toLowerCase() === estado.toLowerCase());
+    if (nicho) itens = itens.filter((p) => contem(p.nicho, nicho.toLowerCase()));
+    if (status) itens = itens.filter((p) => p.status === status);
+    if (probMin !== '' && probMin !== undefined) { const pm = val.inteiro(probMin, 0, 0, 100); itens = itens.filter((p) => (p.probabilidade || 0) >= pm); }
+    const total = itens.length;
+    itens = ordenar(itens, col, dir);
+    page = Number(page) || 1; pageSize = Number(pageSize) || 50;
+    const off = (page - 1) * pageSize;
+    return { total, page, pageSize, itens: itens.slice(off, off + pageSize), statusValidos: STATUS };
+  }
+  function obter(id) { return Store.get().prospeccao.find((p) => p.id === Number(id)); }
+  function criar(dados, { forcar = false } = {}) {
+    const d = sanitizar(dados);
+    if (!d.empresa) return { ok: false, erro: 'O nome da empresa é obrigatório.' };
+    if (!val.emailValido(d.email)) return { ok: false, erro: 'E-mail inválido.' };
+    if (!forcar) { const dup = dedupe.verificarDuplicado({ ...d, nome: d.empresa }); if (dup.duplicado) return { ok: false, erro: `Registro duplicado (${dup.motivo}).`, duplicado: dup }; }
+    const db = Store.get();
+    const reg = { id: ++db.seq.prospeccao, ...d, data: d.data || hoje(), ultimo_contato: d.ultimo_contato || null, hash_dedupe: dedupe.gerarHash({ ...d, nome: d.empresa }), criado_em: agora(), atualizado_em: agora() };
+    db.prospeccao.push(reg);
+    registrarHistorico('alteracao', `Prospecção criada: ${d.empresa}`, { id: reg.id });
+    return { ok: true, id: reg.id };
+  }
+  function atualizar(id, dados) {
+    const atual = obter(id);
+    if (!atual) return { ok: false, erro: 'Registro não encontrado.' };
+    const d = sanitizar(dados);
+    if (!d.empresa) return { ok: false, erro: 'O nome da empresa é obrigatório.' };
+    if (!val.emailValido(d.email)) return { ok: false, erro: 'E-mail inválido.' };
+    Object.assign(atual, { empresa: d.empresa, cidade: d.cidade, estado: d.estado, nicho: d.nicho, telefone: d.telefone, whatsapp: d.whatsapp, instagram: d.instagram, site: d.site, email: d.email, responsavel: d.responsavel, status: d.status, origem: d.origem, ultimo_contato: d.ultimo_contato, probabilidade: d.probabilidade, observacoes: d.observacoes, hash_dedupe: dedupe.gerarHash({ ...d, nome: d.empresa }), atualizado_em: agora() });
+    registrarHistorico('alteracao', `Prospecção atualizada: ${d.empresa}`, { id: atual.id });
+    Store.salvar();
+    return { ok: true };
+  }
+  function excluir(id) {
+    const db = Store.get();
+    const i = db.prospeccao.findIndex((p) => p.id === Number(id));
+    if (i < 0) return { ok: false, erro: 'Registro não encontrado.' };
+    const nome = db.prospeccao[i].empresa;
+    db.prospeccao.splice(i, 1);
+    registrarHistorico('exclusao', `Prospecção excluída: ${nome}`, { id: Number(id) });
+    return { ok: true };
+  }
+  function moverParaClientes(id) {
+    const db = Store.get();
+    const r = obter(id);
+    if (!r) return { ok: false, erro: 'Registro não encontrado.' };
+    const candidato = { nome: r.empresa, cidade: r.cidade, telefone: r.telefone, whatsapp: r.whatsapp, site: r.site, instagram: r.instagram, email: r.email };
+    const dup = dedupe.verificarDuplicado(candidato, { tabelas: ['clientes'] });
+    if (dup.duplicado) return { ok: false, erro: `Já existe em Clientes Fixos (${dup.motivo}).` };
+    const cli = {
+      id: ++db.seq.clientes, nome: r.empresa, telefone: r.telefone || '', whatsapp: r.whatsapp || '', cidade: r.cidade || '',
+      instagram: r.instagram || '', site: r.site || '', email: r.email || '',
+      observacoes: [r.observacoes, r.nicho ? `Nicho: ${r.nicho}` : '', r.origem ? `Origem: ${r.origem}` : ''].filter(Boolean).join(' | '),
+      data_cadastro: hoje(), ultimo_contato: r.ultimo_contato || null, hash_dedupe: dedupe.gerarHash(candidato), criado_em: agora(), atualizado_em: agora(),
+    };
+    db.clientes.push(cli);
+    const i = db.prospeccao.findIndex((p) => p.id === Number(id));
+    db.prospeccao.splice(i, 1);
+    registrarHistorico('movimentacao', `Prospecção movida para Clientes: ${r.empresa}`, { id: Number(id) });
+    return { ok: true };
+  }
+  function todos() { return ordenar(Store.get().prospeccao, 'empresa', 'ASC'); }
+  return { listar, obter, criar, atualizar, excluir, moverParaClientes, todos, STATUS };
+})();
+
+/* -------------------------------------------- Serviço: Pesquisa / Revisão */
+const svcPesquisa = (() => {
+  function resolverNicho(texto) {
+    const nichos = Store.get().nichos;
+    let row = nichos.find((n) => n.nome.toLowerCase() === String(texto).toLowerCase()) || nichos.find((n) => n.nome.toLowerCase().includes(String(texto).toLowerCase()));
+    if (row) return { nome: row.nome, categoria: row.categoria, termos: row.termos || [texto], osm: row.osm || [] };
+    return { nome: texto, termos: [texto], osm: [] };
+  }
+  async function executar({ cidade, estado, nicho, max, demo }) {
+    const db = Store.get();
+    const nichoDef = resolverNicho(nicho);
+    let coleta;
+    try {
+      coleta = await providers.coletar({ cidade, estado, nicho, max, demo }, nichoDef);
+    } catch (err) {
+      const pid = ++db.seq.pesquisas;
+      db.pesquisas.push({ id: pid, cidade, estado, nicho, max_qtd: max, total_encontrado: 0, total_novo: 0, fonte: 'erro', status: 'falha', mensagem: err.message, criado_em: agora() });
+      registrarHistorico('erro', `Falha na pesquisa: ${nicho} em ${cidade}`, { erro: err.message });
+      return { pesquisaId: pid, total: 0, novos: 0, duplicados: 0, fonte: 'erro', mensagem: err.message, erro: true };
+    }
+    const unicos = dedupe.deduplicarLista(coleta.resultados);
+    const novos = [];
+    let duplicados = 0;
+    for (const item of unicos) {
+      const check = dedupe.verificarDuplicado(item);
+      if (check.duplicado) { duplicados++; continue; }
+      novos.push(item);
+      if (novos.length >= (max || novos.length)) break;
+    }
+    const pid = ++db.seq.pesquisas;
+    db.pesquisas.push({ id: pid, cidade, estado, nicho, max_qtd: max, total_encontrado: coleta.resultados.length, total_novo: novos.length, fonte: coleta.fonte, status: 'concluida', mensagem: coleta.mensagem, criado_em: agora() });
+    for (const r of novos) {
+      db.resultados.push({
+        id: ++db.seq.resultados, pesquisa_id: pid, nome: r.nome, telefone: r.telefone || '', whatsapp: r.whatsapp || '',
+        instagram: r.instagram || '', site: r.site || '', email: r.email || '', cidade: r.cidade || cidade || '', estado: r.estado || estado || '',
+        endereco: r.endereco || '', latitude: r.latitude, longitude: r.longitude, categoria: r.categoria || '', horario: r.horario || '',
+        avaliacao: r.avaliacao, qtd_avaliacoes: r.qtd_avaliacoes, origem: r.origem || coleta.fonte, url_origem: r.url_origem || '',
+        data_coleta: agora(), status: 'novo', hash_dedupe: dedupe.gerarHash(r),
+      });
+    }
+    registrarHistorico('pesquisa', `Pesquisa: ${nicho} em ${cidade}/${estado} — ${novos.length} novos, ${duplicados} duplicados`, { cidade, estado, nicho, max, fonte: coleta.fonte });
+    return { pesquisaId: pid, total: coleta.resultados.length, novos: novos.length, duplicados, fonte: coleta.fonte, mensagem: coleta.mensagem };
+  }
+  function listarPesquisas() {
+    const db = Store.get();
+    const itens = db.pesquisas.slice().sort((a, b) => b.id - a.id).map((p) => ({ ...p, pendentes: db.resultados.filter((r) => r.pesquisa_id === p.id && r.status === 'novo').length }));
+    return { total: itens.length, itens };
+  }
+  function listarResultados(pesquisaId, { status = '', search = '', sort = 'id', order = 'ASC' } = {}) {
+    let itens = Store.get().resultados.filter((r) => r.pesquisa_id === Number(pesquisaId));
+    if (status) itens = itens.filter((r) => r.status === status);
+    if (search) { const s = search.toLowerCase(); itens = itens.filter((r) => contem(r.nome, s) || contem(r.cidade, s) || contem(r.categoria, s)); }
+    const col = ['id', 'nome', 'cidade', 'categoria', 'status'].includes(sort) ? sort : 'id';
+    const dir = String(order).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    return { itens: ordenar(itens, col, dir) };
+  }
+  function descartar(ids) {
+    const db = Store.get();
+    ids.forEach((id) => { const r = db.resultados.find((x) => x.id === Number(id)); if (r) r.status = 'descartado'; });
+    registrarHistorico('movimentacao', `Descartados ${ids.length} resultados`, { ids });
+    return { descartados: ids.length };
+  }
+  function excluirResultados(ids) {
+    const db = Store.get();
+    db.resultados = db.resultados.filter((r) => !ids.map(Number).includes(r.id));
+    registrarHistorico('exclusao', `Excluídos ${ids.length} resultados de pesquisa`, { ids });
+    Store.salvar();
+    return { excluidos: ids.length };
+  }
+  function moverParaProspeccao(ids) {
+    const db = Store.get();
+    let movidos = 0, ignorados = 0;
+    for (const id of ids) {
+      const r = db.resultados.find((x) => x.id === Number(id));
+      if (!r || r.status === 'movido') { ignorados++; continue; }
+      const candidato = { empresa: r.nome, nome: r.nome, cidade: r.cidade, telefone: r.telefone, whatsapp: r.whatsapp, site: r.site, instagram: r.instagram, email: r.email, endereco: r.endereco };
+      const dup = dedupe.verificarDuplicado(candidato, { tabelas: ['clientes', 'prospeccao'] });
+      if (dup.duplicado) { r.status = 'movido'; ignorados++; continue; }
+      const obs = [r.endereco, r.horario, r.url_origem ? `Fonte: ${r.url_origem}` : ''].filter(Boolean).join(' | ');
+      db.prospeccao.push({
+        id: ++db.seq.prospeccao, empresa: r.nome, cidade: r.cidade || '', estado: r.estado || '', nicho: r.categoria || '',
+        telefone: r.telefone || '', whatsapp: r.whatsapp || '', instagram: r.instagram || '', site: r.site || '', email: r.email || '',
+        responsavel: '', status: 'Novo', origem: r.origem || 'Pesquisa', data: hoje(), ultimo_contato: null, probabilidade: 0,
+        observacoes: obs, hash_dedupe: r.hash_dedupe || dedupe.gerarHash(candidato), criado_em: agora(), atualizado_em: agora(),
+      });
+      r.status = 'movido';
+      movidos++;
+    }
+    registrarHistorico('movimentacao', `Movidos ${movidos} resultados para Prospecção (${ignorados} ignorados por duplicidade)`, { ids });
+    return { movidos, ignorados };
+  }
+  return { executar, listarPesquisas, listarResultados, descartar, excluirResultados, moverParaProspeccao };
+})();
+
+/* ------------------------------------------------------- Serviço: Nichos */
+function listarNichos({ search = '', categoria = '' } = {}) {
+  let itens = Store.get().nichos.slice();
+  const categorias = Array.from(new Set(itens.map((n) => n.categoria).filter(Boolean))).sort();
+  const total = itens.length;
+  if (categoria) itens = itens.filter((n) => n.categoria === categoria);
+  if (search) {
+    const s = norm.normalizarTexto(search);
+    itens = itens.filter((n) => norm.normalizarTexto(n.nome).includes(s) || (n.termos || []).some((t) => norm.normalizarTexto(t).includes(s)) || norm.normalizarTexto(n.categoria).includes(s));
+  }
+  itens.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  return { itens, categorias, total };
+}
+
+/* ---------------------------------------------------- Serviço: Histórico */
+function listarHistorico({ tipo = '', page = 1, pageSize = 50 } = {}) {
+  let itens = Store.get().historico.slice();
+  const tipos = Array.from(new Set(itens.map((h) => h.tipo))).sort();
+  if (tipo) itens = itens.filter((h) => h.tipo === tipo);
+  const total = itens.length;
+  page = Number(page) || 1; pageSize = Number(pageSize) || 50;
+  const off = (page - 1) * pageSize;
+  return { total, page, pageSize, tipos, itens: itens.slice(off, off + pageSize) };
+}
+
+/* ------------------------------------------------------------- Estatísticas */
+function calcularStats() {
+  const db = Store.get();
+  const stats = {
+    clientes: db.clientes.length,
+    prospeccao: db.prospeccao.length,
+    prospeccaoFechado: db.prospeccao.filter((p) => p.status === 'Fechado').length,
+    prospeccaoNegociando: db.prospeccao.filter((p) => ['Negociando', 'Proposta', 'Contatado'].includes(p.status)).length,
+    pesquisas: db.pesquisas.length,
+    resultadosPendentes: db.resultados.filter((r) => r.status === 'novo').length,
+    nichos: db.nichos.length,
+  };
+  const mapa = {};
+  db.prospeccao.forEach((p) => { mapa[p.status] = (mapa[p.status] || 0) + 1; });
+  const porStatus = Object.keys(mapa).map((status) => ({ status, n: mapa[status] })).sort((a, b) => b.n - a.n);
+  const ultimasPesquisas = db.pesquisas.slice().sort((a, b) => b.id - a.id).slice(0, 5).map((p) => ({ id: p.id, cidade: p.cidade, estado: p.estado, nicho: p.nicho, total_novo: p.total_novo, criado_em: p.criado_em }));
+  return { stats, porStatus, ultimasPesquisas };
+}
+
+/* ------------------------------------------------- Importação de planilhas */
+const SINONIMOS = {
+  nome: ['nome', 'empresa', 'razao social', 'razao', 'cliente', 'fantasia', 'nome fantasia', 'estabelecimento', 'name', 'company'],
+  telefone: ['telefone', 'fone', 'tel', 'celular', 'contato', 'phone', 'telefone1', 'telefone 1', 'ddd telefone'],
+  whatsapp: ['whatsapp', 'whats', 'zap', 'wpp', 'whatsapp1'],
+  cidade: ['cidade', 'municipio', 'city', 'localidade'],
+  estado: ['estado', 'uf', 'state'],
+  nicho: ['nicho', 'segmento', 'categoria', 'ramo', 'atividade', 'setor'],
+  instagram: ['instagram', 'insta', 'ig', '@'],
+  site: ['site', 'website', 'url', 'pagina', 'web', 'homepage'],
+  email: ['email', 'e-mail', 'e mail', 'mail'],
+  responsavel: ['responsavel', 'contato responsavel', 'proprietario', 'dono', 'gerente'],
+  status: ['status', 'situacao', 'estagio'],
+  origem: ['origem', 'fonte', 'source'],
+  observacoes: ['observacoes', 'observacao', 'obs', 'notas', 'anotacoes', 'descricao', 'comentarios'],
+  probabilidade: ['probabilidade', 'chance', 'prob'],
+  endereco: ['endereco', 'logradouro', 'rua', 'address'],
+};
+function mapearColunas(cabecalhos) {
+  const mapa = {};
+  cabecalhos.forEach((titulo, idx) => {
+    const t = norm.normalizarTexto(titulo);
+    if (!t) return;
+    for (const [campo, alts] of Object.entries(SINONIMOS)) {
+      if (mapa[campo] !== undefined) continue;
+      if (alts.some((a) => t === a || t.includes(a) || a.includes(t))) { mapa[campo] = idx; break; }
+    }
+  });
+  return mapa;
+}
+function lerArquivo(file) {
+  return new Promise((resolve, reject) => {
+    const nome = (file.name || '').toLowerCase();
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Não foi possível ler o arquivo.'));
+    if (nome.endsWith('.csv') || nome.endsWith('.txt') || nome.endsWith('.tsv')) {
+      reader.onload = () => { try { resolve(SheetLib.lerCsv(String(reader.result))); } catch (e) { reject(e); } };
+      reader.readAsText(file, 'utf-8');
+    } else if (nome.endsWith('.xlsx')) {
+      reader.onload = () => { try { resolve(SheetLib.lerXlsx(new Uint8Array(reader.result))); } catch (e) { reject(new Error('Falha ao ler o Excel: ' + e.message)); } };
+      reader.readAsArrayBuffer(file);
+    } else if (nome.endsWith('.xls')) {
+      reject(new Error('Formato .xls antigo não é suportado. Abra no Excel e salve como .xlsx ou .csv.'));
+    } else {
+      // tenta como xlsx e, se falhar, como CSV
+      reader.onload = () => {
+        try { resolve(SheetLib.lerXlsx(new Uint8Array(reader.result))); }
+        catch (_) {
+          const r2 = new FileReader();
+          r2.onload = () => { try { resolve(SheetLib.lerCsv(String(r2.result))); } catch (e) { reject(e); } };
+          r2.onerror = () => reject(new Error('Formato não reconhecido. Use .xlsx ou .csv.'));
+          r2.readAsText(file, 'utf-8');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  });
+}
+async function importarPlanilha(file, destino) {
+  const linhas = await lerArquivo(file);
+  if (!linhas.length) return { ok: false, erro: 'A planilha está vazia.' };
+  const cabecalhos = (linhas[0] || []).map((c) => String(c || '').trim());
+  const mapa = mapearColunas(cabecalhos);
+  if (!Object.keys(mapa).length) return { ok: false, erro: 'Não foi possível identificar colunas conhecidas na planilha. Verifique se a primeira linha tem os títulos (Nome, Telefone, Cidade, ...).' };
+  if (mapa.nome === undefined) return { ok: false, erro: 'A planilha precisa ter ao menos uma coluna de Nome/Empresa.' };
+
+  const corpo = linhas.slice(1);
+  const total = corpo.length;
+  let inseridos = 0, duplicados = 0, invalidos = 0;
+  const erros = [];
+  const vistos = new Set();
+  const valor = (linha, campo) => { const i = mapa[campo]; return i === undefined ? '' : String(linha[i] == null ? '' : linha[i]).trim(); };
+
+  for (let i = 0; i < corpo.length; i++) {
+    const linha = corpo[i];
+    try {
+      const nome = valor(linha, 'nome');
+      if (!nome) { invalidos++; continue; }
+      const registro = {
+        nome, empresa: nome, telefone: valor(linha, 'telefone'), whatsapp: valor(linha, 'whatsapp') || valor(linha, 'telefone'),
+        cidade: valor(linha, 'cidade'), estado: valor(linha, 'estado'), nicho: valor(linha, 'nicho'),
+        instagram: valor(linha, 'instagram'), site: valor(linha, 'site'), email: valor(linha, 'email'),
+        responsavel: valor(linha, 'responsavel'), status: valor(linha, 'status'), origem: valor(linha, 'origem') || 'Importação',
+        observacoes: [valor(linha, 'observacoes'), valor(linha, 'endereco')].filter(Boolean).join(' | '),
+        probabilidade: valor(linha, 'probabilidade'),
+      };
+      const h = dedupe.gerarHash(registro);
+      if (vistos.has(h)) { duplicados++; continue; }
+      vistos.add(h);
+      const res = destino === 'prospeccao' ? svcProspeccao.criar(registro) : svcClientes.criar(registro);
+      if (res.ok) inseridos++;
+      else if (res.duplicado) duplicados++;
+      else { invalidos++; if (erros.length < 50) erros.push({ linha: i + 2, motivo: res.erro }); }
+    } catch (err) { invalidos++; if (erros.length < 50) erros.push({ linha: i + 2, motivo: err.message }); }
+  }
+  Store.salvar();
+  registrarHistorico('importacao', `Importação para ${destino}: ${inseridos} inseridos, ${duplicados} duplicados, ${invalidos} inválidos (de ${total})`, { destino, total, inseridos, duplicados, invalidos });
+  return { ok: true, total, inseridos, duplicados, invalidos, erros };
+}
+
+/* ---------------------------------------------------- Exportação de dados */
+const COLUNAS_CLIENTES = [
+  { campo: 'nome', titulo: 'Nome' }, { campo: 'telefone', titulo: 'Telefone' }, { campo: 'whatsapp', titulo: 'WhatsApp' },
+  { campo: 'cidade', titulo: 'Cidade' }, { campo: 'instagram', titulo: 'Instagram' }, { campo: 'site', titulo: 'Site' },
+  { campo: 'email', titulo: 'E-mail' }, { campo: 'observacoes', titulo: 'Observações' },
+  { campo: 'data_cadastro', titulo: 'Data Cadastro' }, { campo: 'ultimo_contato', titulo: 'Último Contato' },
+];
+const COLUNAS_PROSPECCAO = [
+  { campo: 'empresa', titulo: 'Empresa' }, { campo: 'cidade', titulo: 'Cidade' }, { campo: 'estado', titulo: 'Estado' },
+  { campo: 'nicho', titulo: 'Nicho' }, { campo: 'telefone', titulo: 'Telefone' }, { campo: 'whatsapp', titulo: 'WhatsApp' },
+  { campo: 'instagram', titulo: 'Instagram' }, { campo: 'site', titulo: 'Site' }, { campo: 'email', titulo: 'E-mail' },
+  { campo: 'responsavel', titulo: 'Responsável' }, { campo: 'status', titulo: 'Status' }, { campo: 'origem', titulo: 'Origem' },
+  { campo: 'probabilidade', titulo: 'Prob. (%)' }, { campo: 'data', titulo: 'Data' }, { campo: 'ultimo_contato', titulo: 'Último Contato' },
+  { campo: 'observacoes', titulo: 'Observações' },
+];
+function carimbo() { const d = new Date(); return `${d.getFullYear()}-${_pad(d.getMonth() + 1)}-${_pad(d.getDate())}-${_pad(d.getHours())}-${_pad(d.getMinutes())}-${_pad(d.getSeconds())}`; }
+function baixarBlob(nome, blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nome; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function montarMatriz(linhas, colunas) {
+  const cab = colunas.map((c) => c.titulo);
+  const corpo = linhas.map((l) => colunas.map((c) => { const v = l[c.campo]; return v === null || v === undefined ? '' : v; }));
+  return [cab, ...corpo];
+}
+function exportarDados(entidade, formato) {
+  const ehCliente = entidade === 'clientes';
+  const linhas = ehCliente ? svcClientes.todos() : svcProspeccao.todos();
+  const colunas = ehCliente ? COLUNAS_CLIENTES : COLUNAS_PROSPECCAO;
+  const nomeBase = ehCliente ? 'clientes' : 'prospeccao';
+  const titulo = ehCliente ? 'Clientes Fixos' : 'Prospecção';
+  const aoa = montarMatriz(linhas, colunas);
+  formato = String(formato).toLowerCase();
+  if (formato === 'csv') {
+    const csv = aoa.map((linha) => linha.map((v) => { let s = String(v); if (/[";\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"'; return s; }).join(';')).join('\r\n');
+    baixarBlob(`${nomeBase}-${carimbo()}.csv`, new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+  } else if (formato === 'pdf') {
+    exportarPDF(linhas, colunas.slice(0, 7), titulo);
+  } else {
+    const bytes = SheetLib.escreverXlsx(aoa);
+    baixarBlob(`${nomeBase}-${carimbo()}.xlsx`, new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+  }
+  registrarHistorico('alteracao', `Exportação (${formato.toUpperCase()}) de ${titulo}: ${linhas.length} registros`, { entidade, formato });
+  Store.salvar();
+}
+function exportarPDF(linhas, colunas, titulo) {
+  const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const ths = colunas.map((c) => `<th>${esc(c.titulo)}</th>`).join('');
+  const trs = linhas.map((l) => `<tr>${colunas.map((c) => `<td>${esc(l[c.campo])}</td>`).join('')}</tr>`).join('');
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>${esc(titulo)}</title>
+    <style>
+      body{font-family:'Segoe UI',Arial,sans-serif;color:#222;margin:18px;}
+      h1{font-size:18px;margin:0 0 2px;color:#1a1a2e;}
+      .sub{font-size:11px;color:#666;margin-bottom:12px;}
+      table{width:100%;border-collapse:collapse;font-size:10px;}
+      th{background:#4361ee;color:#fff;text-align:left;padding:6px 6px;}
+      td{padding:5px 6px;border-bottom:1px solid #e3e6f5;}
+      tr:nth-child(even) td{background:#f2f4ff;}
+      @media print{@page{size:A4 landscape;margin:12mm;}}
+    </style></head><body>
+    <h1>${esc(titulo)}</h1>
+    <div class="sub">Gerado em ${new Date().toLocaleString('pt-BR')} — ${linhas.length} registros</div>
+    <table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>
+    <script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script>
+    </body></html>`;
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed'; iframe.style.right = '0'; iframe.style.bottom = '0';
+  iframe.style.width = '0'; iframe.style.height = '0'; iframe.style.border = '0';
+  document.body.appendChild(iframe);
+  const doc = iframe.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+  UI.toast('Na janela de impressão, escolha "Salvar como PDF" como destino.', 'info', 'Exportar PDF');
+  setTimeout(() => { try { document.body.removeChild(iframe); } catch (_) {} }, 60000);
+}
+
+/* ==========================================================================
+ *  API — roteador local que substitui o servidor. Mantém o MESMO contrato
+ *  das telas (views), mas lê/grava no Store (localStorage).
+ * ======================================================================== */
+const API = (() => {
+  class ApiError extends Error { constructor(m, s, d) { super(m); this.status = s; this.dados = d; } }
+  function parse(caminho) { const [p, q] = caminho.split('?'); return { p, q: new URLSearchParams(q || '') }; }
+  function obj(q) { const o = {}; for (const [k, v] of q.entries()) o[k] = v; return o; }
+
+  async function get(caminho) {
+    const { p, q } = parse(caminho);
+    const db = Store.get();
+    if (p === '/auth/me') { if (!db.logado) throw new ApiError('Não autenticado', 401); return { usuario: { login: db.usuario.login, nome: db.usuario.nome } }; }
+    if (p === '/stats') return calcularStats();
+    if (p === '/clientes') return svcClientes.listar(obj(q));
+    let m;
+    if ((m = p.match(/^\/clientes\/(\d+)$/))) { const c = svcClientes.obter(m[1]); if (!c) throw new ApiError('Cliente não encontrado.', 404); return c; }
+    if (p === '/prospeccao') return svcProspeccao.listar(obj(q));
+    if ((m = p.match(/^\/prospeccao\/(\d+)$/))) { const c = svcProspeccao.obter(m[1]); if (!c) throw new ApiError('Registro não encontrado.', 404); return c; }
+    if (p === '/pesquisa') return svcPesquisa.listarPesquisas();
+    if ((m = p.match(/^\/pesquisa\/(\d+)\/resultados$/))) return svcPesquisa.listarResultados(m[1], obj(q));
+    if (p === '/nichos') return listarNichos(obj(q));
+    if (p === '/historico') return listarHistorico(obj(q));
+    throw new ApiError('Rota não encontrada: ' + p, 404);
+  }
+
+  async function post(caminho, corpo) {
+    const { p } = parse(caminho);
+    corpo = corpo || {};
+    const db = Store.get();
+    if (p === '/auth/logout') { db.logado = false; Store.salvar(); return {}; }
+    if (p === '/auth/change-password') {
+      if (hashSenha(corpo.senhaAtual) !== db.usuario.senha) throw new ApiError('Senha atual incorreta.', 400);
+      if (!corpo.senhaNova || String(corpo.senhaNova).length < 4) throw new ApiError('A nova senha deve ter ao menos 4 caracteres.', 400);
+      db.usuario.senha = hashSenha(corpo.senhaNova); Store.salvar();
+      registrarHistorico('alteracao', 'Senha alterada', {});
+      return {};
+    }
+    if (p === '/backup') { const arquivo = `estacao-backup-${carimbo()}.json`; baixarBlob(arquivo, new Blob([Store.exportarJSON()], { type: 'application/json' })); return { arquivo }; }
+    if (p === '/clientes') { const r = svcClientes.criar(corpo, { forcar: !!corpo.forcar }); if (!r.ok) throw new ApiError(r.erro, r.duplicado ? 409 : 400); Store.salvar(); return r; }
+    if (p === '/prospeccao') { const r = svcProspeccao.criar(corpo, { forcar: !!corpo.forcar }); if (!r.ok) throw new ApiError(r.erro, r.duplicado ? 409 : 400); Store.salvar(); return r; }
+    let m;
+    if ((m = p.match(/^\/prospeccao\/(\d+)\/mover-clientes$/))) { const r = svcProspeccao.moverParaClientes(m[1]); if (!r.ok) throw new ApiError(r.erro, 409); Store.salvar(); return r; }
+    if (p === '/pesquisa') { const r = await svcPesquisa.executar(corpo); Store.salvar(); return r; }
+    if (p === '/pesquisa/mover') { const r = svcPesquisa.moverParaProspeccao(corpo.ids || []); Store.salvar(); return r; }
+    if (p === '/pesquisa/descartar') { const r = svcPesquisa.descartar(corpo.ids || []); Store.salvar(); return r; }
+    if (p === '/pesquisa/excluir') { const r = svcPesquisa.excluirResultados(corpo.ids || []); return r; }
+    throw new ApiError('Rota não encontrada: ' + p, 404);
+  }
+
+  async function put(caminho, corpo) {
+    const { p } = parse(caminho);
+    let m;
+    if ((m = p.match(/^\/clientes\/(\d+)$/))) { const r = svcClientes.atualizar(m[1], corpo); if (!r.ok) throw new ApiError(r.erro, 400); return r; }
+    if ((m = p.match(/^\/prospeccao\/(\d+)$/))) { const r = svcProspeccao.atualizar(m[1], corpo); if (!r.ok) throw new ApiError(r.erro, 400); return r; }
+    throw new ApiError('Rota não encontrada: ' + p, 404);
+  }
+
+  async function del(caminho) {
+    const { p } = parse(caminho);
+    let m;
+    if ((m = p.match(/^\/clientes\/(\d+)$/))) { const r = svcClientes.excluir(m[1]); if (!r.ok) throw new ApiError(r.erro, 404); Store.salvar(); return r; }
+    if ((m = p.match(/^\/prospeccao\/(\d+)$/))) { const r = svcProspeccao.excluir(m[1]); if (!r.ok) throw new ApiError(r.erro, 404); Store.salvar(); return r; }
+    throw new ApiError('Rota não encontrada: ' + p, 404);
+  }
+
+  async function upload(caminho, arquivo) {
+    const { p } = parse(caminho);
+    if (p === '/clientes/import') return importarPlanilha(arquivo, 'clientes');
+    if (p === '/prospeccao/import') return importarPlanilha(arquivo, 'prospeccao');
+    throw new ApiError('Rota de importação inválida.', 404);
+  }
+
+  function download(caminho) {
+    const { p, q } = parse(caminho);
+    const formato = q.get('format') || 'xlsx';
+    if (p === '/clientes/export') return exportarDados('clientes', formato);
+    if (p === '/prospeccao/export') return exportarDados('prospeccao', formato);
+  }
+
+  return { get, post, put, del, upload, download, ApiError };
+})();
+
+  </script>
+  <script>
+/* Interface, telas, controlador, login e inicialização */
+'use strict';
+/* ============================================================================
+ * Interface (UI), telas (Views), controlador (App), login e inicialização.
+ * O código das telas é praticamente idêntico ao original — apenas a camada de
+ * dados (API) mudou para funcionar offline.
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------- UI */
+const UI = (() => {
+  function esc(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+  function soDigitos(s) { return String(s || '').replace(/\D/g, ''); }
+  function waLink(telefone) {
+    let d = soDigitos(telefone);
+    if (!d) return '';
+    if (d.length === 10 || d.length === 11) d = '55' + d;
+    return `https://wa.me/${d}`;
+  }
+  function fmtData(iso) {
+    if (!iso) return '—';
+    const d = new Date(String(iso).length <= 10 ? iso + 'T00:00:00' : iso);
+    if (isNaN(d)) return esc(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+  function fmtDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(String(iso).replace(' ', 'T'));
+    if (isNaN(d)) return esc(iso);
+    return d.toLocaleString('pt-BR');
+  }
+  function iniciais(nome) { return !nome ? '?' : nome.trim().slice(0, 1).toUpperCase(); }
+  function debounce(fn, ms = 350) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+  function toast(mensagem, tipo = 'info', titulo = '') {
+    const cont = document.getElementById('toasts');
+    if (!cont) return;
+    const el = document.createElement('div');
+    el.className = `toast ${tipo}`;
+    el.innerHTML = `<div class="msg">${titulo ? `<div class="t-title">${esc(titulo)}</div>` : ''}${esc(mensagem)}</div>`;
+    cont.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(30px)'; setTimeout(() => el.remove(), 220); }, 4200);
+  }
+  function loading(mostrar, texto = 'Carregando...') {
+    const ov = document.getElementById('loadingOverlay');
+    if (!ov) return;
+    document.getElementById('loadingText').textContent = texto;
+    ov.classList.toggle('show', !!mostrar);
+    if (!mostrar) progress(null);
+  }
+  function progress(pct) {
+    const p = document.getElementById('loadingProgress');
+    if (!p) return;
+    if (pct === null || pct === undefined) { p.classList.add('hidden'); p.querySelector('span').style.width = '0'; }
+    else { p.classList.remove('hidden'); p.querySelector('span').style.width = Math.max(0, Math.min(100, pct)) + '%'; }
+  }
+  function abrirModal({ titulo, corpo, tamanho = '', rodape = '' }) {
+    const root = document.getElementById('modalRoot');
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `<div class="modal ${tamanho}"><div class="modal-head"><h3>${esc(titulo)}</h3><button class="close" aria-label="Fechar">&times;</button></div><div class="modal-body">${corpo}</div>${rodape ? `<div class="modal-foot">${rodape}</div>` : ''}</div>`;
+    root.appendChild(overlay);
+    const fechar = () => overlay.remove();
+    overlay.querySelector('.close').addEventListener('click', fechar);
+    overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) fechar(); });
+    document.addEventListener('keydown', function onEsc(e) { if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); } });
+    return { overlay, fechar };
+  }
+  function confirmar(mensagem, { titulo = 'Confirmar', perigo = false, okLabel = 'Confirmar' } = {}) {
+    return new Promise((resolve) => {
+      const rodape = `<button class="btn" data-acao="cancelar">Cancelar</button><button class="btn ${perigo ? 'btn-danger' : 'btn-primary'}" data-acao="ok">${esc(okLabel)}</button>`;
+      const { overlay, fechar } = abrirModal({ titulo, corpo: `<p style="margin:0;white-space:pre-line">${esc(mensagem)}</p>`, rodape });
+      overlay.querySelector('[data-acao="cancelar"]').addEventListener('click', () => { fechar(); resolve(false); });
+      overlay.querySelector('[data-acao="ok"]').addEventListener('click', () => { fechar(); resolve(true); });
+    });
+  }
+  function campoHTML(f, valor) {
+    const v = valor === null || valor === undefined ? '' : valor;
+    const req = f.required ? 'required' : '';
+    let ctrl;
+    if (f.type === 'textarea') ctrl = `<textarea name="${f.name}" rows="${f.rows || 3}" placeholder="${esc(f.placeholder || '')}" ${req}>${esc(v)}</textarea>`;
+    else if (f.type === 'select') {
+      const opts = (f.options || []).map((o) => { const val = typeof o === 'object' ? o.value : o; const lab = typeof o === 'object' ? o.label : o; return `<option value="${esc(val)}" ${String(val) === String(v) ? 'selected' : ''}>${esc(lab)}</option>`; }).join('');
+      ctrl = `<select name="${f.name}" ${req}>${opts}</select>`;
+    } else if (f.type === 'range') {
+      ctrl = `<input type="range" name="${f.name}" min="0" max="100" step="5" value="${esc(v || 0)}" oninput="this.nextElementSibling.textContent=this.value+'%'" /><span class="small muted">${esc(v || 0)}%</span>`;
+    } else ctrl = `<input type="${f.type || 'text'}" name="${f.name}" value="${esc(v)}" placeholder="${esc(f.placeholder || '')}" ${req} />`;
+    return `<div class="field ${f.full ? 'full' : ''}" ${f.full ? 'style="grid-column:1/-1"' : ''}><label>${esc(f.label)}${f.required ? ' *' : ''}</label>${ctrl}</div>`;
+  }
+  function formModal(cfg) {
+    return new Promise((resolve) => {
+      const valores = cfg.valores || {};
+      const corpo = `<form id="uiForm"><div class="grid-2">${cfg.campos.map((f) => campoHTML(f, valores[f.name])).join('')}</div></form>`;
+      const rodape = `<button class="btn" data-acao="cancelar">Cancelar</button><button class="btn btn-primary" data-acao="salvar">${esc(cfg.okLabel || 'Salvar')}</button>`;
+      const { overlay, fechar } = abrirModal({ titulo: cfg.titulo, corpo, tamanho: cfg.tamanho || 'lg', rodape });
+      const form = overlay.querySelector('#uiForm');
+      const submit = () => {
+        if (!form.reportValidity()) return;
+        const dados = {};
+        cfg.campos.forEach((f) => { const el = form.elements[f.name]; if (el) dados[f.name] = el.value; });
+        fechar(); resolve(dados);
+      };
+      overlay.querySelector('[data-acao="salvar"]').addEventListener('click', submit);
+      overlay.querySelector('[data-acao="cancelar"]').addEventListener('click', () => { fechar(); resolve(null); });
+      form.addEventListener('submit', (e) => { e.preventDefault(); submit(); });
+      const primeiro = form.querySelector('input, select, textarea');
+      if (primeiro) setTimeout(() => primeiro.focus(), 50);
+    });
+  }
+  return { esc, soDigitos, waLink, fmtData, fmtDataHora, iniciais, debounce, toast, loading, progress, abrirModal, confirmar, formModal };
+})();
+
+window.Views = window.Views || {};
+
+/* -------------------------------------------------------------- Dashboard */
+window.Views.dashboard = {
+  async render(el) {
+    el.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    let data;
+    try { data = await API.get('/stats'); } catch (err) { el.innerHTML = `<div class="alert alert-warn">Não foi possível carregar os indicadores: ${UI.esc(err.message)}</div>`; return; }
+    const s = data.stats;
+    const card = (val, label, cor, icon) => `<div class="card stat-card"><div class="stat-ico" style="background:${cor}22;color:${cor}">${icon}</div><div><div class="stat-val">${val}</div><div class="stat-label">${label}</div></div></div>`;
+    const ICON = {
+      users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
+      trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+      search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
+      inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+      tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg>',
+    };
+    const totalStatus = data.porStatus.reduce((a, b) => a + b.n, 0) || 1;
+    const barras = data.porStatus.map((r) => {
+      const pct = ((r.n / totalStatus) * 100).toFixed(0);
+      return `<div style="margin-bottom:10px"><div class="flex" style="justify-content:space-between;margin-bottom:4px"><span class="badge ${r.status.toLowerCase()}">${UI.esc(r.status)}</span><span class="small muted">${r.n} (${pct}%)</span></div><div class="prob-bar" style="width:100%"><span style="width:${pct}%"></span></div></div>`;
+    }).join('') || '<div class="empty small">Sem dados de prospecção ainda.</div>';
+    const ultimas = data.ultimasPesquisas.map((p) => `<tr><td>${UI.esc(p.nicho)}</td><td>${UI.esc(p.cidade)}${p.estado ? '/' + UI.esc(p.estado) : ''}</td><td>${p.total_novo}</td><td class="muted small">${UI.fmtDataHora(p.criado_em)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty small">Nenhuma pesquisa realizada ainda.</td></tr>';
+    el.innerHTML = `<div class="cards">
+        ${card(s.clientes, 'Clientes Fixos', '#2dd4a7', ICON.users)}
+        ${card(s.prospeccao, 'Em Prospecção', '#4895ef', ICON.trend)}
+        ${card(s.prospeccaoNegociando, 'Em Negociação', '#f7b955', ICON.trend)}
+        ${card(s.prospeccaoFechado, 'Negócios Fechados', '#2dd4a7', ICON.check)}
+        ${card(s.pesquisas, 'Pesquisas Feitas', '#56b4ff', ICON.search)}
+        ${card(s.resultadosPendentes, 'Aguardando Revisão', '#4361ee', ICON.inbox)}
+        ${card(s.nichos, 'Nichos Disponíveis', '#a78bfa', ICON.tag)}
+      </div>
+      <div class="grid-2">
+        <div class="panel"><div class="panel-head"><h3>Prospecção por Status</h3></div><div class="panel-body">${barras}</div></div>
+        <div class="panel"><div class="panel-head"><h3>Últimas Pesquisas</h3></div><div class="table-wrap"><table class="data"><thead><tr><th>Nicho</th><th>Local</th><th>Novos</th><th>Quando</th></tr></thead><tbody>${ultimas}</tbody></table></div></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h3>Atalhos</h3></div><div class="panel-body flex gap" style="flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="App.irPara('pesquisa')">Nova Pesquisa Automática</button>
+        <button class="btn" onclick="App.irPara('clientes')">Ver Clientes</button>
+        <button class="btn" onclick="App.irPara('prospeccao')">Ver Prospecção</button>
+        <button class="btn" onclick="App.irPara('revisao')">Ir para Revisão</button>
+      </div></div>`;
+  },
+};
+
+/* --------------------------------------------------------------- Clientes */
+window.Views.clientes = (() => {
+  const estado = { search: '', sort: 'nome', order: 'ASC', page: 1, pageSize: 50 };
+  let container = null;
+  const CAMPOS = [
+    { name: 'nome', label: 'Nome', type: 'text', required: true }, { name: 'telefone', label: 'Telefone', type: 'text' },
+    { name: 'whatsapp', label: 'WhatsApp', type: 'text' }, { name: 'cidade', label: 'Cidade', type: 'text' },
+    { name: 'instagram', label: 'Instagram', type: 'text' }, { name: 'site', label: 'Site', type: 'text' },
+    { name: 'email', label: 'E-mail', type: 'email' }, { name: 'ultimo_contato', label: 'Último contato', type: 'date' },
+    { name: 'observacoes', label: 'Observações', type: 'textarea', full: true, rows: 3 },
+  ];
+  async function render(el) {
+    container = el;
+    el.innerHTML = `<div class="panel"><div class="panel-head"><div class="toolbar" style="flex:1">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="cliSearch" placeholder="Pesquisar por nome, cidade, telefone, e-mail..." /></div>
+        <button class="btn btn-primary" id="cliNovo">+ Novo Cliente</button>
+        <button class="btn" id="cliImportar">Importar Meus Clientes</button>
+        <div class="flex gap"><button class="btn btn-sm" data-exp="xlsx">Excel</button><button class="btn btn-sm" data-exp="csv">CSV</button><button class="btn btn-sm" data-exp="pdf">PDF</button></div>
+      </div></div><div class="table-wrap" id="cliTabela"></div><div id="cliPager"></div></div>
+      <input type="file" id="cliFile" accept=".csv,.xls,.xlsx" class="hidden" />`;
+    el.querySelector('#cliSearch').addEventListener('input', UI.debounce((e) => { estado.search = e.target.value.trim(); estado.page = 1; carregar(); }, 350));
+    el.querySelector('#cliNovo').addEventListener('click', () => editar(null));
+    el.querySelector('#cliImportar').addEventListener('click', () => el.querySelector('#cliFile').click());
+    el.querySelector('#cliFile').addEventListener('change', importar);
+    el.querySelectorAll('[data-exp]').forEach((b) => b.addEventListener('click', () => API.download(`/clientes/export?format=${b.dataset.exp}`)));
+    await carregar();
+  }
+  async function carregar() {
+    const tabela = container.querySelector('#cliTabela');
+    if (!tabela) return;
+    tabela.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    const q = new URLSearchParams({ search: estado.search, sort: estado.sort, order: estado.order, page: estado.page, pageSize: estado.pageSize });
+    const r = await API.get('/clientes?' + q.toString());
+    render_tabela(r); render_pager(r);
+  }
+  function th(campo, label) { const ativo = estado.sort === campo; const seta = ativo ? (estado.order === 'ASC' ? ' ▲' : ' ▼') : ''; return `<th class="sortable" data-sort="${campo}">${label}${seta}</th>`; }
+  function render_tabela(r) {
+    const tabela = container.querySelector('#cliTabela');
+    if (!tabela) return;
+    if (!r.itens.length) { tabela.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div>Nenhum cliente encontrado.</div><button class="btn btn-primary mt" onclick="Views.clientes.novo()">Cadastrar primeiro cliente</button></div>`; return; }
+    const linhas = r.itens.map((c) => {
+      const wa = UI.waLink(c.whatsapp || c.telefone);
+      return `<tr><td>${UI.esc(c.nome)}</td><td>${UI.esc(c.telefone) || '—'}</td><td>${UI.esc(c.cidade) || '—'}</td>
+        <td>${c.instagram ? `<a href="https://instagram.com/${UI.esc(c.instagram.replace(/^@/, ''))}" target="_blank">@${UI.esc(c.instagram.replace(/^@/, ''))}</a>` : '—'}</td>
+        <td>${c.site ? `<a href="${/^https?:/.test(c.site) ? UI.esc(c.site) : 'https://' + UI.esc(c.site)}" target="_blank">site</a>` : '—'}</td>
+        <td class="muted small">${UI.fmtData(c.ultimo_contato)}</td>
+        <td class="actions"><div class="row-actions">${wa ? `<a class="btn btn-sm btn-whatsapp" href="${wa}" target="_blank" title="Abrir WhatsApp">WhatsApp</a>` : ''}<button class="btn btn-sm" data-edit="${c.id}">Editar</button><button class="btn btn-sm btn-danger" data-del="${c.id}">Excluir</button></div></td></tr>`;
+    }).join('');
+    tabela.innerHTML = `<table class="data"><thead><tr>${th('nome', 'Nome')}${th('telefone', 'Telefone')}${th('cidade', 'Cidade')}<th>Instagram</th><th>Site</th>${th('ultimo_contato', 'Último Contato')}<th>Ações</th></tr></thead><tbody>${linhas}</tbody></table>`;
+    tabela.querySelectorAll('th.sortable').forEach((t) => t.addEventListener('click', () => { const campo = t.dataset.sort; if (estado.sort === campo) estado.order = estado.order === 'ASC' ? 'DESC' : 'ASC'; else { estado.sort = campo; estado.order = 'ASC'; } carregar(); }));
+    tabela.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => editar(Number(b.dataset.edit))));
+    tabela.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => excluir(Number(b.dataset.del))));
+  }
+  function render_pager(r) {
+    const pager = container.querySelector('#cliPager');
+    if (!pager) return;
+    const totalPag = Math.max(1, Math.ceil(r.total / r.pageSize));
+    pager.innerHTML = `<div class="pager"><span class="info">${r.total} cliente(s) — página ${r.page} de ${totalPag}</span><div class="spacer"></div><button class="btn btn-sm" ${r.page <= 1 ? 'disabled' : ''} id="pgPrev">‹ Anterior</button><button class="btn btn-sm" ${r.page >= totalPag ? 'disabled' : ''} id="pgNext">Próxima ›</button></div>`;
+    const prev = pager.querySelector('#pgPrev'), next = pager.querySelector('#pgNext');
+    if (prev) prev.addEventListener('click', () => { estado.page--; carregar(); });
+    if (next) next.addEventListener('click', () => { estado.page++; carregar(); });
+  }
+  async function editar(id) {
+    let valores = {};
+    if (id) { try { valores = await API.get('/clientes/' + id); } catch (e) { UI.toast(e.message, 'error'); return; } }
+    const dados = await UI.formModal({ titulo: id ? 'Editar Cliente' : 'Novo Cliente', campos: CAMPOS, valores, okLabel: id ? 'Salvar alterações' : 'Cadastrar' });
+    if (!dados) return;
+    try {
+      if (id) await API.put('/clientes/' + id, dados); else await API.post('/clientes', dados);
+      UI.toast(id ? 'Cliente atualizado.' : 'Cliente cadastrado.', 'success');
+      await carregar(); App.atualizarContadores();
+    } catch (err) {
+      if (err.status === 409) {
+        const forcar = await UI.confirmar(`${err.message}\n\nDeseja cadastrar mesmo assim?`, { titulo: 'Possível duplicado', okLabel: 'Cadastrar assim mesmo' });
+        if (forcar) { try { await API.post('/clientes', { ...dados, forcar: true }); UI.toast('Cliente cadastrado.', 'success'); await carregar(); App.atualizarContadores(); } catch (e2) { UI.toast(e2.message, 'error'); } }
+      } else UI.toast(err.message, 'error');
+    }
+  }
+  async function excluir(id) {
+    if (!(await UI.confirmar('Excluir este cliente? Esta ação não pode ser desfeita.', { titulo: 'Excluir', perigo: true, okLabel: 'Excluir' }))) return;
+    try { await API.del('/clientes/' + id); UI.toast('Cliente excluído.', 'success'); await carregar(); App.atualizarContadores(); } catch (err) { UI.toast(err.message, 'error'); }
+  }
+  async function importar(e) {
+    const file = e.target.files[0]; e.target.value = '';
+    if (!file) return;
+    UI.loading(true, 'Importando planilha...'); UI.progress(15);
+    try {
+      const r = await API.upload('/clientes/import', file);
+      UI.progress(100);
+      if (!r.ok) { UI.toast(r.erro, 'error', 'Importar'); return; }
+      UI.toast(`Importação concluída: ${r.inseridos} inseridos, ${r.duplicados} duplicados, ${r.invalidos} inválidos (de ${r.total}).`, 'success', 'Importar');
+      if (r.erros && r.erros.length) mostrarErros(r);
+      await carregar(); App.atualizarContadores();
+    } catch (err) { UI.toast(err.message, 'error', 'Importar'); } finally { UI.loading(false); }
+  }
+  function mostrarErros(r) {
+    const linhas = r.erros.map((e) => `<tr><td>${e.linha}</td><td>${UI.esc(e.motivo)}</td></tr>`).join('');
+    UI.abrirModal({ titulo: `Detalhes da importação (${r.inseridos}/${r.total})`, corpo: `<p class="small muted">Algumas linhas não foram importadas:</p><div class="table-wrap"><table class="data"><thead><tr><th>Linha</th><th>Motivo</th></tr></thead><tbody>${linhas}</tbody></table></div>` });
+  }
+  return { render, novo: () => editar(null) };
+})();
+
+/* ------------------------------------------------------------- Prospecção */
+window.Views.prospeccao = (() => {
+  const estado = { search: '', cidade: '', estado: '', nicho: '', status: '', probMin: '', sort: 'empresa', order: 'ASC', page: 1, pageSize: 50 };
+  let container = null;
+  let statusValidos = ['Novo', 'Contatado', 'Negociando', 'Proposta', 'Fechado', 'Perdido'];
+  function campos() {
+    return [
+      { name: 'empresa', label: 'Empresa', type: 'text', required: true }, { name: 'cidade', label: 'Cidade', type: 'text' },
+      { name: 'estado', label: 'Estado (UF)', type: 'text' }, { name: 'nicho', label: 'Nicho', type: 'text' },
+      { name: 'telefone', label: 'Telefone', type: 'text' }, { name: 'whatsapp', label: 'WhatsApp', type: 'text' },
+      { name: 'instagram', label: 'Instagram', type: 'text' }, { name: 'site', label: 'Site', type: 'text' },
+      { name: 'email', label: 'E-mail', type: 'email' }, { name: 'responsavel', label: 'Responsável', type: 'text' },
+      { name: 'status', label: 'Status', type: 'select', options: statusValidos }, { name: 'origem', label: 'Origem', type: 'text' },
+      { name: 'probabilidade', label: 'Probabilidade de fechamento', type: 'range' }, { name: 'ultimo_contato', label: 'Último contato', type: 'date' },
+      { name: 'observacoes', label: 'Observações', type: 'textarea', full: true, rows: 3 },
+    ];
+  }
+  async function render(el) {
+    container = el;
+    el.innerHTML = `<div class="panel"><div class="panel-head" style="flex-direction:column;align-items:stretch;gap:10px">
+        <div class="toolbar"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="pSearch" placeholder="Pesquisar empresa, telefone, responsável..." /></div>
+          <button class="btn btn-primary" id="pNovo">+ Nova Empresa</button><button class="btn" id="pImportar">Importar</button>
+          <div class="flex gap"><button class="btn btn-sm" data-exp="xlsx">Excel</button><button class="btn btn-sm" data-exp="csv">CSV</button><button class="btn btn-sm" data-exp="pdf">PDF</button></div></div>
+        <div class="toolbar"><input type="text" id="fCidade" placeholder="Cidade" /><input type="text" id="fEstado" placeholder="UF" style="max-width:80px" /><input type="text" id="fNicho" placeholder="Nicho" />
+          <select id="fStatus"><option value="">Todos os status</option>${statusValidos.map((s) => `<option>${s}</option>`).join('')}</select>
+          <select id="fProb"><option value="">Qualquer probabilidade</option><option value="25">≥ 25%</option><option value="50">≥ 50%</option><option value="75">≥ 75%</option><option value="90">≥ 90%</option></select>
+          <button class="btn btn-sm btn-ghost" id="fLimpar">Limpar filtros</button></div>
+      </div><div class="table-wrap" id="pTabela"></div><div id="pPager"></div></div>
+      <input type="file" id="pFile" accept=".csv,.xls,.xlsx" class="hidden" />`;
+    el.querySelector('#pSearch').addEventListener('input', UI.debounce((e) => { estado.search = e.target.value.trim(); estado.page = 1; carregar(); }, 350));
+    el.querySelector('#fCidade').addEventListener('input', UI.debounce((e) => { estado.cidade = e.target.value.trim(); estado.page = 1; carregar(); }, 350));
+    el.querySelector('#fEstado').addEventListener('input', UI.debounce((e) => { estado.estado = e.target.value.trim(); estado.page = 1; carregar(); }, 350));
+    el.querySelector('#fNicho').addEventListener('input', UI.debounce((e) => { estado.nicho = e.target.value.trim(); estado.page = 1; carregar(); }, 350));
+    el.querySelector('#fStatus').addEventListener('change', (e) => { estado.status = e.target.value; estado.page = 1; carregar(); });
+    el.querySelector('#fProb').addEventListener('change', (e) => { estado.probMin = e.target.value; estado.page = 1; carregar(); });
+    el.querySelector('#fLimpar').addEventListener('click', () => { Object.assign(estado, { search: '', cidade: '', estado: '', nicho: '', status: '', probMin: '', page: 1 }); el.querySelector('#pSearch').value = ''; el.querySelector('#fCidade').value = ''; el.querySelector('#fEstado').value = ''; el.querySelector('#fNicho').value = ''; el.querySelector('#fStatus').value = ''; el.querySelector('#fProb').value = ''; carregar(); });
+    el.querySelector('#pNovo').addEventListener('click', () => editar(null));
+    el.querySelector('#pImportar').addEventListener('click', () => el.querySelector('#pFile').click());
+    el.querySelector('#pFile').addEventListener('change', importar);
+    el.querySelectorAll('[data-exp]').forEach((b) => b.addEventListener('click', () => API.download(`/prospeccao/export?format=${b.dataset.exp}`)));
+    await carregar();
+  }
+  async function carregar() {
+    const tabela = container.querySelector('#pTabela');
+    if (!tabela) return;
+    tabela.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    const q = new URLSearchParams({ search: estado.search, cidade: estado.cidade, estado: estado.estado, nicho: estado.nicho, status: estado.status, probMin: estado.probMin, sort: estado.sort, order: estado.order, page: estado.page, pageSize: estado.pageSize });
+    const r = await API.get('/prospeccao?' + q.toString());
+    if (r.statusValidos) statusValidos = r.statusValidos;
+    render_tabela(r); render_pager(r);
+  }
+  function th(campo, label) { const ativo = estado.sort === campo; const seta = ativo ? (estado.order === 'ASC' ? ' ▲' : ' ▼') : ''; return `<th class="sortable" data-sort="${campo}">${label}${seta}</th>`; }
+  function render_tabela(r) {
+    const tabela = container.querySelector('#pTabela');
+    if (!tabela) return;
+    if (!r.itens.length) { tabela.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><div>Nenhuma empresa em prospecção.</div><button class="btn btn-primary mt" onclick="Views.prospeccao.novo()">Adicionar empresa</button></div>`; return; }
+    const linhas = r.itens.map((p) => {
+      const wa = UI.waLink(p.whatsapp || p.telefone);
+      const st = (p.status || 'Novo').toLowerCase();
+      return `<tr><td>${UI.esc(p.empresa)}</td><td>${UI.esc(p.cidade) || '—'}${p.estado ? '/' + UI.esc(p.estado) : ''}</td><td>${UI.esc(p.nicho) || '—'}</td><td>${UI.esc(p.telefone) || '—'}</td>
+        <td><span class="badge ${st}">${UI.esc(p.status)}</span></td>
+        <td><div class="prob-bar"><span style="width:${p.probabilidade || 0}%"></span></div> <span class="small muted">${p.probabilidade || 0}%</span></td>
+        <td class="actions"><div class="row-actions">${wa ? `<a class="btn btn-sm btn-whatsapp" href="${wa}" target="_blank" title="WhatsApp">Whats</a>` : ''}<button class="btn btn-sm btn-success" data-mover="${p.id}" title="Mover para Clientes Fixos">→ Cliente</button><button class="btn btn-sm" data-edit="${p.id}">Editar</button><button class="btn btn-sm btn-danger" data-del="${p.id}">Excluir</button></div></td></tr>`;
+    }).join('');
+    tabela.innerHTML = `<table class="data"><thead><tr>${th('empresa', 'Empresa')}${th('cidade', 'Cidade')}${th('nicho', 'Nicho')}<th>Telefone</th>${th('status', 'Status')}${th('probabilidade', 'Probabilidade')}<th>Ações</th></tr></thead><tbody>${linhas}</tbody></table>`;
+    tabela.querySelectorAll('th.sortable').forEach((t) => t.addEventListener('click', () => { const campo = t.dataset.sort; if (estado.sort === campo) estado.order = estado.order === 'ASC' ? 'DESC' : 'ASC'; else { estado.sort = campo; estado.order = 'ASC'; } carregar(); }));
+    tabela.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => editar(Number(b.dataset.edit))));
+    tabela.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => excluir(Number(b.dataset.del))));
+    tabela.querySelectorAll('[data-mover]').forEach((b) => b.addEventListener('click', () => mover(Number(b.dataset.mover))));
+  }
+  function render_pager(r) {
+    const pager = container.querySelector('#pPager');
+    if (!pager) return;
+    const totalPag = Math.max(1, Math.ceil(r.total / r.pageSize));
+    pager.innerHTML = `<div class="pager"><span class="info">${r.total} empresa(s) — página ${r.page} de ${totalPag}</span><div class="spacer"></div><button class="btn btn-sm" ${r.page <= 1 ? 'disabled' : ''} id="pgPrev">‹ Anterior</button><button class="btn btn-sm" ${r.page >= totalPag ? 'disabled' : ''} id="pgNext">Próxima ›</button></div>`;
+    const prev = pager.querySelector('#pgPrev'), next = pager.querySelector('#pgNext');
+    if (prev) prev.addEventListener('click', () => { estado.page--; carregar(); });
+    if (next) next.addEventListener('click', () => { estado.page++; carregar(); });
+  }
+  async function editar(id) {
+    let valores = { status: 'Novo', probabilidade: 0 };
+    if (id) { try { valores = await API.get('/prospeccao/' + id); } catch (e) { UI.toast(e.message, 'error'); return; } }
+    const dados = await UI.formModal({ titulo: id ? 'Editar Empresa' : 'Nova Empresa', campos: campos(), valores, okLabel: id ? 'Salvar alterações' : 'Cadastrar' });
+    if (!dados) return;
+    try {
+      if (id) await API.put('/prospeccao/' + id, dados); else await API.post('/prospeccao', dados);
+      UI.toast(id ? 'Empresa atualizada.' : 'Empresa cadastrada.', 'success');
+      await carregar(); App.atualizarContadores();
+    } catch (err) {
+      if (err.status === 409) {
+        const forcar = await UI.confirmar(`${err.message}\n\nCadastrar mesmo assim?`, { titulo: 'Possível duplicado', okLabel: 'Cadastrar assim mesmo' });
+        if (forcar) { try { await API.post('/prospeccao', { ...dados, forcar: true }); UI.toast('Empresa cadastrada.', 'success'); await carregar(); App.atualizarContadores(); } catch (e2) { UI.toast(e2.message, 'error'); } }
+      } else UI.toast(err.message, 'error');
+    }
+  }
+  async function excluir(id) {
+    if (!(await UI.confirmar('Excluir esta empresa da prospecção?', { titulo: 'Excluir', perigo: true, okLabel: 'Excluir' }))) return;
+    try { await API.del('/prospeccao/' + id); UI.toast('Empresa excluída.', 'success'); await carregar(); App.atualizarContadores(); } catch (err) { UI.toast(err.message, 'error'); }
+  }
+  async function mover(id) {
+    if (!(await UI.confirmar('Mover esta empresa para Clientes Fixos?', { titulo: 'Mover para Clientes', okLabel: 'Mover' }))) return;
+    try { await API.post(`/prospeccao/${id}/mover-clientes`); UI.toast('Movida para Clientes Fixos.', 'success'); await carregar(); App.atualizarContadores(); } catch (err) { UI.toast(err.message, 'error'); }
+  }
+  async function importar(e) {
+    const file = e.target.files[0]; e.target.value = '';
+    if (!file) return;
+    UI.loading(true, 'Importando planilha...'); UI.progress(15);
+    try {
+      const r = await API.upload('/prospeccao/import', file);
+      UI.progress(100);
+      if (!r.ok) { UI.toast(r.erro, 'error', 'Importar'); return; }
+      UI.toast(`Importação: ${r.inseridos} inseridos, ${r.duplicados} duplicados, ${r.invalidos} inválidos.`, 'success', 'Importar');
+      await carregar(); App.atualizarContadores();
+    } catch (err) { UI.toast(err.message, 'error', 'Importar'); } finally { UI.loading(false); }
+  }
+  return { render, novo: () => editar(null) };
+})();
+
+/* --------------------------------------------------- Pesquisa Automática */
+window.Views.pesquisa = (() => {
+  let container = null;
+  const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
+  async function render(el) {
+    container = el;
+    const pre = sessionStorage.getItem('nichoPreselecionado') || '';
+    el.innerHTML = `<div class="alert alert-info"><strong>Fontes gratuitas e abertas.</strong> A pesquisa utiliza o <strong>OpenStreetMap</strong> (Nominatim + Overpass API) — dados públicos, gratuitos e legais. Requer conexão com a internet. Se estiver offline, marque <strong>Modo demonstração</strong> para testar o fluxo com dados de exemplo.</div>
+      <div class="grid-2">
+        <div class="panel"><div class="panel-head"><h3>Nova Pesquisa</h3></div><div class="panel-body"><form id="formPesquisa">
+          <div class="field"><label>Cidade *</label><input type="text" id="qCidade" placeholder="Ex.: Serra Azul" required /></div>
+          <div class="grid-2"><div class="field"><label>Estado (UF)</label><select id="qEstado"><option value="">—</option>${UFS.map((u) => `<option>${u}</option>`).join('')}</select></div>
+            <div class="field"><label>Quantidade máxima</label><input type="number" id="qMax" value="50" min="1" max="300" /></div></div>
+          <div class="field"><label>Nicho *</label><input type="text" id="qNicho" placeholder="Ex.: Padarias" required autocomplete="off" value="${UI.esc(pre)}" /><div id="nichoSug" class="mt"></div></div>
+          <label class="flex gap" style="align-items:center;margin:6px 0 12px"><input type="checkbox" id="qDemo" style="width:auto" /> <span class="small muted">Modo demonstração (offline) — gera exemplos rotulados, sem internet.</span></label>
+          <button type="submit" class="btn btn-primary btn-block" id="btnPesquisar"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Pesquisar</button>
+        </form></div></div>
+        <div class="panel"><div class="panel-head"><h3>Resultado</h3></div><div class="panel-body" id="resultadoBox"><div class="empty small">Preencha os campos e clique em <strong>Pesquisar</strong>. Os resultados aparecerão aqui e na aba <strong>Revisão</strong>.</div></div></div>
+      </div>`;
+    sessionStorage.removeItem('nichoPreselecionado');
+    carregarSugestoes('');
+    el.querySelector('#qNicho').addEventListener('input', UI.debounce((e) => carregarSugestoes(e.target.value.trim()), 300));
+    el.querySelector('#formPesquisa').addEventListener('submit', executar);
+  }
+  async function carregarSugestoes(termo) {
+    const box = container.querySelector('#nichoSug');
+    if (!box) return;
+    try {
+      const r = await API.get('/nichos?search=' + encodeURIComponent(termo));
+      const alvo = container.querySelector('#nichoSug');
+      if (!alvo) return;
+      const itens = r.itens.slice(0, 18);
+      alvo.innerHTML = itens.map((n) => `<span class="chip" data-nicho="${UI.esc(n.nome)}">${UI.esc(n.nome)} <span class="cat">${UI.esc(n.categoria)}</span></span>`).join('') || '<span class="small muted">Nenhum nicho na base — você pode digitar qualquer termo livre.</span>';
+      alvo.querySelectorAll('[data-nicho]').forEach((c) => c.addEventListener('click', () => { const inp = container.querySelector('#qNicho'); if (inp) inp.value = c.dataset.nicho; }));
+    } catch (_) { const alvo = container.querySelector('#nichoSug'); if (alvo) alvo.innerHTML = ''; }
+  }
+  async function executar(e) {
+    e.preventDefault();
+    const cidade = container.querySelector('#qCidade').value.trim();
+    const estadoUf = container.querySelector('#qEstado').value;
+    const nicho = container.querySelector('#qNicho').value.trim();
+    const max = Number(container.querySelector('#qMax').value) || 50;
+    const demo = container.querySelector('#qDemo').checked;
+    if (!cidade || !nicho) { UI.toast('Informe cidade e nicho.', 'warning'); return; }
+    const btn = container.querySelector('#btnPesquisar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin-inline"></span> Pesquisando... (pode levar alguns segundos)';
+    const box = container.querySelector('#resultadoBox');
+    box.innerHTML = '<div class="empty"><div class="spinner"></div><div class="loading-text mt">Coletando em fontes abertas...</div></div>';
+    try {
+      const r = await API.post('/pesquisa', { cidade, estado: estadoUf, nicho, max, demo });
+      if (r.erro) {
+        box.innerHTML = `<div class="alert alert-warn"><strong>Não foi possível concluir a pesquisa.</strong><br>${UI.esc(r.mensagem)}</div><p class="small muted">Dica: verifique a conexão com a internet e o nome da cidade. Você também pode marcar <strong>Modo demonstração</strong> para testar o fluxo offline.</p>`;
+      } else {
+        box.innerHTML = `<div class="cards" style="grid-template-columns:1fr 1fr"><div class="card stat-card"><div><div class="stat-val">${r.novos}</div><div class="stat-label">Novos encontrados</div></div></div><div class="card stat-card"><div><div class="stat-val">${r.duplicados}</div><div class="stat-label">Duplicados ignorados</div></div></div></div><p class="small muted">${UI.esc(r.mensagem)} Fonte: <strong>${UI.esc(r.fonte)}</strong>.</p><button class="btn btn-primary btn-block mt" id="irRevisao">Ver resultados na Revisão →</button>`;
+        box.querySelector('#irRevisao').addEventListener('click', () => App.irPara('revisao'));
+        UI.toast(`Pesquisa concluída: ${r.novos} novos.`, 'success', 'Pesquisa');
+        App.atualizarContadores();
+      }
+    } catch (err) { box.innerHTML = `<div class="alert alert-warn">${UI.esc(err.message)}</div>`; UI.toast(err.message, 'error', 'Pesquisa'); }
+    finally { btn.disabled = false; btn.innerHTML = 'Pesquisar'; }
+  }
+  return { render };
+})();
+
+/* ----------------------------------------------------------------- Revisão */
+window.Views.revisao = (() => {
+  let container = null;
+  let pesquisaSel = null;
+  const filtro = { status: 'novo', search: '', sort: 'id', order: 'ASC' };
+  async function render(el) {
+    container = el;
+    el.innerHTML = `<div class="panel"><div class="panel-head"><h3>Pesquisas Realizadas</h3><div class="spacer"></div><button class="btn btn-sm btn-primary" onclick="App.irPara('pesquisa')">+ Nova Pesquisa</button></div><div class="table-wrap" id="listaPesquisas"></div></div><div id="painelResultados"></div>`;
+    await carregarPesquisas();
+  }
+  async function carregarPesquisas() {
+    const lista = container.querySelector('#listaPesquisas');
+    lista.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    const r = await API.get('/pesquisa');
+    if (!r.itens.length) { lista.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div>Nenhuma pesquisa ainda.</div><button class="btn btn-primary mt" onclick="App.irPara('pesquisa')">Fazer primeira pesquisa</button></div>`; return; }
+    const linhas = r.itens.map((p) => `<tr><td>${UI.esc(p.nicho)}</td><td>${UI.esc(p.cidade)}${p.estado ? '/' + UI.esc(p.estado) : ''}</td><td>${p.total_encontrado}</td><td><strong>${p.pendentes}</strong></td><td>${statusPesquisa(p)}</td><td class="muted small">${UI.fmtDataHora(p.criado_em)}</td><td class="actions"><button class="btn btn-sm btn-primary" data-ver="${p.id}">Ver resultados</button></td></tr>`).join('');
+    lista.innerHTML = `<table class="data"><thead><tr><th>Nicho</th><th>Local</th><th>Total</th><th>Pendentes</th><th>Status</th><th>Quando</th><th></th></tr></thead><tbody>${linhas}</tbody></table>`;
+    lista.querySelectorAll('[data-ver]').forEach((b) => b.addEventListener('click', () => abrirResultados(Number(b.dataset.ver), r.itens.find((x) => x.id === Number(b.dataset.ver)))));
+  }
+  function statusPesquisa(p) { if (p.status === 'falha') return `<span class="badge perdido" title="${UI.esc(p.mensagem || '')}">falha</span>`; return `<span class="badge fechado">${UI.esc(p.fonte || 'ok')}</span>`; }
+  async function abrirResultados(id, pesquisa) { pesquisaSel = pesquisa || { id }; filtro.status = 'novo'; filtro.search = ''; await carregarResultados(); container.querySelector('#painelResultados').scrollIntoView({ behavior: 'smooth' }); }
+  async function carregarResultados() {
+    const painel = container.querySelector('#painelResultados');
+    painel.innerHTML = `<div class="panel"><div class="panel-head" style="flex-wrap:wrap;gap:10px"><h3>Resultados — ${UI.esc(pesquisaSel.nicho || '')} ${pesquisaSel.cidade ? 'em ' + UI.esc(pesquisaSel.cidade) : ''}</h3><div class="spacer"></div>
+        <div class="search" style="max-width:240px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="rSearch" placeholder="Filtrar resultados..." /></div>
+        <select id="rStatus"><option value="novo">Pendentes</option><option value="">Todos</option><option value="movido">Movidos</option><option value="descartado">Descartados</option></select></div>
+      <div class="panel-body" style="padding:12px 18px"><div class="toolbar"><label class="flex gap" style="align-items:center;margin:0"><input type="checkbox" id="selAll" /> Selecionar todos</label><div class="spacer"></div>
+        <button class="btn btn-sm btn-success" id="bMover">→ Mover selecionados para Prospecção</button><button class="btn btn-sm" id="bDescartar">Descartar</button><button class="btn btn-sm btn-danger" id="bExcluir">Excluir</button></div></div>
+      <div class="table-wrap" id="rTabela"></div></div>`;
+    painel.querySelector('#rSearch').addEventListener('input', UI.debounce((e) => { filtro.search = e.target.value.trim(); listar(); }, 300));
+    painel.querySelector('#rStatus').addEventListener('change', (e) => { filtro.status = e.target.value; listar(); });
+    painel.querySelector('#selAll').addEventListener('change', (e) => { painel.querySelectorAll('.rowChk').forEach((c) => (c.checked = e.target.checked)); });
+    painel.querySelector('#bMover').addEventListener('click', () => acaoLote('mover'));
+    painel.querySelector('#bDescartar').addEventListener('click', () => acaoLote('descartar'));
+    painel.querySelector('#bExcluir').addEventListener('click', () => acaoLote('excluir'));
+    await listar();
+  }
+  async function listar() {
+    const tabela = container.querySelector('#rTabela');
+    if (!tabela) return;
+    tabela.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    const q = new URLSearchParams({ status: filtro.status, search: filtro.search, sort: filtro.sort, order: filtro.order });
+    const r = await API.get(`/pesquisa/${pesquisaSel.id}/resultados?` + q.toString());
+    const tabela2 = container.querySelector('#rTabela');
+    if (!tabela2) return;
+    if (!r.itens.length) { tabela2.innerHTML = '<div class="empty small">Nenhum resultado neste filtro.</div>'; return; }
+    const linhas = r.itens.map((x) => {
+      const wa = UI.waLink(x.whatsapp || x.telefone);
+      const bStatus = x.status === 'novo' ? '' : `<span class="badge ${x.status === 'movido' ? 'fechado' : 'perdido'}">${x.status}</span>`;
+      return `<tr><td class="checkbox-cell">${x.status === 'novo' ? `<input type="checkbox" class="rowChk" value="${x.id}" />` : ''}</td><td>${UI.esc(x.nome)} ${bStatus}</td><td>${UI.esc(x.telefone) || '—'}</td><td>${UI.esc(x.cidade) || '—'}</td><td class="wrap muted small">${UI.esc(x.endereco) || '—'}</td><td>${x.site ? `<a href="${/^https?:/.test(x.site) ? UI.esc(x.site) : 'https://' + UI.esc(x.site)}" target="_blank">site</a>` : '—'}</td>
+        <td class="actions"><div class="row-actions">${wa ? `<a class="btn btn-sm btn-whatsapp" href="${wa}" target="_blank">Whats</a>` : ''}<button class="btn btn-sm" data-ver="${x.id}">Ver</button>${x.status === 'novo' ? `<button class="btn btn-sm btn-success" data-add="${x.id}">+ Prospecção</button>` : ''}</div></td></tr>`;
+    }).join('');
+    tabela.innerHTML = `<table class="data"><thead><tr><th class="checkbox-cell"></th><th>Nome</th><th>Telefone</th><th>Cidade</th><th>Endereço</th><th>Site</th><th>Ações</th></tr></thead><tbody>${linhas}</tbody></table>`;
+    const dados = {}; r.itens.forEach((x) => (dados[x.id] = x));
+    tabela.querySelectorAll('[data-ver]').forEach((b) => b.addEventListener('click', () => visualizar(dados[b.dataset.ver])));
+    tabela.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => mover([Number(b.dataset.add)])));
+  }
+  function selecionados() { return Array.from(container.querySelectorAll('.rowChk:checked')).map((c) => Number(c.value)); }
+  async function acaoLote(tipo) {
+    const ids = selecionados();
+    if (!ids.length) { UI.toast('Selecione ao menos um resultado.', 'warning'); return; }
+    if (tipo === 'mover') return mover(ids);
+    if (tipo === 'descartar') { if (!(await UI.confirmar(`Descartar ${ids.length} resultado(s)?`, { titulo: 'Descartar' }))) return; try { await API.post('/pesquisa/descartar', { ids }); UI.toast('Resultados descartados.', 'success'); await listar(); App.atualizarContadores(); } catch (e) { UI.toast(e.message, 'error'); } }
+    if (tipo === 'excluir') { if (!(await UI.confirmar(`Excluir DEFINITIVAMENTE ${ids.length} resultado(s)?`, { titulo: 'Excluir', perigo: true, okLabel: 'Excluir' }))) return; try { await API.post('/pesquisa/excluir', { ids }); UI.toast('Resultados excluídos.', 'success'); await listar(); App.atualizarContadores(); } catch (e) { UI.toast(e.message, 'error'); } }
+  }
+  async function mover(ids) {
+    try { const r = await API.post('/pesquisa/mover', { ids }); UI.toast(`${r.movidos} movido(s) para Prospecção. ${r.ignorados ? r.ignorados + ' ignorado(s) por duplicidade.' : ''}`, 'success', 'Mover'); await listar(); App.atualizarContadores(); } catch (err) { UI.toast(err.message, 'error'); }
+  }
+  function visualizar(x) {
+    if (!x) return;
+    const linha = (rot, v) => v ? `<div class="field" style="margin-bottom:8px"><label>${rot}</label><div>${UI.esc(v)}</div></div>` : '';
+    const wa = UI.waLink(x.whatsapp || x.telefone);
+    UI.abrirModal({ titulo: x.nome, corpo: `<div class="grid-2">${linha('Telefone', x.telefone)}${linha('WhatsApp', x.whatsapp)}${linha('Cidade', x.cidade)}${linha('Estado', x.estado)}${linha('Instagram', x.instagram)}${linha('E-mail', x.email)}${linha('Endereço', x.endereco)}${linha('Categoria', x.categoria)}${linha('Horário', x.horario)}${linha('Origem', x.origem)}${x.latitude ? linha('Coordenadas', `${x.latitude}, ${x.longitude}`) : ''}</div>${x.site ? `<p><a href="${/^https?:/.test(x.site) ? UI.esc(x.site) : 'https://' + UI.esc(x.site)}" target="_blank">Abrir site</a></p>` : ''}${x.url_origem ? `<p class="small"><a href="${UI.esc(x.url_origem)}" target="_blank">Ver fonte (OpenStreetMap)</a></p>` : ''}<div class="flex gap mt">${wa ? `<a class="btn btn-whatsapp" href="${wa}" target="_blank">Abrir WhatsApp</a>` : ''}${x.status === 'novo' ? `<button class="btn btn-success" id="mvOne">+ Adicionar à Prospecção</button>` : ''}</div>` });
+    const b = document.getElementById('mvOne');
+    if (b) b.addEventListener('click', () => { document.querySelector('.modal-overlay .close').click(); mover([x.id]); });
+  }
+  return { render };
+})();
+
+/* ------------------------------------------------------------------ Nichos */
+window.Views.nichos = (() => {
+  let container = null;
+  const estado = { search: '', categoria: '' };
+  async function render(el) {
+    container = el;
+    el.innerHTML = `<div class="panel"><div class="panel-head"><div class="toolbar" style="flex:1"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="nSearch" placeholder="Pesquisar nicho (ex.: padaria, oficina, advogado)..." /></div><select id="nCategoria"><option value="">Todas as categorias</option></select></div></div><div class="panel-body" id="nLista"></div></div>
+      <div class="alert alert-info">A base contém <strong id="nTotal">—</strong> nichos prontos para uso. Você também pode digitar <strong>qualquer termo livre</strong> na Pesquisa Automática — nichos fora da base são buscados por nome. Clique em um nicho para iniciar uma pesquisa com ele.</div>`;
+    el.querySelector('#nSearch').addEventListener('input', UI.debounce((e) => { estado.search = e.target.value.trim(); carregar(); }, 300));
+    el.querySelector('#nCategoria').addEventListener('change', (e) => { estado.categoria = e.target.value; carregar(); });
+    await carregar(true);
+  }
+  async function carregar(primeira) {
+    const lista = container.querySelector('#nLista');
+    if (!lista) return;
+    lista.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    const q = new URLSearchParams({ search: estado.search, categoria: estado.categoria });
+    const r = await API.get('/nichos?' + q.toString());
+    if (primeira) { const sel = container.querySelector('#nCategoria'); sel.innerHTML = '<option value="">Todas as categorias</option>' + r.categorias.map((c) => `<option>${UI.esc(c)}</option>`).join(''); container.querySelector('#nTotal').textContent = r.total; }
+    if (!r.itens.length) { lista.innerHTML = '<div class="empty small">Nenhum nicho encontrado. Você ainda pode usar este termo livre na Pesquisa Automática.</div>'; return; }
+    const grupos = {};
+    r.itens.forEach((n) => { (grupos[n.categoria] = grupos[n.categoria] || []).push(n); });
+    lista.innerHTML = Object.keys(grupos).sort().map((cat) => `<div style="margin-bottom:16px"><div class="small muted" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">${UI.esc(cat)}</div><div>${grupos[cat].map((n) => `<span class="chip" data-nicho="${UI.esc(n.nome)}">${UI.esc(n.nome)}</span>`).join('')}</div></div>`).join('');
+    lista.querySelectorAll('[data-nicho]').forEach((c) => c.addEventListener('click', () => { sessionStorage.setItem('nichoPreselecionado', c.dataset.nicho); App.irPara('pesquisa'); setTimeout(() => { const inp = document.getElementById('qNicho'); if (inp) { inp.value = c.dataset.nicho; inp.focus(); } }, 200); }));
+  }
+  return { render };
+})();
+
+/* --------------------------------------------------------------- Histórico */
+window.Views.historico = (() => {
+  let container = null;
+  const estado = { tipo: '', page: 1, pageSize: 50 };
+  const ICONE = { login: '🔑', pesquisa: '🔍', importacao: '📥', exclusao: '🗑️', alteracao: '✏️', movimentacao: '🔀', erro: '⚠️' };
+  async function render(el) {
+    container = el;
+    el.innerHTML = `<div class="panel"><div class="panel-head"><h3>Histórico de Atividades</h3><div class="spacer"></div><select id="hTipo"><option value="">Todos os tipos</option></select></div><div class="table-wrap" id="hTabela"></div><div id="hPager"></div></div>`;
+    el.querySelector('#hTipo').addEventListener('change', (e) => { estado.tipo = e.target.value; estado.page = 1; carregar(); });
+    await carregar(true);
+  }
+  async function carregar(primeira) {
+    const tabela = container.querySelector('#hTabela');
+    if (!tabela) return;
+    tabela.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    const q = new URLSearchParams({ tipo: estado.tipo, page: estado.page, pageSize: estado.pageSize });
+    const r = await API.get('/historico?' + q.toString());
+    if (primeira) { const sel = container.querySelector('#hTipo'); sel.innerHTML = '<option value="">Todos os tipos</option>' + r.tipos.map((t) => `<option value="${UI.esc(t)}">${UI.esc(t)}</option>`).join(''); }
+    if (!r.itens.length) { tabela.innerHTML = '<div class="empty small">Nenhum registro no histórico.</div>'; container.querySelector('#hPager').innerHTML = ''; return; }
+    const linhas = r.itens.map((h) => `<tr><td>${ICONE[h.tipo] || '•'} <span class="badge">${UI.esc(h.tipo)}</span></td><td class="wrap">${UI.esc(h.descricao)}</td><td class="muted small">${UI.esc(h.usuario_login) || '—'}</td><td class="muted small">${UI.fmtDataHora(h.criado_em)}</td></tr>`).join('');
+    tabela.innerHTML = `<table class="data"><thead><tr><th>Tipo</th><th>Descrição</th><th>Usuário</th><th>Quando</th></tr></thead><tbody>${linhas}</tbody></table>`;
+    const totalPag = Math.max(1, Math.ceil(r.total / r.pageSize));
+    container.querySelector('#hPager').innerHTML = `<div class="pager"><span class="info">${r.total} registro(s) — página ${r.page} de ${totalPag}</span><div class="spacer"></div><button class="btn btn-sm" ${r.page <= 1 ? 'disabled' : ''} id="hPrev">‹ Anterior</button><button class="btn btn-sm" ${r.page >= totalPag ? 'disabled' : ''} id="hNext">Próxima ›</button></div>`;
+    const prev = container.querySelector('#hPrev'), next = container.querySelector('#hNext');
+    if (prev) prev.addEventListener('click', () => { estado.page--; carregar(); });
+    if (next) next.addEventListener('click', () => { estado.page++; carregar(); });
+  }
+  return { render };
+})();
+
+/* ================================================================== App */
+const App = (() => {
+  const TITULOS = { dashboard: 'Dashboard', clientes: 'Clientes Fixos', prospeccao: 'Prospectando', pesquisa: 'Pesquisa Automática', revisao: 'Revisão', nichos: 'Nichos', historico: 'Histórico' };
+  let usuario = null, viewAtual = null, configurado = false;
+
+  async function iniciar() {
+    try { const r = await API.get('/auth/me'); usuario = r.usuario; }
+    catch (e) { mostrarLogin(); return; }
+    document.getElementById('userName').textContent = usuario.nome || usuario.login;
+    document.getElementById('userAvatar').textContent = UI.iniciais(usuario.nome || usuario.login);
+    if (!configurado) { configurarNavegacao(); configurarAcoes(); configurado = true; }
+    await atualizarContadores();
+    const inicial = (location.hash || '#dashboard').replace('#', '');
+    irPara(TITULOS[inicial] ? inicial : 'dashboard');
+  }
+  function configurarNavegacao() {
+    document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => irPara(item.dataset.view)));
+    window.addEventListener('hashchange', () => { const v = location.hash.replace('#', ''); if (TITULOS[v] && v !== viewAtual) irPara(v); });
+    const toggle = document.getElementById('menuToggle'), sidebar = document.getElementById('sidebar');
+    toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    document.getElementById('view').addEventListener('click', () => sidebar.classList.remove('open'));
+  }
+  function configurarAcoes() {
+    document.getElementById('btnLogout').addEventListener('click', logout);
+    document.getElementById('btnBackup').addEventListener('click', backup);
+    document.getElementById('btnSenha').addEventListener('click', trocarSenha);
+  }
+  async function irPara(nome) {
+    if (!TITULOS[nome]) nome = 'dashboard';
+    viewAtual = nome; location.hash = nome;
+    document.querySelectorAll('.nav-item').forEach((i) => i.classList.toggle('active', i.dataset.view === nome));
+    document.getElementById('pageTitle').textContent = TITULOS[nome];
+    const container = document.getElementById('view');
+    container.innerHTML = '';
+    const view = window.Views && window.Views[nome];
+    if (!view) { container.innerHTML = `<div class="empty">Tela "${nome}" não encontrada.</div>`; return; }
+    try { await view.render(container, { usuario, app: App }); }
+    catch (err) { console.error(err); container.innerHTML = `<div class="alert alert-warn">Erro ao carregar a tela: ${UI.esc(err.message)}</div>`; }
+  }
+  async function atualizarContadores() {
+    try {
+      const r = await API.get('/stats'); const s = r.stats;
+      setCount('cntClientes', s.clientes); setCount('cntProspeccao', s.prospeccao); setCount('cntRevisao', s.resultadosPendentes); setCount('cntNichos', s.nichos);
+    } catch (_) {}
+  }
+  function setCount(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+  async function logout() {
+    if (!(await UI.confirmar('Deseja realmente sair?', { titulo: 'Sair', okLabel: 'Sair' }))) return;
+    try { await API.post('/auth/logout'); } catch (_) {}
+    mostrarLogin();
+  }
+  async function backup() {
+    const corpo = `<p class="small muted">Seus dados ficam salvos neste navegador. Faça um <strong>backup</strong> para guardar em arquivo ou transferir para outro computador.</p>
+      <div class="flex gap mt" style="flex-wrap:wrap">
+        <button class="btn btn-primary" id="bkBaixar">Baixar backup (.json)</button>
+        <button class="btn" id="bkRestaurar">Restaurar de arquivo</button>
+      </div>
+      <input type="file" id="bkFile" accept=".json" class="hidden" />
+      <p class="small muted mt">A restauração substitui todos os dados atuais pelos do arquivo.</p>`;
+    const { overlay, fechar } = UI.abrirModal({ titulo: 'Backup e restauração', corpo });
+    overlay.querySelector('#bkBaixar').addEventListener('click', async () => { try { await API.post('/backup'); UI.toast('Backup gerado com sucesso.', 'success', 'Backup'); } catch (e) { UI.toast(e.message, 'error'); } });
+    overlay.querySelector('#bkRestaurar').addEventListener('click', () => overlay.querySelector('#bkFile').click());
+    overlay.querySelector('#bkFile').addEventListener('change', (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          Store.importarJSON(String(reader.result));
+          const db = Store.get(); db.logado = true; Store.salvar();
+          fechar();
+          usuario = { login: db.usuario.login, nome: db.usuario.nome };
+          document.getElementById('userName').textContent = usuario.nome || usuario.login;
+          document.getElementById('userAvatar').textContent = UI.iniciais(usuario.nome || usuario.login);
+          await atualizarContadores();
+          irPara('dashboard');
+          UI.toast('Backup restaurado com sucesso.', 'success', 'Restaurar');
+        } catch (err) { UI.toast(err.message, 'error', 'Restaurar'); }
+      };
+      reader.readAsText(file, 'utf-8');
+    });
+  }
+  async function trocarSenha() {
+    const dados = await UI.formModal({ titulo: 'Alterar senha', tamanho: '', campos: [{ name: 'senhaAtual', label: 'Senha atual', type: 'password', required: true, full: true }, { name: 'senhaNova', label: 'Nova senha', type: 'password', required: true, full: true }], okLabel: 'Alterar' });
+    if (!dados) return;
+    try { await API.post('/auth/change-password', dados); UI.toast('Senha alterada com sucesso.', 'success'); } catch (err) { UI.toast(err.message, 'error'); }
+  }
+  return { iniciar, irPara, atualizarContadores, get usuario() { return usuario; } };
+})();
+
+/* ------------------------------------------------------- Login e boot */
+function mostrarApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = '';
+  App.iniciar();
+}
+function mostrarLogin() {
+  document.getElementById('appScreen').style.display = 'none';
+  const ls = document.getElementById('loginScreen');
+  ls.style.display = '';
+  const err = document.getElementById('loginError'); if (err) err.classList.remove('show');
+  const li = document.getElementById('login'); if (li) { li.value = ''; setTimeout(() => li.focus(), 60); }
+  const se = document.getElementById('senha'); if (se) se.value = '';
+}
+function configurarLogin() {
+  const form = document.getElementById('loginForm');
+  const erroBox = document.getElementById('loginError');
+  const btn = document.getElementById('btnEntrar');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    erroBox.classList.remove('show');
+    const login = document.getElementById('login').value.trim();
+    const senha = document.getElementById('senha').value;
+    if (!login || !senha) return;
+    const db = Store.get();
+    const ok = login.toLowerCase() === String(db.usuario.login).toLowerCase() && hashSenha(senha) === db.usuario.senha;
+    if (!ok) { erroBox.textContent = 'Login ou senha inválidos.'; erroBox.classList.add('show'); return; }
+    db.logado = true; Store.salvar();
+    registrarHistorico('login', `Login de ${db.usuario.login}`, {});
+    mostrarApp();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.UI = UI; window.API = API; window.App = App; window.Store = Store;
+  Store.carregar();
+  configurarLogin();
+  if (Store.get().logado) mostrarApp();
+  else mostrarLogin();
+});
+
+  </script>
+</body>
+</html>
