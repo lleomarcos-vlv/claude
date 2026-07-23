@@ -38,6 +38,15 @@ diante de milhares de registros.
 
 Requisitos: **Python 3.10+**.
 
+### Windows (mais fácil — clique duplo)
+
+1. Dê **duplo clique em `instalar.bat`** — cria o ambiente, instala tudo e o
+   navegador do Playwright automaticamente.
+2. Dê **duplo clique em `iniciar.bat`** — abre o painel em
+   http://127.0.0.1:8000 no seu navegador.
+
+### Linux / macOS (ou Windows via terminal)
+
 ```bash
 # 1. Instale as dependências
 pip install -r requirements.txt
