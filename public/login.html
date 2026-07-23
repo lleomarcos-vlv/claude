@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar — Estação de Trabalho</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <form class="login-card" id="loginForm" autocomplete="on">
+      <div class="login-logo">
+        <img src="/assets/logo.svg" alt="Logo" />
+        <h1 id="appNome">Estação de Trabalho</h1>
+        <p id="appDesc">Prospecção Comercial Inteligente</p>
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <div class="field">
+        <label for="login">Login</label>
+        <input type="text" id="login" name="login" placeholder="Seu usuário" required autofocus />
+      </div>
+
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" placeholder="Sua senha" required />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="btnEntrar">Entrar</button>
+
+      <p class="login-hint">
+        Primeiro acesso? Utilize <strong>admin / admin123</strong> e altere a senha depois.
+      </p>
+    </form>
+  </div>
+
+  <script src="/js/login.js"></script>
+</body>
+</html>

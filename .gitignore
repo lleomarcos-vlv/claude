@@ -1,0 +1,36 @@
+# Dependências
+node_modules/
+
+# Banco de dados e backups (gerados em tempo de execução)
+database/*.db
+database/*.db-shm
+database/*.db-wal
+database/backups/*.db
+database/backups/*.zip
+
+# Uploads temporários e arquivos de trabalho
+uploads/*
+!uploads/.gitkeep
+temp/*
+!temp/.gitkeep
+
+# Logs
+logs/*
+!logs/.gitkeep
+*.log
+
+# Empacotamento
+dist/
+build/
+*.zip
+!.gitkeep
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
