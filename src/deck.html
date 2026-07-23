@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Drone Kairós ERP — Apresentação do Produto</title>
+<style>
+@font-face{font-family:'Playfair Display';src:local('Playfair Display'),url('fonts/PlayfairDisplay.ttf') format('truetype');font-weight:400 900;font-style:normal;}
+@font-face{font-family:'Playfair Display';src:local('Playfair Display Italic'),url('fonts/PlayfairDisplay-Italic.ttf') format('truetype');font-weight:400 900;font-style:italic;}
+@font-face{font-family:'Inter';src:local('Inter'),url('fonts/Inter.ttf') format('truetype');font-weight:100 900;font-style:normal;}
+@font-face{font-family:'Inter';src:local('Inter Italic'),url('fonts/Inter-Italic.ttf') format('truetype');font-weight:100 900;font-style:italic;}
+
+:root{
+  --navy:#0A1628;
+  --navy-2:#0F1E38;
+  --charcoal:#141822;
+  --gold:#C9A961;
+  --gold-soft:#E2D0A0;
+  --gold-ink:#9C7A2E;
+  --ivory:#F5F2EA;
+  --ivory-2:#ECE6D8;
+  --ink:#0A1628;
+  --muted-light:#6A6455;
+  --text-dark:#AEA891;
+  --line-dark:rgba(201,169,97,.30);
+  --line-light:rgba(10,22,40,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+@page{size:13.333in 7.5in;margin:0;}
+html,body{background:#20242c;}
+body{font-family:'Inter',sans-serif;}
+
+.page{position:relative;width:1280px;height:720px;overflow:hidden;page-break-after:always;break-after:page;}
+.page:last-child{page-break-after:auto;}
+
+.navy{background:var(--navy);color:var(--ivory);}
+.navy-grad{background:radial-gradient(130% 100% at 6% -8%,#15294a 0%,#0e1e39 34%,#0A1628 72%);color:var(--ivory);}
+.ivory{background:var(--ivory);color:var(--ink);}
+
+/* diagonal peaks motif */
+.peaks{position:absolute;bottom:0;left:0;width:100%;opacity:.5;pointer-events:none;}
+.peaks.faint{opacity:.28;}
+
+/* type helpers */
+.serif{font-family:'Playfair Display',serif;}
+.eyebrow{font-family:'Inter';font-weight:600;font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);}
+.eyebrow.ink{color:var(--gold-ink);}
+.gold{color:var(--gold);}
+
+/* ===== COVER ===== */
+.cv-top{position:absolute;top:0;left:0;width:100%;height:6px;background:linear-gradient(90deg,var(--gold) 0%,var(--gold) 60%,rgba(201,169,97,.28) 60%,rgba(201,169,97,.28) 100%);}
+.cv-eyebrow{position:absolute;top:64px;left:96px;}
+.cv-hero{position:absolute;left:92px;top:150px;}
+.cv-hero .kicker{font-family:'Inter';font-weight:500;letter-spacing:.14em;font-size:19px;color:var(--text-dark);text-transform:uppercase;margin-bottom:10px;}
+.cv-hero h1{font-family:'Playfair Display',serif;font-weight:800;font-size:150px;line-height:.94;letter-spacing:.01em;color:var(--ivory);}
+.cv-hero h1 .g{color:var(--gold);}
+.cv-tagwrap{position:absolute;right:96px;top:300px;width:430px;display:flex;gap:26px;align-items:flex-start;}
+.cv-rule{width:4px;height:120px;background:var(--gold);flex:none;margin-top:4px;}
+.cv-tag{font-family:'Playfair Display',serif;font-style:italic;font-size:26px;line-height:1.5;color:#DCD8CB;}
+.cv-foot-l{position:absolute;left:96px;bottom:60px;font-family:'Inter';letter-spacing:.34em;font-size:13px;text-transform:uppercase;color:var(--text-dark);font-weight:500;}
+.cv-foot-r{position:absolute;right:96px;bottom:56px;text-align:right;font-family:'Inter';letter-spacing:.32em;font-size:11.5px;line-height:2.3;text-transform:uppercase;color:#5C6478;font-weight:500;}
+.cv-medal{position:absolute;right:150px;top:96px;}
+
+/* medallion */
+.medal{display:block;}
+.medal .ring{fill:none;stroke:var(--gold);stroke-width:1.5;}
+.medal .mono{fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.on-dark .mono{stroke:var(--ivory);}
+.on-light .mono{stroke:var(--navy);}
+.wordmark{font-family:'Playfair Display',serif;letter-spacing:.30em;font-weight:600;}
+.wordmark .g{color:var(--gold);}
+
+/* ===== SECTION DIVIDER ===== */
+.dv-num{position:absolute;left:80px;top:34px;font-family:'Playfair Display',serif;font-weight:800;font-size:290px;line-height:1;color:rgba(201,169,97,.10);}
+.dv-body{position:absolute;left:96px;top:286px;width:850px;}
+.dv-eyebrow{margin-bottom:18px;}
+.dv-title{font-family:'Playfair Display',serif;font-weight:700;font-size:60px;line-height:1.08;color:var(--ivory);}
+.dv-underline{width:88px;height:5px;background:var(--gold);margin:54px 0 22px;}
+.dv-lead{font-size:18px;line-height:1.7;color:var(--text-dark);font-weight:300;max-width:648px;}
+.dv-foot{position:absolute;left:96px;bottom:44px;font-family:'Inter';letter-spacing:.3em;font-size:11px;text-transform:uppercase;color:#4E566B;font-weight:500;}
+
+/* ===== CONTENT PAGE ===== */
+.chead{position:absolute;top:46px;left:96px;right:96px;display:flex;justify-content:space-between;align-items:baseline;}
+.chead .b{font-family:'Inter';letter-spacing:.34em;font-size:11.5px;text-transform:uppercase;color:#A79A7E;font-weight:600;}
+.chead .n{font-family:'Inter';letter-spacing:.2em;font-size:11.5px;color:#B9AE93;font-weight:500;}
+.chead-line{position:absolute;top:74px;left:96px;right:96px;height:1px;background:linear-gradient(90deg,rgba(10,22,40,.28),rgba(10,22,40,.05));}
+.badge{position:absolute;top:104px;left:96px;background:var(--navy);color:var(--gold);font-family:'Inter';font-weight:600;letter-spacing:.28em;font-size:12px;text-transform:uppercase;padding:11px 20px;}
+.ptitle{position:absolute;top:168px;left:94px;font-family:'Playfair Display',serif;font-weight:700;font-size:52px;color:var(--ink);letter-spacing:.005em;}
+
+/* highlight banner */
+.banner{position:absolute;left:96px;right:96px;background:var(--navy);color:var(--ivory);display:flex;align-items:center;padding:30px 40px 30px 36px;border-left:6px solid var(--gold);}
+.banner .bt{font-family:'Playfair Display',serif;font-size:26px;line-height:1.42;font-weight:500;}
+.banner .bt em{font-style:italic;color:var(--gold-soft);}
+
+/* card grids */
+.grid{position:absolute;display:grid;}
+
+/* dark feature card */
+.cardD{background:var(--navy-2);border-top:4px solid var(--gold);padding:34px 30px 30px;display:flex;flex-direction:column;}
+.cardD.alt{border-top-color:var(--text-dark);}
+.icontile{width:58px;height:58px;border-radius:14px;background:var(--charcoal);display:flex;align-items:center;justify-content:center;color:var(--gold);margin-bottom:24px;box-shadow:inset 0 0 0 1px rgba(201,169,97,.18);}
+.icontile svg{width:28px;height:28px;}
+.cardD .lab{font-family:'Inter';font-weight:600;letter-spacing:.24em;font-size:12px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.cardD .sub{font-family:'Inter';font-weight:500;letter-spacing:.05em;font-size:11px;text-transform:uppercase;color:#7E869A;margin-bottom:14px;}
+.cardD h3{font-family:'Playfair Display',serif;font-weight:600;font-size:23px;color:var(--ivory);margin-bottom:12px;line-height:1.2;}
+.cardD p{font-size:14.5px;line-height:1.62;color:var(--text-dark);font-weight:300;}
+
+/* light card (gold left border) */
+.cardL{background:#fff;border-left:5px solid var(--gold);padding:30px 32px;display:flex;flex-direction:column;box-shadow:0 1px 0 rgba(10,22,40,.05);}
+.cardL.alt{border-left-color:var(--navy);}
+.cardL .lab{font-family:'Inter';font-weight:700;letter-spacing:.2em;font-size:12px;text-transform:uppercase;color:var(--gold-ink);margin-bottom:14px;}
+.cardL h3{font-family:'Playfair Display',serif;font-weight:700;font-size:24px;color:var(--ink);margin-bottom:12px;line-height:1.15;}
+.cardL p{font-size:14.5px;line-height:1.62;color:var(--muted-light);font-weight:400;}
+.cardL .num{font-family:'Playfair Display';font-size:15px;color:var(--gold-ink);font-weight:700;margin-bottom:10px;letter-spacing:.1em;}
+
+/* chips */
+.chips{position:absolute;display:flex;flex-wrap:wrap;gap:10px;}
+.chip{font-family:'Inter';font-weight:600;letter-spacing:.14em;font-size:11px;text-transform:uppercase;padding:9px 16px;border-radius:2px;}
+.chip.g{background:var(--gold);color:var(--navy);}
+.chip.n{background:var(--navy);color:var(--ivory);}
+.chip.o{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px rgba(10,22,40,.28);}
+
+/* stage flow */
+.flow{position:absolute;left:96px;right:96px;display:flex;align-items:stretch;gap:0;}
+.stage{flex:1;background:#fff;border-top:3px solid var(--gold);padding:22px 12px;text-align:center;position:relative;}
+.stage.opt{border-top-color:var(--text-dark);background:var(--ivory-2);}
+.stage .sn{font-family:'Playfair Display';font-weight:700;font-size:20px;color:var(--gold-ink);}
+.stage .st{font-family:'Inter';font-weight:600;letter-spacing:.1em;font-size:11px;text-transform:uppercase;color:var(--ink);margin-top:8px;line-height:1.35;}
+.stage .so{font-family:'Inter';font-weight:500;font-size:9.5px;letter-spacing:.08em;color:var(--gold-ink);margin-top:6px;text-transform:uppercase;}
+.arw{display:flex;align-items:center;justify-content:center;width:30px;color:var(--gold);flex:none;font-size:18px;}
+
+/* compare columns */
+.cmp{position:absolute;top:252px;left:96px;right:96px;display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.cmpcol{padding:30px 34px 26px;min-height:388px;}
+.cmp-yes{background:var(--navy-2);border-top:5px solid var(--gold);}
+.cmp-no{background:#1a1207;border-top:5px solid #8A5A3C;}
+.cmp h4{font-family:'Inter';font-weight:600;letter-spacing:.2em;font-size:12.5px;text-transform:uppercase;margin-bottom:26px;}
+.cmp-yes h4{color:var(--gold);}
+.cmp-no h4{color:#C98A63;}
+.cmp ul{list-style:none;}
+.cmp li{display:flex;gap:14px;align-items:flex-start;font-size:15.5px;line-height:1.5;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#CFC9B9;font-weight:300;}
+.cmp li .mk{font-family:'Playfair Display';font-weight:700;flex:none;font-size:16px;line-height:1.4;}
+.cmp-yes li .mk{color:var(--gold);}
+.cmp-no li .mk{color:#B06A4A;}
+.cmp-no li{color:#9E978A;}
+
+/* metric tiles */
+.metrics{position:absolute;display:grid;gap:18px;}
+.metric{background:var(--navy);color:var(--ivory);padding:24px 24px;border-bottom:3px solid var(--gold);}
+.metric .mv{font-family:'Playfair Display';font-weight:800;font-size:40px;color:var(--gold);line-height:1;}
+.metric .ml{font-family:'Inter';font-weight:500;letter-spacing:.08em;font-size:12px;text-transform:uppercase;color:var(--text-dark);margin-top:12px;}
+
+/* stack list */
+.stack{position:absolute;}
+.stack .row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line-light);}
+.stack .k{font-family:'Inter';font-weight:600;letter-spacing:.14em;font-size:11.5px;text-transform:uppercase;color:var(--gold-ink);}
+.stack .v{font-family:'Inter';font-weight:400;font-size:14.5px;color:var(--ink);}
+
+/* palette ribbon */
+.ribbon{position:absolute;left:96px;right:96px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;box-shadow:0 1px 0 var(--line-light);}
+.sw{padding:18px 20px;color:#fff;}
+.sw .nm{font-family:'Playfair Display';font-weight:700;font-size:16px;}
+.sw .hx{font-family:'Inter';font-weight:500;letter-spacing:.12em;font-size:11px;margin-top:6px;opacity:.85;}
+
+/* ===== MANIFESTO ===== */
+.mf-eyebrow{position:absolute;top:70px;left:96px;}
+.mf-quote{position:absolute;top:150px;left:88px;width:660px;}
+.mf-mark{font-family:'Playfair Display';font-size:120px;color:rgba(201,169,97,.28);line-height:.2;height:60px;display:block;}
+.mf-quote h2{font-family:'Playfair Display',serif;font-weight:700;font-size:52px;line-height:1.14;color:var(--ivory);}
+.mf-quote h2 .g{color:var(--gold);font-style:italic;}
+.mf-cols{position:absolute;top:214px;right:96px;width:420px;}
+.mf-col{margin-bottom:40px;}
+.mf-col h5{font-family:'Playfair Display';font-weight:700;font-size:23px;color:var(--gold);margin-bottom:12px;font-style:italic;}
+.mf-col p{font-size:15px;line-height:1.7;color:var(--text-dark);font-weight:300;}
+.mf-rule{position:absolute;left:96px;right:96px;bottom:112px;height:1px;background:var(--line-dark);}
+.mf-foot{position:absolute;bottom:56px;left:96px;right:96px;display:flex;justify-content:space-between;align-items:center;}
+.mf-foot .wm{font-family:'Playfair Display';font-size:30px;letter-spacing:.28em;color:var(--ivory);font-weight:600;}
+.mf-foot .mt{font-family:'Inter';letter-spacing:.3em;font-size:11px;text-transform:uppercase;color:#4E566B;font-weight:500;}
+
+/* ===== BACK COVER ===== */
+.bc-bar{position:absolute;left:0;width:100%;height:5px;background:linear-gradient(90deg,rgba(201,169,97,.28),var(--gold) 40%,var(--gold));}
+.bc-center{position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);text-align:center;}
+.bc-center .wm{font-family:'Playfair Display';font-size:58px;letter-spacing:.34em;color:var(--ivory);font-weight:600;margin-top:30px;}
+.bc-center .wm .g{color:var(--gold);}
+.bc-center .sub{font-family:'Inter';letter-spacing:.5em;font-size:14px;text-transform:uppercase;color:var(--text-dark);margin-top:16px;font-weight:500;}
+.bc-center .tag{font-family:'Playfair Display';font-style:italic;font-size:22px;color:var(--gold-soft);margin-top:34px;}
+.bc-foot{position:absolute;bottom:54px;left:0;width:100%;text-align:center;font-family:'Inter';letter-spacing:.28em;font-size:11.5px;text-transform:uppercase;color:#5C6478;font-weight:500;}
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · COVER ============ -->
+<section class="page navy-grad on-dark">
+  <div class="cv-top"></div>
+  <svg class="peaks faint" width="1280" height="240" viewBox="0 0 1280 240" preserveAspectRatio="none">
+    <path d="M0 240 L150 70 L300 240" fill="none" stroke="#C9A961" stroke-width="1"/>
+    <path d="M300 240 L450 70 L600 240" fill="none" stroke="#37507a" stroke-width="1"/>
+    <path d="M600 240 L750 70 L900 240" fill="none" stroke="#C9A961" stroke-width="1"/>
+    <path d="M900 240 L1050 70 L1200 240" fill="none" stroke="#37507a" stroke-width="1"/>
+  </svg>
+  <div class="cv-eyebrow eyebrow">Plataforma Kairós &middot; Documento de Produto</div>
+  <svg class="cv-medal medal" width="88" height="88" viewBox="0 0 100 100">
+    <circle class="ring" cx="50" cy="50" r="45"/>
+    <path class="mono" d="M40 27 L40 73"/>
+    <path class="mono" d="M40 51 L62 27"/>
+    <path class="mono" d="M47 45 L62 73"/>
+  </svg>
+  <div class="cv-hero">
+    <div class="kicker">Assistência Técnica de Drones</div>
+    <h1>DRONE<br>KAIR<span class="g">Ó</span>S<br>ERP</h1>
+  </div>
+  <div class="cv-tagwrap">
+    <div class="cv-rule"></div>
+    <div class="cv-tag">A assistência técnica de drones agrícolas que opera no tempo certo &mdash; do diagnóstico à entrega.</div>
+  </div>
+  <div class="cv-foot-l">DJI Agras &middot; SaaS Multiempresa</div>
+  <div class="cv-foot-r">Apresentação do Produto<br>2026<br>Uso Institucional</div>
+</section>
+
+<!-- ============ 2 · ÍNDICE ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">02</span></div>
+  <div class="chead-line"></div>
+  <div class="eyebrow ink" style="position:absolute;top:118px;left:96px;">Sumário</div>
+  <h2 class="serif" style="position:absolute;top:140px;left:94px;font-size:52px;font-weight:700;color:var(--ink);">Neste Documento</h2>
+  <div style="position:absolute;top:250px;left:96px;right:96px;">
+    <!-- rows -->
+    <div class="idx-row">
+      <span class="idx-n">01</span><span class="idx-t">A Plataforma</span><span class="idx-d">Multiempresa, rastreabilidade vitalícia e operação offline-first</span><span class="idx-p">04</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-n">02</span><span class="idx-t">Perfis &amp; Permissões</span><span class="idx-d">Quatro camadas de acesso que espelham a operação real</span><span class="idx-p">06</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-n">03</span><span class="idx-t">Ordem de Serviço por Estágios</span><span class="idx-d">Fluxo com aprovação do administrativo em cada virada</span><span class="idx-p">08</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-n">04</span><span class="idx-t">Módulos Inteligentes</span><span class="idx-d">KCI · Inteligência · KSI · Estoque · KCD · Segurança</span><span class="idx-p">10</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-n">05</span><span class="idx-t">Confiança &amp; Rastreabilidade</span><span class="idx-d">Auditoria imutável e histórico vitalício por Serial Number</span><span class="idx-p">12</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-n">06</span><span class="idx-t">Arquitetura &amp; Tecnologia</span><span class="idx-d">A engenharia e os números que sustentam a plataforma</span><span class="idx-p">15</span>
+    </div>
+  </div>
+  <svg class="peaks faint" width="1280" height="150" viewBox="0 0 1280 150" preserveAspectRatio="none" style="opacity:.14">
+    <path d="M0 150 L150 30 L300 150 L450 30 L600 150 L750 30 L900 150 L1050 30 L1200 150 L1350 30" fill="none" stroke="#C9A961" stroke-width="1"/>
+  </svg>
+</section>
+
+<!-- ============ 3 · DIVIDER 01 ============ -->
+<section class="page navy-grad on-dark">
+  <div class="dv-num">01</div>
+  <div class="dv-body">
+    <div class="dv-eyebrow eyebrow">Capítulo 01</div>
+    <div class="dv-title">A Plataforma</div>
+    <div class="dv-underline"></div>
+    <div class="dv-lead">Um SaaS multiempresa que orquestra toda a assistência técnica de drones agrícolas DJI Agras &mdash; do chamado ao laudo &mdash; com uma única fonte de verdade: o número de série do equipamento.</div>
+  </div>
+  <div class="dv-foot">KAIRÓS · DRONE ERP — APRESENTAÇÃO DO PRODUTO</div>
+</section>
+
+<!-- ============ 4 · CONTENT 01 ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">04</span></div>
+  <div class="chead-line"></div>
+  <div class="badge">01 — A Plataforma</div>
+  <h2 class="ptitle">Uma Plataforma, Todo o Ciclo</h2>
+  <div class="banner" style="top:250px;">
+    <div class="bt">Do fabricante à revenda, da bancada ao cliente final. Uma só plataforma, um só número de série, <em>uma só verdade.</em></div>
+  </div>
+  <div class="grid" style="top:410px;left:96px;right:96px;grid-template-columns:repeat(3,1fr);gap:24px;">
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="7" height="12"/><rect x="14" y="4" width="7" height="17"/><path d="M6 13h1M6 17h1M17 8h1M17 12h1M17 16h1"/></svg></div>
+      <div class="lab">Multiempresa</div>
+      <p>Cada assistência opera isolada &mdash; seus dados, sua equipe, seu estoque. Um núcleo, infinitos tenants, zero vazamento entre empresas.</p>
+    </div>
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10"/><path d="M12 6a6 6 0 0 0-6 6 6 6 0 0 0 6 6"/><circle cx="12" cy="12" r="2"/><path d="M12 12h9"/></svg></div>
+      <div class="lab">Rastreabilidade Vitalícia</div>
+      <p>Cada drone carrega uma linha do tempo perpétua pelo Serial Number: ordens de serviço, peças trocadas, laudos e telemetria.</p>
+    </div>
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
+      <div class="lab">Offline-First</div>
+      <p>O diagnóstico crítico opera em campo sem depender da nuvem. A IA externa é opcional; a autonomia é regra, não recurso.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 · DIVIDER 02 ============ -->
+<section class="page navy-grad on-dark">
+  <div class="dv-num">02</div>
+  <div class="dv-body">
+    <div class="dv-eyebrow eyebrow">Capítulo 02</div>
+    <div class="dv-title">Perfis &amp; Permissões</div>
+    <div class="dv-underline"></div>
+    <div class="dv-lead">Quatro camadas de acesso que espelham a operação real de uma assistência técnica. Cada perfil enxerga exatamente o que precisa &mdash; nada além, nada aquém.</div>
+  </div>
+  <div class="dv-foot">KAIRÓS · DRONE ERP — APRESENTAÇÃO DO PRODUTO</div>
+</section>
+
+<!-- ============ 6 · CONTENT 02 ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">06</span></div>
+  <div class="chead-line"></div>
+  <div class="badge">02 — Perfis &amp; Permissões</div>
+  <h2 class="ptitle">Quatro Perfis, Um Fluxo</h2>
+  <div class="grid" style="top:258px;left:96px;right:96px;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:22px 24px;bottom:60px;">
+    <div class="cardL">
+      <div class="lab">Desenvolvedor · DEV</div>
+      <h3>Governança total</h3>
+      <p>Acesso completo e console técnico próprio. Gera o PDF das solicitações de alteração e mantém a saúde da plataforma.</p>
+    </div>
+    <div class="cardL">
+      <div class="lab">Administrativo</div>
+      <h3>O centro de decisão</h3>
+      <p>Abre chamados, aprova orçamentos, comanda estoque, IA, financeiro, usuários e auditoria. Aprova ou reprova cada estágio.</p>
+    </div>
+    <div class="cardL alt">
+      <div class="lab">Técnico</div>
+      <h3>A mão na aeronave</h3>
+      <p>Executa a OS por estágios &mdash; diagnóstico, orçamento, manutenção e laudo. Enxerga a sua fila e a fila comum.</p>
+    </div>
+    <div class="cardL alt">
+      <div class="lab">Cliente</div>
+      <h3>Acompanhamento claro</h3>
+      <p>Agenda e acompanha os próprios chamados numa linha do tempo amigável, sem jargão técnico e em tempo real.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7 · DIVIDER 03 ============ -->
+<section class="page navy-grad on-dark">
+  <div class="dv-num">03</div>
+  <div class="dv-body">
+    <div class="dv-eyebrow eyebrow">Capítulo 03</div>
+    <div class="dv-title">Ordem de Serviço<br>por Estágios</div>
+    <div class="dv-underline"></div>
+    <div class="dv-lead">Um fluxo por estágios com aprovação do administrativo em cada virada. Nada avança sem decisão registrada &mdash; e cada conclusão atualiza estoque, histórico e financeiro de uma vez.</div>
+  </div>
+  <div class="dv-foot">KAIRÓS · DRONE ERP — APRESENTAÇÃO DO PRODUTO</div>
+</section>
+
+<!-- ============ 8 · CONTENT 03 ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">08</span></div>
+  <div class="chead-line"></div>
+  <div class="badge">03 — Ordem de Serviço</div>
+  <h2 class="ptitle">A OS Por Estágios</h2>
+  <div class="flow" style="top:262px;">
+    <div class="stage"><div class="sn">01</div><div class="st">Fila de Espera</div></div>
+    <div class="arw">&rsaquo;</div>
+    <div class="stage"><div class="sn">02</div><div class="st">Orçamento</div><div class="so">PDF + WhatsApp</div></div>
+    <div class="arw">&rsaquo;</div>
+    <div class="stage"><div class="sn">03</div><div class="st">Aprovação</div><div class="so">Administrativo</div></div>
+    <div class="arw">&rsaquo;</div>
+    <div class="stage"><div class="sn">04</div><div class="st">Estágio 1</div><div class="so">Manutenção</div></div>
+    <div class="arw">&rsaquo;</div>
+    <div class="stage opt"><div class="sn">05</div><div class="st">Estágio 2</div><div class="so">Se surgir novo</div></div>
+    <div class="arw">&rsaquo;</div>
+    <div class="stage"><div class="sn">06</div><div class="st">Finalizado</div><div class="so">Laudo + baixa</div></div>
+  </div>
+  <div class="grid" style="top:440px;left:96px;right:96px;grid-template-columns:repeat(3,1fr);gap:24px;">
+    <div class="cardL">
+      <div class="lab">Orçamento Automatizado</div>
+      <p>O técnico monta diagnóstico, peças do estoque com preço e mão de obra. O sistema gera o PDF e envia pelo WhatsApp.</p>
+    </div>
+    <div class="cardL">
+      <div class="lab">Aprovação Registrada</div>
+      <p>O administrativo aprova ou reprova. Só então a manutenção é liberada. Cada decisão fica auditada e visível.</p>
+    </div>
+    <div class="cardL alt">
+      <div class="lab">Conclusão Que Fecha Tudo</div>
+      <p>Ao concluir: baixa de peças no estoque, evento no histórico vitalício, financeiro atualizado e cliente notificado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9 · DIVIDER 04 ============ -->
+<section class="page navy-grad on-dark">
+  <div class="dv-num">04</div>
+  <div class="dv-body">
+    <div class="dv-eyebrow eyebrow">Capítulo 04</div>
+    <div class="dv-title">Módulos Inteligentes</div>
+    <div class="dv-underline"></div>
+    <div class="dv-lead">Três motores proprietários que transformam dados em decisão: inteligência preditiva, estoque inteligente e defesa cibernética &mdash; ativáveis de forma modular sobre qualquer plano.</div>
+  </div>
+  <div class="dv-foot">KAIRÓS · DRONE ERP — APRESENTAÇÃO DO PRODUTO</div>
+</section>
+
+<!-- ============ 10 · CONTENT 04 ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">10</span></div>
+  <div class="chead-line"></div>
+  <div class="badge">04 — Módulos Inteligentes</div>
+  <h2 class="ptitle">Inteligência Kairós</h2>
+  <div class="grid" style="top:258px;left:96px;right:96px;grid-template-columns:repeat(3,1fr);gap:24px;">
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/><circle cx="12" cy="12" r="2.2"/></svg></div>
+      <div class="lab">KCI</div>
+      <h3>Kairós Core Intelligence</h3>
+      <p>IA preditiva offline-first: problemas crônicos, peças mais trocadas e recomendações com laudo. Human-in-the-loop em cada decisão.</p>
+    </div>
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></div>
+      <div class="lab">KSI</div>
+      <h3>Kairós Smart Inventory</h3>
+      <p>Estoque inteligente: custo, venda, margem, giro, curva ABC e reposição automática &mdash; tudo integrado ao financeiro de peças.</p>
+    </div>
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <div class="lab">KCD</div>
+      <h3>Kairós Cyber Defense</h3>
+      <p>Segurança Zero Trust por padrão: criptografia, auditoria, detecção de ameaças e backups &mdash; desde o design, não como remendo.</p>
+    </div>
+  </div>
+  <div class="chips" style="top:600px;left:96px;right:96px;">
+    <span class="chip g">Problemas crônicos</span>
+    <span class="chip n">Peças mais trocadas</span>
+    <span class="chip o">Previsão de giro</span>
+    <span class="chip n">Curva ABC</span>
+    <span class="chip g">Recomendações</span>
+    <span class="chip o">Exporta PDF · Excel · CSV</span>
+  </div>
+</section>
+
+<!-- ============ 11 · DIVIDER 05 ============ -->
+<section class="page navy-grad on-dark">
+  <div class="dv-num">05</div>
+  <div class="dv-body">
+    <div class="dv-eyebrow eyebrow">Capítulo 05</div>
+    <div class="dv-title">Confiança &amp;<br>Rastreabilidade</div>
+    <div class="dv-underline"></div>
+    <div class="dv-lead">A memória da plataforma é imutável. Cada ação, cada peça e cada laudo ficam gravados para sempre &mdash; porque confiança se prova, não se promete.</div>
+  </div>
+  <div class="dv-foot">KAIRÓS · DRONE ERP — APRESENTAÇÃO DO PRODUTO</div>
+</section>
+
+<!-- ============ 12 · CONTENT 05a ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">12</span></div>
+  <div class="chead-line"></div>
+  <div class="badge">05 — Confiança &amp; Rastreabilidade</div>
+  <h2 class="ptitle">O Que Fica Registrado</h2>
+  <div class="grid" style="top:258px;left:96px;right:96px;grid-template-columns:repeat(3,1fr);gap:24px;">
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.3"/></svg></div>
+      <div class="lab">Auditoria Imutável</div>
+      <p>Cada ação grava usuário, data, hora, IP e tela. Nada se edita, nada se apaga. Exportável em PDF por período para conformidade.</p>
+    </div>
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <div class="lab">Serial Number Vitalício</div>
+      <p>A identidade universal do equipamento. Toda intervenção permanece na linha do tempo perpétua do drone &mdash; para sempre.</p>
+    </div>
+    <div class="cardD">
+      <div class="icontile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
+      <div class="lab">Chamado Provisionado</div>
+      <p>Um chamado cadastra cliente, aeronave, protocolo e acesso &mdash; de uma vez. Menos retrabalho, mais velocidade na porta de entrada.</p>
+    </div>
+  </div>
+  <div class="banner" style="bottom:56px;left:96px;right:96px;">
+    <div class="bt">A linha do tempo do cliente traduz o técnico: <em>&ldquo;manutenção iniciada&rdquo;, &ldquo;entrou no Estágio 2&rdquo;, &ldquo;pronto para retirada&rdquo;.</em></div>
+  </div>
+</section>
+
+<!-- ============ 13 · CONTENT 05b — COMPARE ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">13</span></div>
+  <div class="chead-line"></div>
+  <div class="badge">05 — Confiança &amp; Rastreabilidade</div>
+  <h2 class="ptitle">A Diferença Que Isso Faz</h2>
+  <div class="cmp">
+    <div class="cmpcol cmp-yes">
+      <h4>Com o Drone Kairós</h4>
+      <ul>
+        <li><span class="mk">&#43;</span><span>Orçamento em PDF, no WhatsApp do cliente, em minutos.</span></li>
+        <li><span class="mk">&#43;</span><span>Cada peça baixada do estoque na conclusão da OS.</span></li>
+        <li><span class="mk">&#43;</span><span>Histórico vitalício por número de série da aeronave.</span></li>
+        <li><span class="mk">&#43;</span><span>Auditoria imutável de cada ação, com IP e tela.</span></li>
+        <li><span class="mk">&#43;</span><span>Margem, giro e curva ABC calculados sozinhos.</span></li>
+      </ul>
+    </div>
+    <div class="cmpcol cmp-no">
+      <h4>Sem plataforma</h4>
+      <ul>
+        <li><span class="mk">&times;</span><span>Orçamento no caderno, perdido na gaveta.</span></li>
+        <li><span class="mk">&times;</span><span>Estoque que ninguém sabe o saldo real.</span></li>
+        <li><span class="mk">&times;</span><span>Cada reparo recomeça do zero, sem memória.</span></li>
+        <li><span class="mk">&times;</span><span>Nenhum rastro de quem fez o quê, e quando.</span></li>
+        <li><span class="mk">&times;</span><span>Preço no achismo, lucro no escuro.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14 · DIVIDER 06 ============ -->
+<section class="page navy-grad on-dark">
+  <div class="dv-num">06</div>
+  <div class="dv-body">
+    <div class="dv-eyebrow eyebrow">Capítulo 06</div>
+    <div class="dv-title">Arquitetura &amp;<br>Tecnologia</div>
+    <div class="dv-underline"></div>
+    <div class="dv-lead">Um monólito modular orientado a domínio (DDD), construído para escala internacional e isolamento de dados desde o primeiro commit. Engenharia séria por baixo da elegância.</div>
+  </div>
+  <div class="dv-foot">KAIRÓS · DRONE ERP — APRESENTAÇÃO DO PRODUTO</div>
+</section>
+
+<!-- ============ 15 · CONTENT 06 ============ -->
+<section class="page ivory">
+  <div class="chead"><span class="b">KAIRÓS · DRONE ERP</span><span class="n">15</span></div>
+  <div class="chead-line"></div>
+  <div class="badge">06 — Arquitetura &amp; Tecnologia</div>
+  <h2 class="ptitle">Construído Para Durar</h2>
+
+  <div class="stack" style="top:262px;left:96px;width:560px;">
+    <div class="row"><span class="k">Backend</span><span class="v">Java 21 · Spring Boot · DDD modular</span></div>
+    <div class="row"><span class="k">Frontend</span><span class="v">React 18 · TypeScript · Vite</span></div>
+    <div class="row"><span class="k">Banco de Dados</span><span class="v">PostgreSQL · Flyway (V1–V11)</span></div>
+    <div class="row"><span class="k">Infraestrutura</span><span class="v">Docker Compose · reverse proxy · HTTPS</span></div>
+    <div class="row"><span class="k">Segurança</span><span class="v">Spring Security · JWT · RBAC · multi-tenant</span></div>
+    <div class="row"><span class="k">Entrega</span><span class="v">Instalação em 2 cliques · demo semeada</span></div>
+  </div>
+
+  <div class="metrics" style="top:262px;right:96px;width:490px;grid-template-columns:1fr 1fr;">
+    <div class="metric"><div class="mv">41</div><div class="ml">Testes de integração verdes</div></div>
+    <div class="metric"><div class="mv">11</div><div class="ml">Bounded contexts de domínio</div></div>
+    <div class="metric"><div class="mv">03</div><div class="ml">Módulos proprietários · KCI · KSI · KCD</div></div>
+    <div class="metric"><div class="mv">04</div><div class="ml">Perfis de acesso com RBAC</div></div>
+  </div>
+
+  <div class="eyebrow ink" style="position:absolute;bottom:120px;left:96px;">Paleta Kairós</div>
+  <div class="ribbon" style="bottom:56px;">
+    <div class="sw" style="background:#0A1628;"><div class="nm">Navy Kairós</div><div class="hx">#0A1628</div></div>
+    <div class="sw" style="background:#C9A961;color:#3a2f12;"><div class="nm">Gold</div><div class="hx" style="opacity:.9">#C9A961</div></div>
+    <div class="sw" style="background:#1C1F26;"><div class="nm">Charcoal</div><div class="hx">#1C1F26</div></div>
+    <div class="sw" style="background:#EEE9DC;color:#2b2a24;"><div class="nm" style="color:#2b2a24">Ivory</div><div class="hx" style="color:#6a6455;opacity:1">#F5F2EA</div></div>
+  </div>
+</section>
+
+<!-- ============ 16 · MANIFESTO ============ -->
+<section class="page navy on-dark">
+  <svg class="peaks faint" width="1280" height="200" viewBox="0 0 1280 200" preserveAspectRatio="none" style="opacity:.22">
+    <path d="M0 200 L160 60 L320 200 L480 60 L640 200 L800 60 L960 200 L1120 60 L1280 200" fill="none" stroke="#C9A961" stroke-width="1"/>
+  </svg>
+  <div class="mf-eyebrow eyebrow">Manifesto</div>
+  <div class="mf-quote">
+    <span class="mf-mark">&ldquo;</span>
+    <h2>Kairós é o instante certo.<br>A manutenção do seu drone <span class="g">também tem o dela.</span></h2>
+  </div>
+  <div class="mf-cols">
+    <div class="mf-col">
+      <h5>Tempo é lavoura.</h5>
+      <p>Cada dia parado é hectare sem pulverizar. O Drone Kairós existe para devolver a aeronave ao céu no menor tempo &mdash; com diagnóstico preciso e a peça certa na primeira tentativa.</p>
+    </div>
+    <div class="mf-col">
+      <h5>Precisão é confiança.</h5>
+      <p>Do orçamento no WhatsApp ao laudo assinado, cada etapa fica registrada. O cliente vê. O técnico prova. A gestão decide. Nada se perde, nada se inventa.</p>
+    </div>
+  </div>
+  <div class="mf-rule"></div>
+  <div class="mf-foot">
+    <div class="wm">KAIR<span class="gold">Ó</span>S</div>
+    <div class="mt">Drone ERP · 2026 · Documento de Produto</div>
+  </div>
+</section>
+
+<!-- ============ 17 · BACK COVER ============ -->
+<section class="page navy-grad on-dark">
+  <div class="bc-bar" style="top:0;"></div>
+  <div class="bc-bar" style="bottom:0;background:linear-gradient(90deg,var(--gold),var(--gold) 60%,rgba(201,169,97,.28));"></div>
+  <div class="bc-center">
+    <svg class="medal" width="96" height="96" viewBox="0 0 100 100" style="margin:0 auto;">
+      <circle class="ring" cx="50" cy="50" r="45"/>
+      <path class="mono" d="M40 27 L40 73"/>
+      <path class="mono" d="M40 51 L62 27"/>
+      <path class="mono" d="M47 45 L62 73"/>
+    </svg>
+    <div class="wm" style="font-family:'Playfair Display';">KAIR<span class="g">Ó</span>S</div>
+    <div class="sub">Drone ERP · Assistência Técnica</div>
+    <div class="tag">O momento certo é agora.</div>
+  </div>
+  <div class="bc-foot">contato@kairosconsultoria.com &middot; kairosconsultoria.com</div>
+</section>
+
+<style>
+/* índice rows */
+.idx-row{display:grid;grid-template-columns:70px 320px 1fr 60px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line-light);}
+.idx-n{font-family:'Playfair Display';font-weight:700;font-size:20px;color:var(--gold-ink);}
+.idx-t{font-family:'Playfair Display';font-weight:600;font-size:21px;color:var(--ink);}
+.idx-d{font-family:'Inter';font-weight:300;font-size:14px;color:var(--muted-light);}
+.idx-p{font-family:'Inter';font-weight:500;font-size:14px;color:var(--gold-ink);text-align:right;letter-spacing:.1em;}
+</style>
+</body>
+</html>
