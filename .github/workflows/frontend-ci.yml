@@ -1,0 +1,32 @@
+name: frontend-ci
+
+# Integração contínua do frontend (doc 19 — DevOps).
+# Verifica typecheck + build de produção a cada push/PR que toque o frontend.
+on:
+  push:
+    branches: [ "**" ]
+    paths: [ "frontend/**", ".github/workflows/frontend-ci.yml" ]
+  pull_request:
+    paths: [ "frontend/**", ".github/workflows/frontend-ci.yml" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build (typecheck + bundle)
+        run: npm run build

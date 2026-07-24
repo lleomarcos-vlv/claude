@@ -1,0 +1,11 @@
+# Segredos de produção — nunca versionar
+.env
+
+# Artefatos de build
+backend/target/
+frontend/dist/
+frontend/node_modules/
+*.tsbuildinfo
+
+# Jar copiado pelos scripts .bat
+backend/app.jar

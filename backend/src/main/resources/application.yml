@@ -1,0 +1,103 @@
+# Configuração base — Drone Kairós ERP (backend)
+# Perfil padrão: H2 em modo PostgreSQL (roda em qualquer lugar, inclusive testes).
+# Perfil "postgres": banco PostgreSQL real (produção) — ver application-postgres.yml.
+spring:
+  application:
+    name: kairos-erp
+  datasource:
+    url: jdbc:h2:mem:kairos;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:10}
+      minimum-idle: ${DB_POOL_MIN:2}
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: validate        # o schema é criado pelo Flyway; o JPA apenas valida
+    open-in-view: false
+    properties:
+      hibernate.format_sql: false
+      hibernate.jdbc.batch_size: 30
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  servlet:
+    multipart:
+      max-file-size: 5MB       # limite de upload de documentos (etapa 052)
+      max-request-size: 6MB
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true          # /actuator/health/liveness e /readiness
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+kairos:
+  security:
+    jwt:
+      # Segredo de assinatura HS256 (mín. 32 bytes). Valor de DEV — em produção,
+      # defina KAIROS_JWT_SECRET com um segredo forte e único (nunca versionado).
+      secret: ${KAIROS_JWT_SECRET:dev-secret-kairos-erp-troque-em-producao-0123456789}
+      issuer: kairos-erp
+      ttl: PT8H          # validade do token de acesso (ISO-8601); 8 horas
+      refresh-ttl: P7D   # validade do refresh token; 7 dias
+    login:
+      max-tentativas: ${KAIROS_LOGIN_MAX_TENTATIVAS:5}
+      bloqueio: PT15M    # tempo de bloqueio após exceder as tentativas
+  cors:
+    # Origens permitidas para o frontend (CSV). Em produção, defina as suas.
+    origins: ${KAIROS_CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  demo:
+    # Semeia uma empresa de demonstração no boot (idempotente). O docker compose
+    # liga (KAIROS_DEMO_SEED=true); testes e produção ficam desligados.
+    seed: ${KAIROS_DEMO_SEED:false}
+  webhooks:
+    # Envio automático das entregas de webhook (dispatcher agendado). Desligado
+    # por padrão (mantém testes offline/determinísticos); ligue em produção.
+    dispatch: ${KAIROS_WEBHOOKS_DISPATCH:false}
+    intervalo-ms: 15000
+
+# Marca do cliente (white-label). Espelha frontend/src/brand.ts. Defaults: geoAG.
+app:
+  marca:
+    nome: ${APP_MARCA_NOME:geoAG}
+    cor: ${APP_MARCA_COR:#2f6a1e}
+    site: ${APP_MARCA_SITE:https://geoag.com.br}
+    email: ${APP_MARCA_EMAIL:contato@geoag.com.br}
+    telefone: ${APP_MARCA_TELEFONE:+55 (62) 3914-4516}
+    endereco: ${APP_MARCA_ENDERECO:Av. Francisco de Melo, Quadra 41, Lote 06 — 74.345-210, Vila Rosa, Goiânia-GO}
+
+# Onboarding de produção do cliente geoAG (empresa + admin). Desligado por padrão;
+# ligue GEOAG_ONBOARDING_SEED=true no primeiro boot de produção e troque o CNPJ/senha.
+geoag:
+  onboarding:
+    seed: ${GEOAG_ONBOARDING_SEED:false}
+  empresa:
+    nome: ${GEOAG_EMPRESA_NOME:geoAG}
+    documento: ${GEOAG_CNPJ:00.000.000/0001-00}
+  admin:
+    nome: ${GEOAG_ADMIN_NOME:Administrador geoAG}
+    email: ${GEOAG_ADMIN_EMAIL:contato@geoag.com.br}
+    senha: ${GEOAG_ADMIN_SENHA:geoag-trocar-esta-senha-2026}

@@ -1,0 +1,68 @@
+# geoAG — stack completa (PostgreSQL + backend + frontend).
+#
+# Testar rápido (com dados de demonstração/treinamento):
+#   KAIROS_DEMO_SEED=true docker compose up --build
+#   Abra http://localhost:8080  (dev@conlor.com / admin@conlor.com / tecnico@conlor.com
+#   / cliente@conlor.com — senha kairos-demo-123)
+#
+# Produção real (geoAG): copie .env.example para .env, defina segredos fortes,
+# deixe KAIROS_DEMO_SEED=false e GEOAG_ONBOARDING_SEED=true no 1º boot, e rode:
+#   docker compose up --build -d
+# O sistema cria a empresa geoAG + o admin. Depois, entre e troque a senha.
+#
+# Acesso pela rede local: http://IP-DO-SERVIDOR:8080 (o frontend faz proxy de
+# /api para o backend — mesma origem, sem necessidade de configurar CORS).
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-geoag}
+      POSTGRES_USER: ${DB_USER:-geoag}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-troque-a-senha-do-banco}
+    volumes:
+      - geoag-db:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"          # host 5433 (evita conflito com um Postgres local)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-geoag} -d ${DB_NAME:-geoag}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-geoag}
+      DB_USER: ${DB_USER:-geoag}
+      DB_PASSWORD: ${DB_PASSWORD:-troque-a-senha-do-banco}
+      # OBRIGATÓRIO em produção: segredo forte, único, com 32+ bytes.
+      KAIROS_JWT_SECRET: ${KAIROS_JWT_SECRET:-troque-este-segredo-de-demo-com-mais-de-32-bytes-000}
+      # Origens do frontend permitidas (CSV). Ajuste para o domínio do geoAG.
+      KAIROS_CORS_ORIGINS: ${KAIROS_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      # Onboarding do cliente geoAG (empresa + admin) no 1º boot. Idempotente.
+      GEOAG_ONBOARDING_SEED: ${GEOAG_ONBOARDING_SEED:-false}
+      GEOAG_CNPJ: ${GEOAG_CNPJ:-00.000.000/0001-00}
+      GEOAG_ADMIN_EMAIL: ${GEOAG_ADMIN_EMAIL:-contato@geoag.com.br}
+      GEOAG_ADMIN_SENHA: ${GEOAG_ADMIN_SENHA:-geoag-trocar-esta-senha-2026}
+      # Semeia a empresa de demonstração/treinamento no primeiro boot. Em produção: false.
+      KAIROS_DEMO_SEED: ${KAIROS_DEMO_SEED:-false}
+    ports:
+      - "8081:8080"          # API direta (opcional): http://localhost:8081/api/v1/health
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"            # a aplicação: http://localhost:8080
+
+volumes:
+  geoag-db:

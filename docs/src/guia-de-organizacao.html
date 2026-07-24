@@ -1,0 +1,663 @@
+<meta charset="utf-8">
+<style>
+  :root{
+    --ink:#0f172a;        /* slate-900 */
+    --ink2:#334155;       /* slate-700 */
+    --muted:#64748b;      /* slate-500 */
+    --line:#e2e8f0;       /* slate-200 */
+    --brand:#1e3a8a;      /* indigo-900 */
+    --brand2:#2563eb;     /* blue-600 */
+    --accent:#0891b2;     /* cyan-700 */
+    --accent-soft:#ecfeff;/* cyan-50 */
+    --soft:#f8fafc;       /* slate-50 */
+    --kci:#2563eb;
+    --kcd:#b91c1c;
+    --ksi:#047857;
+  }
+
+  @page{
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+    @bottom-center{
+      content: "Drone Kairós ERP · Kit de Desenvolvimento por Fases";
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 8pt;
+      color: #94a3b8;
+    }
+    @bottom-right{
+      content: counter(page) " / " counter(pages);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 8pt;
+      color: #94a3b8;
+    }
+  }
+  @page cover{ margin:0; @bottom-center{content:""} @bottom-right{content:""} }
+
+  *{ box-sizing:border-box; }
+  html{ -weasy-hyphens:auto; }
+  body{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    color:var(--ink);
+    font-size:10.2pt;
+    line-height:1.5;
+    margin:0;
+  }
+
+  /* ---------- COVER ---------- */
+  .cover{
+    page: cover;
+    height:297mm;
+    padding:0;
+    color:#fff;
+    background:linear-gradient(150deg,#0b1220 0%, #14225a 45%, #1e3a8a 78%, #0e7490 100%);
+    position:relative;
+    page-break-after:always;
+  }
+  .cover .pad{ padding:34mm 22mm; height:100%; display:block; }
+  .cover .kicker{
+    text-transform:uppercase; letter-spacing:.32em; font-size:9pt;
+    color:#7dd3fc; font-weight:700; margin-bottom:12mm;
+  }
+  .cover h1{
+    font-size:41pt; line-height:1.02; margin:0 0 6mm 0; font-weight:800; letter-spacing:-.5pt;
+  }
+  .cover h1 span{ color:#67e8f9; display:block; font-size:20pt; font-weight:600; letter-spacing:.02em; margin-top:5mm;}
+  .cover .lede{ font-size:12pt; color:#dbeafe; max-width:135mm; line-height:1.55; margin-top:4mm; }
+  .cover .rule{ width:46mm; height:3px; background:#67e8f9; margin:11mm 0; border-radius:2px;}
+  .cover .meta{ position:absolute; bottom:24mm; left:22mm; right:22mm; font-size:9.5pt; color:#cbd5e1;}
+  .cover .meta b{ color:#fff; font-weight:600;}
+  .cover .chips{ margin-top:12mm;}
+  .cover .chip{
+    display:inline-block; border:1px solid rgba(255,255,255,.35); border-radius:999px;
+    padding:3px 11px; font-size:8.5pt; margin:0 6px 6px 0; color:#e0f2fe;
+  }
+
+  /* ---------- TYPOGRAPHY ---------- */
+  h2{
+    font-size:16pt; color:var(--brand); margin:0 0 4mm 0; padding-top:2mm;
+    border-bottom:2px solid var(--line); padding-bottom:2mm; font-weight:800;
+    letter-spacing:-.2pt;
+  }
+  h2 .num{ color:var(--accent); font-weight:800; margin-right:8px;}
+  h3{ font-size:11.6pt; color:var(--brand2); margin:6mm 0 2mm 0; font-weight:700;}
+  h4{ font-size:10.4pt; color:var(--ink); margin:4mm 0 1.5mm 0; font-weight:700;}
+  p{ margin:0 0 2.6mm 0; text-align:justify;}
+  strong{ color:var(--ink);}
+  a{ color:var(--brand2); text-decoration:none;}
+  ul,ol{ margin:0 0 3mm 0; padding-left:6mm;}
+  li{ margin-bottom:1.3mm;}
+  .lead{ font-size:11pt; color:var(--ink2); }
+
+  .section{ page-break-before:always; }
+  .tight li{ margin-bottom:.6mm;}
+
+  .callout{
+    background:var(--soft); border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:6px; padding:4mm 5mm; margin:3mm 0;
+  }
+  .callout.warn{ border-left-color:#d97706; background:#fffbeb;}
+  .callout.rule{ border-left-color:var(--brand2); background:#eff6ff;}
+  .callout p:last-child{ margin-bottom:0;}
+  .callout .t{ font-weight:700; color:var(--brand); margin-bottom:1mm; display:block; font-size:9.5pt; text-transform:uppercase; letter-spacing:.05em;}
+
+  /* ---------- TABLES ---------- */
+  table{ width:100%; border-collapse:collapse; margin:3mm 0; font-size:9pt;}
+  th{ background:var(--brand); color:#fff; text-align:left; padding:2.4mm 3mm; font-weight:600; font-size:8.6pt; letter-spacing:.02em;}
+  td{ padding:2.2mm 3mm; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:nth-child(even) td{ background:var(--soft);}
+  td.code{ font-family:'SF Mono',Consolas,monospace; color:var(--brand2); font-weight:600; white-space:nowrap;}
+  .doc-table td:first-child{ width:22mm;}
+
+  /* ---------- TOC ---------- */
+  .toc ol{ list-style:none; padding:0; margin:0; counter-reset:toc;}
+  .toc li{ counter-increment:toc; padding:2.2mm 0; border-bottom:1px solid var(--line); font-size:10.5pt; display:flex; }
+  .toc li .tn{ color:var(--accent); font-weight:800; width:12mm; }
+  .toc li .tt{ flex:1; color:var(--ink); font-weight:600;}
+  .toc li .td{ color:var(--muted); font-weight:400; font-size:9pt; display:block; margin-top:.5mm;}
+
+  /* ---------- FLOW DIAGRAMS ---------- */
+  .flow{ margin:3mm 0 4mm 0; padding:5mm; border-radius:8px; background:var(--soft); border:1px solid var(--line);}
+  .flow .head{ font-weight:800; font-size:11pt; margin-bottom:3mm; padding-bottom:2mm; border-bottom:1px dashed var(--line);}
+  .flow.kci .head{ color:var(--kci);}
+  .flow.kcd .head{ color:var(--kcd);}
+  .flow.ksi .head{ color:var(--ksi);}
+  .flow .head small{ display:block; font-weight:500; color:var(--muted); font-size:8.5pt; margin-top:1mm; text-transform:none; letter-spacing:0;}
+  .pill{
+    display:inline-block; padding:2.2mm 3.4mm; margin:0 1.5mm 2.5mm 0; border-radius:6px;
+    font-size:8.8pt; font-weight:600; background:#fff; border:1px solid var(--line); color:var(--ink);
+    line-height:1;
+  }
+  .flow.kci .pill{ border-color:#bfdbfe;}
+  .flow.kcd .pill{ border-color:#fecaca;}
+  .flow.ksi .pill{ border-color:#a7f3d0;}
+  .arrow{ color:var(--muted); font-weight:700; margin:0 1mm 2.5mm 0; display:inline-block; font-size:9pt;}
+
+  /* ---------- CARDS ---------- */
+  .grid2{ display:block;}
+  .card{
+    border:1px solid var(--line); border-radius:8px; padding:4mm 4.5mm; margin:0 0 3mm 0; background:#fff;
+    break-inside:avoid;
+  }
+  .card .h{ font-weight:700; color:var(--brand); font-size:10.4pt; margin-bottom:1.5mm;}
+  .card .h .tag{ float:right; font-size:7.5pt; background:var(--accent-soft); color:var(--accent); border-radius:999px; padding:1px 8px; font-weight:700; letter-spacing:.04em;}
+  .card p{ font-size:9.3pt; margin-bottom:0; color:var(--ink2);}
+
+  .kv{ font-size:9.3pt;}
+  .kv b{ color:var(--brand);}
+
+  .badge{ display:inline-block; background:var(--brand2); color:#fff; border-radius:4px; padding:1px 7px; font-size:8pt; font-weight:700; margin-right:4px;}
+
+  .stagebar{ background:var(--brand); color:#fff; padding:2mm 4mm; border-radius:6px 6px 0 0; font-weight:700; font-size:10pt; margin-top:4mm;}
+  .stagebar + table{ margin-top:0;}
+  .stagebar + table th{ display:none;}
+
+  .footer-note{ margin-top:6mm; padding-top:3mm; border-top:1px solid var(--line); font-size:8.5pt; color:var(--muted); text-align:center;}
+  .no-break{ break-inside:avoid;}
+</style>
+
+<!-- =================== COVER =================== -->
+<section class="cover">
+  <div class="pad">
+    <div class="kicker">Manual Operacional de Desenvolvimento</div>
+    <h1>Drone Kairós&nbsp;ERP
+      <span>Kit de Desenvolvimento por Fases · Guia de Organização</span>
+    </h1>
+    <div class="rule"></div>
+    <p class="lede">Documento-síntese que consolida a estratégia, a arquitetura de documentação,
+      os módulos proprietários e o roadmap para construir a plataforma com o Claude — produzindo o
+      projeto <b>em fases</b>, com um conjunto de documentos permanentes como fonte de verdade,
+      em vez de um único prompt gigante.</p>
+
+    <div class="chips">
+      <span class="chip">Master Prompt OS</span>
+      <span class="chip">Project Bible</span>
+      <span class="chip">~25 Documentos</span>
+      <span class="chip">KCI · KCD · KSI</span>
+      <span class="chip">Roadmap · 100 Etapas</span>
+      <span class="chip">Arquitetura Enterprise · DDD</span>
+    </div>
+
+    <div class="meta">
+      <b>Objetivo:</b> organizar a criação da plataforma &nbsp;·&nbsp;
+      <b>Data:</b> 21 de julho de 2026 &nbsp;·&nbsp;
+      <b>Versão:</b> 1.0 &nbsp;·&nbsp;
+      <b>Status:</b> Base para produção da documentação
+    </div>
+  </div>
+</section>
+
+<!-- =================== TOC =================== -->
+<section>
+  <h2><span class="num">—</span>Sumário</h2>
+  <p class="lead">Este guia resume todas as decisões tomadas sobre <em>como</em> conduzir o projeto.
+    Ele não substitui os documentos técnicos que serão produzidos — ele os organiza e serve de
+    ponto de partida.</p>
+  <div class="toc">
+    <ol>
+      <li><span class="tn">01</span><span class="tt">Visão Geral e Propósito deste Guia<span class="td">Por que existe e como usar</span></span></li>
+      <li><span class="tn">02</span><span class="tt">A Estratégia de Execução<span class="td">Por que fases + documentos permanentes, e não um prompt único</span></span></li>
+      <li><span class="tn">03</span><span class="tt">Estrutura do Kit de Documentação<span class="td">Os ~25 documentos e o que contêm</span></span></li>
+      <li><span class="tn">04</span><span class="tt">O Master Prompt — Papel e Regras da IA<span class="td">O "sistema operacional" do Claude no projeto</span></span></li>
+      <li><span class="tn">05</span><span class="tt">Project Bible — O Cérebro do Projeto<span class="td">Fonte de verdade e regra de conflito</span></span></li>
+      <li><span class="tn">06</span><span class="tt">Módulos Proprietários Kairós<span class="td">KCI · KCD · KSI e seus fluxos</span></span></li>
+      <li><span class="tn">07</span><span class="tt">Escopo Funcional da Plataforma<span class="td">ERP, apps, painéis, portais e serviços</span></span></li>
+      <li><span class="tn">08</span><span class="tt">Roadmap em Fases (~100 Etapas)<span class="td">Da pesquisa à expansão internacional</span></span></li>
+      <li><span class="tn">09</span><span class="tt">Estrutura do Repositório<span class="td">Organização de código, docs e ativos</span></span></li>
+      <li><span class="tn">10</span><span class="tt">Metodologia de Execução<span class="td">Ordem de produção e checklist de progresso</span></span></li>
+      <li><span class="tn">11</span><span class="tt">Próximos Passos<span class="td">O que produzir primeiro</span></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- =================== 01 =================== -->
+<section class="section">
+  <h2><span class="num">01</span>Visão Geral e Propósito deste Guia</h2>
+
+  <p class="lead">O Drone Kairós ERP não é apenas um ERP. É uma <strong>plataforma completa de software</strong>
+  para o ecossistema de drones — englobando ERP multiempresa, aplicativos de cliente e técnico,
+  painéis de fabricante e revenda, portal administrativo, CRM, financeiro, BI, API pública e três
+  módulos proprietários de inteligência, cibersegurança e estoque inteligente.</p>
+
+  <p>Quando expandido, o material que fundamenta o projeto ultrapassa facilmente <strong>100.000 palavras</strong>.
+  Tentar entregar tudo isso em um único prompt colocaria em risco a consistência — mesmo modelos
+  avançados podem perder o fio ao receber tudo de uma vez. Por isso, a decisão central do projeto é
+  clara:</p>
+
+  <div class="callout rule">
+    <span class="t">Decisão Fundamental</span>
+    <p>Construir a plataforma <strong>em fases</strong>, guiadas por um <strong>Master Prompt</strong> e apoiadas
+    por um conjunto de <strong>documentos permanentes</strong> (Project Bible, ADR, Roadmap etc.), produzindo
+    e revisando um documento por vez — em vez de um único prompt gigante e difícil de manter.</p>
+  </div>
+
+  <h3>Para que serve este documento</h3>
+  <ul>
+    <li><strong>Organizar a criação:</strong> dá uma visão única de tudo que será produzido e em que ordem.</li>
+    <li><strong>Alinhar o método:</strong> fixa como o Claude deve trabalhar (o Master Prompt e o Project Bible).</li>
+    <li><strong>Servir de índice vivo:</strong> lista os ~25 documentos, os módulos e as ~100 etapas do roadmap.</li>
+    <li><strong>Reduzir retrabalho:</strong> evita contradições ao centralizar as decisões de escopo e arquitetura.</li>
+  </ul>
+
+  <h3>O que este documento NÃO é</h3>
+  <p>Ele não é a documentação técnica em si. A arquitetura detalhada, a modelagem de banco, os contratos
+  de API e o código serão produzidos <em>depois</em>, fase a fase, cada um em seu próprio documento. Este guia
+  é o mapa; os documentos são o território.</p>
+
+  <div class="callout">
+    <span class="t">Resultado esperado</span>
+    <p>Ao final, o projeto terá algo entre <strong>300 e 800 páginas</strong> de documentação técnica —
+    semelhante ao acervo interno de empresas como SAP, Oracle, Microsoft ou Salesforce — mais um repositório
+    utilizável durante todo o desenvolvimento.</p>
+  </div>
+</section>
+
+<!-- =================== 02 =================== -->
+<section class="section">
+  <h2><span class="num">02</span>A Estratégia de Execução</h2>
+
+  <p class="lead">A espinha dorsal do projeto é a combinação de um <strong>Master Prompt</strong> (o cérebro que
+  conduz o Claude) com um conjunto de <strong>documentos permanentes</strong> que capturam e preservam cada decisão.</p>
+
+  <h3>Por que não um único prompt gigante</h3>
+  <p>Condensar toda a conversa em um só prompt cria um artefato imenso, frágil e difícil de evoluir. A
+  qualidade cai à medida que o contexto cresce e qualquer ajuste exige reprocessar o todo. A estratégia por
+  fases resolve isso.</p>
+
+  <h3>As três vantagens da abordagem em fases</h3>
+  <table>
+    <tr><th style="width:44mm">Vantagem</th><th>O que significa na prática</th></tr>
+    <tr><td><strong>Qualidade por fase</strong></td><td>A IA mantém foco e profundidade em cada etapa, pois trabalha um documento por vez, com contexto controlado.</td></tr>
+    <tr><td><strong>Menos contradições</strong></td><td>As decisões ficam registradas em documentos permanentes; conflitos são resolvidos atualizando a fonte de verdade, não improvisando.</td></tr>
+    <tr><td><strong>Fácil de revisar e evoluir</strong></td><td>Cada documento pode ser lido, auditado e melhorado isoladamente, sem tocar no restante do projeto.</td></tr>
+  </table>
+
+  <h3>Os três pilares operacionais</h3>
+  <div class="card no-break">
+    <div class="h">1 · Master Prompt <span class="tag">O CÉREBRO</span></div>
+    <p>O único texto que se cola inicialmente no Claude. Define o papel da IA, a metodologia por fases e as
+    regras gerais. A partir dele, o Claude conduz o projeto e produz/atualiza os demais documentos.</p>
+  </div>
+  <div class="card no-break">
+    <div class="h">2 · Project Bible <span class="tag">A VERDADE</span></div>
+    <p>O documento que toda conversa futura deve obedecer. Se houver conflito, nunca se inventa: atualiza-se o
+    Project Bible e explica-se a alteração.</p>
+  </div>
+  <div class="card no-break">
+    <div class="h">3 · Documentos por Fase <span class="tag">O DETALHE</span></div>
+    <p>Cerca de 25 documentos técnicos (arquitetura, banco, APIs, módulos, DevOps, comercial…), produzidos um a
+    um, cada um como documentação enterprise completa.</p>
+  </div>
+
+  <div class="callout">
+    <span class="t">Princípio de execução</span>
+    <p>Em vez de gerar tudo de uma vez, produzir <strong>um documento por vez, com qualidade máxima</strong>. Ao
+    concluir, organizar tudo em um repositório versionado. O resultado é consistente e realmente utilizável — não
+    um prompt enorme e difícil de manter.</p>
+  </div>
+</section>
+
+<!-- =================== 03 =================== -->
+<section class="section">
+  <h2><span class="num">03</span>Estrutura do Kit de Documentação</h2>
+  <p class="lead">O acervo é dividido em ~25 documentos numerados. O <span class="code" style="font-family:monospace">00</span>
+  é o Master Prompt; os demais detalham pesquisa, arquitetura, módulos, operação e estratégia.</p>
+
+  <table class="doc-table">
+    <tr><th>Doc</th><th>Documento</th><th>Foco principal</th></tr>
+    <tr><td class="code">00</td><td><strong>Master Prompt</strong></td><td>O "sistema operacional" do projeto — papel da IA, método, regras</td></tr>
+    <tr><td class="code">01</td><td>Constituição do Projeto</td><td>Visão, missão, princípios inegociáveis</td></tr>
+    <tr><td class="code">02</td><td>Project Bible</td><td>Fonte de verdade viva; regra de conflito</td></tr>
+    <tr><td class="code">03</td><td>Roadmap</td><td>~100 etapas, da pesquisa à internacionalização</td></tr>
+    <tr><td class="code">04</td><td>Pesquisa Mundial</td><td>Estado da arte, mercado, tendências</td></tr>
+    <tr><td class="code">05</td><td>Benchmark</td><td>Concorrentes e referências de mercado</td></tr>
+    <tr><td class="code">06</td><td>Requisitos</td><td>Engenharia de requisitos, personas, casos de uso</td></tr>
+    <tr><td class="code">07</td><td>Arquitetura</td><td>Arquitetura enterprise, DDD, padrões</td></tr>
+    <tr><td class="code">08</td><td>Banco de Dados</td><td>Modelagem, multiempresa, histórico por Serial Number</td></tr>
+    <tr><td class="code">09</td><td>Microsserviços</td><td>Decomposição de serviços, contratos, mensageria</td></tr>
+    <tr><td class="code">10</td><td>Backend</td><td>Padrões de implementação, segurança, camadas</td></tr>
+    <tr><td class="code">11</td><td>Frontend</td><td>Painéis web, design system, UX</td></tr>
+    <tr><td class="code">12</td><td>Mobile</td><td>Apps de cliente e técnico (Flutter)</td></tr>
+    <tr><td class="code">13</td><td>Kairós Core Intelligence (KCI)</td><td>Motor inteligente offline + IA externa opcional</td></tr>
+    <tr><td class="code">14</td><td>Kairós Cyber Defense (KCD)</td><td>Cibersegurança, Zero Trust, SOC</td></tr>
+    <tr><td class="code">15</td><td>Kairós Smart Inventory (KSI)</td><td>Estoque inteligente, rastreabilidade, reposição preditiva</td></tr>
+    <tr><td class="code">16</td><td>Business Intelligence</td><td>Indicadores, dashboards, analytics</td></tr>
+    <tr><td class="code">17</td><td>CRM</td><td>Relacionamento, funil, pós-venda</td></tr>
+    <tr><td class="code">18</td><td>Financeiro</td><td>Contas, faturamento, conciliação, integrações</td></tr>
+    <tr><td class="code">19</td><td>DevOps</td><td>CI/CD, infraestrutura, observabilidade</td></tr>
+    <tr><td class="code">20</td><td>QA</td><td>Estratégia de testes, qualidade, cobertura</td></tr>
+    <tr><td class="code">21</td><td>Implantação</td><td>Deploy, ambientes, rollout, migrações</td></tr>
+    <tr><td class="code">22</td><td>Comercial</td><td>Modelo de negócio, precificação, go-to-market</td></tr>
+    <tr><td class="code">23</td><td>Internacionalização</td><td>i18n, multi-moeda, conformidade por país</td></tr>
+    <tr><td class="code">24</td><td>Evolução da Plataforma</td><td>Governança de produto, escala, próximas versões</td></tr>
+  </table>
+
+  <h3>Anatomia de cada documento</h3>
+  <p>Todos seguem o mesmo esqueleto de documentação enterprise, garantindo consistência e facilidade de auditoria:</p>
+  <p>
+    <span class="pill">Resumo Executivo</span>
+    <span class="pill">Objetivos</span>
+    <span class="pill">Escopo</span>
+    <span class="pill">Regras</span>
+    <span class="pill">Arquitetura</span>
+    <span class="pill">Diagramas</span>
+    <span class="pill">Fluxogramas</span>
+    <span class="pill">Boas Práticas</span>
+    <span class="pill">Padrões</span>
+    <span class="pill">Casos de Uso</span>
+    <span class="pill">Modelagem</span>
+    <span class="pill">Checklist</span>
+    <span class="pill">Riscos</span>
+    <span class="pill">Melhorias</span>
+    <span class="pill">Auditoria</span>
+  </p>
+</section>
+
+<!-- =================== 04 =================== -->
+<section class="section">
+  <h2><span class="num">04</span>O Master Prompt — Papel e Regras da IA</h2>
+  <p class="lead">O Master Prompt é praticamente um <strong>sistema operacional</strong> para o Claude. Ele define
+  quem a IA "é" dentro do projeto e como deve se comportar em toda interação.</p>
+
+  <div class="callout rule">
+    <span class="t">O papel da IA</span>
+    <p>“Você não é apenas um programador. Você é o <strong>CTO da empresa</strong> e deve agir como uma equipe
+    formada pelos maiores especialistas do mundo — arquitetos, engenheiros, segurança, dados, produto e negócio.”</p>
+  </div>
+
+  <h3>As regras de ouro</h3>
+  <table>
+    <tr><th style="width:50%">Sempre</th><th>Nunca</th></tr>
+    <tr><td>Analisar antes de agir</td><td>Simplificar o que precisa de rigor</td></tr>
+    <tr><td>Auditar o próprio trabalho</td><td>Gerar código antes da arquitetura</td></tr>
+    <tr><td>Melhorar continuamente</td><td>Inventar quando há conflito</td></tr>
+    <tr><td>Documentar tudo</td><td>Pular etapas do método</td></tr>
+    <tr><td>Justificar cada decisão</td><td>Contradizer o Project Bible</td></tr>
+    <tr><td>Pensar como empresa de software internacional</td><td>Perder a rastreabilidade das decisões</td></tr>
+  </table>
+
+  <h3>Como o Master Prompt conduz o projeto</h3>
+  <ol>
+    <li>É o <strong>único texto colado inicialmente</strong> no Claude.</li>
+    <li>Estabelece o método por fases e as regras acima.</li>
+    <li>A cada fase, orienta o Claude a <strong>produzir ou atualizar</strong> o documento correspondente.</li>
+    <li>Garante que arquitetura venha antes de código e que toda decisão seja registrada.</li>
+  </ol>
+
+  <div class="callout warn">
+    <span class="t">Ordem inegociável</span>
+    <p>Arquitetura → Documentação → Código. Nunca gerar código antes de a arquitetura estar definida e registrada.</p>
+  </div>
+</section>
+
+<!-- =================== 05 =================== -->
+<section class="section">
+  <h2><span class="num">05</span>Project Bible — O Cérebro do Projeto</h2>
+  <p class="lead">O Project Bible é a <strong>fonte única de verdade</strong>. Toda conversa e todo documento futuro
+  devem obedecê-lo. Ele evita que o projeto se contradiga à medida que cresce.</p>
+
+  <h3>A regra de conflito</h3>
+  <p>Sempre que surgir uma contradição entre o que se pede e o que já está definido, aplica-se um procedimento fixo:</p>
+
+  <div class="flow" style="background:#eff6ff;border-color:#bfdbfe;">
+    <div class="head" style="color:var(--brand2)">Procedimento de Conflito</div>
+    <span class="pill">1 · Nunca inventar</span>
+    <span class="arrow">→</span>
+    <span class="pill">2 · Atualizar o Project Bible</span>
+    <span class="arrow">→</span>
+    <span class="pill">3 · Explicar a alteração</span>
+    <span class="arrow">→</span>
+    <span class="pill">4 · Propagar aos documentos afetados</span>
+  </div>
+
+  <h3>O que o Project Bible guarda</h3>
+  <ul>
+    <li><strong>Visão e missão</strong> do produto e princípios inegociáveis.</li>
+    <li><strong>Escopo consolidado</strong> de todos os módulos e aplicações.</li>
+    <li><strong>Decisões de arquitetura</strong> e seus porquês (referenciando os ADRs).</li>
+    <li><strong>Glossário e convenções</strong> (nomes, entidades, padrões de código).</li>
+    <li><strong>Estado atual</strong> de cada documento e etapa do roadmap.</li>
+  </ul>
+
+  <div class="callout">
+    <span class="t">Companheiro: os ADRs</span>
+    <p>Cada decisão arquitetural relevante vira um <strong>ADR</strong> (Architecture Decision Record) em
+    <span class="code" style="font-family:monospace">/adr</span> — com contexto, decisão, alternativas e consequências.
+    O Project Bible aponta para eles; juntos formam a memória de longo prazo do projeto.</p>
+  </div>
+</section>
+
+<!-- =================== 06 =================== -->
+<section class="section">
+  <h2><span class="num">06</span>Módulos Proprietários Kairós</h2>
+  <p class="lead">Três módulos diferenciam a plataforma. Cada um é um subsistema completo, com seu próprio fluxo
+  e documento dedicado.</p>
+
+  <div class="flow kci no-break">
+    <div class="head">KCI — Kairós Core Intelligence
+      <small>Motor inteligente offline, com integração opcional a IA externa. Diagnóstico e conhecimento do ecossistema de drones.</small>
+    </div>
+    <span class="pill">Diagnóstico</span><span class="arrow">→</span>
+    <span class="pill">OCR</span><span class="arrow">→</span>
+    <span class="pill">Visão Computacional</span><span class="arrow">→</span>
+    <span class="pill">Sistema Especialista</span><span class="arrow">→</span>
+    <span class="pill">Motor Preditivo</span><span class="arrow">→</span>
+    <span class="pill">Motor Generativo</span><span class="arrow">→</span>
+    <span class="pill">Knowledge Base</span><span class="arrow">→</span>
+    <span class="pill">RAG Local</span><span class="arrow">→</span>
+    <span class="pill">Aprendizado</span>
+  </div>
+
+  <div class="flow kcd no-break">
+    <div class="head">KCD — Kairós Cyber Defense
+      <small>Módulo de cibersegurança de ponta a ponta, sob princípios Zero Trust.</small>
+    </div>
+    <span class="pill">Segurança</span><span class="arrow">→</span>
+    <span class="pill">Firewall</span><span class="arrow">→</span>
+    <span class="pill">Criptografia</span><span class="arrow">→</span>
+    <span class="pill">Auditoria</span><span class="arrow">→</span>
+    <span class="pill">SOC</span><span class="arrow">→</span>
+    <span class="pill">Zero Trust</span><span class="arrow">→</span>
+    <span class="pill">Logs</span><span class="arrow">→</span>
+    <span class="pill">Backups</span><span class="arrow">→</span>
+    <span class="pill">Threat Detection</span>
+  </div>
+
+  <div class="flow ksi no-break">
+    <div class="head">KSI — Kairós Smart Inventory
+      <small>Estoque inteligente com baixa automática, reserva, rastreabilidade e reposição preditiva.</small>
+    </div>
+    <span class="pill">Estoque</span><span class="arrow">→</span>
+    <span class="pill">Código de Barras</span><span class="arrow">→</span>
+    <span class="pill">QR Code</span><span class="arrow">→</span>
+    <span class="pill">RFID</span><span class="arrow">→</span>
+    <span class="pill">NFC</span><span class="arrow">→</span>
+    <span class="pill">Compras</span><span class="arrow">→</span>
+    <span class="pill">Reposição Automática</span><span class="arrow">→</span>
+    <span class="pill">Curva ABC</span><span class="arrow">→</span>
+    <span class="pill">Previsão</span><span class="arrow">→</span>
+    <span class="pill">Integração Financeira</span>
+  </div>
+
+  <table>
+    <tr><th style="width:26mm">Módulo</th><th>Diferencial</th><th>Depende de</th></tr>
+    <tr><td><span class="badge" style="background:var(--kci)">KCI</span></td><td>Inteligência offline-first (opera sem nuvem) com IA externa opcional; diagnóstico técnico assistido.</td><td>Knowledge Base, histórico por Serial Number</td></tr>
+    <tr><td><span class="badge" style="background:var(--kcd)">KCD</span></td><td>Postura Zero Trust, SOC e detecção de ameaças integrados ao produto — não como acessório.</td><td>Logs centralizados, auditoria contínua</td></tr>
+    <tr><td><span class="badge" style="background:var(--ksi)">KSI</span></td><td>Rastreabilidade total da peça e reposição preditiva ligada ao financeiro.</td><td>Financeiro, Compras, Serial Number</td></tr>
+  </table>
+</section>
+
+<!-- =================== 07 =================== -->
+<section class="section">
+  <h2><span class="num">07</span>Escopo Funcional da Plataforma</h2>
+  <p class="lead">Não estamos criando apenas um ERP, e sim uma empresa de software completa. O escopo abrange
+  os aplicativos, os painéis por perfil e os serviços transversais.</p>
+
+  <h3>Aplicações por perfil</h3>
+  <div class="card no-break"><div class="h">App do Cliente <span class="tag">MOBILE</span></div><p>Acompanhamento de equipamentos, serviços, histórico e relacionamento — em Flutter.</p></div>
+  <div class="card no-break"><div class="h">App do Técnico <span class="tag">MOBILE</span></div><p>Ordens de serviço, diagnóstico assistido por KCI, registro de campo e baixa de estoque via KSI.</p></div>
+  <div class="card no-break"><div class="h">Painel do Fabricante <span class="tag">WEB</span></div><p>Produção, garantia, rastreabilidade por Serial Number e visão do ciclo de vida do produto.</p></div>
+  <div class="card no-break"><div class="h">Painel da Revenda <span class="tag">WEB</span></div><p>Vendas, pós-venda, estoque e relacionamento com o fabricante e clientes.</p></div>
+  <div class="card no-break"><div class="h">Portal Administrativo <span class="tag">WEB</span></div><p>Governança multiempresa, configurações, permissões e supervisão global da plataforma.</p></div>
+
+  <h3>Serviços transversais</h3>
+  <table>
+    <tr><th style="width:40mm">Serviço</th><th>Descrição</th></tr>
+    <tr><td><strong>ERP completo</strong></td><td>Núcleo operacional que integra todos os módulos e perfis.</td></tr>
+    <tr><td><strong>CRM</strong></td><td>Funil, relacionamento e pós-venda unificados.</td></tr>
+    <tr><td><strong>Financeiro</strong></td><td>Faturamento, contas, conciliação e integração com KSI.</td></tr>
+    <tr><td><strong>Business Intelligence</strong></td><td>Dashboards e indicadores para decisão em todos os níveis.</td></tr>
+    <tr><td><strong>API pública</strong></td><td>Integrações externas e ecossistema de parceiros.</td></tr>
+    <tr><td><strong>Multiempresa</strong></td><td>Isolamento e governança de múltiplas organizações na mesma plataforma.</td></tr>
+    <tr><td><strong>Histórico vitalício por Serial Number</strong></td><td>Rastreabilidade permanente de cada equipamento, do fabricante ao cliente final.</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="t">Fio condutor</span>
+    <p>O <strong>Serial Number</strong> é o elo que atravessa toda a plataforma — conecta fabricante, revenda,
+    técnico e cliente, e alimenta o KCI (diagnóstico), o KSI (peças) e o histórico vitalício.</p>
+  </div>
+</section>
+
+<!-- =================== 08 =================== -->
+<section class="section">
+  <h2><span class="num">08</span>Roadmap em Fases</h2>
+  <p class="lead">O desenvolvimento segue um roadmap de aproximadamente <strong>100 etapas</strong>, da pesquisa
+  inicial à expansão internacional. Abaixo, as etapas agrupadas em fases lógicas.</p>
+
+  <div class="stagebar">Fase 1 · Descoberta e Requisitos &nbsp;— &nbsp;etapas 001–006</div>
+  <table>
+    <tr><td class="code">001</td><td>Pesquisa</td><td class="code">004</td><td>Requisitos</td></tr>
+    <tr><td class="code">002</td><td>Benchmark</td><td class="code">005</td><td>Casos de Uso</td></tr>
+    <tr><td class="code">003</td><td>Personas</td><td class="code">006</td><td>UX</td></tr>
+  </table>
+
+  <div class="stagebar">Fase 2 · Arquitetura e Fundações &nbsp;— &nbsp;etapas 007–009</div>
+  <table>
+    <tr><td class="code">007</td><td>Arquitetura</td><td class="code">009</td><td>APIs</td></tr>
+    <tr><td class="code">008</td><td>Banco de Dados</td><td></td><td></td></tr>
+  </table>
+
+  <div class="stagebar">Fase 3 · Construção do Produto &nbsp;— &nbsp;etapas 010–012+</div>
+  <table>
+    <tr><td class="code">010</td><td>Backend</td><td class="code">012</td><td>Mobile (Flutter)</td></tr>
+    <tr><td class="code">011</td><td>Frontend</td><td>…</td><td>Módulos KCI · KCD · KSI</td></tr>
+  </table>
+
+  <div class="stagebar">Fase 4 · Inteligência, Segurança e Estoque</div>
+  <table>
+    <tr><td class="code">—</td><td>Kairós Core Intelligence (KCI)</td><td class="code">—</td><td>Kairós Smart Inventory (KSI)</td></tr>
+    <tr><td class="code">—</td><td>Kairós Cyber Defense (KCD)</td><td class="code">—</td><td>BI · CRM · Financeiro</td></tr>
+  </table>
+
+  <div class="stagebar">Fase 5 · Operação e Qualidade</div>
+  <table>
+    <tr><td class="code">—</td><td>DevOps · CI/CD</td><td class="code">—</td><td>Implantação</td></tr>
+    <tr><td class="code">—</td><td>QA · Testes</td><td class="code">—</td><td>Auditoria contínua</td></tr>
+  </table>
+
+  <div class="stagebar">Fase 6 · Negócio e Expansão &nbsp;— &nbsp;etapas 097–100</div>
+  <table>
+    <tr><td class="code">097</td><td>Comercial</td><td class="code">099</td><td>Escala</td></tr>
+    <tr><td class="code">098</td><td>Marketing</td><td class="code">100</td><td>Internacionalização</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="t">Como ler o roadmap</span>
+    <p>As etapas 001–012 e 097–100 são âncoras fixas; as intermediárias detalham a construção de cada módulo e
+    serviço. O documento <span class="code" style="font-family:monospace">03 - Roadmap</span> expandirá as ~100 etapas
+    com entregáveis, critérios de aceite e dependências.</p>
+  </div>
+</section>
+
+<!-- =================== 09 =================== -->
+<section class="section">
+  <h2><span class="num">09</span>Estrutura do Repositório</h2>
+  <p class="lead">Todo o material — documentação, prompts, código e ativos — vive em um repositório versionado com
+  organização clara, para permanecer utilizável durante todo o desenvolvimento.</p>
+
+  <table>
+    <tr><th style="width:38mm">Diretório</th><th>Conteúdo</th></tr>
+    <tr><td class="code">/docs</td><td>Toda a documentação (os ~25 documentos, incluindo Project Bible e Roadmap).</td></tr>
+    <tr><td class="code">/prompts</td><td>Master Prompt e prompts especializados por fase.</td></tr>
+    <tr><td class="code">/backend</td><td>Serviços e APIs do lado servidor.</td></tr>
+    <tr><td class="code">/frontend</td><td>Painéis web (fabricante, revenda, admin, BI).</td></tr>
+    <tr><td class="code">/mobile</td><td>Apps de cliente e técnico (Flutter).</td></tr>
+    <tr><td class="code">/architecture</td><td>Diagramas de arquitetura, fluxos e modelos.</td></tr>
+    <tr><td class="code">/adr</td><td>Architecture Decision Records — decisões e seus porquês.</td></tr>
+    <tr><td class="code">/assets</td><td>Identidade visual, logotipos e materiais de apoio.</td></tr>
+  </table>
+
+  <div class="callout rule">
+    <span class="t">Convenção</span>
+    <p>A documentação (<span class="code" style="font-family:monospace">/docs</span>) e os prompts
+    (<span class="code" style="font-family:monospace">/prompts</span>) são produzidos <strong>antes</strong> do
+    código. O código só começa quando a arquitetura correspondente está documentada e registrada em ADR.</p>
+  </div>
+</section>
+
+<!-- =================== 10 =================== -->
+<section class="section">
+  <h2><span class="num">10</span>Metodologia de Execução</h2>
+  <p class="lead">A regra de execução é simples e disciplinada: <strong>um documento por vez, com qualidade máxima</strong>.
+  Isso preserva consistência e evita cortes por limite de tamanho.</p>
+
+  <h3>Ordem de produção sugerida</h3>
+  <ol>
+    <li><strong>Master Prompt (00)</strong> — o ponto de partida que rege todo o resto.</li>
+    <li><strong>Constituição (01)</strong> e <strong>Project Bible (02)</strong> — fixam visão e fonte de verdade.</li>
+    <li><strong>Roadmap (03)</strong> — expande as ~100 etapas com entregáveis.</li>
+    <li><strong>Pesquisa, Benchmark, Requisitos (04–06)</strong> — fundamentam as decisões.</li>
+    <li><strong>Arquitetura, Banco, Microsserviços (07–09)</strong> — a base técnica, antes de qualquer código.</li>
+    <li><strong>Backend, Frontend, Mobile (10–12)</strong> — a construção do produto.</li>
+    <li><strong>KCI, KCD, KSI (13–15)</strong> — os módulos proprietários.</li>
+    <li><strong>BI, CRM, Financeiro (16–18)</strong> — serviços de negócio.</li>
+    <li><strong>DevOps, QA, Implantação (19–21)</strong> — operação e qualidade.</li>
+    <li><strong>Comercial, i18n, Evolução (22–24)</strong> — negócio e futuro.</li>
+  </ol>
+
+  <h3>Checklist de qualidade por documento</h3>
+  <ul class="tight">
+    <li>☐ Segue o esqueleto enterprise (Resumo → Auditoria).</li>
+    <li>☐ Consistente com o Project Bible; conflitos resolvidos e registrados.</li>
+    <li>☐ Decisões relevantes viraram ADR.</li>
+    <li>☐ Contém diagramas/fluxogramas quando aplicável.</li>
+    <li>☐ Traz checklist, riscos e melhorias.</li>
+    <li>☐ Revisado e auditado antes de passar à próxima fase.</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="t">Sinal de alerta</span>
+    <p>Se um documento começar a "puxar" outro (ex.: arquitetura definindo detalhe de código), pare e registre a
+    dependência no Roadmap/Project Bible em vez de antecipar a fase seguinte.</p>
+  </div>
+</section>
+
+<!-- =================== 11 =================== -->
+<section class="section">
+  <h2><span class="num">11</span>Próximos Passos</h2>
+  <p class="lead">Este guia fecha a etapa de <em>organização</em>. A partir daqui, começa a produção da documentação,
+  fase a fase.</p>
+
+  <table>
+    <tr><th style="width:14mm">#</th><th>Ação</th><th>Entregável</th></tr>
+    <tr><td class="code">1</td><td>Aprovar este guia como base de organização</td><td>Guia v1.0 (este PDF)</td></tr>
+    <tr><td class="code">2</td><td>Produzir o <strong>Master Prompt (00)</strong></td><td><span class="code" style="font-family:monospace">/prompts/00-master-prompt.md</span></td></tr>
+    <tr><td class="code">3</td><td>Escrever Constituição (01) e Project Bible (02)</td><td><span class="code" style="font-family:monospace">/docs</span></td></tr>
+    <tr><td class="code">4</td><td>Detalhar o Roadmap (03) com as ~100 etapas</td><td><span class="code" style="font-family:monospace">/docs/03-roadmap.md</span></td></tr>
+    <tr><td class="code">5</td><td>Inicializar o repositório com a estrutura de pastas</td><td>Esqueleto <span class="code" style="font-family:monospace">/docs /prompts /adr …</span></td></tr>
+    <tr><td class="code">6</td><td>Seguir a ordem de produção, um documento por vez</td><td>Documentos 04 → 24</td></tr>
+  </table>
+
+  <div class="callout rule">
+    <span class="t">Em resumo</span>
+    <p>Um <strong>Master Prompt</strong> conduz o Claude; um <strong>Project Bible</strong> mantém a verdade;
+    <strong>~25 documentos</strong> e um <strong>roadmap de ~100 etapas</strong> guiam a construção; três módulos
+    proprietários — <strong>KCI, KCD e KSI</strong> — diferenciam o produto. Tudo produzido <strong>em fases</strong>,
+    com qualidade máxima, dentro de um repositório versionado.</p>
+  </div>
+
+  <div class="footer-note">
+    Drone Kairós ERP · Kit de Desenvolvimento por Fases · Guia de Organização v1.0 · 21 de julho de 2026<br>
+    Documento-síntese — a documentação técnica detalhada será produzida fase a fase.
+  </div>
+</section>
