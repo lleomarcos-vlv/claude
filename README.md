@@ -15,8 +15,9 @@ PostgreSQL + Flyway · Docker Compose · 41 testes de integração verdes.
 > ### 🟢🟠 Integração geoAG (este cliente)
 > Esta instalação está **white-label para o geoAG** (Goiânia-GO): marca, cores
 > (verde/laranja), contato e onboarding de produção já configurados.
-> - **Passo a passo do zero:** [`docs/INTEGRACAO-GEOAG.md`](docs/INTEGRACAO-GEOAG.md)
->   e o PDF `docs/Integracao-geoAG-Passo-a-Passo.pdf`.
+> - **Manual de operação (PDF):** `docs/Integracao-geoAG-Passo-a-Passo.pdf` —
+>   como colocar **administração e técnicos** operando oficialmente, passo a passo.
+> - **Detalhe técnico de implantação:** [`docs/INTEGRACAO-GEOAG.md`](docs/INTEGRACAO-GEOAG.md).
 > - **Identidade da marca (fonte única):** `frontend/src/brand.ts` + `app.marca.*`
 >   (backend) — trocar de cliente = editar só esses dois pontos.
 > - **Onboarding automático:** `GEOAG_ONBOARDING_SEED=true` cria a empresa geoAG

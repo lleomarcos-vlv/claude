@@ -4,10 +4,10 @@
 **Local:** Av. Francisco de Melo, Quadra 41, Lote 06 — 74.345-210, Vila Rosa, Goiânia-GO
 **Contato:** contato@geoag.com.br · +55 (62) 3914-4516 · https://geoag.com.br
 
-Este documento explica, **do zero e etapa por etapa**, o que foi feito na
-integração do cliente geoAG e **o que fazer para colocar tudo no ar** — desde o
-servidor vazio até a operação diária. Há uma versão em PDF ao lado:
-`Integracao-geoAG-Passo-a-Passo.pdf`.
+Este documento é o **detalhe técnico de implantação** (servidor, Docker, `.env`,
+onboarding). Para o **manual de operação do dia a dia** — como a **administração**
+e os **técnicos** trabalham oficialmente, passo a passo — veja o PDF ao lado:
+`Integracao-geoAG-Passo-a-Passo.pdf` (gerado por `gerar-manual-pdf.py`).
 
 ---
 
