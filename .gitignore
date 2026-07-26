@@ -1,0 +1,6 @@
+# Build tooling / working dir (not part of the deliverable)
+scratchpad-build/
+node_modules/
+*.log
+
+# Keep the generated deliverables in docs/master-plan/dist/ (committed intentionally)
