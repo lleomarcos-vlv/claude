@@ -1,0 +1,156 @@
+<Window x:Class="ConlorPCCleaner.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Name="Root"
+        Title="Configurações — Conlor PC Cleaner"
+        Height="720" Width="660" MinHeight="560" MinWidth="560"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Segoe UI"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextBrush}">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!-- Geral -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="🛡️ Geral e segurança" Style="{StaticResource H2}" />
+                        <CheckBox Content="Modo Simulação (não apaga nem move nada, apenas mostra)"
+                                  IsChecked="{Binding SimulationMode}" Style="{StaticResource ModernCheckBox}" />
+                        <CheckBox Content="Criar ponto de restauração antes de operações grandes (requer admin)"
+                                  IsChecked="{Binding CreateRestorePoint}" Style="{StaticResource ModernCheckBox}" />
+                        <CheckBox Content="Detectar arquivos duplicados por hash SHA-256 durante a análise"
+                                  IsChecked="{Binding EnableDuplicateDetection}" Style="{StaticResource ModernCheckBox}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Transferência -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="📦 Transferência" Style="{StaticResource H2}" />
+
+                        <Grid Margin="0,4">
+                            <TextBlock Text="Tamanho mínimo para sugerir mover (MB)" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                            <TextBox Width="90" HorizontalAlignment="Right" Text="{Binding MinimumMoveSizeMb}" />
+                        </Grid>
+                        <Grid Margin="0,4">
+                            <TextBlock Text="Considerar &quot;não utilizado&quot; após (dias)" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                            <TextBox Width="90" HorizontalAlignment="Right" Text="{Binding UnusedThresholdDays}" />
+                        </Grid>
+                        <Grid Margin="0,4">
+                            <TextBlock Text="HD externo padrão (ex.: E:\)" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                            <TextBox Width="120" HorizontalAlignment="Right" Text="{Binding PreferredExternalDrive}" />
+                        </Grid>
+
+                        <CheckBox Content="Comprimir arquivos muito grandes em .zip antes de transferir"
+                                  IsChecked="{Binding CompressBeforeTransfer}" Style="{StaticResource ModernCheckBox}" Margin="0,6,0,0" />
+                        <Grid Margin="0,4">
+                            <TextBlock Text="Comprimir arquivos acima de (MB)" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                            <TextBox Width="90" HorizontalAlignment="Right" Text="{Binding CompressThresholdMb}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Pastas protegidas -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="🔒 Pastas protegidas (nunca serão tocadas)" Style="{StaticResource H2}" />
+                            <Button Content="+ Adicionar pasta" HorizontalAlignment="Right" Padding="10,4"
+                                    Style="{StaticResource GhostButton}" Command="{Binding AddProtectedPathCommand}" />
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding ProtectedPaths}" Margin="0,6,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="6" Padding="8,4" Margin="0,0,0,4">
+                                        <Grid>
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                            <Button Content="✕" HorizontalAlignment="Right" Padding="8,2" Cursor="Hand"
+                                                    Background="Transparent" BorderThickness="0" Foreground="{DynamicResource DangerBrush}"
+                                                    Command="{Binding DataContext.RemoveProtectedPathCommand, ElementName=Root}"
+                                                    CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="As pastas do sistema (Windows, Arquivos de Programas) e pessoais já são protegidas automaticamente."
+                                   Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Extensões movíveis -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="🧩 Tipos de arquivo extras para mover" Style="{StaticResource H2}" />
+                        <Grid Margin="0,4,0,6">
+                            <TextBox Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,90,0" />
+                            <Button Content="Adicionar" HorizontalAlignment="Right" Width="82" Padding="8,4"
+                                    Style="{StaticResource GhostButton}" Command="{Binding AddExtensionCommand}" />
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding MovableExtensions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="10,4" Margin="0,0,6,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                                            <Button Content="✕" Padding="6,0" Margin="6,0,0,0" Cursor="Hand"
+                                                    Background="Transparent" BorderThickness="0" Foreground="{DynamicResource DangerBrush}"
+                                                    Command="{Binding DataContext.RemoveExtensionCommand, ElementName=Root}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Agendamento -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,4">
+                    <StackPanel>
+                        <TextBlock Text="⏰ Agendamento automático" Style="{StaticResource H2}" />
+                        <CheckBox Content="Executar Limpeza Inteligente automaticamente"
+                                  IsChecked="{Binding ScheduleEnabled}" Style="{StaticResource ModernCheckBox}" />
+                        <Grid Margin="0,6">
+                            <TextBlock Text="Frequência" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                            <ComboBox Width="140" HorizontalAlignment="Right" Style="{StaticResource ModernCombo}"
+                                      ItemsSource="{Binding Frequencies}" SelectedItem="{Binding ScheduleFrequency}" />
+                        </Grid>
+                        <Grid Margin="0,4">
+                            <TextBlock Text="Horário (HH:mm)" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                            <TextBox Width="90" HorizontalAlignment="Right" Text="{Binding ScheduleTime}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <Grid Grid.Row="1" Margin="0,14,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="📤 Exportar" Style="{StaticResource GhostButton}" Padding="12,8" Margin="0,0,8,0" Command="{Binding ExportCommand}" />
+                <Button Content="📥 Importar" Style="{StaticResource GhostButton}" Padding="12,8" Margin="0,0,8,0" Command="{Binding ImportCommand}" />
+                <Button Content="📁 Logs" Style="{StaticResource GhostButton}" Padding="12,8" Command="{Binding OpenLogsFolderCommand}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cancelar" Style="{StaticResource GhostButton}" Padding="16,8" Margin="0,0,8,0" Command="{Binding CancelCommand}" />
+                <Button Content="Salvar" Style="{StaticResource SuccessButton}" Padding="20,8" Command="{Binding SaveCommand}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

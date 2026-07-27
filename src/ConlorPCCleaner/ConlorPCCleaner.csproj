@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Conlor PC Cleaner - main application project.
+    Target: Windows 10 (1809+) / Windows 11.
+    Framework: .NET 8 (WPF).
+    IMPORTANT: This project intentionally has ZERO external NuGet dependencies so
+    it restores and compiles out of the box in Visual Studio (Release), even
+    on machines without internet access.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>ConlorPCCleaner</RootNamespace>
+    <AssemblyName>ConlorPCCleaner</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Product metadata -->
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Company>Conlor</Company>
+    <Product>Conlor PC Cleaner</Product>
+    <AssemblyTitle>Conlor PC Cleaner</AssemblyTitle>
+    <Description>Modern, safe Windows cleaner and intelligent file organizer.</Description>
+    <Copyright>Copyright © Conlor 2026</Copyright>
+    <NeutralLanguage>pt-BR</NeutralLanguage>
+
+    <!-- Only the current runtime is required; supported on x64/x86/ARM64 Windows. -->
+    <Platforms>AnyCPU;x64</Platforms>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+
+    <!-- Do not fail the build on nullable warnings so the project always compiles. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+</Project>
