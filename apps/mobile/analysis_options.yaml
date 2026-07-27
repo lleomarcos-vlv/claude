@@ -1,0 +1,28 @@
+# Static analysis for the JardimJá mobile apps.
+# Built on the recommended Flutter lints with a few extra guards.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+  errors:
+    # Treat missing awaits and dead code as errors — cheap correctness wins.
+    unawaited_futures: warning
+    invalid_annotation_target: ignore
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  rules:
+    - prefer_const_constructors
+    - prefer_const_constructors_in_immutables
+    - prefer_const_declarations
+    - prefer_final_locals
+    - avoid_print
+    - use_key_in_widget_constructors
+    - sort_child_properties_last
+    - require_trailing_commas
+    - directives_ordering
+    - unnecessary_late
+    # Feature-first code uses relative imports within the package by convention.
