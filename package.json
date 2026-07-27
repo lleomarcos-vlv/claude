@@ -1,0 +1,35 @@
+{
+  "name": "jardimja",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JardimJá — the Uber for gardening. AI photo-based quoting, marketplace, real-time tracking and integrated payments.",
+  "license": "SEE LICENSE IN LICENSE",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "db:generate": "pnpm --filter @jardimja/api prisma:generate",
+    "db:migrate": "pnpm --filter @jardimja/api prisma:migrate",
+    "db:seed": "pnpm --filter @jardimja/api prisma:seed",
+    "infra:up": "docker compose -f infra/docker-compose.yml up -d",
+    "infra:down": "docker compose -f infra/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  }
+}
