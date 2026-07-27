@@ -1,0 +1,106 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# VPC with public + private subnets across `az_count` AZs, an Internet Gateway,
+# and NAT for private egress. Public subnets host the ALB; private subnets host
+# the ECS tasks, RDS and ElastiCache.
+# ─────────────────────────────────────────────────────────────────────────────
+
+resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  tags = merge(local.tags, { Name = "${local.name_prefix}-vpc" })
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+  tags   = merge(local.tags, { Name = "${local.name_prefix}-igw" })
+}
+
+# ── Public subnets ───────────────────────────────────────────────────────────
+resource "aws_subnet" "public" {
+  count = var.az_count
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = local.public_subnet_cidrs[count.index]
+  availability_zone       = local.azs[count.index]
+  map_public_ip_on_launch = true
+
+  tags = merge(local.tags, {
+    Name = "${local.name_prefix}-public-${local.azs[count.index]}"
+    Tier = "public"
+  })
+}
+
+# ── Private subnets ──────────────────────────────────────────────────────────
+resource "aws_subnet" "private" {
+  count = var.az_count
+
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = local.private_subnet_cidrs[count.index]
+  availability_zone = local.azs[count.index]
+
+  tags = merge(local.tags, {
+    Name = "${local.name_prefix}-private-${local.azs[count.index]}"
+    Tier = "private"
+  })
+}
+
+# ── NAT gateways (one shared, or one per AZ for HA) ──────────────────────────
+locals {
+  nat_count = var.single_nat_gateway ? 1 : var.az_count
+}
+
+resource "aws_eip" "nat" {
+  count  = local.nat_count
+  domain = "vpc"
+  tags   = merge(local.tags, { Name = "${local.name_prefix}-nat-eip-${count.index}" })
+}
+
+resource "aws_nat_gateway" "main" {
+  count = local.nat_count
+
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
+
+  tags       = merge(local.tags, { Name = "${local.name_prefix}-nat-${count.index}" })
+  depends_on = [aws_internet_gateway.main]
+}
+
+# ── Route tables ─────────────────────────────────────────────────────────────
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  tags   = merge(local.tags, { Name = "${local.name_prefix}-public-rt" })
+}
+
+resource "aws_route" "public_internet" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}
+
+resource "aws_route_table_association" "public" {
+  count          = var.az_count
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table" "private" {
+  count  = var.az_count
+  vpc_id = aws_vpc.main.id
+  tags   = merge(local.tags, { Name = "${local.name_prefix}-private-rt-${count.index}" })
+}
+
+resource "aws_route" "private_nat" {
+  count                  = var.az_count
+  route_table_id         = aws_route_table.private[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  # With a single NAT gateway every private subnet routes through NAT #0.
+  nat_gateway_id = var.single_nat_gateway ? aws_nat_gateway.main[0].id : aws_nat_gateway.main[count.index].id
+}
+
+resource "aws_route_table_association" "private" {
+  count          = var.az_count
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
+}

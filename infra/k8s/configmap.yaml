@@ -1,0 +1,25 @@
+# Non-secret runtime configuration for the API.
+# Secret values (DATABASE_URL, JWT_SECRET, API keys, …) live in a Secret — see
+# secret.example.yaml. Prefer an external secrets operator in real clusters.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: jardimja
+  labels:
+    app.kubernetes.io/name: api
+    app.kubernetes.io/part-of: jardimja
+data:
+  NODE_ENV: "production"
+  API_PORT: "3333"
+  LOG_LEVEL: "info"
+  # S3 / media (bucket + CDN provisioned by Terraform)
+  S3_REGION: "sa-east-1"
+  S3_BUCKET: "jardimja-media"
+  S3_FORCE_PATH_STYLE: "false"
+  # AI consensus configuration
+  AI_VISION_PROVIDERS: "openai,gemini,anthropic"
+  AI_VISION_MIN_QUORUM: "2"
+  # Pricing engine
+  PRICING_DEFAULT_CITY: "São Paulo"
+  PRICING_CURRENCY: "BRL"

@@ -1,5 +1,5 @@
 {
-  "name": "@jardimja/pricing-engine",
+  "name": "@jardimja/knowledge-base",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,6 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {

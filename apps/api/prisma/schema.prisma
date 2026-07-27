@@ -1,0 +1,565 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// JardimJá — data model
+//
+// PostgreSQL + PostGIS. Prisma models the relational core; geospatial columns
+// and indexes (GEOGRAPHY, GIST, ST_DWithin radius search) are layered on via a
+// SQL migration — see `prisma/migrations/*_postgis`. Enums mirror
+// `@jardimja/shared` exactly so the DB, the API and the clients share one
+// vocabulary. Money is stored as integer cents. Large AI/quote payloads live in
+// JSONB, validated at the application boundary by the shared Zod schemas.
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
+}
+
+// ── Enums (mirror @jardimja/shared) ──────────────────────────────────────────
+
+enum UserRole {
+  CLIENT
+  GARDENER
+  ADMIN
+  SUPPORT
+}
+
+enum ServiceType {
+  CORTE_GRAMA
+  PODA
+  PAISAGISMO
+  LIMPEZA
+  RETIRADA_FOLHAS
+  ADUBACAO
+  PLANTIO
+  CONTROLE_PRAGAS
+  IRRIGACAO
+  JARDIM_COMPLETO
+  OUTRO
+}
+
+enum JobStatus {
+  DRAFT
+  ANALYZING
+  QUOTED
+  MATCHING
+  OFFERED
+  ACCEPTED
+  SCHEDULED
+  ENROUTE
+  ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  APPROVED
+  PAID
+  REVIEWED
+  CANCELLED
+  DISPUTED
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED_BY_GARDENER
+  COUNTERED
+  DECLINED
+  CHOSEN
+  EXPIRED
+  WITHDRAWN
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  SPLIT
+  REFUNDED
+  FAILED
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  GOOGLE_PAY
+  APPLE_PAY
+}
+
+enum Equipment {
+  ROCADEIRA
+  CORTADOR_GRAMA
+  MOTOSSERRA
+  SOPRADOR
+  TRITURADOR
+  ESCADA
+  CAMINHAO
+  PULVERIZADOR
+  PODADOR_ALTURA
+}
+
+enum UrgencyLevel {
+  FLEXIBLE
+  NORMAL
+  URGENT
+  EMERGENCY
+}
+
+enum MediaKind {
+  PHOTO
+  VIDEO
+  AUDIO
+  DOCUMENT
+}
+
+enum QuoteSource {
+  AI
+  GARDENER
+}
+
+enum CheckEventType {
+  CHECKIN
+  CHECKOUT
+}
+
+enum MessageKind {
+  TEXT
+  PHOTO
+  VIDEO
+  AUDIO
+  LOCATION
+  DOCUMENT
+  SYSTEM
+}
+
+enum GardenerStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+// ── Identity & profiles ──────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  phone        String?   @unique
+  passwordHash String?
+  role         UserRole  @default(CLIENT)
+  name         String
+  avatarUrl    String?
+  locale       String    @default("pt-BR")
+  // Auth provider linkage (Supabase/Firebase) when not using local password.
+  authProvider String?
+  authSubject  String?
+  emailVerified Boolean  @default(false)
+  twoFactorEnabled Boolean @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime? // soft-delete for LGPD "right to be forgotten"
+
+  gardenerProfile GardenerProfile?
+  addresses       Address[]
+  jobsAsClient    Job[]            @relation("ClientJobs")
+  offers          Offer[]          @relation("GardenerOffers")
+  messages        Message[]
+  reviewsAuthored Review[]         @relation("ReviewAuthor")
+  reviewsReceived Review[]         @relation("ReviewTarget")
+  devices         Device[]
+  consents        ConsentRecord[]
+  notifications   Notification[]
+
+  @@index([role])
+  @@index([authProvider, authSubject])
+}
+
+model GardenerProfile {
+  id            String         @id @default(cuid())
+  userId        String         @unique
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cpfCnpj       String         @unique
+  bio           String?
+  documentsJson Json? // uploaded doc URLs + verification metadata
+  status        GardenerStatus @default(PENDING_VERIFICATION)
+  verifiedAt    DateTime?
+
+  city          String
+  state         String         @db.Char(2)
+  baseLat       Float
+  baseLng       Float
+  serviceRadiusKm Float        @default(15)
+
+  specialties   ServiceType[]
+  equipment     Equipment[]
+  crewSize      Int            @default(1)
+
+  minPriceCents      Int        @default(8000)
+  hourlyRateCents    Int        @default(4500)
+  pricePerM2Cents    Int?
+  availabilityJson   Json? // days/hours grid
+
+  ratingAvg     Float          @default(0)
+  ratingCount   Int            @default(0)
+  jobsCompleted Int            @default(0)
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  offers        Offer[]
+  assignedJobs  Job[]          @relation("AssignedGardener")
+
+  @@index([city, state])
+  @@index([status])
+}
+
+model Address {
+  id           String  @id @default(cuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String?
+  street       String?
+  number       String?
+  complement   String?
+  neighborhood String?
+  city         String
+  state        String  @db.Char(2)
+  zipCode      String?
+  country      String  @default("BR")
+  lat          Float
+  lng          Float
+
+  jobs         Job[]
+
+  @@index([userId])
+  @@index([city, state])
+}
+
+// ── The core job lifecycle ───────────────────────────────────────────────────
+
+model Job {
+  id            String       @id @default(cuid())
+  clientId      String
+  client        User         @relation("ClientJobs", fields: [clientId], references: [id])
+  addressId     String?
+  address       Address?     @relation(fields: [addressId], references: [id])
+
+  serviceTypes  ServiceType[]
+  status        JobStatus    @default(DRAFT)
+  urgency       UrgencyLevel @default(NORMAL)
+  note          String?
+
+  // Snapshot location (denormalised for the marketplace radius query).
+  lat           Float?
+  lng           Float?
+  city          String?
+  state         String?      @db.Char(2)
+
+  // Area the client drew on the map (m²), a strong prior for the AI.
+  drawnAreaM2   Float?
+  drawnPolygon  Json?
+
+  analysis      GardenAnalysisRecord?
+  quotes        Quote[]
+  offers        Offer[]
+  media         Media[]
+  messages      Message[]
+  checkEvents   CheckEvent[]
+  trackingPings TrackingPing[]
+  payment       Payment?
+  review        Review?
+
+  // Assignment (set when the client chooses an offer).
+  chosenOfferId String?      @unique
+  chosenGardenerId String?
+  chosenGardener   GardenerProfile? @relation("AssignedGardener", fields: [chosenGardenerId], references: [id])
+  scheduledAt   DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+  @@index([city, state, status])
+  @@index([createdAt])
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  jobId     String
+  job       Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  kind      MediaKind
+  url       String
+  mimeType  String
+  sizeBytes Int?
+  width     Int?
+  height    Int?
+  durationS Float?
+  createdAt DateTime  @default(now())
+
+  @@index([jobId])
+}
+
+// AI garden analysis (JSONB blobs validated by @jardimja/shared Zod schemas).
+model GardenAnalysisRecord {
+  id             String   @id @default(cuid())
+  jobId          String   @unique
+  job            Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  featuresJson   Json
+  workJson       Json
+  summary        String
+  confidence     Float
+  fieldAgreement Json
+  providersJson  Json
+  warnings       String[]
+  createdAt      DateTime @default(now())
+}
+
+model Quote {
+  id               String      @id @default(cuid())
+  jobId            String
+  job              Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  source           QuoteSource @default(AI)
+  gardenerId       String? // set when a gardener counters
+  currency         String      @default("BRL")
+  lineItemsJson    Json
+  subtotalCents    Int
+  platformFeeCents Int
+  totalCents       Int
+  gardenerNetCents Int
+  confidence       Float
+  bandLowCents     Int
+  bandHighCents    Int
+  breakdownVersion String
+  createdAt        DateTime    @default(now())
+
+  offers           Offer[]
+
+  @@index([jobId])
+}
+
+model Offer {
+  id          String      @id @default(cuid())
+  jobId       String
+  job         Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  gardenerId  String
+  gardener    GardenerProfile @relation(fields: [gardenerId], references: [id])
+  // Denormalised user id for quick auth checks.
+  gardenerUserId String
+  gardenerUser   User      @relation("GardenerOffers", fields: [gardenerUserId], references: [id])
+  quoteId     String?
+  quote       Quote?      @relation(fields: [quoteId], references: [id])
+  status      OfferStatus @default(PENDING)
+  priceCents  Int
+  message     String?
+  expiresAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([jobId, gardenerId])
+  @@index([gardenerId, status])
+}
+
+model CheckEvent {
+  id        String         @id @default(cuid())
+  jobId     String
+  job       Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  type      CheckEventType
+  photoUrl  String?
+  lat       Float
+  lng       Float
+  at        DateTime       @default(now())
+
+  @@index([jobId])
+}
+
+model TrackingPing {
+  id         String   @id @default(cuid())
+  jobId      String
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  gardenerId String
+  lat        Float
+  lng        Float
+  headingDeg Float?
+  speedKmh   Float?
+  etaSeconds Int?
+  at         DateTime @default(now())
+
+  @@index([jobId, at])
+}
+
+// ── Payments (escrow + marketplace split) ────────────────────────────────────
+
+model Payment {
+  id               String        @id @default(cuid())
+  jobId            String        @unique
+  job              Job           @relation(fields: [jobId], references: [id])
+  provider         String // mercadopago | stripe
+  method           PaymentMethod
+  status           PaymentStatus @default(PENDING)
+  amountCents      Int
+  platformFeeCents Int
+  gardenerNetCents Int
+  externalId       String?
+  pixQrCode        String?
+  pixCopyPaste     String?
+  rawJson          Json?
+  authorizedAt     DateTime?
+  capturedAt       DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  jobId      String   @unique
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User     @relation("ReviewAuthor", fields: [authorId], references: [id])
+  targetId   String
+  target     User     @relation("ReviewTarget", fields: [targetId], references: [id])
+  rating     Int // 1..5
+  comment    String?
+  photosJson Json?
+  createdAt  DateTime @default(now())
+
+  @@index([targetId])
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  jobId     String
+  job       Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User        @relation(fields: [senderId], references: [id])
+  kind      MessageKind @default(TEXT)
+  body      String?
+  mediaUrl  String?
+  lat       Float?
+  lng       Float?
+  readAt    DateTime?
+  createdAt DateTime    @default(now())
+
+  @@index([jobId, createdAt])
+}
+
+// ── Pricing intelligence ─────────────────────────────────────────────────────
+
+// Per-city/region overrides for the pricing engine config.
+model PricingConfig {
+  id         String   @id @default(cuid())
+  city       String
+  state      String   @db.Char(2)
+  overrides  Json // partial PricingConfig JSON
+  updatedAt  DateTime @updatedAt
+
+  @@unique([city, state])
+}
+
+// Learned calibration factor per (city, serviceType) cohort — the "ML" that
+// makes estimates converge on real market-clearing prices over time.
+model CalibrationFactor {
+  id         String   @id @default(cuid())
+  cohortKey  String   @unique
+  factor     Float    @default(1)
+  sampleSize Int      @default(0)
+  updatedAt  DateTime @updatedAt
+}
+
+// Outcome record feeding the calibration job (estimate vs actual).
+model PricingOutcome {
+  id             String   @id @default(cuid())
+  jobId          String   @unique
+  cohortKey      String
+  estimatedCents Int
+  actualCents    Int
+  createdAt      DateTime @default(now())
+
+  @@index([cohortKey])
+}
+
+// ── Knowledge base (seeded from @jardimja/knowledge-base) ────────────────────
+
+model PlantSpecies {
+  id             String   @id @default(cuid())
+  scientificName String   @unique
+  commonNames    String[]
+  category       String // tree | shrub | grass | flower | palm | succulent ...
+  careJson       Json // watering, sunlight, pruning season, growth rate
+  pests          String[]
+  createdAt      DateTime @default(now())
+
+  @@index([category])
+}
+
+model Pest {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  scientificName String?
+  affects       String[]
+  symptomsJson  Json
+  treatmentJson Json
+  createdAt     DateTime @default(now())
+}
+
+// ── Notifications & devices (FCM) ────────────────────────────────────────────
+
+model Device {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fcmToken  String   @unique
+  platform  String // ios | android | web
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  dataJson  Json?
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, readAt])
+}
+
+// ── LGPD / compliance ────────────────────────────────────────────────────────
+
+model ConsentRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose   String // marketing | analytics | data_processing | location ...
+  granted   Boolean
+  version   String
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, purpose])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}

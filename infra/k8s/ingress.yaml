@@ -1,0 +1,31 @@
+# Ingress for the API. Annotations shown for the AWS Load Balancer Controller
+# (EKS); swap for nginx-ingress/cert-manager annotations on other clusters.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api
+  namespace: jardimja
+  labels:
+    app.kubernetes.io/name: api
+    app.kubernetes.io/part-of: jardimja
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    # Provide an ACM cert ARN to enable HTTPS:
+    # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:sa-east-1:...:certificate/...
+spec:
+  rules:
+    - host: api.jardimja.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80

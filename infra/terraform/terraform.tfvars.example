@@ -1,0 +1,57 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Copy to terraform.tfvars (git-ignored) or pass with -var-file per environment.
+# NO SECRETS HERE — passwords/API keys live in AWS Secrets Manager (see main.tf).
+# ─────────────────────────────────────────────────────────────────────────────
+
+aws_region  = "sa-east-1"
+environment = "staging"
+project     = "jardimja"
+
+# ── Networking ───────────────────────────────────────────────────────────────
+vpc_cidr           = "10.20.0.0/16"
+az_count           = 2
+single_nat_gateway = true # set false in production for per-AZ NAT (HA)
+
+# ── RDS (PostgreSQL + PostGIS) ───────────────────────────────────────────────
+db_engine_version        = "16.4"
+db_instance_class        = "db.t4g.medium"
+db_allocated_storage     = 20
+db_max_allocated_storage = 100
+db_multi_az              = false # true in production
+db_name                  = "jardimja"
+db_username              = "jardimja"
+
+# ── Redis ────────────────────────────────────────────────────────────────────
+redis_engine_version  = "7.1"
+redis_node_type       = "cache.t4g.small"
+redis_num_cache_nodes = 1 # >=2 enables automatic failover / Multi-AZ
+
+# ── API service ──────────────────────────────────────────────────────────────
+api_image             = "ghcr.io/OWNER/jardimja-api:latest"
+api_container_port    = 3333
+api_cpu               = 512
+api_memory            = 1024
+api_desired_count     = 2
+api_min_count         = 2
+api_max_count         = 6
+api_health_check_path = "/health"
+
+# ── TLS / DNS (optional) ─────────────────────────────────────────────────────
+# acm_certificate_arn = "arn:aws:acm:sa-east-1:123456789012:certificate/xxxx"
+# domain_name         = "api.jardimja.com.br"
+
+log_retention_days = 30
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Production overrides (example):
+#   environment              = "production"
+#   db_instance_class        = "db.r6g.large"
+#   db_multi_az              = true
+#   redis_node_type          = "cache.r6g.large"
+#   redis_num_cache_nodes    = 2
+#   single_nat_gateway       = false
+#   api_cpu                  = 1024
+#   api_memory               = 2048
+#   api_desired_count        = 3
+#   api_max_count            = 12
+# ─────────────────────────────────────────────────────────────────────────────

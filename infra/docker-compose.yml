@@ -1,0 +1,135 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# JardimJá — local development stack
+#
+#   Postgres 16 + PostGIS   ·   Redis 7   ·   MinIO (S3-compatible)
+#
+# Bring it up with:  pnpm infra:up          (docker compose -f infra/docker-compose.yml up -d)
+# Tear it down with: pnpm infra:down
+#
+# Values are read from ../.env when present (copy ../.env.example → ../.env),
+# with sensible dev defaults inlined via ${VAR:-default} so the stack works
+# out of the box even with no .env file.
+# ─────────────────────────────────────────────────────────────────────────────
+name: jardimja
+
+services:
+  # ── PostgreSQL 16 with PostGIS ─────────────────────────────────────────────
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: jardimja-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jardimja
+      POSTGRES_USER: jardimja
+      POSTGRES_PASSWORD: jardimja
+      # Enable useful defaults for local dev
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jardimja -d jardimja"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Redis 7 (cache + BullMQ queues) ────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: jardimja-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ── MinIO (S3-compatible object storage) ───────────────────────────────────
+  # API   → http://localhost:9000
+  # Console → http://localhost:9001
+  minio:
+    image: minio/minio:latest
+    container_name: jardimja-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:-jardimja}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY:-jardimja-secret}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      # MinIO exposes a liveness endpoint; curl is available in the image.
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── One-shot: create the media bucket and make it publicly readable ─────────
+  createbuckets:
+    image: minio/mc:latest
+    container_name: jardimja-createbuckets
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      S3_BUCKET: ${S3_BUCKET:-jardimja-media}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-jardimja}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-jardimja-secret}
+    entrypoint: >
+      /bin/sh -c "
+      set -e;
+      mc alias set local http://minio:9000 \"$${S3_ACCESS_KEY_ID}\" \"$${S3_SECRET_ACCESS_KEY}\";
+      mc mb --ignore-existing local/\"$${S3_BUCKET}\";
+      mc anonymous set download local/\"$${S3_BUCKET}\";
+      echo 'Bucket '\"$${S3_BUCKET}\"' ready.';
+      exit 0;
+      "
+    restart: "no"
+
+  # ── API (NestJS) ───────────────────────────────────────────────────────────
+  # Optional: uncomment to run the API in a container instead of `pnpm dev`.
+  # Note the S3_ENDPOINT/DATABASE_URL/REDIS_URL overrides so the container
+  # talks to the sibling services by name rather than to localhost.
+  #
+  # api:
+  #   build:
+  #     context: ..
+  #     dockerfile: infra/docker/api.Dockerfile
+  #   container_name: jardimja-api
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ../.env
+  #   environment:
+  #     DATABASE_URL: postgresql://jardimja:jardimja@postgres:5432/jardimja?schema=public
+  #     REDIS_URL: redis://redis:6379
+  #     S3_ENDPOINT: http://minio:9000
+  #     API_PORT: "3333"
+  #   ports:
+  #     - "3333:3333"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     minio:
+  #       condition: service_healthy
+
+volumes:
+  postgres_data:
+    name: jardimja_postgres_data
+  redis_data:
+    name: jardimja_redis_data
+  minio_data:
+    name: jardimja_minio_data

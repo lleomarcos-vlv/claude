@@ -168,3 +168,15 @@ export const MediaKind = {
   DOCUMENT: 'DOCUMENT',
 } as const;
 export type MediaKind = (typeof MediaKind)[keyof typeof MediaKind];
+
+/** Kinds of chat message (WhatsApp-style thread between client and gardener). */
+export const MessageKind = {
+  TEXT: 'TEXT',
+  PHOTO: 'PHOTO',
+  VIDEO: 'VIDEO',
+  AUDIO: 'AUDIO',
+  LOCATION: 'LOCATION',
+  DOCUMENT: 'DOCUMENT',
+  SYSTEM: 'SYSTEM',
+} as const;
+export type MessageKind = (typeof MessageKind)[keyof typeof MessageKind];

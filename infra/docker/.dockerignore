@@ -1,0 +1,54 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Build context ignore rules (shared by all infra/docker/*.Dockerfile builds).
+# Docker looks up `.dockerignore` next to the build context root; for these
+# images the context is the repo root (see `docker build -f infra/docker/...`).
+# Keep this in sync with the repo .gitignore.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Dependencies (reinstalled inside the image)
+**/node_modules
+.pnp
+.pnp.*
+.pnpm-store
+
+# Build outputs (rebuilt inside the image)
+**/dist
+**/build
+**/.next
+**/out
+**/*.tsbuildinfo
+
+# Turbo / test / coverage
+**/.turbo
+**/coverage
+**/.nyc_output
+
+# Local env & secrets — never bake these into an image
+.env
+.env.*
+!.env.example
+**/*.pem
+**/*.key
+
+# VCS & tooling
+.git
+.gitignore
+.github
+**/.idea
+**/.vscode
+**/*.swp
+.DS_Store
+
+# Infra & docs not needed at build time
+infra/terraform
+infra/k8s
+docs
+
+# Flutter / mobile (not part of server images)
+apps/mobile
+
+# Logs & temp
+**/*.log
+logs
+tmp
+uploads
