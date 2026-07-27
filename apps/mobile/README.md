@@ -37,6 +37,30 @@ flutter analyze
 flutter test
 ```
 
+## Variáveis de ambiente
+
+Nenhum segredo é commitado — tudo entra por `--dart-define` (lidas em
+`lib/core/config/env.dart`).
+
+| Chave | Descrição | Default |
+| --- | --- | --- |
+| `API_BASE_URL` | URL do backend, sem `/api/v1` | `https://api.jardimja.com.br` |
+| `GOOGLE_MAPS_API_KEY` | chave do Google Maps (camada Dart) | `""` |
+| `ENABLE_NETWORK_LOGS` | logs verbosos do Dio | `true` |
+
+Para não repetir os defines, use um `env.json` (git-ignored):
+
+```json
+{ "API_BASE_URL": "https://api.jardimja.com.br", "GOOGLE_MAPS_API_KEY": "AIza..." }
+```
+
+```bash
+flutter run --flavor client -t lib/main_client.dart --dart-define-from-file=env.json
+```
+
+As chaves do Google Maps também precisam ser configuradas nativamente
+(`AndroidManifest.xml` / `AppDelegate.swift`).
+
 ## Arquitetura (feature-first)
 
 ```
