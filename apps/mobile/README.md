@@ -7,7 +7,7 @@ Um único código-fonte, **dois aplicativos** via _flavors_:
 | `client` | **JardimJá** | clientes que contratam serviços |
 | `professional` | **JardimJá Pro** | jardineiros/empresas que atendem |
 
-Stack: **Flutter 3.27 / Dart 3.6**, Riverpod (estado), go_router (navegação),
+Stack: **Flutter 3.29 / Dart 3.7**, Riverpod (estado), go_router (navegação),
 Dio (HTTP), flutter_secure_storage (tokens), google_maps_flutter (mapas),
 image_picker (câmera/galeria), intl (formatação pt-BR). Material 3, marca verde
 `#16A34A` (ver [`docs/design`](../../docs/design/README.md)).

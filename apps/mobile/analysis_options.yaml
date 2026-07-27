@@ -22,7 +22,5 @@ linter:
     - avoid_print
     - use_key_in_widget_constructors
     - sort_child_properties_last
-    - require_trailing_commas
-    - directives_ordering
     - unnecessary_late
     # Feature-first code uses relative imports within the package by convention.

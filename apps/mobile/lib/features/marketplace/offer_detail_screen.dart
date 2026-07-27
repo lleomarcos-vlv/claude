@@ -26,7 +26,17 @@ class OfferDetailScreen extends ConsumerWidget {
           priceCents: priceCents,
           message: 'Aceito pelo preço sugerido. Posso realizar o serviço!',
         );
-    _afterSubmit(context, ok);
+    if (!context.mounted) return;
+    if (ok) {
+      // Prototype flow: acceptance takes the gardener to the active-job screen
+      // (check-in / start / check-out). In production this opens only after the
+      // client chooses this offer (via push notification deep-link).
+      context.pushReplacement(Routes.checkin(jobId));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível enviar a proposta.')),
+      );
+    }
   }
 
   Future<void> _counter(BuildContext context, WidgetRef ref, int suggested) async {

@@ -8,9 +8,9 @@ version: 1.0.0+1
 #   flutter run --flavor professional -t lib/main_professional.dart
 
 environment:
-  # Dart 3.6 / Flutter 3.27 — the theme uses the `Color.withValues` API.
-  sdk: ">=3.6.0 <4.0.0"
-  flutter: ">=3.27.0"
+  # Dart 3.7 / Flutter 3.29 — uses `Color.withValues` and `CardThemeData`.
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:
