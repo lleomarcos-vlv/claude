@@ -1,0 +1,35 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Ambiente
+.env
+.env.local
+.env*.local
+!.env.example
+
+# Banco de dados local (SQLite)
+prisma/*.db
+prisma/*.db-journal
+prisma/migrations/dev.db*
+
+# Uploads enviados pelos clientes
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Prisma client gerado
+src/generated/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-error.log
+.vercel
+next-env.d.ts
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+coverage/
