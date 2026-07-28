@@ -1,0 +1,415 @@
+// Verde Fixo — modelo de dados operacional.
+// Conteúdo editorial (blog, FAQ, depoimentos) vive em src/content para render estático e SEO.
+// Aqui ficam os dados transacionais: usuários, agendamentos, assinaturas, faturas e cadastros do admin.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Pessoas e acesso
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  whatsapp      String?
+  passwordHash  String
+  role          String   @default("CLIENT") // CLIENT | STAFF | ADMIN
+  document      String? // CPF/CNPJ
+  propertyType  String? // residencia | condominio | empresa | comercio | escola | fazenda | sitio | hotel | pousada
+  city          String?
+  state         String?
+  zip           String?
+  street        String?
+  number        String?
+  complement    String?
+  district      String?
+  areaM2        Int?
+  notes         String?
+  marketingOptIn Boolean @default(false)
+  lgpdAcceptedAt DateTime?
+  active        Boolean  @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bookings      Booking[]
+  subscriptions Subscription[]
+  invoices      Invoice[]
+  quotes        Quote[]
+  surveys       SatisfactionSurvey[]
+  messages      Message[]
+  notifications NotificationLog[]
+
+  @@index([role])
+  @@index([city])
+}
+
+model Employee {
+  id         String   @id @default(cuid())
+  name       String
+  email      String?  @unique
+  phone      String?
+  role       String   @default("JARDINEIRO") // JARDINEIRO | PAISAGISTA | SUPERVISOR | ATENDIMENTO
+  document   String?
+  hiredAt    DateTime @default(now())
+  skills     String   @default("") // lista separada por vírgula (slugs de serviço)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  bookings   Booking[]
+}
+
+// ---------------------------------------------------------------------------
+// Catálogo (preços configuráveis pelo admin)
+// ---------------------------------------------------------------------------
+
+model Service {
+  id            String  @id @default(cuid())
+  slug          String  @unique
+  name          String
+  shortDesc     String
+  description   String
+  image         String
+  icon          String  @default("leaf")
+  basePrice     Int // centavos — valor mínimo de visita
+  pricePerM2    Int // centavos por m²
+  durationMin   Int     @default(60)
+  order         Int     @default(0)
+  featured      Boolean @default(false)
+  active        Boolean @default(true)
+  seoTitle      String?
+  seoDescription String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bookings      Booking[]
+
+  @@index([active, order])
+}
+
+model Plan {
+  id            String  @id @default(cuid())
+  slug          String  @unique
+  name          String
+  tagline       String
+  priceMonthly  Int // centavos
+  priceYearly   Int // centavos (cobrança anual, com desconto)
+  visitsPerMonth Int // -1 = ilimitado
+  features      String // JSON array de strings
+  highlight     Boolean @default(false)
+  badge         String?
+  order         Int     @default(0)
+  active        Boolean @default(true)
+  maxAreaM2     Int     @default(500)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@index([active, order])
+}
+
+model Coupon {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  description   String   @default("")
+  discountType  String   @default("PERCENT") // PERCENT | FIXED
+  discountValue Int // % ou centavos
+  minValue      Int      @default(0)
+  maxUses       Int      @default(0) // 0 = ilimitado
+  uses          Int      @default(0)
+  validFrom     DateTime @default(now())
+  validUntil    DateTime?
+  firstOrderOnly Boolean @default(false)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ServiceArea {
+  id         String  @id @default(cuid())
+  city       String
+  state      String  @default("SP")
+  slug       String  @unique
+  zipPrefix  String  @default("")
+  travelFee  Int     @default(0) // centavos
+  active     Boolean @default(true)
+  lat        Float?
+  lng        Float?
+  order      Int     @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([active])
+}
+
+// ---------------------------------------------------------------------------
+// Operação
+// ---------------------------------------------------------------------------
+
+model Booking {
+  id            String   @id @default(cuid())
+  protocol      String   @unique // VF-2026-0001
+  userId        String?
+  serviceId     String?
+  employeeId    String?
+
+  // Snapshot do contato (permite agendamento sem cadastro)
+  contactName   String
+  contactEmail  String
+  contactPhone  String
+  contactWhatsapp String?
+
+  serviceSlug   String
+  serviceName   String
+  scheduledAt   DateTime
+  timeSlot      String // "08:00"
+  frequency     String   @default("unica") // unica | semanal | quinzenal | mensal
+  status        String   @default("PENDENTE") // PENDENTE | CONFIRMADO | EM_ANDAMENTO | CONCLUIDO | CANCELADO
+  paymentStatus String   @default("AGUARDANDO") // AGUARDANDO | PAGO | ESTORNADO | ISENTO_PLANO
+  paymentMethod String? // pix | cartao | assinatura
+
+  // Local
+  zip           String
+  street        String
+  number        String
+  complement    String?
+  district      String?
+  city          String
+  state         String   @default("SP")
+  propertyType  String   @default("residencia")
+  areaM2        Int?
+
+  notes         String?
+  internalNotes String?
+  estimatedPrice Int     @default(0) // centavos
+  finalPrice    Int      @default(0)
+  couponCode    String?
+  discount      Int      @default(0)
+
+  reminderSentAt DateTime?
+  surveySentAt   DateTime?
+  completedAt    DateTime?
+  cancelledAt    DateTime?
+  cancelReason   String?
+  source         String   @default("site") // site | whatsapp | telefone | admin | assinatura
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  service       Service?  @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  employee      Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  photos        BookingPhoto[]
+  survey        SatisfactionSurvey?
+
+  @@index([status, scheduledAt])
+  @@index([userId, scheduledAt])
+  @@index([scheduledAt])
+}
+
+model BookingPhoto {
+  id        String   @id @default(cuid())
+  bookingId String
+  url       String
+  kind      String   @default("ANTES") // ANTES | DEPOIS | REFERENCIA
+  caption   String?
+  createdAt DateTime @default(now())
+
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId, kind])
+}
+
+model Subscription {
+  id             String   @id @default(cuid())
+  userId         String
+  planId         String
+  status         String   @default("ATIVA") // ATIVA | PAUSADA | CANCELADA | INADIMPLENTE
+  billingCycle   String   @default("MENSAL") // MENSAL | ANUAL
+  price          Int // centavos, snapshot no momento da contratação
+  startedAt      DateTime @default(now())
+  currentPeriodEnd DateTime
+  nextVisitAt    DateTime?
+  cancelledAt    DateTime?
+  cancelReason   String?
+  provider       String   @default("demo") // stripe | mercadopago | pix | demo
+  providerSubId  String?
+  couponCode     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan           Plan     @relation(fields: [planId], references: [id])
+  invoices       Invoice[]
+
+  @@index([status])
+  @@index([userId])
+}
+
+model Invoice {
+  id             String   @id @default(cuid())
+  number         String   @unique // FAT-2026-0001
+  userId         String
+  subscriptionId String?
+  amount         Int // centavos
+  status         String   @default("PENDENTE") // PENDENTE | PAGA | ATRASADA | CANCELADA
+  dueDate        DateTime
+  paidAt         DateTime?
+  method         String? // pix | cartao | boleto
+  description    String
+  pdfUrl         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([status, dueDate])
+}
+
+model Quote {
+  id           String   @id @default(cuid())
+  protocol     String   @unique // ORC-2026-0001
+  userId       String?
+  name         String
+  phone        String
+  whatsapp     String?
+  email        String
+  city         String
+  address      String
+  propertyType String
+  areaM2       Int?
+  serviceSlug  String
+  serviceName  String
+  frequency    String   @default("unica")
+  notes        String?
+  photos       String   @default("[]") // JSON array de URLs
+  status       String   @default("NOVO") // NOVO | EM_ANALISE | ENVIADO | GANHO | PERDIDO
+  estimatedPrice Int    @default(0)
+  quotedPrice  Int      @default(0)
+  respondedAt  DateTime?
+  source       String   @default("site")
+  utmSource    String?
+  utmCampaign  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+}
+
+model SatisfactionSurvey {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  userId     String?
+  rating     Int? // 1..5
+  npsScore   Int? // 0..10
+  comment    String?
+  publish    Boolean  @default(false)
+  sentAt     DateTime @default(now())
+  answeredAt DateTime?
+
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// ---------------------------------------------------------------------------
+// Comunicação e automações
+// ---------------------------------------------------------------------------
+
+model Message {
+  id        String   @id @default(cuid())
+  userId    String?
+  channel   String   @default("SITE") // SITE | WHATSAPP | EMAIL | CHAT
+  direction String   @default("IN") // IN | OUT
+  name      String?
+  email     String?
+  phone     String?
+  subject   String?
+  body      String
+  status    String   @default("NOVO") // NOVO | LIDO | RESPONDIDO | ARQUIVADO
+  meta      String   @default("{}") // JSON
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([channel])
+}
+
+model NotificationLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  channel    String // WHATSAPP | EMAIL | PUSH | INTERNO
+  template   String // booking_confirmed | reminder_24h | survey | team_new_booking ...
+  to         String
+  payload    String   @default("{}")
+  status     String   @default("ENFILEIRADO") // ENFILEIRADO | ENVIADO | ERRO | SIMULADO
+  error      String?
+  refType    String? // booking | quote | subscription | invoice
+  refId      String?
+  sentAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([refType, refId])
+}
+
+model NewsletterSubscriber {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  name       String?
+  source     String   @default("site")
+  confirmed  Boolean  @default(false)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  unsubscribedAt DateTime?
+}
+
+model GalleryItem {
+  id         String  @id @default(cuid())
+  title      String
+  slug       String  @unique
+  category   String // paisagismo | corte | revitalizacao | poda | limpeza
+  city       String  @default("")
+  beforeUrl  String
+  afterUrl   String
+  description String @default("")
+  areaM2     Int?
+  order      Int     @default(0)
+  published  Boolean @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([published, order])
+}
+
+model AvailabilityBlock {
+  id        String   @id @default(cuid())
+  date      DateTime
+  timeSlot  String? // null = dia inteiro bloqueado
+  reason    String   @default("")
+  createdAt DateTime @default(now())
+
+  @@unique([date, timeSlot])
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

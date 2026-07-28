@@ -1,0 +1,44 @@
+{
+  "name": "verde-fixo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Verde Fixo — Seu jardim sempre impecável. Plataforma de agendamento de serviços de jardinagem e assinatura de planos de manutenção.",
+  "scripts": {
+    "predev": "node scripts/ensure-db.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/ensure-db.mjs",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:push": "prisma db push --skip-generate",
+    "db:seed": "node --experimental-strip-types prisma/seed.ts",
+    "db:reset": "rm -f prisma/verde-fixo.db && npm run db:push && npm run db:seed",
+    "db:studio": "prisma studio",
+    "images:build": "node scripts/generate-images.mjs",
+    "postinstall": "prisma generate",
+    "og:build": "node scripts/build-og.mjs"
+  },
+  "prisma": {
+    "seed": "node --experimental-strip-types prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3",
+    "next": "16.2.12",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "22.14.0",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.1",
+    "prisma": "6.19.3",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}

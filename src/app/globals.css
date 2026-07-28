@@ -1,0 +1,473 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   Verde Fixo — design tokens
+   Paleta extraída do catálogo oficial da empresa.
+   ========================================================================= */
+@theme {
+  /* Verde escuro — cor do logotipo e das superfícies de destaque */
+  --color-verde-50: #f5faf7;
+  --color-verde-100: #e6f2ec;
+  --color-verde-200: #d1ebe0;
+  --color-verde-300: #9fdfb9;
+  --color-verde-400: #63b795;
+  --color-verde-500: #38907a;
+  --color-verde-600: #2a7261;
+  --color-verde-700: #20574a;
+  --color-verde-800: #1d3a31;
+  --color-verde-900: #142822;
+  --color-verde-950: #0b1814;
+
+  /* Cinzas com leve viés verde, para texto e bordas */
+  --color-cinza-50: #fafcfb;
+  --color-cinza-100: #f2f5f4;
+  --color-cinza-200: #e5eae8;
+  --color-cinza-300: #cfd8d4;
+  --color-cinza-400: #99a8a2;
+  --color-cinza-500: #799a8f;
+  --color-cinza-600: #557a6d;
+  --color-cinza-700: #4a6b5f;
+  --color-cinza-800: #33473f;
+  --color-cinza-900: #1f2a26;
+
+  /* Âmbar — avisos e selos */
+  --color-ambar-50: #fffdf0;
+  --color-ambar-200: #f0e5b6;
+  --color-ambar-400: #f2c95e;
+  --color-ambar-600: #8c7b35;
+  --color-ambar-700: #6b5d26;
+
+  --color-preto: #0a0f0d;
+
+  /* Tipografia */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-sans);
+
+  /* Escala tipográfica de display, com tracking apertado (visual premium) */
+  --text-hero: clamp(2.5rem, 6.2vw, 5rem);
+  --text-hero--line-height: 1.03;
+  --text-hero--letter-spacing: -0.035em;
+  --text-display: clamp(2rem, 4.4vw, 3.5rem);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.03em;
+  --text-title: clamp(1.5rem, 2.6vw, 2.25rem);
+  --text-title--line-height: 1.14;
+  --text-title--letter-spacing: -0.022em;
+
+  /* Sombras suaves, com tint verde em vez de preto puro */
+  --shadow-card: 0 1px 2px rgb(29 58 49 / 0.04), 0 8px 24px -12px rgb(29 58 49 / 0.14);
+  --shadow-lift: 0 2px 4px rgb(29 58 49 / 0.05), 0 18px 44px -16px rgb(29 58 49 / 0.2);
+  --shadow-float: 0 8px 40px -8px rgb(29 58 49 / 0.28);
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-up: fade-up 0.7s var(--ease-out-soft) both;
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-shimmer: shimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* =========================================================================
+   Base
+   ========================================================================= */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply border-cinza-200;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    @apply bg-white text-verde-800 antialiased;
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-verde-800;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Foco visível e consistente em todo o site (acessibilidade) */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-verde-500;
+  }
+
+  ::selection {
+    @apply bg-verde-300 text-verde-800;
+  }
+
+  /* Tipografia numérica tabular em tabelas de preço e dashboards */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Remove as setas dos inputs numéricos (usamos sliders e steppers) */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* =========================================================================
+   Componentes utilitários
+   ========================================================================= */
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[76rem] px-5 sm:px-8;
+  }
+
+  .container-narrow {
+    @apply mx-auto w-full max-w-[46rem] px-5 sm:px-8;
+  }
+
+  /* --- Botões --- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full text-[0.9375rem] font-semibold
+           transition-all duration-200 select-none;
+    transition-timing-function: var(--ease-out-soft);
+  }
+  .btn:disabled {
+    @apply pointer-events-none opacity-55;
+  }
+
+  .btn-lg {
+    @apply h-13 px-7 text-base;
+  }
+  .btn-md {
+    @apply h-11 px-5;
+  }
+  .btn-sm {
+    @apply h-9 px-4 text-sm;
+  }
+
+  .btn-primary {
+    @apply bg-verde-600 text-white shadow-[0_1px_2px_rgb(29_58_49/0.12),0_10px_24px_-10px_rgb(42_114_97/0.5)];
+  }
+  .btn-primary:hover {
+    @apply -translate-y-px bg-verde-700 shadow-[0_2px_4px_rgb(29_58_49/0.14),0_16px_32px_-12px_rgb(42_114_97/0.55)];
+  }
+  .btn-primary:active {
+    @apply translate-y-0 bg-verde-800 shadow-none;
+  }
+
+  .btn-accent {
+    @apply bg-verde-300 text-verde-800 shadow-[0_1px_2px_rgb(29_58_49/0.08),0_10px_24px_-12px_rgb(159_223_185/0.9)];
+  }
+  .btn-accent:hover {
+    @apply -translate-y-px bg-[#8ad6aa];
+  }
+
+  .btn-outline {
+    @apply border border-cinza-300 bg-white text-verde-800;
+  }
+  .btn-outline:hover {
+    @apply -translate-y-px border-verde-400 bg-verde-50;
+  }
+
+  .btn-ghost {
+    @apply text-verde-700;
+  }
+  .btn-ghost:hover {
+    @apply bg-verde-50;
+  }
+
+  .btn-onDark {
+    @apply border border-white/25 bg-white/10 text-white backdrop-blur-sm;
+  }
+  .btn-onDark:hover {
+    @apply -translate-y-px border-white/40 bg-white/20;
+  }
+
+  /* --- Superfícies --- */
+  .card {
+    @apply rounded-2xl border border-cinza-200 bg-white shadow-card;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300;
+    transition-timing-function: var(--ease-out-soft);
+  }
+  .card-hover:hover {
+    @apply -translate-y-1 border-verde-300 shadow-lift;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-cinza-200 bg-white px-3 py-1
+           text-xs font-medium text-cinza-700;
+  }
+
+  .badge-accent {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-verde-200 px-3 py-1 text-xs font-semibold text-verde-700;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[0.8125rem] font-semibold tracking-[0.14em] text-verde-600 uppercase;
+  }
+
+  /* --- Formulários --- */
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-verde-800;
+  }
+
+  .field {
+    @apply h-12 w-full rounded-xl border border-cinza-300 bg-white px-4 text-[0.9375rem]
+           text-verde-800 transition-colors duration-150 placeholder:text-cinza-400;
+  }
+  .field:hover {
+    @apply border-cinza-400;
+  }
+  .field:focus {
+    @apply border-verde-500 outline-2 outline-offset-0 outline-verde-500/25;
+  }
+  .field[aria-invalid="true"] {
+    @apply border-red-400 outline-red-400/25;
+  }
+
+  .field-textarea {
+    @apply w-full rounded-xl border border-cinza-300 bg-white px-4 text-[0.9375rem]
+           text-verde-800 transition-colors duration-150 placeholder:text-cinza-400;
+    @apply min-h-28 resize-y py-3 leading-relaxed;
+  }
+  .field-textarea:hover {
+    @apply border-cinza-400;
+  }
+  .field-textarea:focus {
+    @apply border-verde-500 outline-2 outline-offset-0 outline-verde-500/25;
+  }
+  .field-textarea[aria-invalid="true"] {
+    @apply border-red-400 outline-red-400/25;
+  }
+
+  .field-select {
+    @apply w-full rounded-xl border border-cinza-300 bg-white px-4 text-[0.9375rem]
+           text-verde-800 transition-colors duration-150 placeholder:text-cinza-400;
+    @apply h-12 cursor-pointer appearance-none bg-no-repeat pr-11;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234a6b5f' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.9rem center;
+  }
+  .field-select:hover {
+    @apply border-cinza-400;
+  }
+  .field-select:focus {
+    @apply border-verde-500 outline-2 outline-offset-0 outline-verde-500/25;
+  }
+  .field-select[aria-invalid="true"] {
+    @apply border-red-400 outline-red-400/25;
+  }
+
+  .field-error {
+    @apply mt-1.5 flex items-start gap-1.5 text-sm text-red-600;
+  }
+
+  .hint {
+    @apply mt-1.5 text-sm text-cinza-600;
+  }
+
+  /* --- Seções --- */
+  .section {
+    @apply py-20 sm:py-28;
+  }
+  .section-tight {
+    @apply py-14 sm:py-20;
+  }
+
+  /* --- Prosa (blog, páginas legais) --- */
+  .prose-vf {
+    @apply text-[1.0625rem] leading-[1.75] text-cinza-800;
+  }
+  .prose-vf > * + * {
+    @apply mt-5;
+  }
+  .prose-vf h2 {
+    @apply mt-12 mb-3 text-2xl font-semibold tracking-[-0.02em] text-verde-800 sm:text-[1.75rem];
+  }
+  .prose-vf h3 {
+    @apply mt-9 mb-2 text-lg font-semibold text-verde-800 sm:text-xl;
+  }
+  .prose-vf strong {
+    @apply font-semibold text-verde-800;
+  }
+  .prose-vf a {
+    @apply font-medium text-verde-600 underline decoration-verde-300 decoration-2 underline-offset-2;
+  }
+  .prose-vf a:hover {
+    @apply text-verde-700 decoration-verde-500;
+  }
+  .prose-vf ul,
+  .prose-vf ol {
+    @apply space-y-2 pl-1;
+  }
+  .prose-vf ul > li {
+    @apply relative pl-6;
+  }
+  .prose-vf ul > li::before {
+    @apply absolute top-[0.7em] left-1 h-1.5 w-1.5 rounded-full bg-verde-400;
+    content: "";
+  }
+  .prose-vf ol {
+    @apply list-decimal space-y-2 pl-6;
+  }
+  .prose-vf ol > li::marker {
+    @apply font-semibold text-verde-600;
+  }
+  .prose-vf blockquote {
+    @apply my-8 rounded-r-xl border-l-[3px] border-verde-400 bg-verde-50 py-4 pr-5 pl-5 text-cinza-800 italic;
+  }
+  .prose-vf blockquote p {
+    @apply m-0;
+  }
+  .prose-vf table {
+    @apply my-7 w-full border-collapse text-[0.9375rem];
+  }
+  .prose-vf thead th {
+    @apply border-b border-cinza-300 pb-2.5 text-left text-sm font-semibold text-verde-800;
+  }
+  .prose-vf tbody td {
+    @apply border-b border-cinza-200 py-2.5 align-top;
+  }
+  .prose-vf tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  .prose-vf code {
+    @apply rounded bg-cinza-100 px-1.5 py-0.5 text-[0.9em];
+  }
+  .prose-vf hr {
+    @apply my-10 border-cinza-200;
+  }
+  .prose-vf .table-scroll {
+    @apply -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0;
+  }
+}
+
+/* =========================================================================
+   Utilitários
+   ========================================================================= */
+@utility text-gradient-verde {
+  background-image: linear-gradient(105deg, var(--color-verde-700), var(--color-verde-500) 55%, var(--color-verde-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Malha decorativa suave usada em faixas escuras */
+@utility bg-mesh-verde {
+  background-color: var(--color-verde-800);
+  background-image:
+    radial-gradient(60% 80% at 15% 0%, rgb(159 223 185 / 0.22), transparent 60%),
+    radial-gradient(50% 70% at 90% 20%, rgb(56 144 122 / 0.35), transparent 65%),
+    radial-gradient(70% 90% at 60% 110%, rgb(32 87 74 / 0.7), transparent 60%);
+}
+
+@utility bg-grid-soft {
+  background-image:
+    linear-gradient(to right, rgb(42 114 97 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(42 114 97 / 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Máscara de fade nas bordas (carrosséis e marquees) */
+@utility mask-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Aparece quando entra na viewport (via IntersectionObserver em <Reveal />) */
+@utility reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity 0.75s var(--ease-out-soft),
+    transform 0.75s var(--ease-out-soft);
+  will-change: opacity, transform;
+}
+
+@utility reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
