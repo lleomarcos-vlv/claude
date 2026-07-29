@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Prompt · Vídeos de Venda</title>
+<style>
+  :root{
+    --bg:#0f1116;
+    --bg-soft:#161923;
+    --card:#1c1f2b;
+    --card-2:#232735;
+    --line:#2c3040;
+    --line-soft:#242838;
+    --txt:#eef1f7;
+    --txt-2:#a5adbf;
+    --txt-3:#6f7789;
+    --accent:#6c5ce7;
+    --accent-2:#8b7bf0;
+    --accent-soft:rgba(108,92,231,.14);
+    --ok:#22c98a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,rgba(108,92,231,.18),transparent 60%),
+               radial-gradient(900px 600px at 0% 110%,rgba(34,201,138,.10),transparent 55%),
+               var(--bg);
+    color:var(--txt);
+    min-height:100vh;
+    padding:40px 20px 60px;
+    line-height:1.55;
+  }
+  .wrap{max-width:920px;margin:0 auto}
+
+  /* HEADER */
+  .head{text-align:center;margin-bottom:34px}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--accent-soft);border:1px solid rgba(108,92,231,.3);
+    color:var(--accent-2);font-size:13px;font-weight:600;
+    padding:7px 16px;border-radius:999px;margin-bottom:18px;
+    letter-spacing:.3px;
+  }
+  .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 10px var(--accent-2)}
+  .head h1{font-size:34px;font-weight:800;letter-spacing:-.5px;line-height:1.15;
+    background:linear-gradient(120deg,#fff,#b9b2f5);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .head p{color:var(--txt-2);font-size:16px;margin-top:12px;max-width:600px;margin-inline:auto}
+
+  /* CARD */
+  .card{
+    background:linear-gradient(180deg,var(--card),var(--bg-soft));
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.6);
+  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .field{margin-bottom:22px}
+  .field.full{grid-column:1/-1}
+  label{display:block;font-size:13px;font-weight:600;color:var(--txt-2);margin-bottom:9px;letter-spacing:.2px}
+  label .ic{color:var(--accent-2);margin-right:6px}
+
+  input[type=text],textarea,select{
+    width:100%;background:var(--card-2);border:1px solid var(--line);
+    color:var(--txt);border-radius:12px;padding:13px 15px;font-size:15px;
+    font-family:inherit;transition:.18s;outline:none;
+  }
+  textarea{resize:vertical;min-height:64px;line-height:1.5}
+  input::placeholder,textarea::placeholder{color:var(--txt-3)}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  select{appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23a5adbf' stroke-width='2'><path d='M2 4l5 5 5-5'/></svg>");
+    background-repeat:no-repeat;background-position:right 15px center;padding-right:40px}
+
+  /* CHIPS */
+  .chips{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{
+    font-size:14px;font-weight:500;padding:9px 16px;border-radius:11px;
+    border:1px solid var(--line);background:var(--card-2);color:var(--txt-2);
+    cursor:pointer;transition:.16s;user-select:none;
+  }
+  .chip:hover{border-color:var(--accent);color:var(--txt)}
+  .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-2);font-weight:600}
+
+  /* ===== UPLOAD / ANÁLISE DE FOTO ===== */
+  .drop{
+    position:relative;border:1.5px dashed var(--line);border-radius:14px;
+    background:var(--card-2);padding:26px 20px;text-align:center;cursor:pointer;
+    transition:.18s;
+  }
+  .drop:hover,.drop.drag{border-color:var(--accent);background:rgba(108,92,231,.07)}
+  .drop input[type=file]{display:none}
+  .drop .up-ic{font-size:30px;line-height:1;margin-bottom:8px;filter:grayscale(.1)}
+  .drop .up-t{font-size:15px;font-weight:600;color:var(--txt)}
+  .drop .up-s{font-size:13px;color:var(--txt-3);margin-top:4px}
+
+  .analysis{margin-top:16px;display:none;animation:fade .35s ease}
+  .analysis.show{display:block}
+  .an-top{display:flex;gap:16px;align-items:flex-start}
+  .an-thumb{
+    flex:0 0 auto;width:96px;height:96px;border-radius:12px;object-fit:cover;
+    border:1px solid var(--line);background:#0c0e14;
+  }
+  .an-body{flex:1;min-width:0}
+  .an-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:4px}
+  .an-mood{font-size:13.5px;color:var(--txt-2);margin-bottom:12px}
+  .an-mood b{color:var(--accent-2);font-weight:700}
+
+  .palette{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .sw{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.12);
+    position:relative;cursor:default;box-shadow:0 4px 10px -4px rgba(0,0,0,.6)}
+  .sw span{
+    position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+    background:#0c0e14;border:1px solid var(--line);color:var(--txt-2);
+    font-size:11px;font-family:'Consolas',monospace;padding:3px 7px;border-radius:6px;
+    white-space:nowrap;opacity:0;pointer-events:none;transition:.15s;z-index:5;
+  }
+  .sw:hover span{opacity:1}
+
+  .tags{display:flex;flex-wrap:wrap;gap:7px}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;
+    background:rgba(255,255,255,.03);border:1px solid var(--line-soft);color:var(--txt-2);
+    padding:6px 11px;border-radius:9px;
+  }
+  .tag b{color:var(--txt);font-weight:600}
+
+  .an-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+  .an-suggest{
+    font-size:12.5px;color:var(--txt-2);background:rgba(34,201,138,.08);
+    border:1px solid rgba(34,201,138,.28);border-radius:9px;padding:6px 11px;
+  }
+  .an-suggest b{color:var(--ok)}
+  .an-suggest button{
+    background:none;border:none;color:var(--ok);font-weight:700;font-family:inherit;
+    font-size:12.5px;cursor:pointer;text-decoration:underline;margin-left:6px;padding:0;
+  }
+  .an-remove{
+    background:none;border:none;color:var(--txt-3);font-size:12.5px;cursor:pointer;
+    font-family:inherit;text-decoration:underline;
+  }
+  .an-remove:hover{color:var(--txt-2)}
+  .an-loading{font-size:13px;color:var(--txt-2);margin-top:14px;display:none}
+  .an-loading.show{display:block}
+
+  /* BUTTONS */
+  .actions{display:flex;gap:12px;margin-top:6px}
+  .btn{
+    flex:1;height:52px;border:none;border-radius:13px;font-size:16px;font-weight:700;
+    cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:9px;
+    font-family:inherit;
+  }
+  .btn-primary{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;
+    box-shadow:0 12px 26px -10px var(--accent)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 32px -10px var(--accent)}
+  .btn-ghost{flex:0 0 auto;padding:0 24px;background:var(--card-2);border:1px solid var(--line);color:var(--txt)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent-2)}
+
+  /* OUTPUT */
+  .out{margin-top:26px;display:none}
+  .out.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .out-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .out-head h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .out-box{
+    background:#0c0e14;border:1px solid var(--line);border-radius:14px;padding:20px;
+    font-family:'Consolas','Courier New',monospace;font-size:13.5px;line-height:1.7;
+    color:#d3d9e6;white-space:pre-wrap;max-height:440px;overflow:auto;
+  }
+  .copybtn{
+    background:var(--accent-soft);border:1px solid rgba(108,92,231,.3);color:var(--accent-2);
+    font-size:13px;font-weight:600;padding:8px 15px;border-radius:9px;cursor:pointer;transition:.16s;
+    display:flex;align-items:center;gap:6px;font-family:inherit;
+  }
+  .copybtn:hover{background:rgba(108,92,231,.22)}
+  .copybtn.done{color:var(--ok);border-color:rgba(34,201,138,.4);background:rgba(34,201,138,.12)}
+
+  .foot{text-align:center;color:var(--txt-3);font-size:13px;margin-top:26px}
+
+  @media(max-width:680px){
+    .grid{grid-template-columns:1fr}
+    .head h1{font-size:26px}
+    .card{padding:22px}
+    .actions{flex-direction:column}
+    .btn-ghost{padding:14px}
+    .an-top{flex-direction:column}
+    .an-thumb{width:100%;height:150px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="badge"><span class="dot"></span>GERADOR DE PROMPTS · E-COMMERCE</div>
+    <h1>Crie o prompt perfeito para<br>vídeos que vendem</h1>
+    <p>Envie a foto do produto: ela é analisada direto no navegador (cores, luz, clima e enquadramento) e vira parte do prompt. Preencha o resto e gere um roteiro pronto para Mercado Livre, Shopee e outras.</p>
+  </div>
+
+  <div class="card">
+
+    <!-- FOTO DO PRODUTO + ANÁLISE -->
+    <div class="field full">
+      <label><span class="ic">◆</span>Foto do produto <span style="color:var(--txt-3);font-weight:400">(análise automática, sem enviar para servidor nenhum)</span></label>
+      <label class="drop" id="drop" for="file">
+        <input type="file" id="file" accept="image/*">
+        <div class="up-ic">🖼️</div>
+        <div class="up-t">Clique ou arraste a foto do produto aqui</div>
+        <div class="up-s">JPG, PNG ou WEBP · a imagem não sai do seu computador</div>
+      </label>
+
+      <div class="an-loading" id="anLoading">🔎 Analisando a imagem…</div>
+
+      <div class="analysis" id="analysis">
+        <div class="an-top">
+          <img class="an-thumb" id="anThumb" alt="Prévia da foto">
+          <div class="an-body">
+            <div class="an-title">✅ Análise visual concluída</div>
+            <div class="an-mood" id="anMood"></div>
+            <div class="palette" id="anPalette"></div>
+            <div class="tags" id="anTags"></div>
+            <div class="an-actions">
+              <div class="an-suggest" id="anSuggest"></div>
+              <button class="an-remove" id="anRemove" type="button">Remover foto</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label><span class="ic">◆</span>Nome do produto</label>
+        <input id="produto" type="text" placeholder="Ex: Fone Bluetooth TWS Pro">
+      </div>
+      <div class="field">
+        <label><span class="ic">◆</span>Plataforma de venda</label>
+        <select id="plataforma">
+          <option>Mercado Livre</option>
+          <option>Shopee</option>
+          <option>Amazon</option>
+          <option>Instagram / Reels</option>
+          <option>TikTok Shop</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label><span class="ic">◆</span>Principais benefícios / diferenciais</label>
+        <textarea id="beneficios" placeholder="Ex: Bateria 40h, cancelamento de ruído, à prova d'água, frete grátis, garantia de 1 ano"></textarea>
+      </div>
+
+      <div class="field full">
+        <label><span class="ic">◆</span>Público-alvo <span style="color:var(--txt-3);font-weight:400">(selecione um ou mais)</span></label>
+        <div class="chips" id="publico">
+          <div class="chip" data-v="jovens de 18 a 30 anos">Jovens 18-30</div>
+          <div class="chip" data-v="adultos de 30 a 50 anos">Adultos 30-50</div>
+          <div class="chip" data-v="donas de casa">Donas de casa</div>
+          <div class="chip" data-v="gamers">Gamers</div>
+          <div class="chip" data-v="público fitness e esportivo">Fitness</div>
+          <div class="chip" data-v="público geral">Geral</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><span class="ic">◆</span>Duração do vídeo</label>
+        <select id="duracao">
+          <option>15 segundos</option>
+          <option>30 segundos</option>
+          <option>45 segundos</option>
+          <option>60 segundos</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="ic">◆</span>Tom / estilo</label>
+        <select id="tom">
+          <option>Enérgico e vendedor</option>
+          <option>Confiável e informativo</option>
+          <option>Divertido e descontraído</option>
+          <option>Premium e sofisticado</option>
+          <option>Urgência / oferta relâmpago</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label><span class="ic">◆</span>Formato do vídeo</label>
+        <div class="chips" id="formato">
+          <div class="chip on" data-v="vertical 9:16">📱 Vertical 9:16</div>
+          <div class="chip" data-v="quadrado 1:1">⬛ Quadrado 1:1</div>
+          <div class="chip" data-v="horizontal 16:9">🖥️ Horizontal 16:9</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="gerar">✨ Gerar prompt perfeito</button>
+      <button class="btn btn-ghost" id="limpar">Limpar</button>
+    </div>
+
+    <div class="out" id="out">
+      <div class="out-head">
+        <h3>📝 Seu prompt está pronto</h3>
+        <button class="copybtn" id="copiar">⧉ Copiar</button>
+      </div>
+      <div class="out-box" id="saida"></div>
+    </div>
+  </div>
+
+  <div class="foot">Cole o prompt gerado no seu gerador de vídeos por IA favorito e comece a vender.</div>
+</div>
+
+<script>
+(function(){
+  /* ============================================================
+     CHIPS
+  ============================================================ */
+  function bindChips(id,multi){
+    var g=document.getElementById(id);
+    g.querySelectorAll('.chip').forEach(function(c){
+      c.addEventListener('click',function(){
+        if(!multi) g.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});
+        c.classList.toggle('on');
+      });
+    });
+  }
+  bindChips('publico',true);
+  bindChips('formato',false);
+
+  function sel(id){var e=document.querySelector('#'+id+' .chip.on');return e?e.getAttribute('data-v'):'';}
+  function selAll(id){return Array.prototype.map.call(document.querySelectorAll('#'+id+' .chip.on'),function(c){return c.getAttribute('data-v');}).join(', ');}
+
+  /* ============================================================
+     MOTOR DE ANÁLISE DE IMAGEM  (100% no navegador, sem API)
+     Mede o que dá pra medir de verdade a partir dos pixels:
+     paleta, luz, temperatura de cor, saturação, contraste,
+     enquadramento e tipo de fundo — e vira texto pro prompt.
+  ============================================================ */
+  var ANALYSIS=null; // resultado atual (ou null)
+
+  function rgbToHsl(r,g,b){
+    r/=255;g/=255;b/=255;
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),h,s,l=(mx+mn)/2;
+    if(mx===mn){h=0;s=0;}
+    else{
+      var d=mx-mn;
+      s=l>0.5?d/(2-mx-mn):d/(mx+mn);
+      if(mx===r) h=(g-b)/d+(g<b?6:0);
+      else if(mx===g) h=(b-r)/d+2;
+      else h=(r-g)/d+4;
+      h/=6;
+    }
+    return [h*360,s,l];
+  }
+
+  function hex(r,g,b){
+    return '#'+[r,g,b].map(function(v){v=Math.max(0,Math.min(255,Math.round(v)));var s=v.toString(16);return s.length<2?'0'+s:s;}).join('');
+  }
+
+  function colorName(r,g,b){
+    var h=rgbToHsl(r,g,b),hue=h[0],s=h[1],l=h[2];
+    if(s<0.12){
+      if(l>0.90) return 'branco';
+      if(l>0.72) return 'cinza claro';
+      if(l>0.40) return 'cinza';
+      if(l>0.15) return 'cinza escuro';
+      return 'preto';
+    }
+    var name;
+    if(hue<15||hue>=345) name='vermelho';
+    else if(hue<40) name='laranja';
+    else if(hue<65) name='amarelo';
+    else if(hue<95) name='verde-limão';
+    else if(hue<150) name='verde';
+    else if(hue<188) name='turquesa';
+    else if(hue<210) name='ciano';
+    else if(hue<255) name='azul';
+    else if(hue<290) name='roxo';
+    else if(hue<330) name='rosa';
+    else name='magenta';
+    var mod = l>0.74?' claro':(l<0.28?' escuro':'');
+    return name+mod;
+  }
+
+  function analyze(img){
+    // canvas pequeno pra performance
+    var mx=220, scale=Math.min(1, mx/Math.max(img.naturalWidth,img.naturalHeight));
+    var w=Math.max(1,Math.round(img.naturalWidth*scale));
+    var h=Math.max(1,Math.round(img.naturalHeight*scale));
+    var cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    var ctx=cv.getContext('2d');
+    ctx.drawImage(img,0,0,w,h);
+    var data;
+    try{ data=ctx.getImageData(0,0,w,h).data; }
+    catch(e){ return null; }
+
+    var n=0, sumR=0,sumG=0,sumB=0, sumL=0,sumL2=0, sumS=0;
+    var bSum=0,bCnt=0,bL=[]; // bordas p/ detectar fundo
+    var buckets={};
+
+    for(var y=0;y<h;y++){
+      for(var x=0;x<w;x++){
+        var i=(y*w+x)*4;
+        var r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
+        if(a<125) continue; // ignora transparência (PNG recortado)
+        n++;
+        sumR+=r;sumG+=g;sumB+=b;
+        var lum=0.2126*r+0.7152*g+0.0722*b;
+        sumL+=lum;sumL2+=lum*lum;
+        var hsl=rgbToHsl(r,g,b);
+        sumS+=hsl[1];
+
+        // paleta: quantiza em 6 níveis por canal e guarda média real
+        var key=((r>>5)<<10)|((g>>5)<<5)|(b>>5);
+        var bk=buckets[key];
+        if(!bk){ bk=buckets[key]={c:0,r:0,g:0,b:0}; }
+        bk.c++;bk.r+=r;bk.g+=g;bk.b+=b;
+
+        // bordas
+        if(x<2||y<2||x>w-3||y>h-3){ bSum+=lum;bCnt++;bL.push(lum); }
+      }
+    }
+    if(n===0) return null;
+
+    var avgR=sumR/n, avgG=sumG/n, avgB=sumB/n;
+    var bright=sumL/n;                                  // 0..255
+    var contrast=Math.sqrt(Math.max(0,sumL2/n-bright*bright)); // desvio padrão da luz
+    var sat=sumS/n;                                     // 0..1
+    var warm=avgR-avgB;
+
+    // fundo (bordas)
+    var bAvg=bCnt?bSum/bCnt:bright, bVar=0;
+    for(var k=0;k<bL.length;k++){ bVar+=(bL[k]-bAvg)*(bL[k]-bAvg); }
+    var bStd=bL.length?Math.sqrt(bVar/bL.length):0;
+
+    // paleta: top buckets -> cor representativa
+    var arr=[];
+    for(var key2 in buckets){ var o=buckets[key2]; arr.push({c:o.c,r:o.r/o.c,g:o.g/o.c,b:o.b/o.c}); }
+    arr.sort(function(a,b2){return b2.c-a.c;});
+    var pal=[], used=[];
+    for(var p=0;p<arr.length && pal.length<5;p++){
+      var c=arr[p], dup=false;
+      for(var u=0;u<used.length;u++){
+        var d=Math.abs(c.r-used[u].r)+Math.abs(c.g-used[u].g)+Math.abs(c.b-used[u].b);
+        if(d<48){dup=true;break;}
+      }
+      if(dup) continue;
+      used.push(c);
+      pal.push({ hex:hex(c.r,c.g,c.b), name:colorName(c.r,c.g,c.b), pct:Math.round(c.c/n*100) });
+    }
+
+    // orientação
+    var ratio=img.naturalWidth/img.naturalHeight, orient, fmt;
+    if(ratio>1.2){ orient='horizontal (paisagem)'; fmt='horizontal 16:9'; }
+    else if(ratio<0.83){ orient='vertical (retrato)'; fmt='vertical 9:16'; }
+    else { orient='quadrado'; fmt='quadrado 1:1'; }
+
+    // rótulos textuais
+    var light = bright>=200?'muito clara / bem iluminada'
+             : bright>=150?'clara e iluminada'
+             : bright>=95 ?'iluminação equilibrada'
+             : bright>=55 ?'baixa luz / intimista'
+             :             'muito escura / dramática';
+
+    var warmTxt = warm>22?'quente (tons dourados/avermelhados)'
+                : warm<-22?'fria (tons azulados)'
+                :          'neutra';
+
+    var satTxt = sat>=0.45?'cores vivas e saturadas'
+               : sat>=0.22?'cores equilibradas'
+               :           'cores suaves / dessaturadas';
+
+    var conTxt = contrast>=66?'alto contraste'
+               : contrast>=38?'contraste médio'
+               :              'baixo contraste / suave';
+
+    var scene = (bAvg>216 && bStd<30) ? 'fundo claro de estúdio (produto isolado)'
+              : (bAvg<52  && bStd<34) ? 'fundo escuro / dramático'
+              :                         'cenário com ambiente ao redor';
+
+    // clima geral
+    var mood;
+    if(sat>=0.45 && bright>=120) mood='vibrante e chamativa';
+    else if(sat<0.20 && bright>=150) mood='clean e minimalista';
+    else if(bright<80) mood='sofisticada e dramática';
+    else if(warm>18 && bright>=110) mood='calorosa e acolhedora';
+    else if(warm<-18) mood='moderna e tecnológica';
+    else mood='equilibrada e comercial';
+
+    // tom sugerido (casa com o <select> de tom)
+    var tomSug;
+    if((sat<0.20 && bright>=150) || bright<80) tomSug='Premium e sofisticado';
+    else if(sat>=0.45) tomSug='Enérgico e vendedor';
+    else if(warm>18) tomSug='Divertido e descontraído';
+    else tomSug='Confiável e informativo';
+
+    return {
+      palette:pal, orient:orient, fmt:fmt, mood:mood, tomSug:tomSug,
+      light:light, warm:warmTxt, sat:satTxt, contrast:conTxt, scene:scene,
+      dims:img.naturalWidth+'×'+img.naturalHeight+'px'
+    };
+  }
+
+  /* ============================================================
+     UI DA ANÁLISE
+  ============================================================ */
+  var fileInput=document.getElementById('file');
+  var drop=document.getElementById('drop');
+  var loading=document.getElementById('anLoading');
+  var panel=document.getElementById('analysis');
+
+  function renderAnalysis(a,dataUrl){
+    document.getElementById('anThumb').src=dataUrl;
+
+    document.getElementById('anMood').innerHTML=
+      'Clima visual: <b>'+a.mood+'</b> · '+a.orient;
+
+    var pal=document.getElementById('anPalette');pal.innerHTML='';
+    a.palette.forEach(function(c){
+      var d=document.createElement('div');
+      d.className='sw';d.style.background=c.hex;
+      d.innerHTML='<span>'+c.name+' · '+c.hex+' · '+c.pct+'%</span>';
+      pal.appendChild(d);
+    });
+
+    var tags=document.getElementById('anTags');tags.innerHTML='';
+    [['💡','Luz',a.light],['🌡️','Cor',a.warm],['🎨','Saturação',a.sat],
+     ['◐','Contraste',a.contrast],['🖼️','Fundo',a.scene],['📐','Formato',a.orient]]
+    .forEach(function(t){
+      var d=document.createElement('div');d.className='tag';
+      d.innerHTML=t[0]+' '+t[1]+': <b>'+t[2]+'</b>';
+      tags.appendChild(d);
+    });
+
+    // aplica o formato automaticamente (é objetivo: vem da proporção)
+    var chips=document.querySelectorAll('#formato .chip');
+    chips.forEach(function(c){
+      c.classList.toggle('on', c.getAttribute('data-v')===a.fmt);
+    });
+
+    // sugestão de tom (aplicável com 1 clique)
+    var sg=document.getElementById('anSuggest');
+    sg.innerHTML='Tom sugerido pela foto: <b>'+a.tomSug+'</b> <button type="button" id="aplicaTom">aplicar</button>';
+    document.getElementById('aplicaTom').addEventListener('click',function(){
+      var s=document.getElementById('tom');
+      for(var i=0;i<s.options.length;i++){ if(s.options[i].text===a.tomSug){ s.selectedIndex=i; break; } }
+      this.textContent='aplicado ✓';this.disabled=true;this.style.opacity=.6;
+    });
+
+    panel.classList.add('show');
+  }
+
+  function handleFile(file){
+    if(!file || !/^image\//.test(file.type)) return;
+    loading.classList.add('show');
+    panel.classList.remove('show');
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var url=ev.target.result;
+      var img=new Image();
+      img.onload=function(){
+        var a=analyze(img);
+        loading.classList.remove('show');
+        if(a){ ANALYSIS=a; renderAnalysis(a,url); }
+        else { ANALYSIS=null; alert('Não consegui ler os pixels dessa imagem. Tente outra foto (JPG/PNG).'); }
+      };
+      img.onerror=function(){ loading.classList.remove('show'); alert('Arquivo de imagem inválido.'); };
+      img.src=url;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  fileInput.addEventListener('change',function(){ if(this.files[0]) handleFile(this.files[0]); });
+
+  ['dragenter','dragover'].forEach(function(e){
+    drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add('drag');});
+  });
+  ['dragleave','drop'].forEach(function(e){
+    drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove('drag');});
+  });
+  drop.addEventListener('drop',function(ev){
+    var f=ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+    if(f) handleFile(f);
+  });
+
+  document.getElementById('anRemove').addEventListener('click',function(){
+    ANALYSIS=null;fileInput.value='';panel.classList.remove('show');
+  });
+
+  /* ============================================================
+     BLOCO DE TEXTO DA ANÁLISE (entra no prompt)
+  ============================================================ */
+  function analysisBlock(a){
+    if(!a) return '';
+    var cores=a.palette.map(function(c){return c.name+' ('+c.hex+')';}).join(', ');
+    return "═══ REFERÊNCIA VISUAL DA FOTO (análise automática) ═══\n"+
+      "• Paleta predominante: "+cores+"\n"+
+      "• Iluminação: "+a.light+"\n"+
+      "• Temperatura de cor: "+a.warm+"\n"+
+      "• Saturação: "+a.sat+"\n"+
+      "• Contraste: "+a.contrast+"\n"+
+      "• Enquadramento da foto: "+a.orient+" ("+a.dims+")\n"+
+      "• Fundo/cenário: "+a.scene+"\n"+
+      "• Clima geral: "+a.mood+"\n"+
+      "→ Mantenha o vídeo visualmente coerente com esta referência: reaproveite a mesma paleta e o mesmo clima, ilumine o produto no mesmo estilo e comece com um plano que lembre a foto enviada.\n\n";
+  }
+
+  /* ============================================================
+     GERAR PROMPT
+  ============================================================ */
+  document.getElementById('gerar').addEventListener('click',function(){
+    var produto=document.getElementById('produto').value.trim()||'[NOME DO PRODUTO]';
+    var plataforma=document.getElementById('plataforma').value;
+    var beneficios=document.getElementById('beneficios').value.trim()||'[benefícios do produto]';
+    var publico=selAll('publico')||'público geral';
+    var duracao=document.getElementById('duracao').value;
+    var tom=document.getElementById('tom').value;
+    var formato=sel('formato')||'vertical 9:16';
+
+    var refVisual = analysisBlock(ANALYSIS);
+
+    var p=
+"Crie um roteiro completo de vídeo publicitário de "+duracao+" para vender o produto \""+produto+"\" na plataforma "+plataforma+".\n\n"+
+"═══ CONTEXTO DO PRODUTO ═══\n"+
+"• Produto: "+produto+"\n"+
+"• Principais benefícios: "+beneficios+"\n"+
+"• Público-alvo: "+publico+"\n"+
+"• Plataforma de venda: "+plataforma+"\n\n"+
+refVisual+
+"═══ ESPECIFICAÇÕES DO VÍDEO ═══\n"+
+"• Formato: "+formato+"\n"+
+"• Duração: "+duracao+"\n"+
+"• Tom/estilo: "+tom+"\n\n"+
+"═══ ESTRUTURA DO ROTEIRO ═══\n"+
+"1. GANCHO (0-3s): frase de abertura que prende a atenção e mostra a dor ou o desejo do público.\n"+
+"2. APRESENTAÇÃO: mostre o produto em uso, com ângulos e detalhes que gerem desejo.\n"+
+"3. BENEFÍCIOS: transforme cada característica em um benefício claro para o cliente.\n"+
+"4. PROVA / CONFIANÇA: cite avaliações, garantia ou frete grátis quando fizer sentido.\n"+
+"5. CTA FINAL: chamada direta para a compra (\"Clique em comprar agora\", \"Aproveite o desconto\").\n\n"+
+"═══ PARA CADA CENA, DESCREVA ═══\n"+
+"• Narração / texto na tela (fala e legendas)\n"+
+"• Ação visual e enquadramento da câmera\n"+
+"• Trilha sonora e ritmo sugeridos\n\n"+
+"═══ REGRAS ═══\n"+
+"• Linguagem "+tom.toLowerCase()+", adaptada ao "+publico+".\n"+
+"• Otimizado para conversão no "+plataforma+".\n"+
+(refVisual?"• Respeite a paleta e o clima da foto de referência em todas as cenas.\n":"")+
+"• Ao final, inclua 3 sugestões de título/legenda e 8 hashtags relevantes.";
+
+    document.getElementById('saida').textContent=p;
+    var out=document.getElementById('out');
+    out.classList.add('show');
+    out.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+
+  document.getElementById('copiar').addEventListener('click',function(){
+    var txt=document.getElementById('saida').textContent;
+    if(!txt) return;
+    navigator.clipboard.writeText(txt).then(function(){
+      var b=document.getElementById('copiar');
+      b.classList.add('done');b.innerHTML='✓ Copiado!';
+      setTimeout(function(){b.classList.remove('done');b.innerHTML='⧉ Copiar';},1600);
+    });
+  });
+
+  document.getElementById('limpar').addEventListener('click',function(){
+    document.getElementById('produto').value='';
+    document.getElementById('beneficios').value='';
+    document.getElementById('plataforma').selectedIndex=0;
+    document.getElementById('duracao').selectedIndex=0;
+    document.getElementById('tom').selectedIndex=0;
+    document.querySelectorAll('#publico .chip').forEach(function(c){c.classList.remove('on');});
+    document.getElementById('out').classList.remove('show');
+    // reseta análise
+    ANALYSIS=null;fileInput.value='';panel.classList.remove('show');
+    var chips=document.querySelectorAll('#formato .chip');
+    chips.forEach(function(c,i){ c.classList.toggle('on', i===0); });
+  });
+})();
+</script>
+</body>
+</html>
