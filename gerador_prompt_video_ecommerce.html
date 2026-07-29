@@ -107,6 +107,11 @@
   .an-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:4px}
   .an-mood{font-size:13.5px;color:var(--txt-2);margin-bottom:12px}
   .an-mood b{color:var(--accent-2);font-weight:700}
+  .an-product{font-size:14.5px;color:var(--txt);margin-bottom:3px}
+  .an-product b{font-weight:700}
+  .an-product .src{color:var(--txt-3);font-weight:400;font-size:12.5px}
+  .an-note{font-size:12.5px;color:var(--ok);margin-top:11px;display:none}
+  .an-note.show{display:block}
 
   .palette{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
   .sw{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.12);
@@ -218,9 +223,11 @@
           <img class="an-thumb" id="anThumb" alt="Prévia da foto">
           <div class="an-body">
             <div class="an-title">✅ Análise visual concluída</div>
+            <div class="an-product" id="anProduct"></div>
             <div class="an-mood" id="anMood"></div>
             <div class="palette" id="anPalette"></div>
             <div class="tags" id="anTags"></div>
+            <div class="an-note" id="anNote"></div>
             <div class="an-actions">
               <div class="an-suggest" id="anSuggest"></div>
               <button class="an-remove" id="anRemove" type="button">Remover foto</button>
@@ -382,6 +389,53 @@
     return name+mod;
   }
 
+  // Segmenta o produto (diferente do fundo) e classifica pela silhueta.
+  // É geometria de verdade, não "IA de visão": mede proporção, preenchimento
+  // e o perfil de largura por linha (garrafa tem gargalo estreito no topo).
+  function detectShape(data,w,h,bgR,bgG,bgB){
+    var minX=w,minY=h,maxX=-1,maxY=-1,fg=0;
+    var rowMin=new Int16Array(h), rowMax=new Int16Array(h);
+    for(var q=0;q<h;q++){ rowMin[q]=w; rowMax[q]=-1; }
+    for(var y=0;y<h;y++){
+      for(var x=0;x<w;x++){
+        var i=(y*w+x)*4;
+        if(data[i+3]<125) continue; // transparência = fundo
+        var d=Math.abs(data[i]-bgR)+Math.abs(data[i+1]-bgG)+Math.abs(data[i+2]-bgB);
+        if(d>95){
+          fg++;
+          if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y;
+          if(x<rowMin[y])rowMin[y]=x; if(x>rowMax[y])rowMax[y]=x;
+        }
+      }
+    }
+    var fgRatio=fg/(w*h);
+    if(maxX<0 || fgRatio<0.03) return {cat:'generico',label:'',fgRatio:fgRatio};
+
+    var bbW=maxX-minX+1, bbH=maxY-minY+1;
+    var aspect=bbH/bbW, fill=fg/(bbW*bbH);
+
+    // perfil de largura (span) por linha dentro da bounding box
+    var spans=[];
+    for(var yy=minY;yy<=maxY;yy++){ spans.push(rowMax[yy]>=0?(rowMax[yy]-rowMin[yy]+1):0); }
+    var nH=spans.length, maxSpan=0, maxRow=0;
+    for(var s=0;s<nH;s++){ if(spans[s]>maxSpan){ maxSpan=spans[s]; maxRow=s; } }
+    function avgSpan(a,e){var t=0,c=0;for(var k=a;k<e;k++){t+=spans[k];c++;}return c?t/c:0;}
+    var topAvg=avgSpan(0,Math.max(1,Math.round(nH*0.22)));
+    var botAvg=avgSpan(Math.round(nH*0.78),nH);
+    var midPos=maxRow/nH;
+    var round=(aspect>0.8&&aspect<1.3)&&(topAvg<0.6*maxSpan)&&(botAvg<0.8*maxSpan)&&midPos>0.3&&midPos<0.7;
+
+    var cat='generico',label='formato irregular';
+    if(fgRatio<0.82 && maxSpan>0){
+      if(aspect>1.45 && topAvg<maxSpan*0.55){ cat='garrafa'; label='formato de garrafa (gargalo estreito no topo)'; }
+      else if(aspect>1.7 && fill>0.55 && topAvg>maxSpan*0.6){ cat='copo'; label='formato alto e reto (copo / lata / embalagem)'; }
+      else if(aspect>0.8 && aspect<1.28 && fill>0.72){ cat='caixa'; label='formato de caixa / retângulo cheio'; }
+      else if(round){ cat='redondo'; label='formato arredondado'; }
+      else if(aspect<0.72){ cat='largo'; label='formato largo (mais largo que alto)'; }
+    }
+    return {cat:cat,label:label,fgRatio:fgRatio};
+  }
+
   function analyze(img){
     // canvas pequeno pra performance
     var mx=220, scale=Math.min(1, mx/Math.max(img.naturalWidth,img.naturalHeight));
@@ -395,7 +449,7 @@
     catch(e){ return null; }
 
     var n=0, sumR=0,sumG=0,sumB=0, sumL=0,sumL2=0, sumS=0;
-    var bSum=0,bCnt=0,bL=[]; // bordas p/ detectar fundo
+    var bSum=0,bCnt=0,bL=[],bR=0,bG=0,bB=0; // bordas p/ detectar fundo
     var buckets={};
 
     for(var y=0;y<h;y++){
@@ -417,7 +471,7 @@
         bk.c++;bk.r+=r;bk.g+=g;bk.b+=b;
 
         // bordas
-        if(x<2||y<2||x>w-3||y>h-3){ bSum+=lum;bCnt++;bL.push(lum); }
+        if(x<2||y<2||x>w-3||y>h-3){ bSum+=lum;bCnt++;bL.push(lum);bR+=r;bG+=g;bB+=b; }
       }
     }
     if(n===0) return null;
@@ -432,6 +486,10 @@
     var bAvg=bCnt?bSum/bCnt:bright, bVar=0;
     for(var k=0;k<bL.length;k++){ bVar+=(bL[k]-bAvg)*(bL[k]-bAvg); }
     var bStd=bL.length?Math.sqrt(bVar/bL.length):0;
+
+    // formato do objeto: segmenta o produto do fundo e lê a silhueta
+    var bgR=bCnt?bR/bCnt:avgR, bgG=bCnt?bG/bCnt:avgG, bgB=bCnt?bB/bCnt:avgB;
+    var shape=detectShape(data,w,h,bgR,bgG,bgB);
 
     // paleta: top buckets -> cor representativa
     var arr=[];
@@ -497,8 +555,92 @@
     return {
       palette:pal, orient:orient, fmt:fmt, mood:mood, tomSug:tomSug,
       light:light, warm:warmTxt, sat:satTxt, contrast:conTxt, scene:scene,
+      shape:shape, product:null,
       dims:img.naturalWidth+'×'+img.naturalHeight+'px'
     };
+  }
+
+  /* ============================================================
+     IDENTIFICAÇÃO DO PRODUTO  +  PREENCHIMENTO AUTOMÁTICO
+     Palpite a partir do formato da silhueta e do nome do arquivo.
+     Preenche campos típicos da categoria (editáveis) pra você
+     só clicar em "Gerar prompt".
+  ============================================================ */
+  var CATALOG={
+    garrafa:{emoji:'🍾',label:'Garrafa',nome:'Garrafa Térmica',
+      beneficios:'Mantém gelado ou quente por até 12h, aço inox livre de BPA, tampa com vedação antivazamento, leve para levar a qualquer lugar',
+      publico:['público fitness e esportivo','público geral'], tom:'Confiável e informativo'},
+    copo:{emoji:'🥤',label:'Copo / Caneca',nome:'Copo Térmico',
+      beneficios:'Mantém a bebida na temperatura por horas, parede dupla que não esquenta a mão, tampa antivazamento, fácil de limpar',
+      publico:['público geral','adultos de 30 a 50 anos'], tom:'Confiável e informativo'},
+    caixa:{emoji:'📦',label:'Kit / Embalagem',nome:'Kit Completo',
+      beneficios:'Kit completo pronto para usar, ótimo para presentear, produto de qualidade com garantia, envio rápido',
+      publico:['público geral'], tom:'Confiável e informativo'},
+    eletronico:{emoji:'📱',label:'Eletrônico',nome:'Gadget Eletrônico',
+      beneficios:'Tecnologia de ponta, bateria de longa duração, conexão rápida e estável, design compacto e fácil de usar',
+      publico:['jovens de 18 a 30 anos','gamers'], tom:'Enérgico e vendedor'},
+    calcado:{emoji:'👟',label:'Calçado',nome:'Tênis Esportivo',
+      beneficios:'Solado com amortecimento, cabedal respirável, leve e confortável, ideal para treino e para o dia a dia',
+      publico:['público fitness e esportivo','jovens de 18 a 30 anos'], tom:'Enérgico e vendedor'},
+    vestuario:{emoji:'👕',label:'Vestuário',nome:'Peça de Roupa',
+      beneficios:'Tecido macio e confortável, caimento perfeito, não desbota na lavagem, disponível em vários tamanhos',
+      publico:['jovens de 18 a 30 anos','público geral'], tom:'Divertido e descontraído'},
+    cosmetico:{emoji:'💄',label:'Cosmético',nome:'Cosmético',
+      beneficios:'Fórmula de alta performance, resultado visível, fácil de aplicar, rende muito e dura o dia todo',
+      publico:['jovens de 18 a 30 anos','público geral'], tom:'Premium e sofisticado'},
+    utensilio:{emoji:'🍳',label:'Utensílio de cozinha',nome:'Utensílio de Cozinha',
+      beneficios:'Facilita o dia a dia na cozinha, material durável e antiaderente, fácil de limpar, economiza tempo',
+      publico:['donas de casa','público geral'], tom:'Confiável e informativo'},
+    brinquedo:{emoji:'🧸',label:'Brinquedo',nome:'Brinquedo',
+      beneficios:'Diversão garantida, estimula a criatividade, material seguro e resistente, presente perfeito para as crianças',
+      publico:['público geral'], tom:'Divertido e descontraído'}
+  };
+
+  // Palavras-chave no nome do arquivo -> [regex, categoria, nome específico|null]
+  var NAMEKW=[
+    [/garrafa|squeeze|t[eé]rmica|vinho|whisky|cerveja|\bagua\b|\bágua\b/,'garrafa',null],
+    [/copo|caneca|\bmug\b|x[íi]cara/,'copo',null],
+    [/fone|headphone|headset|earbud|airpod|\btws\b/,'eletronico','Fone de Ouvido Bluetooth'],
+    [/celular|smartphone|iphone|android|capinha|capa.de.celular/,'eletronico','Smartphone'],
+    [/rel[óo]gio|smartwatch|\bwatch\b/,'eletronico','Relógio / Smartwatch'],
+    [/caixa.de.som|speaker|\bjbl\b/,'eletronico','Caixa de Som Bluetooth'],
+    [/t[êe]nis|sapato|sapat[êe]nis|chuteira|sand[áa]lia|chinelo|bota/,'calcado',null],
+    [/camiseta|camisa|blusa|vestido|cal[çc]a|jaqueta|moletom|roupa/,'vestuario',null],
+    [/mochila|bolsa|carteira|necessaire/,'vestuario','Mochila / Bolsa'],
+    [/perfume|maquiagem|batom|creme|hidratante|shampoo|cosm[ée]tico|s[ée]rum/,'cosmetico',null],
+    [/brinquedo|boneca|carrinho|\blego\b|pel[úu]cia/,'brinquedo',null],
+    [/panela|frigideira|liquidificador|air.?fryer|cafeteira|espremedor|utens[íi]lio/,'utensilio',null]
+  ];
+
+  function classify(filename, shape){
+    var fn=(filename||'').toLowerCase();
+    for(var i=0;i<NAMEKW.length;i++){
+      if(NAMEKW[i][0].test(fn)) return {cat:NAMEKW[i][1], name:NAMEKW[i][2], src:'pelo nome do arquivo'};
+    }
+    if(shape && shape.cat && CATALOG[shape.cat]) return {cat:shape.cat, name:null, src:'pelo formato da foto'};
+    return {cat:null, name:null, src:null};
+  }
+
+  var tomTouched=false; // não sobrescreve o tom se o usuário já escolheu
+
+  function autofill(det){
+    if(!det || !det.cat) return false;
+    var c=CATALOG[det.cat]; if(!c) return false;
+    var nome=det.name||c.nome;
+    var pf=document.getElementById('produto');
+    if(nome && pf.value.trim()==='') pf.value=nome;
+    var bf=document.getElementById('beneficios');
+    if(c.beneficios && bf.value.trim()==='') bf.value=c.beneficios;
+    if(!document.querySelector('#publico .chip.on') && c.publico){
+      document.querySelectorAll('#publico .chip').forEach(function(ch){
+        if(c.publico.indexOf(ch.getAttribute('data-v'))>=0) ch.classList.add('on');
+      });
+    }
+    if(c.tom && !tomTouched){
+      var s=document.getElementById('tom');
+      for(var i=0;i<s.options.length;i++){ if(s.options[i].text===c.tom){ s.selectedIndex=i; break; } }
+    }
+    return true;
   }
 
   /* ============================================================
@@ -509,8 +651,23 @@
   var loading=document.getElementById('anLoading');
   var panel=document.getElementById('analysis');
 
-  function renderAnalysis(a,dataUrl){
+  function renderAnalysis(a,dataUrl,det){
     document.getElementById('anThumb').src=dataUrl;
+
+    // produto identificado (palpite)
+    var prodEl=document.getElementById('anProduct');
+    var noteEl=document.getElementById('anNote');
+    if(det && det.cat && CATALOG[det.cat]){
+      var c=CATALOG[det.cat];
+      prodEl.innerHTML='Produto identificado: <b>'+c.emoji+' '+(det.name||c.nome||c.label)+
+        '</b> <span class="src">('+det.src+')</span>';
+      noteEl.textContent='⚡ Preenchi os campos abaixo automaticamente — revise e clique em “Gerar prompt”.';
+      noteEl.classList.add('show');
+    }else{
+      prodEl.innerHTML='Produto: <b>não deu pra identificar pela imagem</b> '+
+        '<span class="src">— preencha o nome abaixo</span>';
+      noteEl.classList.remove('show');
+    }
 
     document.getElementById('anMood').innerHTML=
       'Clima visual: <b>'+a.mood+'</b> · '+a.orient;
@@ -561,7 +718,13 @@
       img.onload=function(){
         var a=analyze(img);
         loading.classList.remove('show');
-        if(a){ ANALYSIS=a; renderAnalysis(a,url); }
+        if(a){
+          var det=classify(file.name, a.shape);
+          a.product = (det && det.cat && CATALOG[det.cat]) ? (det.name||CATALOG[det.cat].nome||CATALOG[det.cat].label) : null;
+          ANALYSIS=a;
+          autofill(det);
+          renderAnalysis(a,url,det);
+        }
         else { ANALYSIS=null; alert('Não consegui ler os pixels dessa imagem. Tente outra foto (JPG/PNG).'); }
       };
       img.onerror=function(){ loading.classList.remove('show'); alert('Arquivo de imagem inválido.'); };
@@ -571,6 +734,7 @@
   }
 
   fileInput.addEventListener('change',function(){ if(this.files[0]) handleFile(this.files[0]); });
+  document.getElementById('tom').addEventListener('change',function(){ tomTouched=true; });
 
   ['dragenter','dragover'].forEach(function(e){
     drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add('drag');});
@@ -594,6 +758,7 @@
     if(!a) return '';
     var cores=a.palette.map(function(c){return c.name+' ('+c.hex+')';}).join(', ');
     return "═══ REFERÊNCIA VISUAL DA FOTO (análise automática) ═══\n"+
+      (a.product?"• Tipo de produto (palpite): "+a.product+"\n":"")+
       "• Paleta predominante: "+cores+"\n"+
       "• Iluminação: "+a.light+"\n"+
       "• Temperatura de cor: "+a.warm+"\n"+
@@ -672,7 +837,7 @@ refVisual+
     document.querySelectorAll('#publico .chip').forEach(function(c){c.classList.remove('on');});
     document.getElementById('out').classList.remove('show');
     // reseta análise
-    ANALYSIS=null;fileInput.value='';panel.classList.remove('show');
+    ANALYSIS=null;fileInput.value='';panel.classList.remove('show');tomTouched=false;
     var chips=document.querySelectorAll('#formato .chip');
     chips.forEach(function(c,i){ c.classList.toggle('on', i===0); });
   });
