@@ -112,6 +112,18 @@
   .an-product .src{color:var(--txt-3);font-weight:400;font-size:12.5px}
   .an-note{font-size:12.5px;color:var(--ok);margin-top:11px;display:none}
   .an-note.show{display:block}
+  .an-cat{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:13px}
+  .an-cat-lbl{font-size:12.5px;color:var(--txt-2);font-weight:600}
+  .an-cat-sel{
+    background:var(--card-2);border:1px solid var(--line);color:var(--txt);
+    border-radius:9px;padding:7px 30px 7px 11px;font-size:13px;font-family:inherit;
+    cursor:pointer;appearance:none;transition:.16s;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23a5adbf' stroke-width='2'><path d='M2 4l4 4 4-4'/></svg>");
+    background-repeat:no-repeat;background-position:right 10px center;
+  }
+  .an-cat-sel:hover{border-color:var(--accent)}
+  .an-cat-sel:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .an-cat-hint{font-size:12px;color:var(--txt-3)}
 
   .palette{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
   .sw{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.12);
@@ -227,6 +239,11 @@
             <div class="an-mood" id="anMood"></div>
             <div class="palette" id="anPalette"></div>
             <div class="tags" id="anTags"></div>
+            <div class="an-cat">
+              <span class="an-cat-lbl">Categoria do produto:</span>
+              <select id="anCategory" class="an-cat-sel"></select>
+              <span class="an-cat-hint">troque aqui se o palpite estiver errado</span>
+            </div>
             <div class="an-note" id="anNote"></div>
             <div class="an-actions">
               <div class="an-suggest" id="anSuggest"></div>
@@ -634,27 +651,69 @@
     return {cat:null, name:null, src:null};
   }
 
-  var tomTouched=false; // não sobrescreve o tom se o usuário já escolheu
+  var tomTouched=false;                                     // não sobrescreve o tom escolhido à mão
+  var lastAuto={produto:'',beneficios:'',publico:[],tom:''}; // o que NÓS preenchemos (p/ não pisar no que o usuário digitou)
 
-  function autofill(det){
-    if(!det || !det.cat) return false;
-    var c=CATALOG[det.cat]; if(!c) return false;
-    var nome=det.name||c.nome;
+  function chipsOn(){return Array.prototype.map.call(document.querySelectorAll('#publico .chip.on'),function(c){return c.getAttribute('data-v');});}
+  function sameSet(a,b){ if(a.length!==b.length) return false; for(var i=0;i<a.length;i++){ if(b.indexOf(a[i])<0) return false; } return true; }
+
+  // Aplica os padrões de uma categoria nos campos (tudo editável).
+  // Só troca o que estava vazio ou o que nós mesmos preenchemos antes —
+  // preserva qualquer coisa que o usuário digitou à mão.
+  // manual=true quando veio do seletor de categoria (correção do usuário).
+  function applyCategory(cat, manual, specificName, srcText){
+    var prodEl=document.getElementById('anProduct');
+    var noteEl=document.getElementById('anNote');
+    var catSel=document.getElementById('anCategory');
+    if(catSel) catSel.value=(cat && CATALOG[cat])?cat:'outro';
+
+    if(!cat || !CATALOG[cat]){
+      if(manual){ // voltou pra "Outro": limpa só o que era automático
+        var pf0=document.getElementById('produto'); if(pf0.value===lastAuto.produto) pf0.value='';
+        var bf0=document.getElementById('beneficios'); if(bf0.value===lastAuto.beneficios) bf0.value='';
+        if(lastAuto.publico.length && sameSet(chipsOn(),lastAuto.publico)){
+          document.querySelectorAll('#publico .chip').forEach(function(ch){ ch.classList.remove('on'); });
+        }
+        if(lastAuto.tom && !tomTouched) document.getElementById('tom').selectedIndex=0;
+        lastAuto={produto:'',beneficios:'',publico:[],tom:''};
+      }
+      if(ANALYSIS) ANALYSIS.product=null;
+      prodEl.innerHTML= manual
+        ? 'Produto: <b>categoria não definida</b> <span class="src">— preencha o nome abaixo</span>'
+        : 'Produto: <b>não deu pra identificar pela imagem</b> <span class="src">— escolha a categoria ou preencha o nome</span>';
+      noteEl.classList.remove('show');
+      return;
+    }
+
+    var c=CATALOG[cat], nome=specificName||c.nome;
     var pf=document.getElementById('produto');
-    if(nome && pf.value.trim()==='') pf.value=nome;
+    if(pf.value.trim()==='' || pf.value===lastAuto.produto){ pf.value=nome; lastAuto.produto=nome; }
     var bf=document.getElementById('beneficios');
-    if(c.beneficios && bf.value.trim()==='') bf.value=c.beneficios;
-    if(!document.querySelector('#publico .chip.on') && c.publico){
-      document.querySelectorAll('#publico .chip').forEach(function(ch){
-        if(c.publico.indexOf(ch.getAttribute('data-v'))>=0) ch.classList.add('on');
-      });
+    if(bf.value.trim()==='' || bf.value===lastAuto.beneficios){ bf.value=c.beneficios; lastAuto.beneficios=c.beneficios; }
+    var on=chipsOn();
+    if(on.length===0 || sameSet(on,lastAuto.publico)){
+      document.querySelectorAll('#publico .chip').forEach(function(ch){ ch.classList.remove('on'); });
+      (c.publico||[]).forEach(function(v){ document.querySelectorAll('#publico .chip').forEach(function(ch){ if(ch.getAttribute('data-v')===v) ch.classList.add('on'); }); });
+      lastAuto.publico=(c.publico||[]).slice();
     }
-    if(c.tom && !tomTouched){
-      var s=document.getElementById('tom');
-      for(var i=0;i<s.options.length;i++){ if(s.options[i].text===c.tom){ s.selectedIndex=i; break; } }
-    }
-    return true;
+    if(c.tom && !tomTouched){ var s=document.getElementById('tom'); for(var i=0;i<s.options.length;i++){ if(s.options[i].text===c.tom){ s.selectedIndex=i; break; } } lastAuto.tom=c.tom; }
+
+    if(ANALYSIS) ANALYSIS.product=nome;
+    prodEl.innerHTML='Produto identificado: <b>'+c.emoji+' '+nome+'</b> <span class="src">('+(manual?'categoria escolhida por você':(srcText||'pelo formato da foto'))+')</span>';
+    noteEl.textContent='⚡ Preenchi os campos abaixo automaticamente — revise e clique em “Gerar prompt”.';
+    noteEl.classList.add('show');
   }
+
+  // monta o seletor de categoria uma vez (todas as categorias + "Outro")
+  (function(){
+    var sel=document.getElementById('anCategory'); if(!sel || sel.options.length) return;
+    Object.keys(CATALOG).forEach(function(k){
+      var o=document.createElement('option'); o.value=k; o.textContent=CATALOG[k].emoji+' '+CATALOG[k].label; sel.appendChild(o);
+    });
+    var oo=document.createElement('option'); oo.value='outro'; oo.textContent='🛍️ Outro / não sei'; sel.appendChild(oo);
+    sel.value='outro';
+    sel.addEventListener('change',function(){ applyCategory(this.value==='outro'?null:this.value, true); });
+  })();
 
   /* ============================================================
      UI DA ANÁLISE
@@ -664,23 +723,8 @@
   var loading=document.getElementById('anLoading');
   var panel=document.getElementById('analysis');
 
-  function renderAnalysis(a,dataUrl,det){
+  function renderAnalysis(a,dataUrl){
     document.getElementById('anThumb').src=dataUrl;
-
-    // produto identificado (palpite)
-    var prodEl=document.getElementById('anProduct');
-    var noteEl=document.getElementById('anNote');
-    if(det && det.cat && CATALOG[det.cat]){
-      var c=CATALOG[det.cat];
-      prodEl.innerHTML='Produto identificado: <b>'+c.emoji+' '+(det.name||c.nome||c.label)+
-        '</b> <span class="src">('+det.src+')</span>';
-      noteEl.textContent='⚡ Preenchi os campos abaixo automaticamente — revise e clique em “Gerar prompt”.';
-      noteEl.classList.add('show');
-    }else{
-      prodEl.innerHTML='Produto: <b>não deu pra identificar pela imagem</b> '+
-        '<span class="src">— preencha o nome abaixo</span>';
-      noteEl.classList.remove('show');
-    }
 
     document.getElementById('anMood').innerHTML=
       'Clima visual: <b>'+a.mood+'</b> · '+a.orient;
@@ -732,11 +776,10 @@
         var a=analyze(img);
         loading.classList.remove('show');
         if(a){
-          var det=classify(file.name, a.shape);
-          a.product = (det && det.cat && CATALOG[det.cat]) ? (det.name||CATALOG[det.cat].nome||CATALOG[det.cat].label) : null;
           ANALYSIS=a;
-          autofill(det);
-          renderAnalysis(a,url,det);
+          renderAnalysis(a,url);
+          var det=classify(file.name, a.shape);
+          applyCategory(det.cat, false, det.name, det.src);
         }
         else { ANALYSIS=null; alert('Não consegui ler os pixels dessa imagem. Tente outra foto (JPG/PNG).'); }
       };
@@ -851,6 +894,8 @@ refVisual+
     document.getElementById('out').classList.remove('show');
     // reseta análise
     ANALYSIS=null;fileInput.value='';panel.classList.remove('show');tomTouched=false;
+    lastAuto={produto:'',beneficios:'',publico:[],tom:''};
+    var acs=document.getElementById('anCategory'); if(acs) acs.value='outro';
     var chips=document.querySelectorAll('#formato .chip');
     chips.forEach(function(c,i){ c.classList.toggle('on', i===0); });
   });
