@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador de Projetos para OSC</title>
+<style>
+  :root{
+    --paper:#ffffff;
+    --field-bg:#ffffff;
+    --bg:#e9ede9;
+    --surface:#f6f8f5;
+    --surface-2:#eef2ee;
+    --ink:#16211f;
+    --ink-soft:#48544f;
+    --muted:#8a958f;
+    --line:#d5ddd6;
+    --line-strong:#c3ccc4;
+    --primary:#0e5b54;
+    --primary-strong:#0a4842;
+    --primary-soft:#e0efec;
+    --accent:#bf7d2c;
+    --accent-soft:#f6ecda;
+    --good:#2f7d54;
+    --warn:#b07d24;
+    --danger:#b23a38;
+    --shadow:0 1px 2px rgba(16,40,36,.06),0 12px 30px rgba(16,40,36,.10);
+    --radius:12px;
+    --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --font-doc-head:Georgia,"Times New Roman","Nimbus Roman",serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --field-bg:#0f1a18;
+      --bg:#0c1413;--surface:#131e1c;--surface-2:#0f1918;
+      --ink:#e7ece9;--ink-soft:#a7b3ae;--muted:#6d7b76;
+      --line:#25332f;--line-strong:#2f3f3a;
+      --primary:#33b0a2;--primary-strong:#45c2b3;--primary-soft:#12302a;
+      --accent:#d4a052;--accent-soft:#2a2216;
+      --good:#4ba874;--warn:#cf9a3a;--danger:#d1615f;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="light"]{
+    --field-bg:#ffffff;
+    --bg:#e9ede9;--surface:#f6f8f5;--surface-2:#eef2ee;--ink:#16211f;--ink-soft:#48544f;--muted:#8a958f;
+    --line:#d5ddd6;--line-strong:#c3ccc4;--primary:#0e5b54;--primary-strong:#0a4842;--primary-soft:#e0efec;
+    --accent:#bf7d2c;--accent-soft:#f6ecda;--good:#2f7d54;--warn:#b07d24;--danger:#b23a38;
+    --shadow:0 1px 2px rgba(16,40,36,.06),0 12px 30px rgba(16,40,36,.10);
+  }
+  :root[data-theme="dark"]{
+    --field-bg:#0f1a18;
+    --bg:#0c1413;--surface:#131e1c;--surface-2:#0f1918;--ink:#e7ece9;--ink-soft:#a7b3ae;--muted:#6d7b76;
+    --line:#25332f;--line-strong:#2f3f3a;--primary:#33b0a2;--primary-strong:#45c2b3;--primary-soft:#12302a;
+    --accent:#d4a052;--accent-soft:#2a2216;--good:#4ba874;--warn:#cf9a3a;--danger:#d1615f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px rgba(0,0,0,.45);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:var(--font-ui);color:var(--ink);background:var(--bg);
+    font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+  .app{display:flex;flex-direction:column;height:100dvh;min-height:0}
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    padding:10px 18px;background:var(--surface);border-bottom:1px solid var(--line);
+    box-shadow:0 1px 0 rgba(0,0,0,.02);z-index:5;
+  }
+  .brand{display:flex;align-items:center;gap:11px;min-width:0}
+  .mark{
+    width:34px;height:34px;border-radius:9px;flex:0 0 auto;
+    background:linear-gradient(150deg,var(--primary),var(--primary-strong));
+    display:grid;place-items:center;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  }
+  .mark svg{width:19px;height:19px}
+  .brand h1{font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em;white-space:nowrap}
+  .brand p{margin:0;font-size:11.5px;color:var(--muted);white-space:nowrap}
+
+  .meter{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .meter .bar{width:150px;height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+  .meter .fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--primary));transition:width .35s ease}
+  .meter .txt{font-size:12px;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .meter .txt b{color:var(--ink)}
+
+  .actions{display:flex;gap:8px;align-items:center}
+  .btn{
+    font:inherit;font-size:13px;font-weight:600;cursor:pointer;border-radius:9px;
+    padding:9px 14px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);
+    display:inline-flex;align-items:center;gap:7px;transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--primary);color:var(--primary)}
+  .btn svg{width:15px;height:15px}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+  .btn.primary:hover{background:var(--primary-strong);border-color:var(--primary-strong);color:#fff}
+  .btn.ghost{background:transparent}
+  .btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+  .btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.tab:focus-visible{
+    outline:2px solid var(--primary);outline-offset:2px
+  }
+  .icon-btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-soft);border-radius:8px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer}
+  .icon-btn:hover{color:var(--primary);border-color:var(--primary)}
+  .icon-btn svg{width:16px;height:16px}
+
+  /* ---------- Mobile tabs ---------- */
+  .tabbar{display:none;gap:6px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+  .tab{flex:1;font:inherit;font-size:13px;font-weight:600;padding:9px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(360px,42%) 1fr}
+  .form-pane{overflow-y:auto;min-height:0;padding:20px 22px 80px;border-right:1px solid var(--line);background:var(--bg)}
+  .preview-pane{overflow-y:auto;min-height:0;background:var(--surface-2);padding:22px}
+  .preview-head{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin:0 auto 14px;max-width:820px}
+  .preview-head .dot{width:7px;height:7px;border-radius:99px;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 22%,transparent)}
+
+  /* ---------- Form ---------- */
+  .fs{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px 18px;margin-bottom:14px}
+  .fs > header{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .fs .sn{flex:0 0 auto;width:24px;height:24px;border-radius:7px;background:var(--primary-soft);color:var(--primary);font-size:12px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+  .fs h2{font-size:14px;margin:0;font-weight:700;letter-spacing:-.01em}
+  .fs .hint{font-size:11.5px;color:var(--muted);margin:2px 0 0}
+
+  .row{display:grid;gap:12px;margin-bottom:12px}
+  .row:last-child{margin-bottom:0}
+  .cols-2{grid-template-columns:1fr 1fr}
+  .cols-3{grid-template-columns:1fr 1fr 1fr}
+  .cols-21{grid-template-columns:2fr 1fr}
+  @media (max-width:520px){.cols-2,.cols-3,.cols-21{grid-template-columns:1fr}}
+
+  .fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .lbl{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em}
+  .lbl em{color:var(--accent);font-style:normal;margin-left:1px}
+  input,select,textarea{
+    font:inherit;font-size:14px;color:var(--ink);background:var(--field-bg);
+    border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px;width:100%;transition:border-color .15s;
+  }
+  input:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
+  input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+  textarea{resize:vertical;min-height:78px;line-height:1.55}
+  input::placeholder,textarea::placeholder{color:var(--muted)}
+  select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a958f' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+
+  /* dynamic lists */
+  .list{display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
+  .litem{display:grid;gap:8px;align-items:start;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:9px}
+  .litem.obj{grid-template-columns:22px 1fr 30px;align-items:center}
+  .litem.meta{grid-template-columns:1fr 1fr 30px}
+  .litem.crono{grid-template-columns:1fr 78px 78px 30px;align-items:center}
+  .litem.orc{grid-template-columns:minmax(120px,1.1fr) minmax(120px,1.6fr) 66px 96px 30px;align-items:center}
+  .litem.equipe{grid-template-columns:1.4fr 60px 1.4fr 84px 30px;align-items:center}
+  @media (max-width:820px){
+    .litem.meta,.litem.crono,.litem.orc,.litem.equipe{grid-template-columns:1fr 1fr;position:relative}
+    .litem.crono .rm,.litem.orc .rm,.litem.equipe .rm,.litem.meta .rm{position:absolute;top:8px;right:8px}
+    .litem.orc .orc-tot{grid-column:1/-1}
+  }
+  .litem .lnum{color:var(--muted);font-size:12px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+  .litem input,.litem select{padding:7px 9px;font-size:13px}
+  .orc-tot{font-size:13px;font-weight:700;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;padding-right:2px}
+  .rm{border:1px solid var(--line-strong);background:var(--paper);color:var(--muted);border-radius:7px;width:28px;height:28px;font-size:17px;line-height:1;cursor:pointer;flex:0 0 auto}
+  .rm:hover{color:var(--danger);border-color:var(--danger)}
+  .add{font:inherit;font-size:12.5px;font-weight:600;color:var(--primary);background:transparent;border:1px dashed var(--line-strong);border-radius:8px;padding:8px 12px;cursor:pointer;width:100%}
+  .add:hover{border-color:var(--primary);background:var(--primary-soft)}
+  .orc-sum{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:10px 12px;background:var(--primary-soft);border-radius:8px;font-size:13px;font-weight:600;color:var(--primary)}
+  .orc-sum b{font-size:15px;font-variant-numeric:tabular-nums}
+  .autosave{font-size:11px;color:var(--muted);margin-top:16px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+
+  /* ---------- Document (paper) ---------- */
+  .paper{
+    background:var(--paper);color:#1b1b1b;max-width:820px;margin:0 auto;border-radius:8px;
+    box-shadow:var(--shadow);border:1px solid var(--line);padding:52px 60px 60px;
+    font-size:13.5px;line-height:1.62;
+  }
+  .doc-eyebrow{font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#0e5b54;margin:0 0 8px}
+  .doc-title{font-family:var(--font-doc-head);font-size:27px;line-height:1.18;margin:0;color:#14211f;font-weight:700;text-wrap:balance}
+  .doc-org{font-family:var(--font-ui);font-size:13px;color:#555;margin:9px 0 0}
+  .doc-rule{height:3px;background:#0e5b54;border-radius:2px;margin:16px 0 0;width:64px}
+
+  .summary{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e6e6e6;border:1px solid #e6e6e6;border-radius:8px;overflow:hidden;margin:22px 0 8px}
+  .summary div{background:#fafafa;padding:9px 13px}
+  .summary dt{font-family:var(--font-ui);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a8a8a;margin:0}
+  .summary dd{margin:2px 0 0;font-size:13px;color:#1f1f1f;font-weight:600;font-variant-numeric:tabular-nums}
+
+  .doc-section{margin-top:26px}
+  .doc-section > h2{
+    font-family:var(--font-doc-head);font-size:16px;color:#14211f;margin:0 0 9px;font-weight:700;
+    display:flex;align-items:baseline;gap:9px;border-bottom:1px solid #e4e4e4;padding-bottom:6px;
+  }
+  .doc-section > h2 .num{
+    font-family:var(--font-ui);font-size:11px;font-weight:700;color:#fff;background:#0e5b54;
+    border-radius:5px;padding:2px 7px;letter-spacing:.02em;flex:0 0 auto;
+  }
+  .doc-p{margin:0 0 9px;white-space:pre-wrap;color:#2a2a2a}
+  .doc-p:last-child{margin-bottom:0}
+  .ph{color:#b3b3b3;font-style:italic}
+  .doc-ol{margin:0;padding-left:22px}
+  .doc-ol li{margin:0 0 5px;color:#2a2a2a}
+  .kv{width:100%;border-collapse:collapse;margin-top:2px}
+  .kv td{padding:6px 10px;border:1px solid #e6e6e6;vertical-align:top;font-size:12.5px}
+  .kv td.k{background:#f7f7f7;font-weight:600;color:#444;width:38%;font-family:var(--font-ui)}
+  .kv td.v{color:#1f1f1f}
+
+  .dtable{width:100%;border-collapse:collapse;margin-top:4px;font-size:12px}
+  .dtable th{background:#0e5b54;color:#fff;font-family:var(--font-ui);font-weight:600;text-align:left;padding:7px 9px;font-size:11px;letter-spacing:.02em}
+  .dtable td{padding:7px 9px;border:1px solid #e6e6e6;vertical-align:top;color:#2a2a2a}
+  .dtable tr:nth-child(even) td{background:#fafafa}
+  .dtable td.num,.dtable th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .dtable tfoot td{font-weight:700;background:#eef4f2;color:#14211f;border-color:#dbe6e2}
+
+  /* mini gantt */
+  .gantt{margin:6px 0 12px;overflow-x:auto}
+  .g-inner{min-width:480px}
+  .g-row{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;margin-bottom:4px}
+  .g-row.head .g-label{color:#8a8a8a;font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+  .g-label{font-size:11.5px;color:#333;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .g-track{display:grid;gap:2px}
+  .g-cell{height:16px;border-radius:3px;background:#eef0ee}
+  .g-cell.on{background:linear-gradient(90deg,#0e5b54,#1a8378);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .g-cell.mnum{height:auto;background:transparent;font-size:9.5px;color:#9a9a9a;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+
+  .signblock{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:46px}
+  .signline{text-align:center;font-size:12px;color:#444}
+  .signline .ln{border-top:1px solid #333;margin:0 0 6px;padding-top:6px}
+  .signline b{color:#1f1f1f}
+  .doc-foot{margin-top:34px;padding-top:12px;border-top:1px solid #ececec;font-family:var(--font-ui);font-size:10.5px;color:#a0a0a0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+  .print-only{display:none}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:940px){
+    .main{grid-template-columns:1fr}
+    .form-pane{border-right:0}
+    .tabbar{display:flex}
+    .main[data-view="form"] .preview-pane{display:none}
+    .main[data-view="preview"] .form-pane{display:none}
+    .meter{display:none}
+    .brand p{display:none}
+    .paper{padding:34px 26px 40px}
+  }
+  @media (max-width:600px){
+    .actions .label-lg{display:none}
+    .summary{grid-template-columns:1fr}
+    .signblock{grid-template-columns:1fr;gap:26px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* ---------- Print ---------- */
+  @media print{
+    @page{size:A4;margin:16mm 15mm}
+    html,body{background:#fff}
+    .topbar,.tabbar,.form-pane,.preview-head,.icon-btn{display:none!important}
+    .app{display:block;height:auto}
+    .main{display:block}
+    .preview-pane{display:block!important;overflow:visible;padding:0;background:#fff}
+    .paper{box-shadow:none;border:0;border-radius:0;max-width:none;width:auto;margin:0;padding:0;font-size:11pt}
+    .doc-section{margin-top:20px;break-inside:auto}
+    .doc-section > h2{break-after:avoid}
+    .doc-ol li,.g-row,.signblock,.summary{break-inside:avoid}
+    .dtable thead{display:table-header-group}
+    .dtable tr{break-inside:avoid}
+    .print-only{display:block}
+    .doc-foot{margin-top:26px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg>
+      </span>
+      <div>
+        <h1>Gerador de Projetos&nbsp;·&nbsp;OSC</h1>
+        <p>Plano de Trabalho conforme a Lei 13.019/2014 (MROSC)</p>
+      </div>
+    </div>
+
+    <div class="meter" title="Preenchimento dos campos essenciais para aprovação">
+      <div class="bar"><span class="fill" id="meterFill"></span></div>
+      <span class="txt"><b id="meterPct">0%</b> · <span id="meterPend">17 pendências</span></span>
+    </div>
+
+    <div class="actions">
+      <button class="icon-btn" id="themeBtn" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+      <button class="btn ghost" id="sampleBtn" title="Preencher com um projeto de exemplo"><span class="label-lg">Exemplo</span></button>
+      <button class="btn ghost danger" id="clearBtn" title="Apagar tudo e recomeçar"><span class="label-lg">Limpar</span></button>
+      <button class="btn primary" id="pdfBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+        Gerar PDF
+      </button>
+    </div>
+  </header>
+
+  <nav class="tabbar" role="tablist" aria-label="Alternar entre formulário e prévia">
+    <button class="tab" id="tabForm" role="tab" aria-selected="true">Formulário</button>
+    <button class="tab" id="tabPreview" role="tab" aria-selected="false">Pré-visualização</button>
+  </nav>
+
+  <div class="main" id="main" data-view="form">
+    <!-- ============ FORM ============ -->
+    <section class="form-pane" aria-label="Formulário do projeto">
+
+      <div class="fs">
+        <header><span class="sn">1</span><div><h2>Identificação da OSC (proponente)</h2><p class="hint">Dados cadastrais da organização e do responsável legal.</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Razão social <em>*</em></span><input data-field="osc.razaoSocial" placeholder="Nome oficial da organização"></label></div>
+        <div class="row cols-2">
+          <label class="fld"><span class="lbl">CNPJ <em>*</em></span><input data-field="osc.cnpj" placeholder="00.000.000/0001-00"></label>
+          <label class="fld"><span class="lbl">Natureza jurídica</span><input data-field="osc.natureza" placeholder="Associação, fundação..."></label>
+        </div>
+        <div class="row"><label class="fld"><span class="lbl">Endereço</span><input data-field="osc.endereco" placeholder="Rua, número, bairro"></label></div>
+        <div class="row cols-3">
+          <label class="fld"><span class="lbl">Município</span><input data-field="osc.municipio" placeholder="Cidade"></label>
+          <label class="fld"><span class="lbl">UF</span>
+            <select data-field="osc.uf"><option value="">—</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select>
+          </label>
+          <label class="fld"><span class="lbl">CEP</span><input data-field="osc.cep" placeholder="00000-000"></label>
+        </div>
+        <div class="row cols-3">
+          <label class="fld"><span class="lbl">Telefone</span><input data-field="osc.telefone" placeholder="(00) 00000-0000"></label>
+          <label class="fld"><span class="lbl">E-mail</span><input data-field="osc.email" type="email" placeholder="contato@osc.org.br"></label>
+          <label class="fld"><span class="lbl">Site / redes</span><input data-field="osc.site" placeholder="site ou @perfil"></label>
+        </div>
+        <div class="row cols-3">
+          <label class="fld"><span class="lbl">Responsável legal</span><input data-field="osc.respLegal" placeholder="Nome do dirigente"></label>
+          <label class="fld"><span class="lbl">CPF</span><input data-field="osc.respCpf" placeholder="000.000.000-00"></label>
+          <label class="fld"><span class="lbl">Cargo</span><input data-field="osc.respCargo" placeholder="Presidente"></label>
+        </div>
+        <div class="row cols-2">
+          <label class="fld"><span class="lbl">Coordenador(a) do projeto</span><input data-field="osc.coordNome" placeholder="Responsável técnico"></label>
+          <label class="fld"><span class="lbl">Contato do coordenador</span><input data-field="osc.coordContato" placeholder="telefone / e-mail"></label>
+        </div>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">2</span><div><h2>Identificação do projeto</h2><p class="hint">Título, área de atuação, abrangência e vigência.</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Título do projeto <em>*</em></span><input data-field="projeto.titulo" placeholder="Nome do projeto"></label></div>
+        <div class="row cols-2">
+          <label class="fld"><span class="lbl">Eixo / área temática <em>*</em></span>
+            <select data-field="projeto.eixo"><option value="">Selecione…</option><option>Assistência Social</option><option>Educação</option><option>Saúde</option><option>Cultura</option><option>Esporte e Lazer</option><option>Meio Ambiente</option><option>Direitos Humanos</option><option>Geração de Trabalho e Renda</option><option>Segurança Alimentar</option><option>Criança e Adolescente</option><option>Pessoa Idosa</option><option>Pessoa com Deficiência</option><option>Outro</option></select>
+          </label>
+          <label class="fld"><span class="lbl">Abrangência / local de execução</span><input data-field="projeto.abrangencia" placeholder="Bairro, cidade, região"></label>
+        </div>
+        <div class="row cols-2">
+          <label class="fld"><span class="lbl">Início da vigência <em>*</em></span><input data-field="projeto.dataInicio" type="date"></label>
+          <label class="fld"><span class="lbl">Término da vigência <em>*</em></span><input data-field="projeto.dataFim" type="date"></label>
+        </div>
+        <div class="row cols-2">
+          <label class="fld"><span class="lbl">Edital / chamamento público</span><input data-field="projeto.edital" placeholder="Nº do edital (se houver)"></label>
+          <label class="fld"><span class="lbl">Órgão / financiador</span><input data-field="projeto.financiador" placeholder="Ente público ou financiador"></label>
+        </div>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">3</span><div><h2>Apresentação e justificativa</h2><p class="hint">O que é o projeto e por que ele é necessário (diagnóstico da realidade).</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Apresentação / resumo <em>*</em></span><textarea data-field="apresentacao" placeholder="Síntese do projeto: o que será realizado, onde e para quem."></textarea></label></div>
+        <div class="row"><label class="fld"><span class="lbl">Justificativa <em>*</em></span><textarea data-field="justificativa" placeholder="Diagnóstico do problema, dados da realidade local e relevância social do projeto." style="min-height:110px"></textarea></label></div>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">4</span><div><h2>Objetivos</h2><p class="hint">Objetivo geral (o propósito central) e os objetivos específicos.</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Objetivo geral <em>*</em></span><textarea data-field="objetivoGeral" placeholder="O que o projeto pretende alcançar de forma ampla." style="min-height:64px"></textarea></label></div>
+        <span class="lbl" style="display:block;margin-bottom:7px">Objetivos específicos <em style="color:var(--accent)">*</em></span>
+        <div class="list" id="list-objetivos"></div>
+        <button class="add" data-add="objetivos">+ Adicionar objetivo específico</button>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">5</span><div><h2>Público-alvo e beneficiários</h2><p class="hint">Quem será atendido e em que quantidade.</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Perfil do público-alvo <em>*</em></span><textarea data-field="publico.perfil" placeholder="Descreva quem serão os beneficiários (faixa etária, condição, território...)."></textarea></label></div>
+        <div class="row cols-2">
+          <label class="fld"><span class="lbl">Beneficiários diretos</span><input data-field="publico.diretos" type="number" min="0" placeholder="Nº de pessoas"></label>
+          <label class="fld"><span class="lbl">Beneficiários indiretos</span><input data-field="publico.indiretos" type="number" min="0" placeholder="Nº de pessoas"></label>
+        </div>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">6</span><div><h2>Metas e indicadores</h2><p class="hint">Resultados esperados, mensuráveis, e como serão aferidos.</p></div></header>
+        <div class="list" id="list-metas"></div>
+        <button class="add" data-add="metas">+ Adicionar meta</button>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">7</span><div><h2>Metodologia</h2><p class="hint">Como o projeto será executado, passo a passo.</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Metodologia de execução <em>*</em></span><textarea data-field="metodologia" placeholder="Descreva as estratégias, atividades e a forma de trabalho." style="min-height:110px"></textarea></label></div>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">8</span><div><h2>Cronograma de execução</h2><p class="hint">Etapas e o mês de início/fim de cada uma (a partir do mês 1).</p></div></header>
+        <div class="list" id="list-cronograma"></div>
+        <button class="add" data-add="cronograma">+ Adicionar etapa</button>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">9</span><div><h2>Plano de aplicação dos recursos</h2><p class="hint">Orçamento detalhado por rubrica. O total é somado automaticamente.</p></div></header>
+        <div class="list" id="list-orcamento"></div>
+        <button class="add" data-add="orcamento">+ Adicionar item de despesa</button>
+        <div class="orc-sum"><span>Valor total do projeto</span><b id="orcGrand">R$&nbsp;0,00</b></div>
+        <div class="row" style="margin-top:12px"><label class="fld"><span class="lbl">Contrapartida da OSC (se houver)</span><textarea data-field="contrapartida" placeholder="Bens, serviços ou recursos aportados pela organização." style="min-height:60px"></textarea></label></div>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">10</span><div><h2>Monitoramento, avaliação e sustentabilidade</h2><p class="hint">Como o projeto será acompanhado e sua continuidade.</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Monitoramento e avaliação <em>*</em></span><textarea data-field="monitoramento" placeholder="Instrumentos de acompanhamento, prestação de contas e avaliação de resultados."></textarea></label></div>
+        <div class="row"><label class="fld"><span class="lbl">Sustentabilidade / continuidade</span><textarea data-field="sustentabilidade" placeholder="Como os resultados se manterão após o término do financiamento." style="min-height:60px"></textarea></label></div>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">11</span><div><h2>Equipe do projeto</h2><p class="hint">Funções, quantidade e qualificação dos profissionais.</p></div></header>
+        <div class="list" id="list-equipe"></div>
+        <button class="add" data-add="equipe">+ Adicionar função</button>
+      </div>
+
+      <div class="fs">
+        <header><span class="sn">12</span><div><h2>Capacidade técnica e experiência da OSC</h2><p class="hint">Histórico e projetos anteriores que comprovam a capacidade de execução.</p></div></header>
+        <div class="row"><label class="fld"><span class="lbl">Experiência da organização</span><textarea data-field="capacidade" placeholder="Tempo de atuação, projetos já realizados, parcerias e resultados anteriores." style="min-height:90px"></textarea></label></div>
+      </div>
+
+      <p class="autosave">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Rascunho salvo automaticamente neste navegador.
+      </p>
+    </section>
+
+    <!-- ============ PREVIEW ============ -->
+    <section class="preview-pane" aria-label="Pré-visualização do documento">
+      <p class="preview-head"><span class="dot"></span> Pré-visualização · o documento é montado em tempo real</p>
+      <article class="paper" id="documento"></article>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "gerador-projetos-osc-v1";
+  var RUBRICAS = ["Recursos Humanos","Material de Consumo","Serviços de Terceiros – PF","Serviços de Terceiros – PJ","Equipamentos e Material Permanente","Diárias e Passagens","Locação / Aluguel","Outras Despesas"];
+
+  function emptyState(){
+    return {
+      osc:{razaoSocial:"",cnpj:"",natureza:"",endereco:"",municipio:"",uf:"",cep:"",telefone:"",email:"",site:"",respLegal:"",respCpf:"",respCargo:"",coordNome:"",coordContato:""},
+      projeto:{titulo:"",eixo:"",abrangencia:"",dataInicio:"",dataFim:"",edital:"",financiador:""},
+      apresentacao:"",justificativa:"",objetivoGeral:"",
+      objetivos:[{texto:""}],
+      publico:{perfil:"",diretos:"",indiretos:""},
+      metas:[{meta:"",indicador:""}],
+      metodologia:"",
+      cronograma:[{etapa:"",ini:"",fim:""}],
+      orcamento:[{rubrica:"",descricao:"",qtd:"",valor:""}],
+      contrapartida:"",
+      monitoramento:"",sustentabilidade:"",
+      equipe:[{funcao:"",qtd:"",formacao:"",carga:""}],
+      capacidade:""
+    };
+  }
+
+  var state = load() || emptyState();
+
+  /* ---------- helpers ---------- */
+  function $(s,r){return (r||document).querySelector(s);}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  var BRL = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+  function money(n){n=Number(n)||0;return BRL.format(n);}
+  function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+  function fmtDate(iso){if(!iso)return "";var p=String(iso).split("-");if(p.length!==3)return iso;return p[2]+"/"+p[1]+"/"+p[0];}
+  function setPath(obj,path,val){var k=path.split("."),o=obj;for(var i=0;i<k.length-1;i++)o=o[k[i]];o[k[k.length-1]]=val;}
+  function getPath(obj,path){var k=path.split("."),o=obj;for(var i=0;i<k.length;i++){if(o==null)return "";o=o[k[i]];}return o==null?"":o;}
+  function has(v){return v!=null && String(v).trim()!=="";}
+  function val(v,ph){return has(v)?esc(v):'<span class="ph">'+esc(ph||"— a preencher —")+"</span>";}
+  function para(v,ph){return '<p class="doc-p">'+val(v,ph)+"</p>";}
+
+  function load(){try{var r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+  var saveT;
+  function scheduleSave(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}},250);}
+
+  /* ---------- list row builders ---------- */
+  function rubricaOpts(sel){
+    var o='<option value="">Rubrica…</option>';
+    for(var i=0;i<RUBRICAS.length;i++){o+='<option'+(RUBRICAS[i]===sel?' selected':'')+'>'+esc(RUBRICAS[i])+'</option>';}
+    return o;
+  }
+  var listRenderers = {
+    objetivos:function(it,i){return '<div class="litem obj"><span class="lnum">'+(i+1)+'</span>'+
+      '<input data-list="objetivos" data-idx="'+i+'" data-key="texto" value="'+esc(it.texto)+'" placeholder="Objetivo específico '+(i+1)+'">'+
+      rmBtn("objetivos",i)+'</div>';},
+    metas:function(it,i){return '<div class="litem meta">'+
+      '<input data-list="metas" data-idx="'+i+'" data-key="meta" value="'+esc(it.meta)+'" placeholder="Meta '+(i+1)+' (ex.: atender 120 crianças)">'+
+      '<input data-list="metas" data-idx="'+i+'" data-key="indicador" value="'+esc(it.indicador)+'" placeholder="Indicador de aferição">'+
+      rmBtn("metas",i)+'</div>';},
+    cronograma:function(it,i){return '<div class="litem crono">'+
+      '<input data-list="cronograma" data-idx="'+i+'" data-key="etapa" value="'+esc(it.etapa)+'" placeholder="Etapa / atividade '+(i+1)+'">'+
+      '<input data-list="cronograma" data-idx="'+i+'" data-key="ini" type="number" min="1" value="'+esc(it.ini)+'" placeholder="Mês ini">'+
+      '<input data-list="cronograma" data-idx="'+i+'" data-key="fim" type="number" min="1" value="'+esc(it.fim)+'" placeholder="Mês fim">'+
+      rmBtn("cronograma",i)+'</div>';},
+    orcamento:function(it,i){var tot=num(it.qtd)*num(it.valor);return '<div class="litem orc">'+
+      '<select data-list="orcamento" data-idx="'+i+'" data-key="rubrica">'+rubricaOpts(it.rubrica)+'</select>'+
+      '<input data-list="orcamento" data-idx="'+i+'" data-key="descricao" value="'+esc(it.descricao)+'" placeholder="Descrição da despesa">'+
+      '<input data-list="orcamento" data-idx="'+i+'" data-key="qtd" type="number" min="0" step="any" value="'+esc(it.qtd)+'" placeholder="Qtd">'+
+      '<input data-list="orcamento" data-idx="'+i+'" data-key="valor" type="number" min="0" step="0.01" value="'+esc(it.valor)+'" placeholder="Vlr unit.">'+
+      rmBtn("orcamento",i)+
+      '<span class="orc-tot" data-orctot="'+i+'">'+money(tot)+'</span></div>';},
+    equipe:function(it,i){return '<div class="litem equipe">'+
+      '<input data-list="equipe" data-idx="'+i+'" data-key="funcao" value="'+esc(it.funcao)+'" placeholder="Função / cargo">'+
+      '<input data-list="equipe" data-idx="'+i+'" data-key="qtd" type="number" min="0" value="'+esc(it.qtd)+'" placeholder="Qtd">'+
+      '<input data-list="equipe" data-idx="'+i+'" data-key="formacao" value="'+esc(it.formacao)+'" placeholder="Formação / qualificação">'+
+      '<input data-list="equipe" data-idx="'+i+'" data-key="carga" value="'+esc(it.carga)+'" placeholder="Carga horária">'+
+      rmBtn("equipe",i)+'</div>';}
+  };
+  function rmBtn(list,i){return '<button class="rm" data-remove="'+list+'" data-idx="'+i+'" title="Remover" aria-label="Remover item">×</button>';}
+  function defItem(list){return {objetivos:{texto:""},metas:{meta:"",indicador:""},cronograma:{etapa:"",ini:"",fim:""},orcamento:{rubrica:"",descricao:"",qtd:"",valor:""},equipe:{funcao:"",qtd:"",formacao:"",carga:""}}[list];}
+
+  function renderList(name){
+    var box=$("#list-"+name);if(!box)return;
+    var arr=state[name],html="";
+    for(var i=0;i<arr.length;i++)html+=listRenderers[name](arr[i],i);
+    box.innerHTML=html;
+  }
+  function renderAllLists(){["objetivos","metas","cronograma","orcamento","equipe"].forEach(renderList);}
+
+  function updateOrcamentoTotals(){
+    var grand=0;
+    for(var i=0;i<state.orcamento.length;i++){
+      var t=num(state.orcamento[i].qtd)*num(state.orcamento[i].valor);grand+=t;
+      var cell=document.querySelector('[data-orctot="'+i+'"]');if(cell)cell.textContent=money(t);
+    }
+    var g=$("#orcGrand");if(g)g.innerHTML=money(grand).replace(/ /g,"&nbsp;");
+    return grand;
+  }
+
+  /* ---------- static field binding ---------- */
+  function bindStatic(){
+    var els=document.querySelectorAll("[data-field]");
+    for(var i=0;i<els.length;i++){
+      var el=els[i];el.value=getPath(state,el.dataset.field);
+    }
+  }
+
+  /* ---------- completeness meter ---------- */
+  var REQUIRED=[
+    ["osc.razaoSocial",function(){return has(state.osc.razaoSocial);}],
+    ["osc.cnpj",function(){return has(state.osc.cnpj);}],
+    ["projeto.titulo",function(){return has(state.projeto.titulo);}],
+    ["projeto.eixo",function(){return has(state.projeto.eixo);}],
+    ["projeto.dataInicio",function(){return has(state.projeto.dataInicio);}],
+    ["projeto.dataFim",function(){return has(state.projeto.dataFim);}],
+    ["apresentacao",function(){return has(state.apresentacao);}],
+    ["justificativa",function(){return has(state.justificativa);}],
+    ["objetivoGeral",function(){return has(state.objetivoGeral);}],
+    ["objetivos",function(){return state.objetivos.some(function(o){return has(o.texto);});}],
+    ["publico.perfil",function(){return has(state.publico.perfil);}],
+    ["metas",function(){return state.metas.some(function(o){return has(o.meta);});}],
+    ["metodologia",function(){return has(state.metodologia);}],
+    ["cronograma",function(){return state.cronograma.some(function(o){return has(o.etapa);});}],
+    ["orcamento",function(){return state.orcamento.some(function(o){return has(o.descricao)&&num(o.valor)>0;});}],
+    ["monitoramento",function(){return has(state.monitoramento);}],
+    ["equipe",function(){return state.equipe.some(function(o){return has(o.funcao);});}]
+  ];
+  function updateMeter(){
+    var done=0;for(var i=0;i<REQUIRED.length;i++)if(REQUIRED[i][1]())done++;
+    var pct=Math.round(done/REQUIRED.length*100),pend=REQUIRED.length-done;
+    $("#meterFill").style.width=pct+"%";
+    $("#meterPct").textContent=pct+"%";
+    $("#meterPend").textContent=pend===0?"pronto para revisão":(pend+(pend===1?" pendência":" pendências"));
+  }
+
+  /* ---------- document render ---------- */
+  function vigenciaMeses(){
+    var a=state.projeto.dataInicio,b=state.projeto.dataFim;if(!a||!b)return 0;
+    var pa=a.split("-"),pb=b.split("-");if(pa.length!==3||pb.length!==3)return 0;
+    var m=(+pb[0]-+pa[0])*12+(+pb[1]-+pa[1])+1;return m>0?m:0;
+  }
+  function ganttHtml(){
+    var cr=state.cronograma.filter(function(c){return has(c.etapa)||c.ini||c.fim;});
+    if(!cr.length)return '<p class="doc-p"><span class="ph">— cronograma a preencher —</span></p>';
+    var maxM=Math.max(vigenciaMeses(),1);
+    cr.forEach(function(c){maxM=Math.max(maxM,num(c.fim),num(c.ini));});
+    maxM=Math.max(maxM,4);if(maxM>36)maxM=36;
+    var cols="repeat("+maxM+",1fr)";
+    var head='<div class="g-row head"><div class="g-label">Etapa</div><div class="g-track" style="grid-template-columns:'+cols+'">';
+    for(var m=1;m<=maxM;m++)head+='<span class="g-cell mnum">'+m+'</span>';
+    head+='</div></div>';
+    var rows="";
+    cr.forEach(function(c){
+      var ini=Math.max(1,num(c.ini)||1),fim=Math.max(ini,num(c.fim)||ini);
+      rows+='<div class="g-row"><div class="g-label" title="'+esc(c.etapa)+'">'+val(c.etapa,"Etapa")+'</div><div class="g-track" style="grid-template-columns:'+cols+'">';
+      for(var m=1;m<=maxM;m++)rows+='<span class="g-cell'+(m>=ini&&m<=fim?" on":"")+'"></span>';
+      rows+='</div></div>';
+    });
+    var tbl='<table class="dtable" style="margin-top:10px"><thead><tr><th>Etapa / atividade</th><th class="num">Mês início</th><th class="num">Mês fim</th></tr></thead><tbody>';
+    cr.forEach(function(c){tbl+='<tr><td>'+val(c.etapa,"—")+'</td><td class="num">'+val(c.ini,"—")+'</td><td class="num">'+val(c.fim,"—")+'</td></tr>';});
+    tbl+='</tbody></table>';
+    return '<div class="gantt"><div class="g-inner">'+head+rows+'</div></div>'+tbl;
+  }
+
+  function sectionsHtml(){
+    var s=state,H="",n=0;
+    function sec(title,body){n++;return '<section class="doc-section"><h2><span class="num">'+n+'</span>'+esc(title)+'</h2>'+body+'</section>';}
+
+    // 1. OSC
+    var osc=s.osc;
+    var end=[osc.endereco,[osc.municipio,osc.uf].filter(has).join("/"),osc.cep].filter(has).join(" · ");
+    H+=sec("Identificação do proponente",'<table class="kv">'+
+      row("Razão social",val(osc.razaoSocial))+
+      row("CNPJ",val(osc.cnpj))+
+      (has(osc.natureza)?row("Natureza jurídica",esc(osc.natureza)):"")+
+      row("Endereço",has(end)?esc(end):'<span class="ph">— a preencher —</span>')+
+      row("Contato",[osc.telefone,osc.email,osc.site].filter(has).map(esc).join(" · ")||'<span class="ph">—</span>')+
+      row("Responsável legal",[osc.respLegal,osc.respCargo].filter(has).map(esc).join(" — ")+(has(osc.respCpf)?" · CPF "+esc(osc.respCpf):"")||'<span class="ph">—</span>')+
+      (has(osc.coordNome)?row("Coordenação do projeto",esc(osc.coordNome)+(has(osc.coordContato)?" · "+esc(osc.coordContato):"")):"")+
+      '</table>');
+
+    // 2. Projeto
+    var p=s.projeto,vig=(has(p.dataInicio)||has(p.dataFim))?(fmtDate(p.dataInicio)||"?")+" a "+(fmtDate(p.dataFim)||"?")+(vigenciaMeses()?" ("+vigenciaMeses()+" meses)":""):"";
+    H+=sec("Identificação do projeto",'<table class="kv">'+
+      row("Título",val(p.titulo))+
+      row("Eixo / área",val(p.eixo))+
+      (has(p.abrangencia)?row("Abrangência",esc(p.abrangencia)):"")+
+      row("Vigência",has(vig)?esc(vig):'<span class="ph">— a preencher —</span>')+
+      (has(p.edital)?row("Edital / chamamento",esc(p.edital)):"")+
+      (has(p.financiador)?row("Órgão / financiador",esc(p.financiador)):"")+
+      row("Valor total",money(grandTotal()))+
+      '</table>');
+
+    // 3. Apresentação e justificativa
+    H+=sec("Apresentação",para(s.apresentacao,"— apresentação a preencher —"));
+    H+=sec("Justificativa",para(s.justificativa,"— justificativa a preencher —"));
+
+    // 4. Objetivos
+    var og=sec("Objetivo geral",para(s.objetivoGeral,"— objetivo geral a preencher —"));
+    H+=og;
+    var objs=s.objetivos.filter(function(o){return has(o.texto);});
+    var objBody=objs.length?'<ol class="doc-ol">'+objs.map(function(o){return "<li>"+esc(o.texto)+"</li>";}).join("")+"</ol>":'<p class="doc-p"><span class="ph">— objetivos específicos a preencher —</span></p>';
+    H+=sec("Objetivos específicos",objBody);
+
+    // 5. Público
+    var pu=s.publico,benef=[];if(has(pu.diretos))benef.push(esc(pu.diretos)+" diretos");if(has(pu.indiretos))benef.push(esc(pu.indiretos)+" indiretos");
+    H+=sec("Público-alvo e beneficiários",para(pu.perfil,"— perfil do público a preencher —")+(benef.length?'<table class="kv" style="margin-top:6px">'+row("Beneficiários",benef.join(" · "))+"</table>":""));
+
+    // 6. Metas
+    var mt=s.metas.filter(function(m){return has(m.meta)||has(m.indicador);});
+    var mtBody=mt.length?'<table class="dtable"><thead><tr><th style="width:56%">Meta</th><th>Indicador de aferição</th></tr></thead><tbody>'+
+      mt.map(function(m){return "<tr><td>"+val(m.meta,"—")+"</td><td>"+val(m.indicador,"—")+"</td></tr>";}).join("")+"</tbody></table>":
+      '<p class="doc-p"><span class="ph">— metas a preencher —</span></p>';
+    H+=sec("Metas e indicadores",mtBody);
+
+    // 7. Metodologia
+    H+=sec("Metodologia",para(s.metodologia,"— metodologia a preencher —"));
+
+    // 8. Cronograma
+    H+=sec("Cronograma de execução",ganttHtml());
+
+    // 9. Orçamento
+    var orc=s.orcamento.filter(function(o){return has(o.descricao)||has(o.rubrica)||num(o.valor)>0;});
+    var orcBody;
+    if(orc.length){
+      orcBody='<table class="dtable"><thead><tr><th>Rubrica</th><th>Descrição</th><th class="num">Qtd</th><th class="num">Vlr unit.</th><th class="num">Total</th></tr></thead><tbody>'+
+        orc.map(function(o){var t=num(o.qtd)*num(o.valor);return "<tr><td>"+val(o.rubrica,"—")+"</td><td>"+val(o.descricao,"—")+'</td><td class="num">'+(has(o.qtd)?esc(o.qtd):"—")+'</td><td class="num">'+money(num(o.valor))+'</td><td class="num">'+money(t)+"</td></tr>";}).join("")+
+        '</tbody><tfoot><tr><td colspan="4">Valor total do projeto</td><td class="num">'+money(grandTotal())+"</td></tr></tfoot></table>";
+    }else{orcBody='<p class="doc-p"><span class="ph">— orçamento a preencher —</span></p>';}
+    if(has(s.contrapartida))orcBody+='<p class="doc-p" style="margin-top:8px"><b>Contrapartida:</b> '+esc(s.contrapartida)+"</p>";
+    H+=sec("Plano de aplicação dos recursos",orcBody);
+
+    // 10. Monitoramento / sustentabilidade
+    H+=sec("Monitoramento e avaliação",para(s.monitoramento,"— monitoramento a preencher —"));
+    if(has(s.sustentabilidade))H+=sec("Sustentabilidade e continuidade",para(s.sustentabilidade));
+
+    // 11. Equipe
+    var eq=s.equipe.filter(function(e){return has(e.funcao);});
+    var eqBody=eq.length?'<table class="dtable"><thead><tr><th>Função</th><th class="num">Qtd</th><th>Formação / qualificação</th><th>Carga horária</th></tr></thead><tbody>'+
+      eq.map(function(e){return "<tr><td>"+val(e.funcao,"—")+'</td><td class="num">'+(has(e.qtd)?esc(e.qtd):"—")+"</td><td>"+val(e.formacao,"—")+"</td><td>"+val(e.carga,"—")+"</td></tr>";}).join("")+"</tbody></table>":
+      '<p class="doc-p"><span class="ph">— equipe a preencher —</span></p>';
+    H+=sec("Equipe do projeto",eqBody);
+
+    // 12. Capacidade
+    if(has(s.capacidade))H+=sec("Capacidade técnica e experiência da OSC",para(s.capacidade));
+
+    return H;
+  }
+  function row(k,v){return '<tr><td class="k">'+esc(k)+'</td><td class="v">'+v+"</td></tr>";}
+  function grandTotal(){var g=0;state.orcamento.forEach(function(o){g+=num(o.qtd)*num(o.valor);});return g;}
+
+  function renderDoc(){
+    var p=state.projeto,osc=state.osc;
+    var head='<p class="doc-eyebrow">Plano de Trabalho · MROSC · Lei 13.019/2014</p>'+
+      '<h1 class="doc-title">'+val(p.titulo,"Título do projeto")+'</h1>'+
+      '<p class="doc-org">'+val(osc.razaoSocial,"Organização da Sociedade Civil")+
+      (has(osc.municipio)?' · '+esc(osc.municipio)+(has(osc.uf)?"/"+esc(osc.uf):""):"")+'</p>'+
+      '<div class="doc-rule"></div>';
+
+    var vig=(has(p.dataInicio)||has(p.dataFim))?(fmtDate(p.dataInicio)||"—")+" a "+(fmtDate(p.dataFim)||"—"):"—";
+    var summary='<dl class="summary">'+
+      sm("Proponente",has(osc.razaoSocial)?esc(osc.razaoSocial):"—")+
+      sm("CNPJ",has(osc.cnpj)?esc(osc.cnpj):"—")+
+      sm("Eixo temático",has(p.eixo)?esc(p.eixo):"—")+
+      sm("Abrangência",has(p.abrangencia)?esc(p.abrangencia):"—")+
+      sm("Vigência",esc(vig))+
+      sm("Beneficiários diretos",has(state.publico.diretos)?esc(state.publico.diretos):"—")+
+      sm("Valor total",money(grandTotal()))+
+      sm("Nº de metas",String(state.metas.filter(function(m){return has(m.meta);}).length||"—"))+
+      '</dl>';
+
+    var localData=(has(osc.municipio)?esc(osc.municipio):"__________")+", ______ de __________________ de ______.";
+    var sign='<div class="signblock">'+
+      '<div class="signline"><div class="ln"></div><b>'+val(osc.respLegal,"Responsável legal")+"</b><br>"+esc(osc.respCargo||"Representante da OSC")+"<br>"+val(osc.razaoSocial,"OSC")+"</div>"+
+      '<div class="signline"><div class="ln"></div>Local e data<br><span style="color:#777">'+localData+"</span></div>"+
+      "</div>";
+
+    var foot='<div class="doc-foot"><span>'+val(p.titulo,"Plano de Trabalho")+"</span><span>"+val(osc.razaoSocial,"OSC")+"</span></div>";
+
+    $("#documento").innerHTML=head+summary+sectionsHtml()+sign+foot;
+    updateMeter();
+  }
+  function sm(k,v){return "<div><dt>"+esc(k)+"</dt><dd>"+v+"</dd></div>";}
+
+  /* ---------- events ---------- */
+  document.addEventListener("input",function(e){
+    var el=e.target;
+    if(el.dataset && el.dataset.list){
+      state[el.dataset.list][+el.dataset.idx][el.dataset.key]=el.value;
+      if(el.dataset.list==="orcamento")updateOrcamentoTotals();
+      scheduleSave();renderDoc();
+    }else if(el.dataset && el.dataset.field){
+      setPath(state,el.dataset.field,el.value);
+      scheduleSave();renderDoc();
+    }
+  });
+  document.addEventListener("change",function(e){
+    var el=e.target;
+    if(el.tagName==="SELECT" && el.dataset && el.dataset.list){
+      state[el.dataset.list][+el.dataset.idx][el.dataset.key]=el.value;scheduleSave();renderDoc();
+    }
+  });
+  document.addEventListener("click",function(e){
+    var add=e.target.closest("[data-add]");
+    if(add){var n=add.dataset.add;state[n].push(defItem(n));renderList(n);if(n==="orcamento")updateOrcamentoTotals();scheduleSave();renderDoc();
+      var box=$("#list-"+n),inp=box&&box.lastElementChild&&box.lastElementChild.querySelector("input,select");if(inp)inp.focus();return;}
+    var rm=e.target.closest("[data-remove]");
+    if(rm){var l=rm.dataset.remove;state[l].splice(+rm.dataset.idx,1);if(!state[l].length)state[l].push(defItem(l));renderList(l);if(l==="orcamento")updateOrcamentoTotals();scheduleSave();renderDoc();return;}
+  });
+
+  $("#pdfBtn").addEventListener("click",function(){window.print();});
+
+  $("#clearBtn").addEventListener("click",function(){
+    if(confirm("Apagar todas as informações e recomeçar? Esta ação não pode ser desfeita.")){
+      state=emptyState();try{localStorage.removeItem(KEY);}catch(e){}
+      bindStatic();renderAllLists();updateOrcamentoTotals();renderDoc();
+    }
+  });
+
+  $("#sampleBtn").addEventListener("click",function(){
+    var filled=REQUIRED.some(function(r){return r[1]();});
+    if(filled && !confirm("Substituir o conteúdo atual pelo projeto de exemplo?"))return;
+    state=sampleState();scheduleSave();bindStatic();renderAllLists();updateOrcamentoTotals();renderDoc();
+  });
+
+  // theme toggle
+  var themeBtn=$("#themeBtn");
+  var storedTheme=null;try{storedTheme=localStorage.getItem(KEY+"-theme");}catch(e){}
+  if(storedTheme)document.documentElement.setAttribute("data-theme",storedTheme);
+  themeBtn.addEventListener("click",function(){
+    var cur=document.documentElement.getAttribute("data-theme");
+    if(!cur)cur=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";
+    var next=cur==="dark"?"light":"dark";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem(KEY+"-theme",next);}catch(e){}
+  });
+
+  // mobile tabs
+  var main=$("#main"),tabForm=$("#tabForm"),tabPreview=$("#tabPreview");
+  tabForm.addEventListener("click",function(){main.dataset.view="form";tabForm.setAttribute("aria-selected","true");tabPreview.setAttribute("aria-selected","false");});
+  tabPreview.addEventListener("click",function(){main.dataset.view="preview";tabPreview.setAttribute("aria-selected","true");tabForm.setAttribute("aria-selected","false");});
+
+  /* ---------- sample data ---------- */
+  function sampleState(){
+    return {
+      osc:{razaoSocial:"Instituto Semear Futuro",cnpj:"12.345.678/0001-90",natureza:"Associação civil sem fins lucrativos",endereco:"Rua das Acácias, 240 – Jardim Paulista",municipio:"Ribeirão Preto",uf:"SP",cep:"14025-000",telefone:"(16) 3600-1200",email:"contato@semearfuturo.org.br",site:"@semearfuturo",respLegal:"Marina Costa Alves",respCpf:"123.456.789-00",respCargo:"Presidente",coordNome:"Rafael Nunes",coordContato:"(16) 99999-0000"},
+      projeto:{titulo:"Trilhas do Saber: reforço escolar e cidadania no contraturno",eixo:"Educação",abrangencia:"Bairro Jardim Paulista e adjacências – Ribeirão Preto/SP",dataInicio:"2026-03-01",dataFim:"2026-12-31",edital:"Edital de Fomento nº 04/2025 – SMDS",financiador:"Secretaria Municipal de Desenvolvimento Social"},
+      apresentacao:"O projeto Trilhas do Saber oferece atividades de reforço escolar, leitura e educação para a cidadania, no contraturno, a 120 crianças e adolescentes de 7 a 14 anos em situação de vulnerabilidade social no Jardim Paulista, ao longo de 10 meses.",
+      justificativa:"O território apresenta altos índices de defasagem escolar e evasão. Dados da rede municipal indicam que 38% dos estudantes do bairro estão em distorção idade-série. A ausência de espaços seguros no contraturno expõe crianças e adolescentes a riscos sociais. O projeto responde a essa realidade com acompanhamento pedagógico contínuo e fortalecimento de vínculos.",
+      objetivoGeral:"Reduzir a defasagem escolar e ampliar as oportunidades de desenvolvimento integral de crianças e adolescentes em situação de vulnerabilidade no Jardim Paulista.",
+      objetivos:[{texto:"Oferecer reforço escolar em língua portuguesa e matemática a 120 estudantes."},{texto:"Estimular o hábito da leitura por meio de rodas literárias semanais."},{texto:"Desenvolver oficinas de cidadania, cultura e convivência."},{texto:"Fortalecer o vínculo entre famílias, escola e comunidade."}],
+      publico:{perfil:"Crianças e adolescentes de 7 a 14 anos, matriculados na rede pública, residentes no Jardim Paulista e bairros vizinhos, prioritariamente de famílias inscritas no CadÚnico.",diretos:"120",indiretos:"480"},
+      metas:[{meta:"Atender 120 crianças e adolescentes no contraturno",indicador:"Nº de matrículas efetivadas / lista de frequência"},{meta:"Reduzir em 30% a defasagem escolar dos participantes",indicador:"Avaliação diagnóstica inicial e final"},{meta:"Realizar 40 rodas de leitura ao longo do projeto",indicador:"Registros e relatórios das atividades"}],
+      metodologia:"As atividades ocorrem de segunda a sexta, em dois turnos, com turmas de até 20 estudantes. O trabalho combina acompanhamento pedagógico individualizado, oficinas temáticas e rodas de leitura, com avaliação diagnóstica no início e no fim do ciclo. Educadores são supervisionados por uma coordenação pedagógica e há reuniões mensais com as famílias.",
+      cronograma:[{etapa:"Mobilização, matrículas e formação da equipe",ini:"1",fim:"1"},{etapa:"Execução das atividades pedagógicas",ini:"2",fim:"9"},{etapa:"Rodas de leitura e oficinas de cidadania",ini:"2",fim:"9"},{etapa:"Monitoramento e avaliação contínua",ini:"1",fim:"10"},{etapa:"Avaliação final e prestação de contas",ini:"10",fim:"10"}],
+      orcamento:[{rubrica:"Recursos Humanos",descricao:"Educadores sociais (2) – 10 meses",qtd:"20",valor:"2500"},{rubrica:"Recursos Humanos",descricao:"Coordenação pedagógica – 10 meses",qtd:"10",valor:"3500"},{rubrica:"Material de Consumo",descricao:"Material didático e de escritório",qtd:"10",valor:"600"},{rubrica:"Material de Consumo",descricao:"Lanche para os participantes",qtd:"10",valor:"1800"},{rubrica:"Equipamentos e Material Permanente",descricao:"Notebooks para as oficinas",qtd:"3",valor:"3200"}],
+      contrapartida:"Cessão do espaço físico da sede da OSC e trabalho voluntário de 4 profissionais para as oficinas culturais.",
+      monitoramento:"O acompanhamento será feito por meio de listas de frequência, relatórios mensais de atividades, avaliações diagnósticas e reuniões de supervisão. Indicadores serão consolidados em relatório trimestral entregue ao órgão financiador, com prestação de contas conforme a legislação.",
+      sustentabilidade:"Após o período de fomento, a OSC pretende dar continuidade às atividades por meio de novas parcerias, editais e mobilização de recursos comunitários, mantendo o vínculo com a rede local de proteção.",
+      equipe:[{funcao:"Coordenador(a) pedagógico(a)",qtd:"1",formacao:"Pedagogia, com experiência em projetos sociais",carga:"20h/semana"},{funcao:"Educador(a) social",qtd:"2",formacao:"Licenciatura ou magistério",carga:"30h/semana"},{funcao:"Assistente administrativo",qtd:"1",formacao:"Ensino médio completo",carga:"20h/semana"}],
+      capacidade:"O Instituto Semear Futuro atua há 12 anos no município, já tendo executado 8 projetos socioeducativos com recursos públicos e privados, atendendo mais de 3.000 crianças e adolescentes, com prestações de contas regularmente aprovadas."
+    };
+  }
+
+  /* ---------- init ---------- */
+  bindStatic();renderAllLists();updateOrcamentoTotals();renderDoc();
+})();
+</script>
+</body>
+</html>
