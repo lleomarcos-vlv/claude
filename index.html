@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boyd Turismo Tour — Sistema de Gestão</title>
+<style>
+:root{
+  --bg:#0b1410; --bg2:#0f1d17; --panel:#132720; --panel2:#173027; --line:#1f4438;
+  --txt:#e6fff6; --muted:#8fb3a6; --acc:#5fe3bd; --acc2:#7ef0d0; --acc-d:#0b3d31;
+  --ok:#3ddc97; --warn:#ffc857; --bad:#ff6b6b; --info:#5bc0eb;
+  --r:12px; --sh:0 6px 24px rgba(0,0,0,.35);
+}
+html[data-theme="light"]{
+  --bg:#f2f7f5; --bg2:#ffffff; --panel:#ffffff; --panel2:#eef6f3; --line:#d5e6e0;
+  --txt:#0d2b22; --muted:#5c7c72; --acc:#0e9e7c; --acc2:#0b7f63; --acc-d:#d8f5ec;
+  --sh:0 6px 20px rgba(10,50,40,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.side{background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{padding:18px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.brand .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;font-size:20px;flex:none}
+.brand h1{font-size:15px;font-weight:700;letter-spacing:.3px;line-height:1.15}
+.brand small{color:var(--muted);font-size:11px;font-weight:500}
+.nav{flex:1;overflow:auto;padding:10px 8px}
+.nav .grp{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:14px 10px 6px;font-weight:700}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;color:var(--txt);font-weight:500;cursor:pointer;position:relative}
+.nav a .ic{width:20px;text-align:center;font-size:15px;flex:none}
+.nav a:hover{background:var(--panel)}
+.nav a.on{background:var(--acc-d);color:var(--acc2);font-weight:700}
+.nav a .cnt{margin-left:auto;background:var(--panel2);color:var(--muted);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
+.side-foot{padding:10px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.main{display:flex;flex-direction:column;min-width:0}
+.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.top h2{font-size:18px;font-weight:700}
+.top .sub{color:var(--muted);font-size:12px}
+.top .sp{flex:1}
+.content{padding:20px;max-width:1500px;width:100%}
+.burger{display:none;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer}
+
+/* ---------- components ---------- */
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 13px;cursor:pointer;font-weight:600;display:inline-flex;gap:7px;align-items:center;white-space:nowrap;transition:.12s}
+.btn:hover{border-color:var(--acc);color:var(--acc2)}
+.btn.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04241c;border:none}
+.btn.pri:hover{filter:brightness(1.08);color:#04241c}
+.btn.dan:hover{border-color:var(--bad);color:var(--bad)}
+.btn.sm{padding:5px 9px;font-size:12px;border-radius:7px}
+.btn.gh{background:transparent}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h3{font-size:13.5px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .sp{flex:1}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(195px,1fr))}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc)}
+.kpi .lb{color:var(--muted);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:flex;gap:6px;align-items:center}
+.kpi .vl{font-size:24px;font-weight:800;margin-top:6px;letter-spacing:-.5px}
+.kpi .ft{font-size:11.5px;color:var(--muted);margin-top:3px}
+.kpi.ok:before{background:var(--ok)}.kpi.warn:before{background:var(--warn)}.kpi.bad:before{background:var(--bad)}.kpi.info:before{background:var(--info)}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:700}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:hover{background:var(--panel2)}
+tbody tr:last-child td{border-bottom:none}
+.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);background:var(--panel)}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.acts{display:flex;gap:5px;justify-content:flex-end}
+.empty{padding:38px 20px;text-align:center;color:var(--muted)}
+.empty .ico{font-size:34px;opacity:.5;display:block;margin-bottom:8px}
+
+.tag{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;background:var(--panel2);color:var(--muted);white-space:nowrap}
+.tag.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.tag.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.tag.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.tag.info{background:color-mix(in srgb,var(--info) 18%,transparent);color:var(--info)}
+.tag.acc{background:var(--acc-d);color:var(--acc2)}
+
+.bar{height:6px;border-radius:6px;background:var(--panel2);overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:6px}
+.bar i.warn{background:var(--warn)}.bar i.bad{background:var(--bad)}.bar i.ok{background:var(--ok)}
+
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.fld input,.fld select,.fld textarea{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;width:100%;outline:none}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--acc)}
+.fld textarea{resize:vertical;min-height:70px}
+.fld .hint{font-size:11px;color:var(--muted)}
+.fr{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.fr .full{grid-column:1/-1}
+.chk{display:flex;align-items:center;gap:8px;padding-top:18px}
+.chk input{width:16px;height:16px;accent-color:var(--acc)}
+
+.bar-tools{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar-tools input,.bar-tools select{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 11px;outline:none}
+.bar-tools input:focus,.bar-tools select:focus{border-color:var(--acc)}
+.bar-tools .sp{flex:1}
+.search{min-width:210px}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;z-index:100;padding:20px;overflow:auto}
+.modal.on{display:flex;align-items:flex-start;justify-content:center}
+.modal .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:100%;max-width:720px;box-shadow:var(--sh);margin:auto;animation:pop .16s ease}
+.modal .box.wide{max-width:960px}
+@keyframes pop{from{transform:translateY(-8px);opacity:0}}
+.modal .hd{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.modal .hd h3{font-size:16px;font-weight:700;flex:1}
+.modal .bd{padding:18px;max-height:70vh;overflow:auto}
+.modal .ft{padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+.x{background:transparent;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
+.x:hover{color:var(--bad)}
+
+#toast{position:fixed;right:18px;bottom:18px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.tst{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:11px 15px;box-shadow:var(--sh);animation:sl .2s ease;max-width:330px;font-weight:600}
+.tst.bad{border-left-color:var(--bad)}.tst.warn{border-left-color:var(--warn)}
+@keyframes sl{from{transform:translateX(30px);opacity:0}}
+
+.lang{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.lang button{background:transparent;border:none;padding:6px 11px;cursor:pointer;font-weight:700;font-size:12px;color:var(--muted)}
+.lang button.on{background:var(--acc-d);color:var(--acc2)}
+
+.pax-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end}
+.list-min{display:flex;flex-direction:column;gap:9px}
+.li{display:flex;gap:10px;align-items:center;padding:9px 11px;background:var(--panel2);border-radius:10px}
+.li .ttl{font-weight:700}
+.li .sb{font-size:11.5px;color:var(--muted)}
+.li .sp{flex:1}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--acc);flex:none}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.muted{color:var(--muted)}
+.b{font-weight:700}
+.pos{color:var(--ok);font-weight:700}
+.neg{color:var(--bad);font-weight:700}
+.center{text-align:center}
+.mt{margin-top:14px}
+.chart{width:100%;height:210px;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px}
+.seatmap{display:flex;flex-wrap:wrap;gap:5px;max-width:100%}
+.seat{width:30px;height:30px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font-size:10.5px;font-weight:700;color:var(--muted)}
+.seat.tk{background:var(--acc-d);color:var(--acc2);border-color:var(--acc)}
+.step{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:-260px;z-index:60;width:250px;transition:.2s;box-shadow:var(--sh)}
+  .side.open{left:0}
+  .burger{display:block}
+  .content{padding:14px}
+  .top{padding:10px 14px}
+}
+@media print{
+  .side,.top,.bar-tools,.acts,.btn,#toast{display:none!important}
+  body,.card,.tw{background:#fff!important;color:#000!important}
+  .content{padding:0;max-width:100%}
+  th,td{border-color:#ccc!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand">
+      <div class="logo">🚌</div>
+      <div>
+        <h1 id="brandName">BOYD TURISMO TOUR</h1>
+        <small data-i18n="app.sub">Sistema de Gestão</small>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="lang">
+        <button id="lgPt" onclick="setLang('pt')">PT</button>
+        <button id="lgEn" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="btn sm gh" onclick="toggleTheme()" title="Tema / Theme">🌓</button>
+      <button class="btn sm gh" onclick="go('settings')" title="⚙">⚙</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <button class="burger" onclick="document.getElementById('side').classList.toggle('open')">☰</button>
+      <div>
+        <h2 id="pgTitle">Dashboard</h2>
+        <div class="sub" id="pgSub"></div>
+      </div>
+      <div class="sp"></div>
+      <div id="topActions"></div>
+    </header>
+    <main class="content" id="view"></main>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   BOYD TURISMO TOUR — ERP  |  i18n  (pt-BR / en-US)
+   ============================================================ */
+const I18N = {
+pt:{
+ "app.sub":"Sistema de Gestão","app.title":"Boyd Turismo Tour — Sistema de Gestão",
+ "nav.main":"Principal","nav.oper":"Operação","nav.comm":"Comercial","nav.fin":"Financeiro","nav.adm":"Administração",
+ "nav.dashboard":"Dashboard","nav.routes":"Roteiros","nav.departures":"Partidas","nav.bookings":"Reservas",
+ "nav.customers":"Clientes","nav.leads":"Leads / CRM","nav.suppliers":"Fornecedores","nav.vehicles":"Frota",
+ "nav.staff":"Equipe","nav.finance":"Financeiro","nav.reports":"Relatórios","nav.agenda":"Agenda","nav.settings":"Configurações",
+ "sub.dashboard":"Visão geral do negócio","sub.routes":"Catálogo de roteiros e destinos","sub.departures":"Saídas programadas e ocupação",
+ "sub.bookings":"Reservas, passageiros e pagamentos","sub.customers":"Base de clientes","sub.leads":"Funil de vendas",
+ "sub.suppliers":"Vans, ônibus, hotéis e parceiros","sub.vehicles":"Veículos e capacidade","sub.staff":"Motoristas, guias e equipe",
+ "sub.finance":"Contas a receber e a pagar","sub.reports":"Indicadores e análises","sub.agenda":"Calendário operacional","sub.settings":"Empresa, dados e backup",
+ /* ações */
+ "a.new":"Novo","a.add":"Adicionar","a.edit":"Editar","a.del":"Excluir","a.save":"Salvar","a.cancel":"Cancelar","a.close":"Fechar",
+ "a.search":"Buscar...","a.filter":"Filtrar","a.all":"Todos","a.export":"Exportar","a.import":"Importar","a.print":"Imprimir",
+ "a.pay":"Pagamento","a.view":"Ver","a.manifest":"Lista de passageiros","a.voucher":"Voucher","a.duplicate":"Duplicar",
+ "a.confirm":"Confirmar","a.back":"Voltar","a.csv":"CSV","a.clear":"Limpar","a.whatsapp":"WhatsApp","a.convert":"Converter em cliente",
+ /* comuns */
+ "c.name":"Nome","c.date":"Data","c.status":"Situação","c.total":"Total","c.paid":"Pago","c.balance":"Saldo","c.notes":"Observações",
+ "c.phone":"Telefone","c.email":"E-mail","c.doc":"CPF / Documento","c.city":"Cidade","c.address":"Endereço","c.type":"Tipo",
+ "c.price":"Preço","c.cost":"Custo","c.margin":"Margem","c.qty":"Qtd.","c.actions":"Ações","c.code":"Código","c.value":"Valor",
+ "c.route":"Roteiro","c.departure":"Partida","c.customer":"Cliente","c.supplier":"Fornecedor","c.vehicle":"Veículo","c.seats":"Lugares",
+ "c.sold":"Vendidos","c.free":"Disponíveis","c.occupancy":"Ocupação","c.revenue":"Receita","c.expense":"Despesa","c.result":"Resultado",
+ "c.period":"Período","c.category":"Categoria","c.method":"Forma de pagamento","c.description":"Descrição","c.none":"—",
+ "c.created":"Criado em","c.rating":"Avaliação","c.origin":"Origem","c.destination":"Destino","c.pax":"Passageiros","c.role":"Função",
+ "c.empty":"Nenhum registro encontrado","c.emptyHint":"Clique em “Novo” para começar.","c.required":"Preencha os campos obrigatórios.",
+ "c.confirmDel":"Tem certeza que deseja excluir este registro?","c.saved":"Registro salvo com sucesso.","c.deleted":"Registro excluído.",
+ "c.yes":"Sim","c.no":"Não","c.of":"de","c.month":"Mês","c.today":"Hoje","c.upcoming":"Próximas","c.overdue":"Vencidas",
+ /* status */
+ "st.draft":"Rascunho","st.scheduled":"Programada","st.confirmed":"Confirmada","st.boarding":"Em viagem","st.done":"Concluída",
+ "st.cancelled":"Cancelada","st.pending":"Pendente","st.partial":"Parcial","st.paid":"Pago","st.open":"Em aberto",
+ "st.new":"Novo","st.contacted":"Em contato","st.proposal":"Proposta enviada","st.won":"Ganho","st.lost":"Perdido",
+ /* tipos */
+ "ty.van":"Van","ty.bus":"Ônibus","ty.hotel":"Hotel / Pousada","ty.guide":"Guia","ty.restaurant":"Restaurante","ty.park":"Parque / Atrativo",
+ "ty.insurance":"Seguro","ty.other":"Outro","ty.driver":"Motorista","ty.seller":"Vendedor","ty.admin":"Administrativo",
+ "ty.excursion":"Excursão (bate-volta)","ty.package":"Pacote com hospedagem","ty.transfer":"Transfer","ty.charter":"Fretamento","ty.tour":"City tour",
+ "pm.pix":"PIX","pm.cash":"Dinheiro","pm.credit":"Cartão de crédito","pm.debit":"Cartão de débito","pm.transfer":"Transferência","pm.boleto":"Boleto","pm.link":"Link de pagamento",
+ /* dashboard */
+ "d.revMonth":"Receita do mês","d.bookMonth":"Reservas do mês","d.toReceive":"A receber","d.nextDep":"Próximas partidas",
+ "d.avgOcc":"Ocupação média","d.customers":"Clientes ativos","d.result":"Resultado do mês","d.paxMonth":"Passageiros no mês",
+ "d.alerts":"Alertas operacionais","d.noAlerts":"Tudo certo! Nenhum alerta no momento.","d.revChart":"Receita x Despesa (6 meses)",
+ "d.topRoutes":"Roteiros mais vendidos","d.recent":"Reservas recentes","d.lowOcc":"Ocupação baixa","d.depIn":"sai em",
+ "d.days":"dias","d.tomorrow":"amanhã","d.overduePay":"pagamento em atraso","d.noSeats":"Lotada",
+ /* campos específicos */
+ "f.routeName":"Nome do roteiro","f.km":"Distância (km)","f.hours":"Duração (h)","f.priceAdult":"Preço adulto",
+ "f.priceChild":"Preço criança","f.includes":"O que está incluso","f.state":"UF / País","f.depDate":"Data de ida","f.retDate":"Data de volta",
+ "f.depTime":"Horário de saída","f.boardPoint":"Ponto de embarque","f.driver":"Motorista","f.guide":"Guia","f.seatsTotal":"Total de lugares",
+ "f.costVehicle":"Custo do veículo","f.costExtra":"Outros custos","f.paxList":"Lista de passageiros","f.paxName":"Nome do passageiro",
+ "f.paxDoc":"Documento","f.paxType":"Tipo","f.adult":"Adulto","f.child":"Criança","f.senior":"Idoso","f.discount":"Desconto",
+ "f.amountPaid":"Valor pago","f.source":"Origem do contato","f.interest":"Interesse","f.nextAction":"Próxima ação","f.seller":"Vendedor",
+ "f.plate":"Placa","f.model":"Modelo","f.year":"Ano","f.license":"CNH / Registro","f.company":"Empresa","f.cnpj":"CNPJ",
+ "f.fleet":"Frota / Serviços","f.contact":"Contato","f.commission":"Comissão (%)","f.dueDate":"Vencimento","f.entryType":"Tipo de lançamento",
+ "f.in":"Entrada","f.out":"Saída","f.currency":"Moeda","f.lang":"Idioma padrão","f.theme":"Tema",
+ /* relatórios */
+ "r.byRoute":"Desempenho por roteiro","r.byMonth":"Evolução mensal","r.topCustomers":"Melhores clientes","r.profit":"Rentabilidade por partida",
+ "r.pipeline":"Funil de vendas","r.occupancy":"Taxa de ocupação","r.ticket":"Ticket médio","r.paymentMix":"Formas de pagamento",
+ /* settings */
+ "s.company":"Dados da empresa","s.pref":"Preferências","s.data":"Dados e backup","s.exportAll":"Exportar backup (JSON)",
+ "s.importAll":"Restaurar backup","s.demo":"Carregar dados de exemplo","s.reset":"Apagar todos os dados","s.resetWarn":"Isto apagará TODOS os dados. Continuar?",
+ "s.storage":"Armazenamento local (navegador)","s.records":"registros","s.about":"Sobre o sistema",
+ "s.aboutTxt":"Sistema de gestão para empresas de turismo, 100% offline, bilíngue e com backup em arquivo.",
+ "s.imported":"Backup restaurado com sucesso.","s.invalidFile":"Arquivo inválido.",
+ /* impressos */
+ "p.manifest":"LISTA DE PASSAGEIROS","p.voucher":"VOUCHER DE VIAGEM","p.seat":"Assento","p.signature":"Assinatura",
+ "p.issued":"Emitido em","p.attention":"Apresente este voucher no embarque.","p.emergency":"Contato de emergência"
+},
+en:{
+ "app.sub":"Management System","app.title":"Boyd Turismo Tour — Management System",
+ "nav.main":"Main","nav.oper":"Operations","nav.comm":"Sales","nav.fin":"Finance","nav.adm":"Administration",
+ "nav.dashboard":"Dashboard","nav.routes":"Tours","nav.departures":"Departures","nav.bookings":"Bookings",
+ "nav.customers":"Customers","nav.leads":"Leads / CRM","nav.suppliers":"Suppliers","nav.vehicles":"Fleet",
+ "nav.staff":"Staff","nav.finance":"Finance","nav.reports":"Reports","nav.agenda":"Calendar","nav.settings":"Settings",
+ "sub.dashboard":"Business overview","sub.routes":"Tour and destination catalog","sub.departures":"Scheduled departures and occupancy",
+ "sub.bookings":"Bookings, passengers and payments","sub.customers":"Customer base","sub.leads":"Sales pipeline",
+ "sub.suppliers":"Vans, buses, hotels and partners","sub.vehicles":"Vehicles and capacity","sub.staff":"Drivers, guides and staff",
+ "sub.finance":"Receivables and payables","sub.reports":"KPIs and analytics","sub.agenda":"Operational calendar","sub.settings":"Company, data and backup",
+ "a.new":"New","a.add":"Add","a.edit":"Edit","a.del":"Delete","a.save":"Save","a.cancel":"Cancel","a.close":"Close",
+ "a.search":"Search...","a.filter":"Filter","a.all":"All","a.export":"Export","a.import":"Import","a.print":"Print",
+ "a.pay":"Payment","a.view":"View","a.manifest":"Passenger list","a.voucher":"Voucher","a.duplicate":"Duplicate",
+ "a.confirm":"Confirm","a.back":"Back","a.csv":"CSV","a.clear":"Clear","a.whatsapp":"WhatsApp","a.convert":"Convert to customer",
+ "c.name":"Name","c.date":"Date","c.status":"Status","c.total":"Total","c.paid":"Paid","c.balance":"Balance","c.notes":"Notes",
+ "c.phone":"Phone","c.email":"Email","c.doc":"ID / Passport","c.city":"City","c.address":"Address","c.type":"Type",
+ "c.price":"Price","c.cost":"Cost","c.margin":"Margin","c.qty":"Qty","c.actions":"Actions","c.code":"Code","c.value":"Amount",
+ "c.route":"Tour","c.departure":"Departure","c.customer":"Customer","c.supplier":"Supplier","c.vehicle":"Vehicle","c.seats":"Seats",
+ "c.sold":"Sold","c.free":"Available","c.occupancy":"Occupancy","c.revenue":"Revenue","c.expense":"Expense","c.result":"Result",
+ "c.period":"Period","c.category":"Category","c.method":"Payment method","c.description":"Description","c.none":"—",
+ "c.created":"Created on","c.rating":"Rating","c.origin":"Origin","c.destination":"Destination","c.pax":"Passengers","c.role":"Role",
+ "c.empty":"No records found","c.emptyHint":"Click “New” to get started.","c.required":"Please fill in the required fields.",
+ "c.confirmDel":"Are you sure you want to delete this record?","c.saved":"Record saved successfully.","c.deleted":"Record deleted.",
+ "c.yes":"Yes","c.no":"No","c.of":"of","c.month":"Month","c.today":"Today","c.upcoming":"Upcoming","c.overdue":"Overdue",
+ "st.draft":"Draft","st.scheduled":"Scheduled","st.confirmed":"Confirmed","st.boarding":"In transit","st.done":"Completed",
+ "st.cancelled":"Cancelled","st.pending":"Pending","st.partial":"Partial","st.paid":"Paid","st.open":"Open",
+ "st.new":"New","st.contacted":"Contacted","st.proposal":"Proposal sent","st.won":"Won","st.lost":"Lost",
+ "ty.van":"Van","ty.bus":"Coach","ty.hotel":"Hotel / Inn","ty.guide":"Guide","ty.restaurant":"Restaurant","ty.park":"Park / Attraction",
+ "ty.insurance":"Insurance","ty.other":"Other","ty.driver":"Driver","ty.seller":"Sales rep","ty.admin":"Back office",
+ "ty.excursion":"Day trip","ty.package":"Package with lodging","ty.transfer":"Transfer","ty.charter":"Charter","ty.tour":"City tour",
+ "pm.pix":"PIX","pm.cash":"Cash","pm.credit":"Credit card","pm.debit":"Debit card","pm.transfer":"Bank transfer","pm.boleto":"Bank slip","pm.link":"Payment link",
+ "d.revMonth":"Revenue this month","d.bookMonth":"Bookings this month","d.toReceive":"Receivables","d.nextDep":"Upcoming departures",
+ "d.avgOcc":"Average occupancy","d.customers":"Active customers","d.result":"Month result","d.paxMonth":"Passengers this month",
+ "d.alerts":"Operational alerts","d.noAlerts":"All good! No alerts right now.","d.revChart":"Revenue vs. Expense (6 months)",
+ "d.topRoutes":"Best selling tours","d.recent":"Recent bookings","d.lowOcc":"Low occupancy","d.depIn":"departs in",
+ "d.days":"days","d.tomorrow":"tomorrow","d.overduePay":"overdue payment","d.noSeats":"Sold out",
+ "f.routeName":"Tour name","f.km":"Distance (km)","f.hours":"Duration (h)","f.priceAdult":"Adult price",
+ "f.priceChild":"Child price","f.includes":"What is included","f.state":"State / Country","f.depDate":"Departure date","f.retDate":"Return date",
+ "f.depTime":"Departure time","f.boardPoint":"Pick-up point","f.driver":"Driver","f.guide":"Guide","f.seatsTotal":"Total seats",
+ "f.costVehicle":"Vehicle cost","f.costExtra":"Other costs","f.paxList":"Passenger list","f.paxName":"Passenger name",
+ "f.paxDoc":"Document","f.paxType":"Type","f.adult":"Adult","f.child":"Child","f.senior":"Senior","f.discount":"Discount",
+ "f.amountPaid":"Amount paid","f.source":"Lead source","f.interest":"Interest","f.nextAction":"Next action","f.seller":"Sales rep",
+ "f.plate":"Plate","f.model":"Model","f.year":"Year","f.license":"License","f.company":"Company","f.cnpj":"Tax ID",
+ "f.fleet":"Fleet / Services","f.contact":"Contact person","f.commission":"Commission (%)","f.dueDate":"Due date","f.entryType":"Entry type",
+ "f.in":"Income","f.out":"Expense","f.currency":"Currency","f.lang":"Default language","f.theme":"Theme",
+ "r.byRoute":"Performance by tour","r.byMonth":"Monthly evolution","r.topCustomers":"Top customers","r.profit":"Profitability by departure",
+ "r.pipeline":"Sales pipeline","r.occupancy":"Occupancy rate","r.ticket":"Average ticket","r.paymentMix":"Payment methods",
+ "s.company":"Company details","s.pref":"Preferences","s.data":"Data and backup","s.exportAll":"Export backup (JSON)",
+ "s.importAll":"Restore backup","s.demo":"Load sample data","s.reset":"Erase all data","s.resetWarn":"This will erase ALL data. Continue?",
+ "s.storage":"Local storage (browser)","s.records":"records","s.about":"About",
+ "s.aboutTxt":"Management system for tourism companies — fully offline, bilingual, with file-based backup.",
+ "s.imported":"Backup restored successfully.","s.invalidFile":"Invalid file.",
+ "p.manifest":"PASSENGER LIST","p.voucher":"TRAVEL VOUCHER","p.seat":"Seat","p.signature":"Signature",
+ "p.issued":"Issued on","p.attention":"Please present this voucher at boarding.","p.emergency":"Emergency contact"
+}};
+function t(k){ return (I18N[S.settings.lang]||I18N.pt)[k] || (I18N.pt[k]||k); }
+/* ============================================================
+   CORE — estado, persistência, helpers, roteador
+   ============================================================ */
+const KEY="boyd_erp_v1";
+let S=null, VIEW="dashboard", F={};
+
+const DEFAULTS=()=>({
+ version:1, seq:{booking:1},
+ settings:{lang:"pt",theme:"dark",currency:"BRL",
+   company:{name:"BOYD TURISMO TOUR",cnpj:"",phone:"(16) 99999-0000",email:"contato@boydturismo.com.br",
+   address:"Ribeirão Preto - SP",city:"Ribeirão Preto",emergency:"(16) 99999-0000"}},
+ routes:[],departures:[],bookings:[],customers:[],leads:[],suppliers:[],vehicles:[],staff:[],finance:[]
+});
+
+function load(){ try{S=JSON.parse(localStorage.getItem(KEY))||null}catch(e){S=null}
+  if(!S||!S.settings){S=DEFAULTS();seed();save();}
+  const d=DEFAULTS(); for(const k in d) if(S[k]===undefined) S[k]=d[k];
+}
+function save(){ localStorage.setItem(KEY,JSON.stringify(S)); }
+const uid=p=>(p||"id")+"_"+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+const byId=(arr,id)=>arr.find(x=>x.id===id)||null;
+const num=v=>{const n=parseFloat(String(v??"").replace(/\s/g,"").replace(",","."));return isNaN(n)?0:n;};
+
+/* ---------- formatação ---------- */
+const loc=()=>S.settings.lang==="en"?"en-US":"pt-BR";
+function money(v){ try{return new Intl.NumberFormat(loc(),{style:"currency",currency:S.settings.currency||"BRL"}).format(num(v))}catch(e){return "R$ "+num(v).toFixed(2)} }
+function fdate(d){ if(!d)return "—"; const p=String(d).slice(0,10).split("-"); if(p.length<3)return d;
+  return new Intl.DateTimeFormat(loc(),{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(+p[0],+p[1]-1,+p[2])); }
+function fdateLong(d){ if(!d)return "—"; const p=String(d).slice(0,10).split("-");
+  return new Intl.DateTimeFormat(loc(),{weekday:"short",day:"2-digit",month:"short",year:"numeric"}).format(new Date(+p[0],+p[1]-1,+p[2])); }
+const today=()=>new Date().toISOString().slice(0,10);
+const ym=d=>String(d||"").slice(0,7);
+function daysTo(d){ if(!d)return 9999; const a=new Date(today()+"T00:00"),b=new Date(String(d).slice(0,10)+"T00:00"); return Math.round((b-a)/864e5); }
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct=(a,b)=>b>0?Math.round(a/b*100):0;
+
+/* ---------- UI helpers ---------- */
+function toast(msg,kind){ const w=document.getElementById("toast"),e=document.createElement("div");
+  e.className="tst "+(kind||""); e.textContent=msg; w.appendChild(e); setTimeout(()=>e.remove(),3200); }
+function modal(title,body,footer,wide){
+  document.getElementById("modalBox").className="box"+(wide?" wide":"");
+  document.getElementById("modalBox").innerHTML=
+   `<div class="hd"><h3>${esc(title)}</h3><button class="x" onclick="closeModal()">×</button></div>
+    <div class="bd">${body}</div><div class="ft">${footer||`<button class="btn" onclick="closeModal()">${t("a.close")}</button>`}</div>`;
+  document.getElementById("modal").classList.add("on");
+}
+const closeModal=()=>document.getElementById("modal").classList.remove("on");
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+
+function confirmBox(msg,fn){ modal(t("a.confirm"),`<p style="font-size:15px">${esc(msg)}</p>`,
+  `<button class="btn" onclick="closeModal()">${t("a.cancel")}</button>
+   <button class="btn pri" id="cfmOk">${t("a.confirm")}</button>`);
+  document.getElementById("cfmOk").onclick=()=>{closeModal();fn();}; }
+
+function tag(txt,kind){ return `<span class="tag ${kind||""}">${esc(txt)}</span>`; }
+function bar(p){ const k=p>=80?"ok":p>=50?"":p>=25?"warn":"bad";
+  return `<div style="display:flex;gap:7px;align-items:center"><div class="bar"><i class="${k}" style="width:${Math.min(100,p)}%"></i></div><b style="font-size:11.5px">${p}%</b></div>`; }
+function emptyRow(cols){ return `<tr><td colspan="${cols}"><div class="empty"><span class="ico">📭</span>${t("c.empty")}<br><small>${t("c.emptyHint")}</small></div></td></tr>`; }
+function sel(opts,val,ph){ return (ph?`<option value="">${esc(ph)}</option>`:"")+
+  opts.map(o=>`<option value="${esc(o.v)}" ${o.v==val?"selected":""}>${esc(o.l)}</option>`).join(""); }
+
+/* ---------- listas de opções ---------- */
+const OPT={
+ routeType:()=>["excursion","package","transfer","charter","tour"].map(v=>({v,l:t("ty."+v)})),
+ supType:()=>["bus","van","hotel","guide","restaurant","park","insurance","other"].map(v=>({v,l:t("ty."+v)})),
+ staffRole:()=>["driver","guide","seller","admin"].map(v=>({v,l:t("ty."+v)})),
+ depStatus:()=>["scheduled","confirmed","boarding","done","cancelled"].map(v=>({v,l:t("st."+v)})),
+ bookStatus:()=>["pending","confirmed","done","cancelled"].map(v=>({v,l:t("st."+v)})),
+ leadStatus:()=>["new","contacted","proposal","won","lost"].map(v=>({v,l:t("st."+v)})),
+ payMethod:()=>["pix","cash","credit","debit","transfer","boleto","link"].map(v=>({v,l:t("pm."+v)})),
+ paxType:()=>[{v:"adult",l:t("f.adult")},{v:"child",l:t("f.child")},{v:"senior",l:t("f.senior")}],
+ routes:()=>S.routes.map(r=>({v:r.id,l:r.name})),
+ customers:()=>S.customers.map(c=>({v:c.id,l:c.name})),
+ suppliers:f=>S.suppliers.filter(s=>!f||f.includes(s.type)).map(s=>({v:s.id,l:s.name})),
+ vehicles:()=>S.vehicles.map(v=>({v:v.id,l:`${v.model||v.type} · ${v.plate||""} (${v.seats||0})`})),
+ staff:r=>S.staff.filter(s=>!r||s.role===r).map(s=>({v:s.id,l:s.name})),
+ departures:()=>S.departures.filter(d=>d.status!=="cancelled").sort((a,b)=>(a.date||"").localeCompare(b.date||""))
+   .map(d=>({v:d.id,l:`${fdate(d.date)} · ${routeName(d.routeId)}`}))
+};
+const routeName=id=>{const r=byId(S.routes,id);return r?r.name:t("c.none")};
+const custName=id=>{const c=byId(S.customers,id);return c?c.name:t("c.none")};
+const supName=id=>{const s=byId(S.suppliers,id);return s?s.name:t("c.none")};
+const staffName=id=>{const s=byId(S.staff,id);return s?s.name:t("c.none")};
+
+/* ---------- regras de negócio ---------- */
+const depBookings=id=>S.bookings.filter(b=>b.departureId===id&&b.status!=="cancelled");
+const seatsSold=id=>depBookings(id).reduce((s,b)=>s+(b.pax||[]).length,0);
+const seatsTotal=d=>{const v=byId(S.vehicles,d.vehicleId);return num(d.seats)||num(v&&v.seats)||0;};
+const depFree=d=>Math.max(0,seatsTotal(d)-seatsSold(d.id));
+const depOcc=d=>pct(seatsSold(d.id),seatsTotal(d));
+const bookTotal=b=>Math.max(0,(b.pax||[]).reduce((s,p)=>s+num(p.price),0)-num(b.discount));
+const bookPaid=b=>(b.payments||[]).reduce((s,p)=>s+num(p.amount),0);
+const bookBal=b=>bookTotal(b)-bookPaid(b);
+const depRevenue=id=>depBookings(id).reduce((s,b)=>s+bookTotal(b),0);
+const depCost=d=>num(d.costVehicle)+num(d.costExtra);
+const payStatus=b=>{const bal=bookBal(b);return bal<=0.009?"paid":bookPaid(b)>0?"partial":"pending";};
+const stKind=s=>({confirmed:"ok",done:"ok",paid:"ok",won:"ok",cancelled:"bad",lost:"bad",pending:"warn",partial:"warn",
+  proposal:"info",contacted:"info",boarding:"info",scheduled:"acc",new:"acc"}[s]||"");
+
+/* ---------- navegação ---------- */
+const MENU=[
+ {g:"nav.main",items:[["dashboard","📊"],["agenda","🗓️"]]},
+ {g:"nav.oper",items:[["routes","🗺️"],["departures","🚏"],["vehicles","🚐"],["staff","👷"]]},
+ {g:"nav.comm",items:[["bookings","🎟️"],["customers","👥"],["leads","🎯"]]},
+ {g:"nav.fin",items:[["finance","💰"],["reports","📈"]]},
+ {g:"nav.adm",items:[["suppliers","🤝"],["settings","⚙️"]]}
+];
+const COUNTS={routes:()=>S.routes.length,departures:()=>S.departures.filter(d=>["scheduled","confirmed"].includes(d.status)).length,
+ bookings:()=>S.bookings.filter(b=>b.status!=="cancelled").length,customers:()=>S.customers.length,
+ leads:()=>S.leads.filter(l=>!["won","lost"].includes(l.status)).length,suppliers:()=>S.suppliers.length,
+ vehicles:()=>S.vehicles.length,staff:()=>S.staff.length};
+
+function buildNav(){
+ document.getElementById("nav").innerHTML=MENU.map(g=>
+  `<div class="grp">${t(g.g)}</div>`+g.items.map(([k,ic])=>{
+    const c=COUNTS[k]?COUNTS[k]():null;
+    return `<a class="${VIEW===k?"on":""}" onclick="go('${k}')"><span class="ic">${ic}</span>${t("nav."+k)}${c?`<span class="cnt">${c}</span>`:""}</a>`;
+  }).join("")).join("");
+}
+function go(v){ VIEW=v; F={}; document.getElementById("side").classList.remove("open"); render(); window.scrollTo(0,0); }
+
+const VIEWS={};
+function render(){
+ document.documentElement.setAttribute("data-theme",S.settings.theme);
+ document.documentElement.lang=S.settings.lang==="en"?"en-US":"pt-BR";
+ document.title=t("app.title");
+ document.getElementById("brandName").textContent=S.settings.company.name||"BOYD TURISMO TOUR";
+ document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
+ document.getElementById("lgPt").className=S.settings.lang==="pt"?"on":"";
+ document.getElementById("lgEn").className=S.settings.lang==="en"?"on":"";
+ document.getElementById("pgTitle").textContent=t("nav."+VIEW);
+ document.getElementById("pgSub").textContent=t("sub."+VIEW);
+ document.getElementById("topActions").innerHTML="";
+ buildNav();
+ document.getElementById("view").innerHTML=(VIEWS[VIEW]||VIEWS.dashboard)();
+}
+function setLang(l){ S.settings.lang=l; save(); render(); }
+function toggleTheme(){ S.settings.theme=S.settings.theme==="dark"?"light":"dark"; save(); render(); }
+function setF(k,v){ F[k]=v; document.getElementById("view").innerHTML=VIEWS[VIEW](); }
+
+/* ---------- formulário genérico ---------- */
+function formHTML(fields,rec){
+ return `<div class="fr">`+fields.map(f=>{
+  const v=rec[f.k]??f.def??"";
+  const cls=f.full?"fld full":"fld";
+  if(f.type==="check") return `<div class="chk"><input type="checkbox" id="fld_${f.k}" ${v?"checked":""}><label for="fld_${f.k}">${t(f.t)}</label></div>`;
+  let inp;
+  if(f.type==="textarea") inp=`<textarea id="fld_${f.k}">${esc(v)}</textarea>`;
+  else if(f.type==="select"){ const o=typeof f.opts==="function"?f.opts():f.opts; inp=`<select id="fld_${f.k}">${sel(o,v,f.ph||t("c.none"))}</select>`; }
+  else inp=`<input id="fld_${f.k}" type="${f.type||"text"}" value="${esc(v)}" ${f.step?`step="${f.step}"`:""} ${f.ph?`placeholder="${esc(f.ph)}"`:""}>`;
+  return `<div class="${cls}"><label>${t(f.t)}${f.req?" *":""}</label>${inp}${f.hint?`<span class="hint">${esc(f.hint)}</span>`:""}</div>`;
+ }).join("")+`</div>`;
+}
+function readForm(fields){
+ const o={},miss=[];
+ fields.forEach(f=>{ const e=document.getElementById("fld_"+f.k); if(!e)return;
+   let v=f.type==="check"?e.checked:e.value;
+   if(f.type==="number")v=num(v);
+   if(f.req&&(v===""||v===null))miss.push(t(f.t)); o[f.k]=v; });
+ if(miss.length){toast(t("c.required")+" "+miss.join(", "),"bad");return null;}
+ return o;
+}
+function crudModal(title,fields,rec,onSave,wide){
+ modal(title,formHTML(fields,rec||{}),
+  `<button class="btn" onclick="closeModal()">${t("a.cancel")}</button>
+   <button class="btn pri" id="frmSave">💾 ${t("a.save")}</button>`,wide);
+ document.getElementById("frmSave").onclick=()=>{const d=readForm(fields);if(!d)return;onSave(d);};
+}
+function saveEntity(coll,rec,data,pfx){
+ if(rec&&rec.id){ Object.assign(rec,data); } else { S[coll].push(Object.assign({id:uid(pfx),createdAt:today()},data)); }
+ save(); closeModal(); render(); toast(t("c.saved"));
+}
+function delEntity(coll,id){ confirmBox(t("c.confirmDel"),()=>{ S[coll]=S[coll].filter(x=>x.id!==id); save(); render(); toast(t("c.deleted")); }); }
+/* ============================================================
+   SEED — dados iniciais (baseados no mapa mental da empresa)
+   ============================================================ */
+function seed(){
+ const d=(n)=>{const x=new Date();x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+ S.suppliers=[
+  {id:"sup_ang",createdAt:today(),name:"Angelitur Turismo, Fretamento e Excursões",type:"bus",contact:"Comercial",
+   phone:"(16) 3941-3346",phone2:"(16) 99142-9212",email:"",address:"R. Cap. Salomão, 466 - Campos Elíseos, Ribeirão Preto - SP",
+   fleet:"Ônibus de 1ª linha Scania — viagens e fretamento",rating:5,notes:"Fornecedor principal de ônibus."},
+  {id:"sup_van1",createdAt:today(),name:"Van Executiva RP",type:"van",contact:"",phone:"(16) 3000-0000",phone2:"",email:"",
+   address:"Ribeirão Preto - SP",fleet:"Vans 15 lugares, ar-condicionado",rating:4,notes:"Cadastre aqui seus fornecedores de vans."},
+  {id:"sup_hot",createdAt:today(),name:"Hotel Parque das Águas",type:"hotel",contact:"Reservas",phone:"(64) 3000-0000",phone2:"",
+   email:"reservas@hotel.com",address:"Caldas Novas - GO",fleet:"Apartamentos duplos e triplos, pensão completa",rating:4,notes:""}
+ ];
+ S.vehicles=[
+  {id:"veh_bus1",createdAt:today(),supplierId:"sup_ang",type:"bus",model:"Scania 1ª linha",plate:"—",year:"",seats:46,notes:"Fretado"},
+  {id:"veh_van1",createdAt:today(),supplierId:"sup_van1",type:"van",model:"Sprinter Executiva",plate:"—",year:"",seats:15,notes:""}
+ ];
+ S.staff=[
+  {id:"stf_1",createdAt:today(),name:"Motorista 1",role:"driver",phone:"(16) 90000-0001",license:"",commission:0,notes:""},
+  {id:"stf_2",createdAt:today(),name:"Guia 1",role:"guide",phone:"(16) 90000-0002",license:"Cadastur",commission:5,notes:""}
+ ];
+ S.routes=[
+  {id:"rt_oli",createdAt:today(),name:"Ribeirão Preto → Olímpia - SP",origin:"Ribeirão Preto",destination:"Olímpia",state:"SP",
+   type:"excursion",km:130,hours:2,priceAdult:250,priceChild:180,includes:"Transporte + ingresso parque aquático + seguro",notes:"Thermas dos Laranjais"},
+  {id:"rt_bar",createdAt:today(),name:"Ribeirão Preto × Barretos - SP",origin:"Ribeirão Preto",destination:"Barretos",state:"SP",
+   type:"excursion",km:120,hours:2,priceAdult:180,priceChild:120,includes:"Transporte + ingresso",notes:"Festa do Peão / eventos"},
+  {id:"rt_cal",createdAt:today(),name:"Ribeirão Preto → Caldas Novas - GO",origin:"Ribeirão Preto",destination:"Caldas Novas",state:"GO",
+   type:"package",km:640,hours:9,priceAdult:1290,priceChild:890,includes:"Transporte + 3 diárias + café da manhã + seguro",notes:"Pacote 4 dias / 3 noites"},
+  {id:"rt_sp",createdAt:today(),name:"Ribeirão Preto → São Paulo - SP",origin:"Ribeirão Preto",destination:"São Paulo",state:"SP",
+   type:"transfer",km:315,hours:5,priceAdult:220,priceChild:160,includes:"Transporte ida e volta",notes:"Shows, compras e eventos"}
+ ];
+ S.departures=[
+  {id:"dep_1",createdAt:today(),routeId:"rt_oli",date:d(9),retDate:d(9),time:"05:00",vehicleId:"veh_bus1",supplierId:"sup_ang",
+   driverId:"stf_1",guideId:"stf_2",seats:46,boardPoint:"Terminal Rodoviário - RP",costVehicle:4200,costExtra:600,status:"confirmed",notes:""},
+  {id:"dep_2",createdAt:today(),routeId:"rt_cal",date:d(26),retDate:d(29),time:"22:00",vehicleId:"veh_bus1",supplierId:"sup_ang",
+   driverId:"stf_1",guideId:"stf_2",seats:46,boardPoint:"Av. Independência, 1000 - RP",costVehicle:16800,costExtra:9500,status:"scheduled",notes:""},
+  {id:"dep_3",createdAt:today(),routeId:"rt_sp",date:d(3),retDate:d(3),time:"06:00",vehicleId:"veh_van1",supplierId:"sup_van1",
+   driverId:"stf_1",guideId:"",seats:15,boardPoint:"Shopping Santa Úrsula - RP",costVehicle:1500,costExtra:200,status:"confirmed",notes:""}
+ ];
+ S.customers=[
+  {id:"cus_1",createdAt:today(),name:"Maria Silva",doc:"123.456.789-00",phone:"16991110001",email:"maria@email.com",city:"Ribeirão Preto",birth:"",notes:""},
+  {id:"cus_2",createdAt:today(),name:"João Pereira",doc:"987.654.321-00",phone:"16991110002",email:"joao@email.com",city:"Sertãozinho",birth:"",notes:""},
+  {id:"cus_3",createdAt:today(),name:"Ana Souza",doc:"",phone:"16991110003",email:"",city:"Ribeirão Preto",birth:"",notes:"Cliente indicada"}
+ ];
+ S.bookings=[
+  {id:"bk_1",code:"BT-0001",createdAt:today(),departureId:"dep_1",customerId:"cus_1",status:"confirmed",discount:0,
+   pax:[{name:"Maria Silva",doc:"123.456.789-00",type:"adult",price:250,seat:"1"},{name:"Pedro Silva",doc:"",type:"child",price:180,seat:"2"}],
+   payments:[{date:today(),amount:430,method:"pix",notes:""}],notes:""},
+  {id:"bk_2",code:"BT-0002",createdAt:today(),departureId:"dep_1",customerId:"cus_2",status:"confirmed",discount:20,
+   pax:[{name:"João Pereira",doc:"987.654.321-00",type:"adult",price:250,seat:"3"}],
+   payments:[{date:today(),amount:100,method:"cash",notes:"Sinal"}],notes:""},
+  {id:"bk_3",code:"BT-0003",createdAt:today(),departureId:"dep_3",customerId:"cus_3",status:"pending",discount:0,
+   pax:[{name:"Ana Souza",doc:"",type:"adult",price:220,seat:"1"}],payments:[],notes:"Aguardando pagamento"}
+ ];
+ S.seq.booking=4;
+ S.leads=[
+  {id:"ld_1",createdAt:today(),name:"Carlos Mendes",phone:"16991110004",email:"",source:"WhatsApp",routeId:"rt_cal",
+   pax:4,status:"proposal",sellerId:"",nextAction:d(2),notes:"Quer pacote em família para Caldas Novas."},
+  {id:"ld_2",createdAt:today(),name:"Grupo Escola Aurora",phone:"16991110005",email:"",source:"Indicação",routeId:"rt_bar",
+   pax:40,status:"new",sellerId:"",nextAction:d(1),notes:"Excursão escolar — orçar ônibus completo."}
+ ];
+ S.finance=[
+  {id:"fin_1",createdAt:today(),date:today(),type:"out",category:"Fornecedor",description:"Sinal ônibus Angelitur — Olímpia",
+   amount:1200,method:"pix",status:"paid",refType:"manual",refId:""}
+ ];
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+VIEWS.dashboard=function(){
+ const m=ym(today());
+ const bkAll=S.bookings.filter(b=>b.status!=="cancelled");
+ const bkMonth=bkAll.filter(b=>ym(b.createdAt)===m);
+ const revMonth=S.finance.filter(f=>f.type==="in"&&ym(f.date)===m).reduce((s,f)=>s+num(f.amount),0)
+   + bkAll.reduce((s,b)=>s+(b.payments||[]).filter(p=>ym(p.date)===m).reduce((x,p)=>x+num(p.amount),0),0);
+ const expMonth=S.finance.filter(f=>f.type==="out"&&ym(f.date)===m).reduce((s,f)=>s+num(f.amount),0);
+ const toRecv=bkAll.reduce((s,b)=>s+Math.max(0,bookBal(b)),0);
+ const next=S.departures.filter(d=>["scheduled","confirmed","boarding"].includes(d.status)&&daysTo(d.date)>=0)
+   .sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+ const paxMonth=bkMonth.reduce((s,b)=>s+(b.pax||[]).length,0);
+ const occs=next.slice(0,12).map(d=>depOcc(d));
+ const avgOcc=occs.length?Math.round(occs.reduce((a,b)=>a+b,0)/occs.length):0;
+
+ /* alertas */
+ const al=[];
+ next.forEach(d=>{ const dt=daysTo(d.date),oc=depOcc(d);
+   if(dt<=7&&oc<50) al.push({k:"warn",txt:`${routeName(d.routeId)} — ${t("d.lowOcc")} (${oc}%) · ${t("d.depIn")} ${dt} ${t("d.days")}`,go:`openDeparture('${d.id}')`});
+   if(depFree(d)===0) al.push({k:"info",txt:`${routeName(d.routeId)} · ${fdate(d.date)} — ${t("d.noSeats")}`,go:`openDeparture('${d.id}')`}); });
+ bkAll.forEach(b=>{ const dep=byId(S.departures,b.departureId);
+   if(dep&&daysTo(dep.date)<=3&&bookBal(b)>0.01)
+     al.push({k:"bad",txt:`${b.code} · ${custName(b.customerId)} — ${t("d.overduePay")}: ${money(bookBal(b))}`,go:`openBooking('${b.id}')`}); });
+
+ /* gráfico 6 meses */
+ const months=[];for(let i=5;i>=0;i--){const x=new Date();x.setDate(1);x.setMonth(x.getMonth()-i);months.push(x.toISOString().slice(0,7));}
+ const series=months.map(mm=>({m:mm,
+   in:S.finance.filter(f=>f.type==="in"&&ym(f.date)===mm).reduce((s,f)=>s+num(f.amount),0)
+     +bkAll.reduce((s,b)=>s+(b.payments||[]).filter(p=>ym(p.date)===mm).reduce((x,p)=>x+num(p.amount),0),0),
+   out:S.finance.filter(f=>f.type==="out"&&ym(f.date)===mm).reduce((s,f)=>s+num(f.amount),0)
+     +S.departures.filter(d=>ym(d.date)===mm).reduce((s,d)=>s+depCost(d),0)}));
+
+ /* top roteiros */
+ const top=S.routes.map(r=>{const ds=S.departures.filter(d=>d.routeId===r.id);
+   const pax=ds.reduce((s,d)=>s+seatsSold(d.id),0), rev=ds.reduce((s,d)=>s+depRevenue(d.id),0);
+   return {r,pax,rev};}).filter(x=>x.pax>0).sort((a,b)=>b.rev-a.rev).slice(0,5);
+ const maxRev=Math.max(1,...top.map(x=>x.rev));
+
+ return `
+ <div class="grid g4">
+  ${kpi("ok","💵",t("d.revMonth"),money(revMonth),`${t("c.expense")}: ${money(expMonth)}`)}
+  ${kpi(revMonth-expMonth>=0?"ok":"bad","📈",t("d.result"),money(revMonth-expMonth),t("c.month")+" "+m)}
+  ${kpi("warn","⏳",t("d.toReceive"),money(toRecv),`${bkAll.filter(b=>bookBal(b)>0.01).length} ${t("nav.bookings").toLowerCase()}`)}
+  ${kpi("info","🎟️",t("d.bookMonth"),bkMonth.length,`${paxMonth} ${t("c.pax").toLowerCase()}`)}
+  ${kpi("","🚏",t("d.nextDep"),next.length,next[0]?fdateLong(next[0].date):"—")}
+  ${kpi("","👥",t("d.customers"),S.customers.length,`${S.leads.filter(l=>!["won","lost"].includes(l.status)).length} leads`)}
+  ${kpi(avgOcc>=70?"ok":avgOcc>=40?"warn":"bad","🪑",t("d.avgOcc"),avgOcc+"%",t("d.nextDep").toLowerCase())}
+  ${kpi("","🗺️",t("nav.routes"),S.routes.length,`${S.suppliers.length} ${t("nav.suppliers").toLowerCase()}`)}
+ </div>
+
+ <div class="grid g2 mt">
+  <div class="card">
+   <h3>📊 ${t("d.revChart")}</h3>
+   ${chartBars(series)}
+   <div class="legend"><span><i style="background:var(--acc)"></i>${t("c.revenue")}</span><span><i style="background:var(--bad)"></i>${t("c.expense")}</span></div>
+  </div>
+  <div class="card">
+   <h3>🔔 ${t("d.alerts")}<span class="sp"></span>${al.length?tag(al.length,"warn"):""}</h3>
+   ${al.length?`<div class="list-min">`+al.slice(0,7).map(a=>
+     `<div class="li" style="cursor:pointer" onclick="${a.go}"><span class="dot" style="background:var(--${a.k==="bad"?"bad":a.k==="warn"?"warn":"info"})"></span>
+      <span>${esc(a.txt)}</span><span class="sp"></span><span class="muted">›</span></div>`).join("")+`</div>`
+    :`<div class="empty"><span class="ico">✅</span>${t("d.noAlerts")}</div>`}
+  </div>
+ </div>
+
+ <div class="grid g2 mt">
+  <div class="card">
+   <h3>🚏 ${t("d.nextDep")}<span class="sp"></span><button class="btn sm gh" onclick="go('departures')">${t("a.view")} ›</button></h3>
+   <div class="tw" style="border:none">
+   <table><thead><tr><th>${t("c.date")}</th><th>${t("c.route")}</th><th>${t("c.occupancy")}</th><th class="num">${t("c.revenue")}</th></tr></thead>
+   <tbody>${next.length?next.slice(0,6).map(d=>`<tr style="cursor:pointer" onclick="openDeparture('${d.id}')">
+     <td><b>${fdate(d.date)}</b><br><small class="muted">${esc(d.time||"")} · ${daysTo(d.date)}d</small></td>
+     <td>${esc(routeName(d.routeId))}<br><small class="muted">${seatsSold(d.id)}/${seatsTotal(d)} ${t("c.seats").toLowerCase()}</small></td>
+     <td>${bar(depOcc(d))}</td><td class="num b">${money(depRevenue(d.id))}</td></tr>`).join(""):emptyRow(4)}</tbody></table></div>
+  </div>
+  <div class="card">
+   <h3>🏆 ${t("d.topRoutes")}</h3>
+   ${top.length?`<div class="list-min">`+top.map(x=>`<div class="li"><div style="flex:1">
+     <div class="ttl">${esc(x.r.name)}</div>
+     <div class="bar" style="margin-top:6px"><i style="width:${pct(x.rev,maxRev)}%"></i></div>
+     <div class="sb">${x.pax} ${t("c.pax").toLowerCase()}</div></div>
+     <b>${money(x.rev)}</b></div>`).join("")+`</div>`:`<div class="empty"><span class="ico">📊</span>${t("c.empty")}</div>`}
+  </div>
+ </div>`;
+};
+function kpi(k,ic,lb,vl,ft){return `<div class="kpi ${k}"><div class="lb">${ic} ${esc(lb)}</div><div class="vl">${esc(vl)}</div><div class="ft">${esc(ft||"")}</div></div>`;}
+function chartBars(series){
+ const W=560,H=200,pad=30,max=Math.max(1,...series.flatMap(s=>[s.in,s.out]));
+ const bw=(W-pad*2)/series.length;
+ return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+  ${[0,.25,.5,.75,1].map(f=>`<line x1="${pad}" x2="${W-5}" y1="${pad+(H-pad*1.6)*f}" y2="${pad+(H-pad*1.6)*f}" stroke="var(--line)" stroke-width="1"/>`).join("")}
+  ${series.map((s,i)=>{const x=pad+i*bw, h=H-pad*1.6;
+    const hi=s.in/max*h, ho=s.out/max*h;
+    return `<rect x="${x+bw*.16}" y="${pad+h-hi}" width="${bw*.3}" height="${Math.max(1,hi)}" fill="var(--acc)" rx="3"/>
+            <rect x="${x+bw*.52}" y="${pad+h-ho}" width="${bw*.3}" height="${Math.max(1,ho)}" fill="var(--bad)" opacity=".8" rx="3"/>
+            <text x="${x+bw*.42}" y="${H-8}" fill="var(--muted)" font-size="10" text-anchor="middle">${s.m.slice(5)}/${s.m.slice(2,4)}</text>`;}).join("")}
+  <text x="${pad}" y="16" fill="var(--muted)" font-size="10">${money(max)}</text></svg>`;
+}
+
+/* ============================================================
+   AGENDA
+   ============================================================ */
+VIEWS.agenda=function(){
+ const base=F.month||ym(today());
+ const [y,mo]=base.split("-").map(Number);
+ const first=new Date(y,mo-1,1), start=new Date(first); start.setDate(1-first.getDay());
+ const cells=[];for(let i=0;i<42;i++){const dt=new Date(start);dt.setDate(start.getDate()+i);cells.push(dt);}
+ const evs=iso=>[
+   ...S.departures.filter(d=>d.date===iso).map(d=>({k:"acc",l:`🚏 ${routeName(d.routeId)}`,go:`openDeparture('${d.id}')`})),
+   ...S.departures.filter(d=>d.retDate===iso&&d.retDate!==d.date).map(d=>({k:"info",l:`↩️ ${routeName(d.routeId)}`,go:`openDeparture('${d.id}')`})),
+   ...S.leads.filter(l=>l.nextAction===iso&&!["won","lost"].includes(l.status)).map(l=>({k:"warn",l:`🎯 ${l.name}`,go:`go('leads')`}))
+ ];
+ const wd=S.settings.lang==="en"?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+ const label=new Intl.DateTimeFormat(loc(),{month:"long",year:"numeric"}).format(first);
+ return `<div class="bar-tools">
+   <button class="btn" onclick="setF('month','${shiftMonth(base,-1)}')">‹</button>
+   <b style="text-transform:capitalize;min-width:170px;text-align:center">${label}</b>
+   <button class="btn" onclick="setF('month','${shiftMonth(base,1)}')">›</button>
+   <button class="btn gh" onclick="setF('month','${ym(today())}')">${t("c.today")}</button><span class="sp"></span>
+   <button class="btn pri" onclick="openDeparture()">+ ${t("nav.departures")}</button></div>
+  <div class="card"><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+   ${wd.map(d=>`<div class="muted b center" style="font-size:11px;padding:4px">${d}</div>`).join("")}
+   ${cells.map(dt=>{const iso=dt.toISOString().slice(0,10),out=dt.getMonth()!==mo-1,ev=evs(iso);
+     return `<div style="min-height:88px;border:1px solid var(--line);border-radius:9px;padding:6px;opacity:${out?.4:1};background:${iso===today()?"var(--acc-d)":"transparent"}">
+       <div class="b" style="font-size:12px">${dt.getDate()}</div>
+       ${ev.slice(0,3).map(e=>`<div class="tag ${e.k}" style="display:block;margin-top:3px;font-size:9.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick="${e.go}">${esc(e.l)}</div>`).join("")}
+       ${ev.length>3?`<small class="muted">+${ev.length-3}</small>`:""}</div>`;}).join("")}
+  </div></div>`;
+};
+function shiftMonth(m,n){const [y,mo]=m.split("-").map(Number);const d=new Date(y,mo-1+n,1);return d.toISOString().slice(0,7);}
+/* ============================================================
+   OPERAÇÃO — Roteiros, Partidas, Frota, Equipe, Fornecedores
+   ============================================================ */
+function tools(inner){return `<div class="bar-tools">${inner}</div>`;}
+function searchBox(ph){return `<input class="search" placeholder="${esc(ph||t("a.search"))}" value="${esc(F.q||"")}" oninput="F.q=this.value;document.getElementById('view').innerHTML=VIEWS[VIEW]();document.querySelector('.search').focus();document.querySelector('.search').setSelectionRange(999,999)">`;}
+const hit=(o,keys)=>{const q=(F.q||"").toLowerCase().trim();if(!q)return true;return keys.some(k=>String(o[k]||"").toLowerCase().includes(q));};
+
+/* ---------------- ROTEIROS ---------------- */
+const RT_FIELDS=()=>[
+ {k:"name",t:"f.routeName",req:true,full:true},
+ {k:"origin",t:"c.origin",req:true},{k:"destination",t:"c.destination",req:true},{k:"state",t:"f.state"},
+ {k:"type",t:"c.type",type:"select",opts:OPT.routeType},
+ {k:"km",t:"f.km",type:"number"},{k:"hours",t:"f.hours",type:"number",step:"0.5"},
+ {k:"priceAdult",t:"f.priceAdult",type:"number",step:"0.01"},{k:"priceChild",t:"f.priceChild",type:"number",step:"0.01"},
+ {k:"includes",t:"f.includes",type:"textarea",full:true},{k:"notes",t:"c.notes",type:"textarea",full:true}];
+function routeForm(r){crudModal((r?t("a.edit"):t("a.new"))+" · "+t("nav.routes"),RT_FIELDS(),r||{type:"excursion"},
+ d=>saveEntity("routes",r,d,"rt"),true);}
+VIEWS.routes=function(){
+ const rows=S.routes.filter(r=>hit(r,["name","origin","destination","state","notes"]));
+ return tools(`${searchBox()}<span class="sp"></span>
+   <button class="btn" onclick="exportCSV('routes')">⬇ ${t("a.csv")}</button>
+   <button class="btn pri" onclick="routeForm()">+ ${t("a.new")}</button>`)+
+ `<div class="tw"><table><thead><tr><th>${t("f.routeName")}</th><th>${t("c.type")}</th><th class="num">${t("f.km")}</th>
+   <th class="num">${t("f.priceAdult")}</th><th class="num">${t("f.priceChild")}</th><th class="num">${t("nav.departures")}</th>
+   <th class="num">${t("c.revenue")}</th><th></th></tr></thead><tbody>
+ ${rows.length?rows.map(r=>{const ds=S.departures.filter(d=>d.routeId===r.id);
+   return `<tr><td><b>${esc(r.name)}</b><br><small class="muted">${esc(r.includes||"").slice(0,60)}</small></td>
+   <td>${tag(t("ty."+(r.type||"excursion")),"acc")}</td><td class="num">${num(r.km)||"—"}</td>
+   <td class="num">${money(r.priceAdult)}</td><td class="num">${money(r.priceChild)}</td>
+   <td class="num">${ds.length}</td><td class="num b">${money(ds.reduce((s,d)=>s+depRevenue(d.id),0))}</td>
+   <td><div class="acts"><button class="btn sm" onclick="routeForm(byId(S.routes,'${r.id}'))">✏️</button>
+   <button class="btn sm dan" onclick="delEntity('routes','${r.id}')">🗑</button></div></td></tr>`;}).join(""):emptyRow(8)}
+ </tbody></table></div>`;
+};
+
+/* ---------------- PARTIDAS ---------------- */
+const DEP_FIELDS=()=>[
+ {k:"routeId",t:"c.route",type:"select",opts:OPT.routes,req:true,full:true},
+ {k:"date",t:"f.depDate",type:"date",req:true},{k:"retDate",t:"f.retDate",type:"date"},{k:"time",t:"f.depTime",type:"time"},
+ {k:"supplierId",t:"c.supplier",type:"select",opts:()=>OPT.suppliers(["bus","van","other"])},
+ {k:"vehicleId",t:"c.vehicle",type:"select",opts:OPT.vehicles},
+ {k:"seats",t:"f.seatsTotal",type:"number"},
+ {k:"driverId",t:"f.driver",type:"select",opts:()=>OPT.staff("driver")},
+ {k:"guideId",t:"f.guide",type:"select",opts:()=>OPT.staff("guide")},
+ {k:"boardPoint",t:"f.boardPoint",full:true},
+ {k:"costVehicle",t:"f.costVehicle",type:"number",step:"0.01"},{k:"costExtra",t:"f.costExtra",type:"number",step:"0.01"},
+ {k:"status",t:"c.status",type:"select",opts:OPT.depStatus},
+ {k:"notes",t:"c.notes",type:"textarea",full:true}];
+function depForm(d){crudModal((d?t("a.edit"):t("a.new"))+" · "+t("nav.departures"),DEP_FIELDS(),d||{status:"scheduled",date:today()},
+ x=>saveEntity("departures",d,x,"dep"),true);}
+function openDeparture(id){
+ if(!id)return depForm();
+ const d=byId(S.departures,id); if(!d)return;
+ const bks=depBookings(id), rev=depRevenue(id), cost=depCost(d), tot=seatsTotal(d);
+ const seatsTaken={}; bks.forEach(b=>(b.pax||[]).forEach(p=>{if(p.seat)seatsTaken[p.seat]=b.code}));
+ modal(`${routeName(d.routeId)} · ${fdate(d.date)}`,
+ `<div class="grid g4" style="margin-bottom:14px">
+   ${kpi("","🪑",t("c.occupancy"),depOcc(d)+"%",`${seatsSold(id)}/${tot} · ${depFree(d)} ${t("c.free").toLowerCase()}`)}
+   ${kpi("ok","💵",t("c.revenue"),money(rev),`${bks.length} ${t("nav.bookings").toLowerCase()}`)}
+   ${kpi("bad","💸",t("c.cost"),money(cost),supName(d.supplierId))}
+   ${kpi(rev-cost>=0?"ok":"bad","📈",t("c.margin"),money(rev-cost),pct(rev-cost,rev||1)+"%")}
+  </div>
+  <div class="grid g2">
+   <div class="card"><h3>ℹ️ ${t("c.departure")}</h3><div class="list-min">
+    <div class="li"><span class="sb">${t("f.depDate")}</span><span class="sp"></span><b>${fdateLong(d.date)} ${esc(d.time||"")}</b></div>
+    ${d.retDate?`<div class="li"><span class="sb">${t("f.retDate")}</span><span class="sp"></span><b>${fdateLong(d.retDate)}</b></div>`:""}
+    <div class="li"><span class="sb">${t("f.boardPoint")}</span><span class="sp"></span><b>${esc(d.boardPoint||"—")}</b></div>
+    <div class="li"><span class="sb">${t("c.vehicle")}</span><span class="sp"></span><b>${esc(vehLabel(d.vehicleId))}</b></div>
+    <div class="li"><span class="sb">${t("f.driver")}</span><span class="sp"></span><b>${esc(staffName(d.driverId))}</b></div>
+    <div class="li"><span class="sb">${t("f.guide")}</span><span class="sp"></span><b>${esc(staffName(d.guideId))}</b></div>
+    <div class="li"><span class="sb">${t("c.status")}</span><span class="sp"></span>${tag(t("st."+d.status),stKind(d.status))}</div>
+   </div></div>
+   <div class="card"><h3>🪑 ${t("c.seats")}</h3>
+    <div class="seatmap">${Array.from({length:tot},(_,i)=>{const n=String(i+1);
+      return `<div class="seat ${seatsTaken[n]?"tk":""}" title="${esc(seatsTaken[n]||"")}">${n}</div>`}).join("")}</div>
+   </div>
+  </div>
+  <div class="card mt"><h3>🎟️ ${t("nav.bookings")}<span class="sp"></span>
+    <button class="btn sm pri" onclick="closeModal();bookForm(null,'${id}')">+ ${t("a.new")}</button></h3>
+   <div class="tw" style="border:none"><table><thead><tr><th>${t("c.code")}</th><th>${t("c.customer")}</th>
+    <th class="num">${t("c.pax")}</th><th class="num">${t("c.total")}</th><th class="num">${t("c.balance")}</th><th>${t("c.status")}</th></tr></thead>
+   <tbody>${bks.length?bks.map(b=>`<tr style="cursor:pointer" onclick="openBooking('${b.id}')"><td class="mono b">${esc(b.code)}</td>
+    <td>${esc(custName(b.customerId))}</td><td class="num">${(b.pax||[]).length}</td><td class="num">${money(bookTotal(b))}</td>
+    <td class="num ${bookBal(b)>0?"neg":"pos"}">${money(bookBal(b))}</td><td>${tag(t("st."+payStatus(b)),stKind(payStatus(b)))}</td></tr>`).join(""):emptyRow(6)}
+   </tbody></table></div></div>`,
+ `<button class="btn" onclick="closeModal()">${t("a.close")}</button>
+  <button class="btn" onclick="printManifest('${id}')">🖨 ${t("a.manifest")}</button>
+  <button class="btn dan" onclick="closeModal();delEntity('departures','${id}')">🗑 ${t("a.del")}</button>
+  <button class="btn pri" onclick="closeModal();depForm(byId(S.departures,'${id}'))">✏️ ${t("a.edit")}</button>`,true);
+}
+const vehLabel=id=>{const v=byId(S.vehicles,id);return v?`${v.model||t("ty."+v.type)} · ${v.plate||""} (${v.seats})`:t("c.none")};
+
+VIEWS.departures=function(){
+ const st=F.st||"", per=F.per||"next";
+ let rows=S.departures.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+ if(st)rows=rows.filter(d=>d.status===st);
+ if(per==="next")rows=rows.filter(d=>daysTo(d.date)>=0);
+ if(per==="past")rows=rows.filter(d=>daysTo(d.date)<0);
+ rows=rows.filter(d=>hit({a:routeName(d.routeId),b:d.boardPoint,c:d.notes},["a","b","c"]));
+ if(per==="next")rows.reverse();
+ return tools(`${searchBox()}
+  <select onchange="setF('per',this.value)">${sel([{v:"next",l:t("c.upcoming")},{v:"past",l:t("c.overdue")},{v:"all",l:t("a.all")}],per)}</select>
+  <select onchange="setF('st',this.value)">${sel(OPT.depStatus(),st,t("c.status")+": "+t("a.all"))}</select>
+  <span class="sp"></span><button class="btn" onclick="exportCSV('departures')">⬇ ${t("a.csv")}</button>
+  <button class="btn pri" onclick="depForm()">+ ${t("a.new")}</button>`)+
+ `<div class="tw"><table><thead><tr><th>${t("c.date")}</th><th>${t("c.route")}</th><th>${t("c.vehicle")}</th>
+   <th>${t("c.occupancy")}</th><th class="num">${t("c.revenue")}</th><th class="num">${t("c.cost")}</th><th class="num">${t("c.margin")}</th>
+   <th>${t("c.status")}</th><th></th></tr></thead><tbody>
+ ${rows.length?rows.map(d=>{const rev=depRevenue(d.id),c=depCost(d);
+  return `<tr><td style="cursor:pointer" onclick="openDeparture('${d.id}')"><b>${fdate(d.date)}</b><br>
+   <small class="muted">${esc(d.time||"")}${daysTo(d.date)>=0?` · ${daysTo(d.date)}d`:""}</small></td>
+   <td style="cursor:pointer" onclick="openDeparture('${d.id}')">${esc(routeName(d.routeId))}<br><small class="muted">${esc(d.boardPoint||"")}</small></td>
+   <td><small>${esc(vehLabel(d.vehicleId))}<br><span class="muted">${esc(supName(d.supplierId))}</span></small></td>
+   <td>${bar(depOcc(d))}<small class="muted">${seatsSold(d.id)}/${seatsTotal(d)}</small></td>
+   <td class="num">${money(rev)}</td><td class="num">${money(c)}</td>
+   <td class="num ${rev-c>=0?"pos":"neg"}">${money(rev-c)}</td>
+   <td>${tag(t("st."+d.status),stKind(d.status))}</td>
+   <td><div class="acts"><button class="btn sm" onclick="printManifest('${d.id}')">🖨</button>
+    <button class="btn sm" onclick="depForm(byId(S.departures,'${d.id}'))">✏️</button>
+    <button class="btn sm dan" onclick="delEntity('departures','${d.id}')">🗑</button></div></td></tr>`;}).join(""):emptyRow(9)}
+ </tbody></table></div>`;
+};
+
+/* ---------------- FROTA ---------------- */
+const VE_FIELDS=()=>[
+ {k:"model",t:"f.model",req:true},{k:"type",t:"c.type",type:"select",opts:()=>[{v:"bus",l:t("ty.bus")},{v:"van",l:t("ty.van")},{v:"other",l:t("ty.other")}]},
+ {k:"plate",t:"f.plate"},{k:"year",t:"f.year"},{k:"seats",t:"c.seats",type:"number",req:true},
+ {k:"supplierId",t:"c.supplier",type:"select",opts:()=>OPT.suppliers(["bus","van","other"])},
+ {k:"notes",t:"c.notes",type:"textarea",full:true}];
+function vehForm(v){crudModal((v?t("a.edit"):t("a.new"))+" · "+t("nav.vehicles"),VE_FIELDS(),v||{type:"bus"},d=>saveEntity("vehicles",v,d,"veh"));}
+VIEWS.vehicles=function(){
+ const rows=S.vehicles.filter(v=>hit(v,["model","plate","notes"]));
+ return tools(`${searchBox()}<span class="sp"></span><button class="btn pri" onclick="vehForm()">+ ${t("a.new")}</button>`)+
+ `<div class="tw"><table><thead><tr><th>${t("f.model")}</th><th>${t("c.type")}</th><th>${t("f.plate")}</th>
+  <th class="num">${t("c.seats")}</th><th>${t("c.supplier")}</th><th class="num">${t("nav.departures")}</th><th></th></tr></thead><tbody>
+ ${rows.length?rows.map(v=>`<tr><td><b>${esc(v.model)}</b><br><small class="muted">${esc(v.notes||"")}</small></td>
+  <td>${tag(t("ty."+(v.type||"other")),"acc")}</td><td class="mono">${esc(v.plate||"—")}</td><td class="num b">${num(v.seats)}</td>
+  <td>${esc(supName(v.supplierId))}</td><td class="num">${S.departures.filter(d=>d.vehicleId===v.id).length}</td>
+  <td><div class="acts"><button class="btn sm" onclick="vehForm(byId(S.vehicles,'${v.id}'))">✏️</button>
+  <button class="btn sm dan" onclick="delEntity('vehicles','${v.id}')">🗑</button></div></td></tr>`).join(""):emptyRow(7)}
+ </tbody></table></div>`;
+};
+
+/* ---------------- EQUIPE ---------------- */
+const ST_FIELDS=()=>[
+ {k:"name",t:"c.name",req:true},{k:"role",t:"c.role",type:"select",opts:OPT.staffRole},
+ {k:"phone",t:"c.phone"},{k:"email",t:"c.email",type:"email"},{k:"license",t:"f.license"},
+ {k:"commission",t:"f.commission",type:"number",step:"0.1"},{k:"notes",t:"c.notes",type:"textarea",full:true}];
+function staffForm(s){crudModal((s?t("a.edit"):t("a.new"))+" · "+t("nav.staff"),ST_FIELDS(),s||{role:"driver"},d=>saveEntity("staff",s,d,"stf"));}
+VIEWS.staff=function(){
+ const rows=S.staff.filter(s=>hit(s,["name","phone","notes"]));
+ return tools(`${searchBox()}<span class="sp"></span><button class="btn pri" onclick="staffForm()">+ ${t("a.new")}</button>`)+
+ `<div class="tw"><table><thead><tr><th>${t("c.name")}</th><th>${t("c.role")}</th><th>${t("c.phone")}</th>
+  <th>${t("f.license")}</th><th class="num">${t("f.commission")}</th><th class="num">${t("nav.departures")}</th><th></th></tr></thead><tbody>
+ ${rows.length?rows.map(s=>`<tr><td><b>${esc(s.name)}</b></td><td>${tag(t("ty."+(s.role||"other")),"acc")}</td>
+  <td>${wa(s.phone)}</td><td>${esc(s.license||"—")}</td><td class="num">${num(s.commission)}%</td>
+  <td class="num">${S.departures.filter(d=>d.driverId===s.id||d.guideId===s.id).length}</td>
+  <td><div class="acts"><button class="btn sm" onclick="staffForm(byId(S.staff,'${s.id}'))">✏️</button>
+  <button class="btn sm dan" onclick="delEntity('staff','${s.id}')">🗑</button></div></td></tr>`).join(""):emptyRow(7)}
+ </tbody></table></div>`;
+};
+const wa=p=>{const d=String(p||"").replace(/\D/g,"");return d?`<a href="https://wa.me/${d.length>11?d:"55"+d}" target="_blank" rel="noopener">${esc(p)} 💬</a>`:"—";};
+
+/* ---------------- FORNECEDORES ---------------- */
+const SU_FIELDS=()=>[
+ {k:"name",t:"c.name",req:true,full:true},{k:"type",t:"c.type",type:"select",opts:OPT.supType,req:true},
+ {k:"contact",t:"f.contact"},{k:"phone",t:"c.phone"},{k:"phone2",t:"c.phone"},{k:"email",t:"c.email",type:"email"},
+ {k:"cnpj",t:"f.cnpj"},{k:"rating",t:"c.rating",type:"number",step:"1"},
+ {k:"address",t:"c.address",full:true},{k:"fleet",t:"f.fleet",type:"textarea",full:true},{k:"notes",t:"c.notes",type:"textarea",full:true}];
+function supForm(s){crudModal((s?t("a.edit"):t("a.new"))+" · "+t("nav.suppliers"),SU_FIELDS(),s||{type:"bus",rating:5},d=>saveEntity("suppliers",s,d,"sup"),true);}
+VIEWS.suppliers=function(){
+ const ty=F.ty||"";
+ let rows=S.suppliers.filter(s=>hit(s,["name","contact","phone","address","fleet","notes"]));
+ if(ty)rows=rows.filter(s=>s.type===ty);
+ return tools(`${searchBox()}<select onchange="setF('ty',this.value)">${sel(OPT.supType(),ty,t("c.type")+": "+t("a.all"))}</select>
+  <span class="sp"></span><button class="btn" onclick="exportCSV('suppliers')">⬇ ${t("a.csv")}</button>
+  <button class="btn pri" onclick="supForm()">+ ${t("a.new")}</button>`)+
+ `<div class="grid g2">${rows.length?rows.map(s=>`<div class="card">
+   <h3>${s.type==="bus"?"🚌":s.type==="van"?"🚐":s.type==="hotel"?"🏨":s.type==="guide"?"🧭":s.type==="restaurant"?"🍽️":"🤝"}
+    ${esc(s.name)}<span class="sp"></span>${tag(t("ty."+s.type),"acc")}</h3>
+   <div class="list-min">
+    ${s.fleet?`<div class="li"><span>🛠️</span><span>${esc(s.fleet)}</span></div>`:""}
+    ${s.phone?`<div class="li"><span>📞</span><span>${wa(s.phone)}${s.phone2?" · "+wa(s.phone2):""}</span></div>`:""}
+    ${s.email?`<div class="li"><span>✉️</span><span>${esc(s.email)}</span></div>`:""}
+    ${s.address?`<div class="li"><span>📍</span><span>${esc(s.address)}</span><span class="sp"></span>
+      <a href="https://www.google.com/maps/search/${encodeURIComponent(s.address)}" target="_blank" rel="noopener">🗺️</a></div>`:""}
+    ${s.contact?`<div class="li"><span>👤</span><span>${esc(s.contact)}</span></div>`:""}
+    <div class="li"><span>⭐</span><span>${"★".repeat(Math.max(0,Math.min(5,num(s.rating))))}${"☆".repeat(5-Math.max(0,Math.min(5,num(s.rating))))}</span>
+     <span class="sp"></span><span class="sb">${S.departures.filter(d=>d.supplierId===s.id).length} ${t("nav.departures").toLowerCase()}</span></div>
+   </div>
+   <div class="acts mt"><button class="btn sm" onclick="supForm(byId(S.suppliers,'${s.id}'))">✏️ ${t("a.edit")}</button>
+    <button class="btn sm dan" onclick="delEntity('suppliers','${s.id}')">🗑</button></div></div>`).join("")
+  :`<div class="card"><div class="empty"><span class="ico">🤝</span>${t("c.empty")}<br><small>${t("c.emptyHint")}</small></div></div>`}</div>`;
+};
+/* ============================================================
+   COMERCIAL — Reservas, Clientes, Leads/CRM
+   ============================================================ */
+let PAX=[];
+function paxRowHTML(p,i){
+ return `<div class="pax-row" id="paxr_${i}">
+  <div class="fld"><label>${t("f.paxName")}</label><input id="px_n_${i}" value="${esc(p.name||"")}"></div>
+  <div class="fld"><label>${t("f.paxType")}</label><select id="px_t_${i}" onchange="paxPrice(${i})">${sel(OPT.paxType(),p.type||"adult")}</select></div>
+  <div class="fld"><label>${t("c.price")}</label><input id="px_p_${i}" type="number" step="0.01" value="${num(p.price)}" oninput="paxSum()"></div>
+  <div class="fld" style="max-width:70px"><label>${t("p.seat")}</label><input id="px_s_${i}" value="${esc(p.seat||"")}"></div>
+  <button class="btn sm dan" onclick="paxDel(${i})" title="${t("a.del")}">🗑</button></div>`;
+}
+function paxRender(){document.getElementById("paxBox").innerHTML=PAX.map(paxRowHTML).join("")||`<p class="muted">${t("c.empty")}</p>`;paxSum();}
+function paxRead(){PAX=PAX.map((p,i)=>({name:document.getElementById("px_n_"+i)?.value||p.name,
+ type:document.getElementById("px_t_"+i)?.value||p.type,price:num(document.getElementById("px_p_"+i)?.value),
+ doc:p.doc||"",seat:document.getElementById("px_s_"+i)?.value||""}));return PAX;}
+function paxAdd(){paxRead();const dep=byId(S.departures,document.getElementById("fld_departureId").value);
+ const r=dep?byId(S.routes,dep.routeId):null;
+ PAX.push({name:"",type:"adult",price:r?num(r.priceAdult):0,seat:String(PAX.length+1)});paxRender();}
+function paxDel(i){paxRead();PAX.splice(i,1);paxRender();}
+function paxPrice(i){paxRead();const dep=byId(S.departures,document.getElementById("fld_departureId").value);
+ const r=dep?byId(S.routes,dep.routeId):null;if(!r)return;
+ PAX[i].price=PAX[i].type==="child"?num(r.priceChild):num(r.priceAdult);paxRender();}
+function paxSum(){const tot=PAX.reduce((s,p,i)=>s+num(document.getElementById("px_p_"+i)?.value??p.price),0);
+ const dc=num(document.getElementById("fld_discount")?.value);
+ const e=document.getElementById("paxTot");if(e)e.innerHTML=`${PAX.length} ${t("c.pax").toLowerCase()} · <b>${money(tot-dc)}</b>`;}
+
+function bookForm(b,depId){
+ PAX=b?JSON.parse(JSON.stringify(b.pax||[])):[];
+ const f=[{k:"departureId",t:"c.departure",type:"select",opts:OPT.departures,req:true,full:true},
+  {k:"customerId",t:"c.customer",type:"select",opts:OPT.customers,req:true},
+  {k:"status",t:"c.status",type:"select",opts:OPT.bookStatus},
+  {k:"discount",t:"f.discount",type:"number",step:"0.01"},
+  {k:"notes",t:"c.notes",type:"textarea",full:true}];
+ const rec=b||{status:"pending",discount:0,departureId:depId||""};
+ modal((b?t("a.edit")+" "+b.code:t("a.new")+" · "+t("nav.bookings")),
+  formHTML(f,rec)+
+  `<div class="card mt"><h3>👥 ${t("f.paxList")}<span class="sp"></span><span id="paxTot" class="muted"></span>
+    <button class="btn sm" onclick="paxAdd()">+ ${t("a.add")}</button>
+    <button class="btn sm gh" onclick="closeModal();customerForm()">+ ${t("c.customer")}</button></h3>
+   <div id="paxBox"></div></div>`,
+  `<button class="btn" onclick="closeModal()">${t("a.cancel")}</button>
+   <button class="btn pri" id="bkSave">💾 ${t("a.save")}</button>`,true);
+ paxRender();
+ document.getElementById("fld_discount").oninput=paxSum;
+ document.getElementById("bkSave").onclick=()=>{
+   const d=readForm(f); if(!d)return; d.pax=paxRead().filter(p=>p.name.trim());
+   if(!d.pax.length){toast(t("f.paxList")+": "+t("c.required"),"bad");return;}
+   const dep=byId(S.departures,d.departureId);
+   const already=b?(b.pax||[]).length:0;
+   if(dep&&d.pax.length-already>depFree(dep)){toast(t("d.noSeats")+" — "+depFree(dep)+" "+t("c.free").toLowerCase(),"warn");}
+   if(b){Object.assign(b,d);}
+   else{const code="BT-"+String(S.seq.booking++).padStart(4,"0");
+     S.bookings.push(Object.assign({id:uid("bk"),code,createdAt:today(),payments:[]},d));}
+   save();closeModal();render();toast(t("c.saved"));};
+}
+function openBooking(id){
+ const b=byId(S.bookings,id);if(!b)return;const dep=byId(S.departures,b.departureId);
+ modal(`${b.code} · ${custName(b.customerId)}`,
+ `<div class="grid g4" style="margin-bottom:14px">
+   ${kpi("","👥",t("c.pax"),(b.pax||[]).length,dep?fdate(dep.date):"—")}
+   ${kpi("","💵",t("c.total"),money(bookTotal(b)),num(b.discount)?`${t("f.discount")}: ${money(b.discount)}`:"")}
+   ${kpi("ok","✅",t("c.paid"),money(bookPaid(b)),(b.payments||[]).length+" x")}
+   ${kpi(bookBal(b)>0?"bad":"ok","⏳",t("c.balance"),money(bookBal(b)),t("st."+payStatus(b)))}
+  </div>
+  <div class="grid g2">
+   <div class="card"><h3>🚏 ${t("c.departure")}</h3><div class="list-min">
+    <div class="li"><span class="sb">${t("c.route")}</span><span class="sp"></span><b>${esc(dep?routeName(dep.routeId):"—")}</b></div>
+    <div class="li"><span class="sb">${t("c.date")}</span><span class="sp"></span><b>${dep?fdateLong(dep.date):"—"} ${esc(dep?.time||"")}</b></div>
+    <div class="li"><span class="sb">${t("f.boardPoint")}</span><span class="sp"></span><b>${esc(dep?.boardPoint||"—")}</b></div>
+    <div class="li"><span class="sb">${t("c.status")}</span><span class="sp"></span>${tag(t("st."+b.status),stKind(b.status))}</div>
+    ${b.notes?`<div class="li"><span class="sb">${t("c.notes")}</span><span class="sp"></span>${esc(b.notes)}</div>`:""}
+   </div></div>
+   <div class="card"><h3>👥 ${t("f.paxList")}</h3><div class="list-min">
+    ${(b.pax||[]).map(p=>`<div class="li"><span class="dot"></span><div><div class="ttl">${esc(p.name)}</div>
+      <div class="sb">${t("f."+(p.type||"adult"))} ${p.seat?`· ${t("p.seat")} ${esc(p.seat)}`:""}</div></div>
+      <span class="sp"></span><b>${money(p.price)}</b></div>`).join("")}
+   </div></div>
+  </div>
+  <div class="card mt"><h3>💳 ${t("a.pay")}<span class="sp"></span>
+    <button class="btn sm pri" onclick="payForm('${b.id}')">+ ${t("a.add")}</button></h3>
+   <div class="tw" style="border:none"><table><thead><tr><th>${t("c.date")}</th><th>${t("c.method")}</th>
+    <th>${t("c.notes")}</th><th class="num">${t("c.value")}</th><th></th></tr></thead><tbody>
+    ${(b.payments||[]).length?b.payments.map((p,i)=>`<tr><td>${fdate(p.date)}</td><td>${tag(t("pm."+p.method),"acc")}</td>
+     <td class="muted">${esc(p.notes||"")}</td><td class="num b">${money(p.amount)}</td>
+     <td class="acts"><button class="btn sm dan" onclick="payDel('${b.id}',${i})">🗑</button></td></tr>`).join(""):emptyRow(5)}
+   </tbody></table></div></div>`,
+ `<button class="btn" onclick="closeModal()">${t("a.close")}</button>
+  <button class="btn" onclick="printVoucher('${b.id}')">🖨 ${t("a.voucher")}</button>
+  <button class="btn dan" onclick="closeModal();delEntity('bookings','${b.id}')">🗑</button>
+  <button class="btn pri" onclick="closeModal();bookForm(byId(S.bookings,'${b.id}'))">✏️ ${t("a.edit")}</button>`,true);
+}
+function payForm(bid){
+ const b=byId(S.bookings,bid);
+ const f=[{k:"date",t:"c.date",type:"date",req:true},{k:"amount",t:"c.value",type:"number",step:"0.01",req:true},
+  {k:"method",t:"c.method",type:"select",opts:OPT.payMethod},{k:"notes",t:"c.notes",full:true}];
+ crudModal(t("a.pay")+" · "+b.code,f,{date:today(),amount:bookBal(b),method:"pix"},d=>{
+  b.payments=b.payments||[];b.payments.push(d);
+  if(b.status==="pending"&&bookBal(b)<=0.009)b.status="confirmed";
+  save();closeModal();render();openBooking(bid);toast(t("c.saved"));});
+}
+function payDel(bid,i){const b=byId(S.bookings,bid);confirmBox(t("c.confirmDel"),()=>{b.payments.splice(i,1);save();render();openBooking(bid);});}
+
+VIEWS.bookings=function(){
+ const st=F.st||"",pay=F.pay||"";
+ let rows=S.bookings.slice().sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+ if(st)rows=rows.filter(b=>b.status===st);
+ if(pay)rows=rows.filter(b=>payStatus(b)===pay);
+ rows=rows.filter(b=>hit({a:b.code,b:custName(b.customerId),c:(b.pax||[]).map(p=>p.name).join(" "),d:b.notes},["a","b","c","d"]));
+ const tot=rows.reduce((s,b)=>s+bookTotal(b),0),paid=rows.reduce((s,b)=>s+bookPaid(b),0);
+ return tools(`${searchBox()}
+  <select onchange="setF('st',this.value)">${sel(OPT.bookStatus(),st,t("c.status")+": "+t("a.all"))}</select>
+  <select onchange="setF('pay',this.value)">${sel([{v:"paid",l:t("st.paid")},{v:"partial",l:t("st.partial")},{v:"pending",l:t("st.pending")}],pay,t("a.pay")+": "+t("a.all"))}</select>
+  <span class="sp"></span><button class="btn" onclick="exportCSV('bookings')">⬇ ${t("a.csv")}</button>
+  <button class="btn pri" onclick="bookForm()">+ ${t("a.new")}</button>`)+
+ `<div class="grid g4" style="margin-bottom:14px">
+   ${kpi("","🎟️",t("nav.bookings"),rows.length,`${rows.reduce((s,b)=>s+(b.pax||[]).length,0)} ${t("c.pax").toLowerCase()}`)}
+   ${kpi("","💵",t("c.total"),money(tot),"")}
+   ${kpi("ok","✅",t("c.paid"),money(paid),pct(paid,tot||1)+"%")}
+   ${kpi("warn","⏳",t("c.balance"),money(tot-paid),"")}
+  </div>
+ <div class="tw"><table><thead><tr><th>${t("c.code")}</th><th>${t("c.customer")}</th><th>${t("c.departure")}</th>
+  <th class="num">${t("c.pax")}</th><th class="num">${t("c.total")}</th><th class="num">${t("c.paid")}</th>
+  <th class="num">${t("c.balance")}</th><th>${t("a.pay")}</th><th>${t("c.status")}</th><th></th></tr></thead><tbody>
+ ${rows.length?rows.map(b=>{const dep=byId(S.departures,b.departureId),ps=payStatus(b);
+  return `<tr style="cursor:pointer"><td onclick="openBooking('${b.id}')" class="mono b">${esc(b.code)}</td>
+  <td onclick="openBooking('${b.id}')">${esc(custName(b.customerId))}<br><small class="muted">${fdate(b.createdAt)}</small></td>
+  <td onclick="openBooking('${b.id}')">${esc(dep?routeName(dep.routeId):"—")}<br><small class="muted">${dep?fdate(dep.date):""}</small></td>
+  <td class="num">${(b.pax||[]).length}</td><td class="num">${money(bookTotal(b))}</td><td class="num">${money(bookPaid(b))}</td>
+  <td class="num ${bookBal(b)>0.009?"neg":"pos"}">${money(bookBal(b))}</td>
+  <td>${tag(t("st."+ps),stKind(ps))}</td><td>${tag(t("st."+b.status),stKind(b.status))}</td>
+  <td><div class="acts"><button class="btn sm" onclick="payForm('${b.id}')">💳</button>
+   <button class="btn sm" onclick="printVoucher('${b.id}')">🖨</button>
+   <button class="btn sm" onclick="bookForm(byId(S.bookings,'${b.id}'))">✏️</button>
+   <button class="btn sm dan" onclick="delEntity('bookings','${b.id}')">🗑</button></div></td></tr>`;}).join(""):emptyRow(10)}
+ </tbody></table></div>`;
+};
+
+/* ---------------- CLIENTES ---------------- */
+const CU_FIELDS=()=>[
+ {k:"name",t:"c.name",req:true,full:true},{k:"doc",t:"c.doc"},{k:"birth",t:"c.date",type:"date"},
+ {k:"phone",t:"c.phone"},{k:"email",t:"c.email",type:"email"},{k:"city",t:"c.city"},
+ {k:"address",t:"c.address",full:true},{k:"notes",t:"c.notes",type:"textarea",full:true}];
+function customerForm(c){crudModal((c?t("a.edit"):t("a.new"))+" · "+t("nav.customers"),CU_FIELDS(),c||{},d=>saveEntity("customers",c,d,"cus"),true);}
+VIEWS.customers=function(){
+ const rows=S.customers.filter(c=>hit(c,["name","doc","phone","email","city","notes"]));
+ return tools(`${searchBox()}<span class="sp"></span><button class="btn" onclick="exportCSV('customers')">⬇ ${t("a.csv")}</button>
+  <button class="btn pri" onclick="customerForm()">+ ${t("a.new")}</button>`)+
+ `<div class="tw"><table><thead><tr><th>${t("c.name")}</th><th>${t("c.phone")}</th><th>${t("c.city")}</th>
+  <th class="num">${t("nav.bookings")}</th><th class="num">${t("c.total")}</th><th class="num">${t("c.balance")}</th><th></th></tr></thead><tbody>
+ ${rows.length?rows.map(c=>{const bs=S.bookings.filter(b=>b.customerId===c.id&&b.status!=="cancelled");
+  const tt=bs.reduce((s,b)=>s+bookTotal(b),0),bal=bs.reduce((s,b)=>s+bookBal(b),0);
+  return `<tr><td><b>${esc(c.name)}</b><br><small class="muted">${esc(c.doc||c.email||"")}</small></td>
+  <td>${wa(c.phone)}</td><td>${esc(c.city||"—")}</td><td class="num">${bs.length}</td>
+  <td class="num b">${money(tt)}</td><td class="num ${bal>0.009?"neg":""}">${money(bal)}</td>
+  <td><div class="acts"><button class="btn sm" onclick="bookForm(null);setTimeout(()=>{const s=document.getElementById('fld_customerId');if(s)s.value='${c.id}'},60)">🎟️</button>
+   <button class="btn sm" onclick="customerForm(byId(S.customers,'${c.id}'))">✏️</button>
+   <button class="btn sm dan" onclick="delEntity('customers','${c.id}')">🗑</button></div></td></tr>`;}).join(""):emptyRow(7)}
+ </tbody></table></div>`;
+};
+
+/* ---------------- LEADS / CRM ---------------- */
+const LD_FIELDS=()=>[
+ {k:"name",t:"c.name",req:true,full:true},{k:"phone",t:"c.phone"},{k:"email",t:"c.email",type:"email"},
+ {k:"source",t:"f.source",ph:"WhatsApp, Instagram, Indicação..."},
+ {k:"routeId",t:"f.interest",type:"select",opts:OPT.routes},{k:"pax",t:"c.pax",type:"number"},
+ {k:"status",t:"c.status",type:"select",opts:OPT.leadStatus},
+ {k:"sellerId",t:"f.seller",type:"select",opts:()=>OPT.staff("seller")},
+ {k:"nextAction",t:"f.nextAction",type:"date"},{k:"notes",t:"c.notes",type:"textarea",full:true}];
+function leadForm(l){crudModal((l?t("a.edit"):t("a.new"))+" · "+t("nav.leads"),LD_FIELDS(),l||{status:"new",nextAction:today()},d=>saveEntity("leads",l,d,"ld"),true);}
+function leadConvert(id){const l=byId(S.leads,id);if(!l)return;
+ const c={id:uid("cus"),createdAt:today(),name:l.name,phone:l.phone,email:l.email,doc:"",city:"",notes:l.notes||""};
+ S.customers.push(c);l.status="won";save();render();toast(t("a.convert")+" ✓");}
+VIEWS.leads=function(){
+ const cols=["new","contacted","proposal","won","lost"];
+ const rows=S.leads.filter(l=>hit(l,["name","phone","source","notes"]));
+ return tools(`${searchBox()}<span class="sp"></span><button class="btn" onclick="exportCSV('leads')">⬇ ${t("a.csv")}</button>
+  <button class="btn pri" onclick="leadForm()">+ ${t("a.new")}</button>`)+
+ `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(215px,1fr))">
+  ${cols.map(c=>{const it=rows.filter(l=>l.status===c);
+   return `<div class="card"><h3>${tag(t("st."+c),stKind(c))}<span class="sp"></span><span class="muted">${it.length}</span></h3>
+    <div class="list-min">${it.map(l=>`<div class="li" style="flex-direction:column;align-items:stretch;cursor:pointer" onclick="leadForm(byId(S.leads,'${l.id}'))">
+      <div class="ttl">${esc(l.name)}</div>
+      <div class="sb">${esc(routeName(l.routeId))} · ${num(l.pax)||1} ${t("c.pax").toLowerCase()}</div>
+      <div class="sb">${l.source?"📥 "+esc(l.source)+" · ":""}${l.nextAction?"⏰ "+fdate(l.nextAction):""}</div>
+      <div class="acts" style="margin-top:6px" onclick="event.stopPropagation()">
+        ${l.phone?`<a class="btn sm" href="https://wa.me/55${String(l.phone).replace(/\\D/g,"")}" target="_blank" rel="noopener">💬</a>`:""}
+        ${c!=="won"?`<button class="btn sm" onclick="leadConvert('${l.id}')" title="${t("a.convert")}">✅</button>`:""}
+        <button class="btn sm dan" onclick="delEntity('leads','${l.id}')">🗑</button></div>
+     </div>`).join("")||`<div class="muted center" style="padding:12px;font-size:12px">—</div>`}</div></div>`;}).join("")}
+ </div>`;
+};
+/* ============================================================
+   FINANCEIRO — livro-caixa consolidado
+   ============================================================ */
+function ledger(){
+ const L=[];
+ S.bookings.filter(b=>b.status!=="cancelled").forEach(b=>{
+  (b.payments||[]).forEach((p,i)=>L.push({date:p.date,type:"in",category:t("nav.bookings"),
+    description:`${b.code} · ${custName(b.customerId)}`,amount:num(p.amount),method:p.method,status:"paid",
+    ref:"booking",refId:b.id,idx:i,locked:true}));
+  const bal=bookBal(b); if(bal>0.009){const dep=byId(S.departures,b.departureId);
+    L.push({date:dep?dep.date:b.createdAt,type:"in",category:t("d.toReceive"),
+     description:`${b.code} · ${custName(b.customerId)}`,amount:bal,method:"",status:"pending",ref:"booking",refId:b.id,locked:true});}
+ });
+ S.departures.filter(d=>d.status!=="cancelled").forEach(d=>{const c=depCost(d);
+  if(c>0)L.push({date:d.date,type:"out",category:t("c.supplier"),description:`${routeName(d.routeId)} · ${supName(d.supplierId)}`,
+   amount:c,method:"",status:daysTo(d.date)<0?"paid":"pending",ref:"departure",refId:d.id,locked:true});});
+ S.finance.forEach(f=>L.push({date:f.date,type:f.type,category:f.category,description:f.description,amount:num(f.amount),
+   method:f.method,status:f.status||"paid",ref:"manual",refId:f.id,locked:false}));
+ return L.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+}
+const FI_FIELDS=()=>[
+ {k:"date",t:"c.date",type:"date",req:true},
+ {k:"type",t:"f.entryType",type:"select",opts:()=>[{v:"in",l:t("f.in")},{v:"out",l:t("f.out")}],req:true},
+ {k:"amount",t:"c.value",type:"number",step:"0.01",req:true},
+ {k:"category",t:"c.category",ph:"Combustível, Pedágio, Marketing..."},
+ {k:"method",t:"c.method",type:"select",opts:OPT.payMethod},
+ {k:"status",t:"c.status",type:"select",opts:()=>[{v:"paid",l:t("st.paid")},{v:"pending",l:t("st.pending")}]},
+ {k:"description",t:"c.description",full:true}];
+function finForm(f){crudModal((f?t("a.edit"):t("a.new"))+" · "+t("nav.finance"),FI_FIELDS(),f||{date:today(),type:"out",status:"paid",method:"pix"},
+ d=>saveEntity("finance",f,d,"fin"),true);}
+
+VIEWS.finance=function(){
+ const per=F.per||ym(today()), ty=F.ty||"", stt=F.stt||"";
+ let L=ledger();
+ if(per!=="all")L=L.filter(x=>ym(x.date)===per);
+ if(ty)L=L.filter(x=>x.type===ty);
+ if(stt)L=L.filter(x=>x.status===stt);
+ L=L.filter(x=>hit({a:x.description,b:x.category},["a","b"]));
+ const inP=L.filter(x=>x.type==="in"&&x.status==="paid").reduce((s,x)=>s+x.amount,0);
+ const outP=L.filter(x=>x.type==="out"&&x.status==="paid").reduce((s,x)=>s+x.amount,0);
+ const inF=L.filter(x=>x.type==="in"&&x.status!=="paid").reduce((s,x)=>s+x.amount,0);
+ const outF=L.filter(x=>x.type==="out"&&x.status!=="paid").reduce((s,x)=>s+x.amount,0);
+ const months=[];for(let i=0;i<12;i++){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);months.push(d.toISOString().slice(0,7));}
+ return tools(`${searchBox()}
+  <select onchange="setF('per',this.value)">${sel([{v:"all",l:t("a.all")},...months.map(m=>({v:m,l:m}))],per)}</select>
+  <select onchange="setF('ty',this.value)">${sel([{v:"in",l:t("f.in")},{v:"out",l:t("f.out")}],ty,t("f.entryType")+": "+t("a.all"))}</select>
+  <select onchange="setF('stt',this.value)">${sel([{v:"paid",l:t("st.paid")},{v:"pending",l:t("st.pending")}],stt,t("c.status")+": "+t("a.all"))}</select>
+  <span class="sp"></span><button class="btn" onclick="exportCSV('ledger')">⬇ ${t("a.csv")}</button>
+  <button class="btn" onclick="window.print()">🖨</button>
+  <button class="btn pri" onclick="finForm()">+ ${t("a.new")}</button>`)+
+ `<div class="grid g4" style="margin-bottom:14px">
+   ${kpi("ok","⬆️",t("f.in"),money(inP),`${t("st.pending")}: ${money(inF)}`)}
+   ${kpi("bad","⬇️",t("f.out"),money(outP),`${t("st.pending")}: ${money(outF)}`)}
+   ${kpi(inP-outP>=0?"ok":"bad","💰",t("c.result"),money(inP-outP),t("st.paid"))}
+   ${kpi("warn","📅",t("c.balance"),money(inP-outP+inF-outF),t("st.open"))}
+  </div>
+ <div class="tw"><table><thead><tr><th>${t("c.date")}</th><th>${t("c.description")}</th><th>${t("c.category")}</th>
+  <th>${t("c.method")}</th><th>${t("c.status")}</th><th class="num">${t("c.value")}</th><th></th></tr></thead><tbody>
+ ${L.length?L.map(x=>`<tr><td>${fdate(x.date)}</td><td>${esc(x.description||"")}
+   <br><small class="muted">${x.ref==="manual"?t("a.edit"):t("nav."+(x.ref==="booking"?"bookings":"departures"))}</small></td>
+  <td>${esc(x.category||"—")}</td><td>${x.method?tag(t("pm."+x.method),"acc"):"—"}</td>
+  <td>${tag(t("st."+x.status),stKind(x.status))}</td>
+  <td class="num ${x.type==="in"?"pos":"neg"}">${x.type==="in"?"+":"−"} ${money(x.amount)}</td>
+  <td><div class="acts">${x.ref==="manual"?`<button class="btn sm" onclick="finForm(byId(S.finance,'${x.refId}'))">✏️</button>
+   <button class="btn sm dan" onclick="delEntity('finance','${x.refId}')">🗑</button>`
+   :`<button class="btn sm" onclick="${x.ref==="booking"?`openBooking('${x.refId}')`:`openDeparture('${x.refId}')`}">↗</button>`}</div></td></tr>`).join(""):emptyRow(7)}
+ </tbody></table></div>`;
+};
+
+/* ============================================================
+   RELATÓRIOS
+   ============================================================ */
+VIEWS.reports=function(){
+ const rt=S.routes.map(r=>{const ds=S.departures.filter(d=>d.routeId===r.id&&d.status!=="cancelled");
+  const seats=ds.reduce((s,d)=>s+seatsTotal(d),0),sold=ds.reduce((s,d)=>s+seatsSold(d.id),0);
+  const rev=ds.reduce((s,d)=>s+depRevenue(d.id),0),cost=ds.reduce((s,d)=>s+depCost(d),0);
+  return {r,ds:ds.length,seats,sold,rev,cost,occ:pct(sold,seats)};}).sort((a,b)=>b.rev-a.rev);
+ const top=S.customers.map(c=>{const bs=S.bookings.filter(b=>b.customerId===c.id&&b.status!=="cancelled");
+  return {c,n:bs.length,pax:bs.reduce((s,b)=>s+(b.pax||[]).length,0),tot:bs.reduce((s,b)=>s+bookTotal(b),0)};})
+  .filter(x=>x.n>0).sort((a,b)=>b.tot-a.tot).slice(0,10);
+ const prof=S.departures.filter(d=>d.status!=="cancelled").map(d=>({d,rev:depRevenue(d.id),cost:depCost(d),occ:depOcc(d)}))
+  .sort((a,b)=>(b.rev-b.cost)-(a.rev-a.cost));
+ const mix={};S.bookings.forEach(b=>(b.payments||[]).forEach(p=>mix[p.method]=(mix[p.method]||0)+num(p.amount)));
+ const mixTot=Object.values(mix).reduce((a,b)=>a+b,0)||1;
+ const pipe=["new","contacted","proposal","won","lost"].map(s=>({s,n:S.leads.filter(l=>l.status===s).length}));
+ const allBk=S.bookings.filter(b=>b.status!=="cancelled");
+ const ticket=allBk.length?allBk.reduce((s,b)=>s+bookTotal(b),0)/allBk.reduce((s,b)=>s+(b.pax||[]).length,0):0;
+ return tools(`<span class="sp"></span><button class="btn" onclick="window.print()">🖨 ${t("a.print")}</button>`)+
+ `<div class="grid g4" style="margin-bottom:14px">
+   ${kpi("","🎫",t("r.ticket"),money(ticket),t("c.pax"))}
+   ${kpi("","🪑",t("r.occupancy"),pct(rt.reduce((s,x)=>s+x.sold,0),rt.reduce((s,x)=>s+x.seats,0)||1)+"%","")}
+   ${kpi("ok","💵",t("c.revenue"),money(rt.reduce((s,x)=>s+x.rev,0)),"")}
+   ${kpi(rt.reduce((s,x)=>s+x.rev-x.cost,0)>=0?"ok":"bad","📈",t("c.margin"),money(rt.reduce((s,x)=>s+x.rev-x.cost,0)),"")}
+  </div>
+ <div class="card mt"><h3>🗺️ ${t("r.byRoute")}</h3><div class="tw" style="border:none">
+  <table><thead><tr><th>${t("c.route")}</th><th class="num">${t("nav.departures")}</th><th class="num">${t("c.pax")}</th>
+   <th>${t("c.occupancy")}</th><th class="num">${t("c.revenue")}</th><th class="num">${t("c.cost")}</th><th class="num">${t("c.result")}</th></tr></thead>
+  <tbody>${rt.length?rt.map(x=>`<tr><td><b>${esc(x.r.name)}</b></td><td class="num">${x.ds}</td><td class="num">${x.sold}</td>
+   <td>${bar(x.occ)}</td><td class="num">${money(x.rev)}</td><td class="num">${money(x.cost)}</td>
+   <td class="num ${x.rev-x.cost>=0?"pos":"neg"}">${money(x.rev-x.cost)}</td></tr>`).join(""):emptyRow(7)}</tbody></table></div></div>
+ <div class="grid g2 mt">
+  <div class="card"><h3>👑 ${t("r.topCustomers")}</h3><div class="list-min">
+   ${top.length?top.map((x,i)=>`<div class="li"><b style="width:22px">${i+1}º</b><div><div class="ttl">${esc(x.c.name)}</div>
+    <div class="sb">${x.n} ${t("nav.bookings").toLowerCase()} · ${x.pax} ${t("c.pax").toLowerCase()}</div></div>
+    <span class="sp"></span><b>${money(x.tot)}</b></div>`).join(""):`<div class="empty">${t("c.empty")}</div>`}</div></div>
+  <div class="card"><h3>💳 ${t("r.paymentMix")}</h3><div class="list-min">
+   ${Object.keys(mix).length?Object.entries(mix).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="li"><div style="flex:1">
+    <div class="ttl">${t("pm."+k)}</div><div class="bar" style="margin-top:6px"><i style="width:${pct(v,mixTot)}%"></i></div></div>
+    <b>${money(v)}</b></div>`).join(""):`<div class="empty">${t("c.empty")}</div>`}</div>
+   <h3 class="mt">🎯 ${t("r.pipeline")}</h3><div class="list-min">
+    ${pipe.map(p=>`<div class="li">${tag(t("st."+p.s),stKind(p.s))}<span class="sp"></span><b>${p.n}</b></div>`).join("")}</div></div>
+ </div>
+ <div class="card mt"><h3>📊 ${t("r.profit")}</h3><div class="tw" style="border:none">
+  <table><thead><tr><th>${t("c.date")}</th><th>${t("c.route")}</th><th>${t("c.occupancy")}</th>
+   <th class="num">${t("c.revenue")}</th><th class="num">${t("c.cost")}</th><th class="num">${t("c.result")}</th><th class="num">%</th></tr></thead>
+  <tbody>${prof.length?prof.map(x=>`<tr><td>${fdate(x.d.date)}</td><td>${esc(routeName(x.d.routeId))}</td><td>${bar(x.occ)}</td>
+   <td class="num">${money(x.rev)}</td><td class="num">${money(x.cost)}</td>
+   <td class="num ${x.rev-x.cost>=0?"pos":"neg"}">${money(x.rev-x.cost)}</td>
+   <td class="num">${x.rev?pct(x.rev-x.cost,x.rev):0}%</td></tr>`).join(""):emptyRow(7)}</tbody></table></div></div>`;
+};
+
+/* ============================================================
+   IMPRESSOS — lista de passageiros e voucher
+   ============================================================ */
+function printHTML(title,body){
+ const w=window.open("","_blank");
+ w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>
+  body{font:13px/1.5 Arial,sans-serif;color:#111;padding:26px;max-width:820px;margin:auto}
+  h1{font-size:19px;margin-bottom:2px}h2{font-size:14px;margin:16px 0 6px;border-bottom:2px solid #111;padding-bottom:3px}
+  table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid #999;padding:6px 8px;font-size:12px;text-align:left}
+  th{background:#eee}.hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:9px}
+  .mut{color:#666;font-size:11px}.box{border:1px solid #999;border-radius:6px;padding:10px;margin-top:8px}
+  .row{display:flex;gap:20px;flex-wrap:wrap}.row>div{flex:1;min-width:170px}
+  .big{font-size:17px;font-weight:bold}@media print{body{padding:0}}</style></head><body>
+  <div class="hd"><div><h1>${esc(S.settings.company.name)}</h1>
+   <div class="mut">${esc(S.settings.company.address||"")} · ${esc(S.settings.company.phone||"")} · ${esc(S.settings.company.email||"")}</div></div>
+   <div style="text-align:right"><div class="big">${esc(title)}</div><div class="mut">${t("p.issued")} ${fdate(today())}</div></div></div>
+  ${body}<p class="mut" style="margin-top:22px">${esc(S.settings.company.name)} — ${t("p.emergency")}: ${esc(S.settings.company.emergency||S.settings.company.phone||"")}</p>
+  </body></html>`);
+ w.document.close(); setTimeout(()=>w.print(),350);
+}
+function printManifest(id){
+ const d=byId(S.departures,id);if(!d)return;const bks=depBookings(id);
+ let n=0;const rows=bks.flatMap(b=>(b.pax||[]).map(p=>{n++;
+  return `<tr><td>${n}</td><td>${esc(p.seat||"")}</td><td>${esc(p.name)}</td><td>${esc(p.doc||"")}</td>
+   <td>${t("f."+(p.type||"adult"))}</td><td>${esc(custName(b.customerId))}</td><td>${esc(b.code)}</td><td></td></tr>`;}));
+ printHTML(t("p.manifest"),
+  `<div class="box row"><div><b>${t("c.route")}:</b> ${esc(routeName(d.routeId))}<br><b>${t("f.depDate")}:</b> ${fdateLong(d.date)} ${esc(d.time||"")}
+    ${d.retDate?`<br><b>${t("f.retDate")}:</b> ${fdateLong(d.retDate)}`:""}</div>
+   <div><b>${t("f.boardPoint")}:</b> ${esc(d.boardPoint||"—")}<br><b>${t("c.vehicle")}:</b> ${esc(vehLabel(d.vehicleId))}<br>
+    <b>${t("c.supplier")}:</b> ${esc(supName(d.supplierId))}</div>
+   <div><b>${t("f.driver")}:</b> ${esc(staffName(d.driverId))}<br><b>${t("f.guide")}:</b> ${esc(staffName(d.guideId))}<br>
+    <b>${t("c.pax")}:</b> ${n} / ${seatsTotal(d)}</div></div>
+   <h2>${t("f.paxList")}</h2>
+   <table><thead><tr><th>#</th><th>${t("p.seat")}</th><th>${t("f.paxName")}</th><th>${t("f.paxDoc")}</th>
+    <th>${t("f.paxType")}</th><th>${t("c.customer")}</th><th>${t("c.code")}</th><th>${t("p.signature")}</th></tr></thead>
+   <tbody>${rows.join("")||`<tr><td colspan="8">${t("c.empty")}</td></tr>`}</tbody></table>`);
+}
+function printVoucher(id){
+ const b=byId(S.bookings,id);if(!b)return;const d=byId(S.departures,b.departureId);
+ printHTML(t("p.voucher"),
+  `<div class="box row"><div><b>${t("c.code")}:</b> <span class="big">${esc(b.code)}</span><br>
+    <b>${t("c.customer")}:</b> ${esc(custName(b.customerId))}<br><b>${t("c.status")}:</b> ${t("st."+b.status)} / ${t("st."+payStatus(b))}</div>
+   <div><b>${t("c.route")}:</b> ${esc(d?routeName(d.routeId):"—")}<br><b>${t("f.depDate")}:</b> ${d?fdateLong(d.date):"—"} ${esc(d?.time||"")}
+    ${d&&d.retDate?`<br><b>${t("f.retDate")}:</b> ${fdateLong(d.retDate)}`:""}<br>
+    <b>${t("f.boardPoint")}:</b> ${esc(d?.boardPoint||"—")}</div></div>
+   <h2>${t("f.paxList")}</h2>
+   <table><thead><tr><th>${t("f.paxName")}</th><th>${t("f.paxDoc")}</th><th>${t("f.paxType")}</th><th>${t("p.seat")}</th><th>${t("c.value")}</th></tr></thead>
+   <tbody>${(b.pax||[]).map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.doc||"")}</td><td>${t("f."+(p.type||"adult"))}</td>
+    <td>${esc(p.seat||"")}</td><td>${money(p.price)}</td></tr>`).join("")}</tbody></table>
+   <h2>${t("a.pay")}</h2>
+   <table><thead><tr><th>${t("c.date")}</th><th>${t("c.method")}</th><th>${t("c.value")}</th></tr></thead>
+   <tbody>${(b.payments||[]).map(p=>`<tr><td>${fdate(p.date)}</td><td>${t("pm."+p.method)}</td><td>${money(p.amount)}</td></tr>`).join("")
+    ||`<tr><td colspan="3">${t("c.empty")}</td></tr>`}</tbody></table>
+   <div class="box"><div class="row"><div><b>${t("c.total")}:</b> <span class="big">${money(bookTotal(b))}</span></div>
+    <div><b>${t("c.paid")}:</b> ${money(bookPaid(b))}</div><div><b>${t("c.balance")}:</b> <span class="big">${money(bookBal(b))}</span></div></div></div>
+   ${(byId(S.routes,d?.routeId)||{}).includes?`<h2>${t("f.includes")}</h2><p>${esc(byId(S.routes,d.routeId).includes)}</p>`:""}
+   <p style="margin-top:14px"><b>${t("p.attention")}</b></p>`);
+}
+/* ============================================================
+   CONFIGURAÇÕES · BACKUP · EXPORTAÇÃO
+   ============================================================ */
+VIEWS.settings=function(){
+ const c=S.settings.company, size=(JSON.stringify(S).length/1024).toFixed(1);
+ const counts=[["routes","nav.routes"],["departures","nav.departures"],["bookings","nav.bookings"],["customers","nav.customers"],
+  ["leads","nav.leads"],["suppliers","nav.suppliers"],["vehicles","nav.vehicles"],["staff","nav.staff"],["finance","nav.finance"]];
+ return `<div class="grid g2">
+  <div class="card"><h3>🏢 ${t("s.company")}</h3>
+   <div class="fr">
+    <div class="fld full"><label>${t("f.company")}</label><input id="co_name" value="${esc(c.name||"")}"></div>
+    <div class="fld"><label>${t("f.cnpj")}</label><input id="co_cnpj" value="${esc(c.cnpj||"")}"></div>
+    <div class="fld"><label>${t("c.phone")}</label><input id="co_phone" value="${esc(c.phone||"")}"></div>
+    <div class="fld"><label>${t("c.email")}</label><input id="co_email" value="${esc(c.email||"")}"></div>
+    <div class="fld"><label>${t("p.emergency")}</label><input id="co_emergency" value="${esc(c.emergency||"")}"></div>
+    <div class="fld full"><label>${t("c.address")}</label><input id="co_address" value="${esc(c.address||"")}"></div>
+   </div>
+   <div class="acts mt"><button class="btn pri" onclick="saveCompany()">💾 ${t("a.save")}</button></div></div>
+
+  <div class="card"><h3>🎛️ ${t("s.pref")}</h3>
+   <div class="fr">
+    <div class="fld"><label>${t("f.lang")}</label><select onchange="setLang(this.value)">
+      ${sel([{v:"pt",l:"Português (BR)"},{v:"en",l:"English (US)"}],S.settings.lang)}</select></div>
+    <div class="fld"><label>${t("f.theme")}</label><select onchange="S.settings.theme=this.value;save();render()">
+      ${sel([{v:"dark",l:"Dark"},{v:"light",l:"Light"}],S.settings.theme)}</select></div>
+    <div class="fld"><label>${t("f.currency")}</label><select onchange="S.settings.currency=this.value;save();render()">
+      ${sel([{v:"BRL",l:"BRL (R$)"},{v:"USD",l:"USD ($)"},{v:"EUR",l:"EUR (€)"},{v:"ARS",l:"ARS ($)"},{v:"PYG",l:"PYG (₲)"}],S.settings.currency)}</select></div>
+   </div>
+   <h3 class="mt">ℹ️ ${t("s.about")}</h3><p class="muted">${t("s.aboutTxt")}</p>
+   <div class="step mt">${counts.map(([k,l])=>`${tag(t(l)+": "+(S[k]||[]).length,"acc")}`).join(" ")}</div>
+   <p class="muted mt">${t("s.storage")}: <b>${size} KB</b></p></div>
+
+  <div class="card"><h3>💾 ${t("s.data")}</h3>
+   <p class="muted">${S.settings.lang==="en"?"All data lives in this browser. Export a backup regularly and keep the file safe.":"Todos os dados ficam neste navegador. Exporte um backup com frequência e guarde o arquivo."}</p>
+   <div class="acts mt" style="justify-content:flex-start;flex-wrap:wrap">
+    <button class="btn pri" onclick="backupExport()">⬇ ${t("s.exportAll")}</button>
+    <button class="btn" onclick="document.getElementById('impFile').click()">⬆ ${t("s.importAll")}</button>
+    <input type="file" id="impFile" accept="application/json" style="display:none" onchange="backupImport(this)">
+    <button class="btn" onclick="exportCSV('bookings')">⬇ ${t("nav.bookings")} CSV</button>
+    <button class="btn" onclick="loadDemo()">🎲 ${t("s.demo")}</button>
+    <button class="btn dan" onclick="resetAll()">🗑 ${t("s.reset")}</button>
+   </div></div>
+
+  <div class="card"><h3>🚀 ${S.settings.lang==="en"?"Quick start":"Primeiros passos"}</h3>
+   <div class="list-min">
+    ${[["🗺️",t("nav.routes"),"routes"],["🤝",t("nav.suppliers"),"suppliers"],["🚐",t("nav.vehicles"),"vehicles"],
+      ["🚏",t("nav.departures"),"departures"],["👥",t("nav.customers"),"customers"],["🎟️",t("nav.bookings"),"bookings"],
+      ["💰",t("nav.finance"),"finance"]].map((x,i)=>
+     `<div class="li" style="cursor:pointer" onclick="go('${x[2]}')"><b style="width:20px">${i+1}</b><span>${x[0]}</span>
+      <span class="ttl">${esc(x[1])}</span><span class="sp"></span><span class="muted">›</span></div>`).join("")}
+   </div></div>
+ </div>`;
+};
+function saveCompany(){["name","cnpj","phone","email","emergency","address"].forEach(k=>{
+  const e=document.getElementById("co_"+k);if(e)S.settings.company[k]=e.value;});
+ save();render();toast(t("c.saved"));}
+function dl(name,txt,mime){const b=new Blob([txt],{type:mime||"application/json;charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+function backupExport(){dl(`boyd-backup-${today()}.json`,JSON.stringify(S,null,1));toast(t("s.exportAll")+" ✓");}
+function backupImport(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.settings)throw 0;S=d;save();render();toast(t("s.imported"));}
+ catch(e){toast(t("s.invalidFile"),"bad");}};r.readAsText(f);inp.value="";}
+function loadDemo(){confirmBox(t("s.demo")+"?",()=>{S=DEFAULTS();seed();save();go("dashboard");toast(t("c.saved"));});}
+function resetAll(){confirmBox(t("s.resetWarn"),()=>{S=DEFAULTS();save();go("dashboard");toast(t("c.deleted"));});}
+
+function exportCSV(what){
+ const M={
+  routes:()=>[["Nome","Origem","Destino","UF","Tipo","KM","Horas","Adulto","Crianca","Inclui"],
+    S.routes.map(r=>[r.name,r.origin,r.destination,r.state,t("ty."+(r.type||"excursion")),r.km,r.hours,r.priceAdult,r.priceChild,r.includes])],
+  departures:()=>[["Data","Volta","Roteiro","Veiculo","Fornecedor","Lugares","Vendidos","Ocupacao%","Receita","Custo","Resultado","Status"],
+    S.departures.map(d=>[d.date,d.retDate,routeName(d.routeId),vehLabel(d.vehicleId),supName(d.supplierId),seatsTotal(d),
+      seatsSold(d.id),depOcc(d),depRevenue(d.id),depCost(d),depRevenue(d.id)-depCost(d),t("st."+d.status)])],
+  bookings:()=>[["Codigo","Data","Cliente","Roteiro","Partida","Pax","Total","Pago","Saldo","Status"],
+    S.bookings.map(b=>{const d=byId(S.departures,b.departureId);
+      return [b.code,b.createdAt,custName(b.customerId),d?routeName(d.routeId):"",d?d.date:"",(b.pax||[]).length,
+        bookTotal(b),bookPaid(b),bookBal(b),t("st."+b.status)];})],
+  customers:()=>[["Nome","Documento","Telefone","Email","Cidade","Reservas","Total"],
+    S.customers.map(c=>{const bs=S.bookings.filter(b=>b.customerId===c.id);
+      return [c.name,c.doc,c.phone,c.email,c.city,bs.length,bs.reduce((s,b)=>s+bookTotal(b),0)];})],
+  leads:()=>[["Nome","Telefone","Origem","Interesse","Pax","Status","Proxima acao"],
+    S.leads.map(l=>[l.name,l.phone,l.source,routeName(l.routeId),l.pax,t("st."+l.status),l.nextAction])],
+  suppliers:()=>[["Nome","Tipo","Contato","Telefone","Telefone 2","Email","Endereco","Frota"],
+    S.suppliers.map(s=>[s.name,t("ty."+s.type),s.contact,s.phone,s.phone2,s.email,s.address,s.fleet])],
+  ledger:()=>[["Data","Tipo","Categoria","Descricao","Forma","Status","Valor"],
+    ledger().map(x=>[x.date,x.type==="in"?"Entrada":"Saida",x.category,x.description,x.method?t("pm."+x.method):"",t("st."+x.status),x.amount])]
+ };
+ const [head,rows]=M[what]();
+ const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+ dl(`boyd-${what}-${today()}.csv`,"﻿"+[head.map(q).join(";"),...rows.map(r=>r.map(q).join(";"))].join("\n"),"text/csv;charset=utf-8");
+ toast("CSV ✓");
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+load();
+render();
+window.addEventListener("beforeunload",save);
+</script>
+</body>
+</html>
