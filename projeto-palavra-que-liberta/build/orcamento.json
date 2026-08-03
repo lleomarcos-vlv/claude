@@ -1,0 +1,756 @@
+{
+  "etapas": [
+    {
+      "codigo": "1",
+      "titulo": "PRÉ-PRODUÇÃO E IMPLANTAÇÃO",
+      "itens": [
+        {
+          "codigo": "1.01",
+          "descricao": "Coordenação geral — etapa de pré-produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 2,
+          "valor_unitario": 7500.0,
+          "total": 15000.0,
+          "justificativa": "Profissional sênior responsável pela direção do programa, interlocução institucional e conformidade normativa. Referência: CBO 262105 (produtor cultural) acrescida de responsabilidade de coordenação de programa."
+        },
+        {
+          "codigo": "1.02",
+          "descricao": "Produção executiva — etapa de pré-produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 2,
+          "valor_unitario": 6000.0,
+          "total": 12000.0,
+          "justificativa": "Responsável por contratos, cotações, logística e implantação dos núcleos."
+        },
+        {
+          "codigo": "1.03",
+          "descricao": "Coordenação pedagógica — etapa de pré-produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 2,
+          "valor_unitario": 5500.0,
+          "total": 11000.0,
+          "justificativa": "Desenho da metodologia de mediação de leitura e da trilha formativa."
+        },
+        {
+          "codigo": "1.04",
+          "descricao": "Consultoria de diagnóstico territorial e linha de base",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 14000.0,
+          "total": 14000.0,
+          "justificativa": "Pesquisa de campo nos territórios: perfil populacional, equipamentos existentes, escolas parceiras e linha de base dos indicadores de leitura. Produto: relatório diagnóstico que baliza a avaliação de impacto."
+        },
+        {
+          "codigo": "1.05",
+          "descricao": "Elaboração de metodologia e material pedagógico (3 cadernos)",
+          "unidade": "produto",
+          "quantidade": 3,
+          "ocorrencias": 1,
+          "valor_unitario": 7000.0,
+          "total": 21000.0,
+          "justificativa": "Caderno do Mediador, Caderno de Rodas de Leitura e Caderno de Acessibilidade na Mediação. Inclui redação, revisão, ilustração e diagramação acessível."
+        },
+        {
+          "codigo": "1.06",
+          "descricao": "Consultoria especializada em acessibilidade — plano e laudo",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 12000.0,
+          "total": 12000.0,
+          "justificativa": "Elaboração do Plano de Acessibilidade (física, comunicacional, atitudinal e metodológica) e laudo dos espaços conforme ABNT NBR 9050. Exigência da IN MinC nº 29/2026."
+        },
+        {
+          "codigo": "1.07",
+          "descricao": "Articulação comunitária e mobilização de participantes",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 2,
+          "valor_unitario": 3500.0,
+          "total": 7000.0,
+          "justificativa": "Agente de território responsável pela mobilização de famílias, escolas, associações de bairro e equipamentos públicos socioassistenciais."
+        },
+        {
+          "codigo": "1.08",
+          "descricao": "Adequação e adaptação acessível dos espaços — 2 núcleos",
+          "unidade": "núcleo",
+          "quantidade": 2,
+          "ocorrencias": 1,
+          "valor_unitario": 15000.0,
+          "total": 30000.0,
+          "justificativa": "Rampa, sinalização tátil e visual, piso podotátil, adequação de sanitário, pintura, instalação elétrica e iluminação. Espaços cedidos em regime de parceria; o recurso custeia exclusivamente a adequação."
+        },
+        {
+          "codigo": "1.09",
+          "descricao": "Mobiliário e equipamentos dos núcleos — 2 núcleos",
+          "unidade": "núcleo",
+          "quantidade": 2,
+          "ocorrencias": 1,
+          "valor_unitario": 19000.0,
+          "total": 38000.0,
+          "justificativa": "Estantes, mesas, cadeiras, pufes, 2 computadores com leitor de tela, projetor, caixa de som, lupa eletrônica e armário. Média de três cotações."
+        },
+        {
+          "codigo": "1.10",
+          "descricao": "Identidade visual, projeto gráfico e sinalização do programa",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 13000.0,
+          "total": 13000.0,
+          "justificativa": "Marca do programa, manual de aplicação, sinalização dos núcleos e templates acessíveis (contraste mínimo AA e tipografia legível)."
+        }
+      ],
+      "subtotal": 173000.0
+    },
+    {
+      "codigo": "2",
+      "titulo": "PRODUÇÃO E EXECUÇÃO",
+      "itens": [
+        {
+          "codigo": "2.01",
+          "descricao": "Coordenação geral — etapa de produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 7500.0,
+          "total": 90000.0,
+          "justificativa": "Direção do programa durante os 12 meses de operação continuada."
+        },
+        {
+          "codigo": "2.02",
+          "descricao": "Produção executiva — etapa de produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 6000.0,
+          "total": 72000.0,
+          "justificativa": "Gestão operacional, contratos, compras e logística."
+        },
+        {
+          "codigo": "2.03",
+          "descricao": "Coordenação pedagógica — etapa de produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 5500.0,
+          "total": 66000.0,
+          "justificativa": "Supervisão metodológica, formação continuada e avaliação pedagógica."
+        },
+        {
+          "codigo": "2.04",
+          "descricao": "Bibliotecário(a) responsável técnico (registro no CRB)",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 5000.0,
+          "total": 60000.0,
+          "justificativa": "Formação e tratamento técnico do acervo, catalogação, política de empréstimo e capacitação das equipes. Exigência técnica para acervos abertos ao público."
+        },
+        {
+          "codigo": "2.05",
+          "descricao": "Mediador-coordenador de núcleo",
+          "unidade": "profissional/mês",
+          "quantidade": 2,
+          "ocorrencias": 12,
+          "valor_unitario": 3500.0,
+          "total": 84000.0,
+          "justificativa": "Um profissional por núcleo, responsável pelo funcionamento diário, pela programação e pela supervisão dos jovens mediadores."
+        },
+        {
+          "codigo": "2.06",
+          "descricao": "Assistente de produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 2800.0,
+          "total": 33600.0,
+          "justificativa": "Apoio administrativo e logístico à operação dos núcleos e do circuito."
+        },
+        {
+          "codigo": "2.07",
+          "descricao": "Articulador comunitário — etapa de produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 3500.0,
+          "total": 42000.0,
+          "justificativa": "Manutenção das parcerias territoriais e busca ativa de participantes."
+        },
+        {
+          "codigo": "2.08",
+          "descricao": "Analista de monitoramento e avaliação",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 3800.0,
+          "total": 45600.0,
+          "justificativa": "Coleta, tratamento e análise dos indicadores; produção dos relatórios de impacto exigidos pelo patrocinador e pelo MinC."
+        },
+        {
+          "codigo": "2.09",
+          "descricao": "Bolsa-formação Jovem Mediador de Leitura",
+          "unidade": "bolsa/mês",
+          "quantidade": 24,
+          "ocorrencias": 6,
+          "valor_unitario": 700.0,
+          "total": 100800.0,
+          "justificativa": "24 jovens de 16 a 29 anos moradores dos territórios, em trilha formativa de 6 meses. Bolsa de incentivo à permanência; não configura vínculo empregatício, conforme instrumento de bolsa-formação."
+        },
+        {
+          "codigo": "2.10",
+          "descricao": "Oficineiros — escrita criativa, slam e contação de histórias",
+          "unidade": "hora/aula",
+          "quantidade": 288,
+          "ocorrencias": 1,
+          "valor_unitario": 165.0,
+          "total": 47520.0,
+          "justificativa": "288 horas/aula distribuídas nos 2 núcleos ao longo de 12 meses (6h semanais por núcleo). Valor hora/aula compatível com tabelas referenciais de projetos culturais."
+        },
+        {
+          "codigo": "2.11",
+          "descricao": "Escritores e mediadores convidados — encontros literários",
+          "unidade": "cachê",
+          "quantidade": 16,
+          "ocorrencias": 1,
+          "valor_unitario": 2200.0,
+          "total": 35200.0,
+          "justificativa": "16 encontros com autores, com prioridade para autores da literatura periférica, negra, indígena e regional. Cachê médio de mercado para atividade de 3 horas, incluindo deslocamento."
+        },
+        {
+          "codigo": "2.12",
+          "descricao": "Formação inicial dos Jovens Mediadores — 120h (2 turmas)",
+          "unidade": "turma",
+          "quantidade": 2,
+          "ocorrencias": 1,
+          "valor_unitario": 16000.0,
+          "total": 32000.0,
+          "justificativa": "Mediação de leitura, acessibilidade, direitos humanos e gestão de acervo. Inclui formadores, material didático e certificação."
+        },
+        {
+          "codigo": "2.13",
+          "descricao": "Aquisição de acervo literário para os núcleos",
+          "unidade": "exemplar",
+          "quantidade": 3000,
+          "ocorrencias": 1,
+          "valor_unitario": 38.0,
+          "total": 114000.0,
+          "justificativa": "3.000 exemplares (1.500 por núcleo), com curadoria diversificada: literatura brasileira, africana e indígena, infantojuvenil, quadrinhos, mangás e obras de direitos humanos. Preço médio com desconto institucional de distribuidoras."
+        },
+        {
+          "codigo": "2.14",
+          "descricao": "Aquisição de acervo acessível — braile, letra ampliada e audiolivro",
+          "unidade": "exemplar",
+          "quantidade": 400,
+          "ocorrencias": 1,
+          "valor_unitario": 92.0,
+          "total": 36800.0,
+          "justificativa": "400 exemplares em formatos acessíveis (200 por núcleo). Custo unitário superior em razão da produção especializada."
+        },
+        {
+          "codigo": "2.15",
+          "descricao": "Acervo digital acessível — licenças de plataforma de leitura",
+          "unidade": "licença/ano",
+          "quantidade": 2,
+          "ocorrencias": 1,
+          "valor_unitario": 6500.0,
+          "total": 13000.0,
+          "justificativa": "Assinatura anual de biblioteca digital compatível com leitores de tela."
+        },
+        {
+          "codigo": "2.16",
+          "descricao": "Circuito Literário Itinerante — produção de 12 sessões",
+          "unidade": "sessão",
+          "quantidade": 12,
+          "ocorrencias": 1,
+          "valor_unitario": 4800.0,
+          "total": 57600.0,
+          "justificativa": "Sessões em escolas públicas, praças, CRAS, unidades socioeducativas e unidades prisionais. Inclui transporte, montagem, equipe de apoio, seguro e material. Média de três cotações."
+        },
+        {
+          "codigo": "2.17",
+          "descricao": "Seminário Franz de Castro: Literatura, Memória e Direitos Humanos",
+          "unidade": "evento",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 38000.0,
+          "total": 38000.0,
+          "justificativa": "Evento de dois dias com mesas, oficinas e lançamento da antologia. Inclui locação, estrutura, equipe técnica, passagens e hospedagem de convidados."
+        },
+        {
+          "codigo": "2.18",
+          "descricao": "Participação na Feira Internacional do Livro de Ribeirão Preto",
+          "unidade": "ativação",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 28000.0,
+          "total": 28000.0,
+          "justificativa": "Estande institucional, programação de saraus e slams dos núcleos e distribuição gratuita da antologia. A 24ª FIL reuniu 274 mil pessoas."
+        },
+        {
+          "codigo": "2.19",
+          "descricao": "Manutenção e custeio dos núcleos — energia, água, internet e limpeza",
+          "unidade": "núcleo/mês",
+          "quantidade": 2,
+          "ocorrencias": 12,
+          "valor_unitario": 1250.0,
+          "total": 30000.0,
+          "justificativa": "Custeio operacional dos dois espaços durante a execução."
+        },
+        {
+          "codigo": "2.20",
+          "descricao": "Material de consumo pedagógico e de oficinas",
+          "unidade": "núcleo/mês",
+          "quantidade": 2,
+          "ocorrencias": 12,
+          "valor_unitario": 520.0,
+          "total": 12480.0,
+          "justificativa": "Papelaria, materiais de escrita, insumos de oficina e higiene."
+        },
+        {
+          "codigo": "2.21",
+          "descricao": "Transporte de participantes e equipe",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 4800.0,
+          "total": 57600.0,
+          "justificativa": "Deslocamento de participantes em situação de vulnerabilidade, incluindo veículo adaptado para pessoas com deficiência, e da equipe entre núcleos e pontos do circuito."
+        },
+        {
+          "codigo": "2.22",
+          "descricao": "Alimentação em atividades formativas e eventos",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 3500.0,
+          "total": 42000.0,
+          "justificativa": "Lanche em oficinas, formações e sessões do circuito. Item essencial para a permanência de participantes em situação de vulnerabilidade."
+        },
+        {
+          "codigo": "2.23",
+          "descricao": "Seguro de responsabilidade civil e de participantes",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 780.0,
+          "total": 9360.0,
+          "justificativa": "Cobertura obrigatória para atividades com público e com menores de idade."
+        },
+        {
+          "codigo": "2.24",
+          "descricao": "Registro audiovisual e fotográfico das ações",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 2400.0,
+          "total": 28800.0,
+          "justificativa": "Documentação das atividades para prestação de contas, comunicação e memória do projeto."
+        }
+      ],
+      "subtotal": 1176360.0
+    },
+    {
+      "codigo": "3",
+      "titulo": "PÓS-PRODUÇÃO, PUBLICAÇÃO E AVALIAÇÃO",
+      "itens": [
+        {
+          "codigo": "3.01",
+          "descricao": "Coordenação editorial da antologia",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 18000.0,
+          "total": 18000.0,
+          "justificativa": "Curadoria dos textos produzidos nas oficinas, organização da obra e acompanhamento de todo o processo editorial."
+        },
+        {
+          "codigo": "3.02",
+          "descricao": "Preparação de originais e revisão de texto",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 11000.0,
+          "total": 11000.0,
+          "justificativa": "Preparação e duas rodadas de revisão da antologia (cerca de 180 páginas)."
+        },
+        {
+          "codigo": "3.03",
+          "descricao": "Projeto gráfico, diagramação e capa",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 14000.0,
+          "total": 14000.0,
+          "justificativa": "Projeto gráfico original com requisitos de legibilidade e contraste."
+        },
+        {
+          "codigo": "3.04",
+          "descricao": "Ilustração da antologia",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 9000.0,
+          "total": 9000.0,
+          "justificativa": "Ilustrações originais, com prioridade para artistas dos territórios."
+        },
+        {
+          "codigo": "3.05",
+          "descricao": "Impressão da antologia — 3.000 exemplares",
+          "unidade": "exemplar",
+          "quantidade": 3000,
+          "ocorrencias": 1,
+          "valor_unitario": 14.5,
+          "total": 43500.0,
+          "justificativa": "Formato 14x21cm, cerca de 180 páginas, miolo offset 90g, capa 250g com laminação. Preço unitário dentro da faixa de mercado para a tiragem (R$ 6,00 a R$ 15,00). Média de três cotações gráficas."
+        },
+        {
+          "codigo": "3.06",
+          "descricao": "Registro de ISBN, ficha catalográfica e depósito legal",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 3200.0,
+          "total": 3200.0,
+          "justificativa": "Obrigações legais da produção editorial."
+        },
+        {
+          "codigo": "3.07",
+          "descricao": "Produção do audiolivro da antologia",
+          "unidade": "produto",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 22000.0,
+          "total": 22000.0,
+          "justificativa": "Narração profissional, direção, estúdio, edição e masterização. Medida de acessibilidade comunicacional integrada ao produto principal."
+        },
+        {
+          "codigo": "3.08",
+          "descricao": "E-book acessível em EPUB3 e edição em braile",
+          "unidade": "produto",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 13000.0,
+          "total": 13000.0,
+          "justificativa": "Versão digital navegável compatível com leitores de tela e edição reduzida em braile para os núcleos e bibliotecas parceiras."
+        },
+        {
+          "codigo": "3.09",
+          "descricao": "Logística de distribuição gratuita da antologia",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 8000.0,
+          "total": 8000.0,
+          "justificativa": "Embalagem, transporte e entrega a participantes, escolas públicas, bibliotecas, unidades prisionais e socioeducativas."
+        },
+        {
+          "codigo": "3.10",
+          "descricao": "Avaliação externa de impacto",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 26000.0,
+          "total": 26000.0,
+          "justificativa": "Instituição independente responsável pela avaliação de resultados, com linha de base e medição final. Relatório de acesso público."
+        },
+        {
+          "codigo": "3.11",
+          "descricao": "Relatório final e documentário curto do projeto",
+          "unidade": "produto",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 18000.0,
+          "total": 18000.0,
+          "justificativa": "Relatório de resultados em versão acessível e videodocumentário de 12 minutos com legendas, janela de Libras e audiodescrição."
+        },
+        {
+          "codigo": "3.12",
+          "descricao": "Coordenação geral e produção executiva — pós-produção",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 2,
+          "valor_unitario": 13500.0,
+          "total": 27000.0,
+          "justificativa": "Coordenação geral e produção executiva nos dois meses de encerramento, publicação e prestação de contas."
+        }
+      ],
+      "subtotal": 212700.0
+    },
+    {
+      "codigo": "4",
+      "titulo": "ACESSIBILIDADE, COMUNICAÇÃO E DIVULGAÇÃO ACESSÍVEL",
+      "itens": [
+        {
+          "codigo": "4.01",
+          "descricao": "Intérprete de Libras nas atividades públicas",
+          "unidade": "hora",
+          "quantidade": 280,
+          "ocorrencias": 1,
+          "valor_unitario": 185.0,
+          "total": 51800.0,
+          "justificativa": "Cobertura de 100% das sessões públicas, formações e eventos, conforme a IN MinC nº 29/2026. Dupla de intérpretes em atividades superiores a 1 hora."
+        },
+        {
+          "codigo": "4.02",
+          "descricao": "Audiodescrição ao vivo e roteirizada",
+          "unidade": "hora",
+          "quantidade": 120,
+          "ocorrencias": 1,
+          "valor_unitario": 200.0,
+          "total": 24000.0,
+          "justificativa": "Audiodescrição das atividades e dos materiais visuais do projeto."
+        },
+        {
+          "codigo": "4.03",
+          "descricao": "Legendagem descritiva de conteúdos audiovisuais",
+          "unidade": "minuto",
+          "quantidade": 420,
+          "ocorrencias": 1,
+          "valor_unitario": 30.0,
+          "total": 12600.0,
+          "justificativa": "Legendagem para surdos e ensurdecidos de todo o material audiovisual."
+        },
+        {
+          "codigo": "4.04",
+          "descricao": "Guia-intérprete e apoio a pessoas com deficiência",
+          "unidade": "diária",
+          "quantidade": 40,
+          "ocorrencias": 1,
+          "valor_unitario": 400.0,
+          "total": 16000.0,
+          "justificativa": "Suporte individualizado em atividades com participação de pessoas com deficiência visual e surdocegueira."
+        },
+        {
+          "codigo": "4.05",
+          "descricao": "Consultoria de acessibilidade atitudinal e formação da equipe",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 14000.0,
+          "total": 14000.0,
+          "justificativa": "Formação de 16 horas para toda a equipe e para os jovens mediadores, conduzida por consultores com deficiência."
+        },
+        {
+          "codigo": "4.06",
+          "descricao": "Assessoria de imprensa e comunicação",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 3800.0,
+          "total": 45600.0,
+          "justificativa": "Relacionamento com veículos regionais e nacionais e produção de conteúdo."
+        },
+        {
+          "codigo": "4.07",
+          "descricao": "Gestão de mídias sociais e conteúdo acessível",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 12,
+          "valor_unitario": 3200.0,
+          "total": 38400.0,
+          "justificativa": "Publicações com texto alternativo, legendas e janela de Libras."
+        },
+        {
+          "codigo": "4.08",
+          "descricao": "Peças gráficas e sinalização acessível",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 21000.0,
+          "total": 21000.0,
+          "justificativa": "Cartazes, banners, folders em formato acessível, materiais em braile e peças com QR code para versão em áudio."
+        },
+        {
+          "codigo": "4.09",
+          "descricao": "Site do projeto com padrão de acessibilidade digital",
+          "unidade": "produto",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 16000.0,
+          "total": 16000.0,
+          "justificativa": "Portal conforme WCAG 2.1 nível AA, com repositório público dos resultados e da prestação de contas."
+        },
+        {
+          "codigo": "4.10",
+          "descricao": "Vídeo institucional acessível",
+          "unidade": "produto",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 14000.0,
+          "total": 14000.0,
+          "justificativa": "Vídeo de 3 minutos com Libras, audiodescrição e legendas."
+        },
+        {
+          "codigo": "4.11",
+          "descricao": "Veiculação de peças publicitárias",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 32000.0,
+          "total": 32000.0,
+          "justificativa": "Mídia regional e digital. Rubrica limitada a 5% dos recursos captados e ao teto de R$ 100.000,00, conforme a IN MinC nº 29/2026."
+        }
+      ],
+      "subtotal": 285400.0
+    },
+    {
+      "codigo": "5",
+      "titulo": "CUSTOS ADMINISTRATIVOS",
+      "itens": [
+        {
+          "codigo": "5.01",
+          "descricao": "Assessoria contábil do projeto",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 16,
+          "valor_unitario": 2600.0,
+          "total": 41600.0,
+          "justificativa": "Contador com registro no CRC, responsável pela escrituração segregada do projeto e pela prestação de contas no SALIC."
+        },
+        {
+          "codigo": "5.02",
+          "descricao": "Assessoria jurídica",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 18000.0,
+          "total": 18000.0,
+          "justificativa": "Contratos, direitos autorais, cessão de imagem e conformidade com a LGPD. Honorários referenciados na tabela URH da OAB."
+        },
+        {
+          "codigo": "5.03",
+          "descricao": "Auditoria independente das contas do projeto",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 22000.0,
+          "total": 22000.0,
+          "justificativa": "Auditoria externa voluntária, além do exigido, como diferencial de governança para o patrocinador."
+        },
+        {
+          "codigo": "5.04",
+          "descricao": "Despesas bancárias e tarifas da conta vinculada",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 16,
+          "valor_unitario": 300.0,
+          "total": 4800.0,
+          "justificativa": "Conta corrente exclusiva do PRONAC, exigida pela legislação."
+        },
+        {
+          "codigo": "5.05",
+          "descricao": "Apoio administrativo e financeiro",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 14,
+          "valor_unitario": 3000.0,
+          "total": 42000.0,
+          "justificativa": "Rotinas de pagamento, conciliação, arquivo de comprovantes e alimentação do sistema de prestação de contas."
+        },
+        {
+          "codigo": "5.06",
+          "descricao": "Material de escritório, licenças de software e correios",
+          "unidade": "mês",
+          "quantidade": 1,
+          "ocorrencias": 14,
+          "valor_unitario": 750.0,
+          "total": 10500.0,
+          "justificativa": "Custeio administrativo da gestão do projeto."
+        },
+        {
+          "codigo": "5.07",
+          "descricao": "Elaboração do projeto e adequação ao SALIC",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 22000.0,
+          "total": 22000.0,
+          "justificativa": "Concepção, redação técnica, planilha orçamentária e submissão no sistema."
+        }
+      ],
+      "subtotal": 160900.0
+    },
+    {
+      "codigo": "6",
+      "titulo": "CAPTAÇÃO DE RECURSOS",
+      "itens": [
+        {
+          "codigo": "6.01",
+          "descricao": "Serviços de captação de recursos incentivados",
+          "unidade": "serviço",
+          "quantidade": 1,
+          "ocorrencias": 1,
+          "valor_unitario": 92000.0,
+          "total": 92000.0,
+          "justificativa": "Remuneração vinculada ao efetivamente captado, respeitados o limite de 10% do valor do projeto e o teto de R$ 150.000,00 previstos na IN MinC nº 29/2026. Não há pagamento sem captação correspondente."
+        }
+      ],
+      "subtotal": 92000.0
+    }
+  ],
+  "subtotais": {
+    "1": 173000.0,
+    "2": 1176360.0,
+    "3": 212700.0,
+    "4": 285400.0,
+    "5": 160900.0,
+    "6": 92000.0
+  },
+  "valor_base": 1562060.0,
+  "valor_total": 2100360.0,
+  "verificacoes": [
+    {
+      "item": "Custos administrativos",
+      "limite": "até 15% do valor do projeto",
+      "apurado": "7.66% — R$ 160.900,00",
+      "ok": true
+    },
+    {
+      "item": "Maior despesa isolada dentro dos custos administrativos",
+      "limite": "até 50% do total da etapa",
+      "apurado": "26.1% — R$ 42.000,00",
+      "ok": true
+    },
+    {
+      "item": "Acessibilidade, comunicação e divulgação acessível",
+      "limite": "até 20% do valor do projeto",
+      "apurado": "13.59% — R$ 285.400,00",
+      "ok": true
+    },
+    {
+      "item": "Veiculação de peças publicitárias",
+      "limite": "até 5% do captado, teto de R$ 100.000,00",
+      "apurado": "1.52% — R$ 32.000,00",
+      "ok": true
+    },
+    {
+      "item": "Captação de recursos",
+      "limite": "até 10% do valor do projeto, teto de R$ 150.000,00",
+      "apurado": "4.38% — R$ 92.000,00",
+      "ok": true
+    },
+    {
+      "item": "Valor total do projeto",
+      "limite": "até R$ 15.000.000,00 por projeto (demais pessoas jurídicas)",
+      "apurado": "R$ 2.100.360,00",
+      "ok": true
+    },
+    {
+      "item": "Prazo de execução",
+      "limite": "até 36 meses",
+      "apurado": "16 meses",
+      "ok": true
+    }
+  ],
+  "percentuais": {
+    "acessibilidade": 13.59,
+    "administrativos": 7.66,
+    "captacao": 4.38,
+    "finalisticas": 74.37
+  }
+}

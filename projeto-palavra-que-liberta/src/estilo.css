@@ -1,0 +1,556 @@
+/* ==========================================================================
+   PALAVRA QUE LIBERTA — folha de estilo para geração do PDF
+   Associação Franz de Castro Holzwarth · Ribeirão Preto/SP
+   ========================================================================== */
+
+:root {
+  --azul:        #10263C;
+  --azul-medio:  #1D4266;
+  --azul-claro:  #E8EEF4;
+  --ambar:       #B8860B;
+  --ambar-claro: #FBF3E0;
+  --tinta:       #1A1A1A;
+  --cinza:       #5A6472;
+  --cinza-claro: #8A94A2;
+  --linha:       #D6DDE5;
+  --fundo-suave: #F7F9FB;
+  --verde:       #1E6B47;
+  --vermelho:    #9B2226;
+}
+
+@page {
+  size: A4;
+  margin: 20mm 17mm 18mm 17mm;
+}
+
+@page :first { margin: 0; }
+
+* { box-sizing: border-box; }
+
+html { font-size: 10.5pt; }
+
+body {
+  font-family: "Georgia", "Times New Roman", serif;
+  color: var(--tinta);
+  line-height: 1.62;
+  margin: 0;
+  padding: 0;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* ------------------------------------------------------------- estrutura -- */
+
+.pagina-quebra { break-before: page; page-break-before: always; }
+.evitar-quebra  { break-inside: avoid; page-break-inside: avoid; }
+
+section { break-before: page; page-break-before: always; }
+section.continua { break-before: auto; page-break-before: auto; }
+
+/* ------------------------------------------------------------------ capa -- */
+
+.capa {
+  height: 297mm;
+  width: 210mm;
+  background: linear-gradient(160deg, #0B1B2C 0%, #10263C 42%, #1D4266 100%);
+  color: #fff;
+  padding: 26mm 20mm 18mm 20mm;
+  position: relative;
+  break-after: page;
+  page-break-after: always;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.capa::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 9mm;
+  background: linear-gradient(90deg, var(--ambar) 0%, #D9A93C 50%, var(--ambar) 100%);
+}
+
+.capa-selo {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 7.5pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #D9A93C;
+  border: 1px solid rgba(217,169,60,.55);
+  border-radius: 2px;
+  padding: 5px 12px;
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: 40mm;
+}
+
+.capa-titulo {
+  font-size: 48pt;
+  line-height: 1.02;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  margin: 0 0 7mm 0;
+  text-align: left;
+  color: #FFFFFF;
+}
+.capa-titulo strong { display: block; font-weight: 700; color: #F2D492; }
+
+.capa-subtitulo {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12.5pt;
+  font-weight: 300;
+  line-height: 1.5;
+  color: #C9D6E3;
+  max-width: 132mm;
+  margin: 0 0 4mm 0;
+  text-align: left;
+}
+
+.capa-regua { width: 46mm; height: 2px; background: var(--ambar); margin: 8mm 0; }
+
+.capa-meta {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 9pt;
+  line-height: 1.85;
+  color: #B7C6D6;
+  margin-top: auto;
+  text-align: left;
+}
+.capa-meta strong { color: #fff; font-weight: 600; }
+
+.capa-rodape {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 8pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8FA3B8;
+  margin-top: 8mm;
+  padding-top: 5mm;
+  border-top: 1px solid rgba(255,255,255,.16);
+  text-align: left;
+}
+
+/* -------------------------------------------------------------- títulos --- */
+
+h1, h2, h3, h4 {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  text-align: left;
+  hyphens: none;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+h1 {
+  font-size: 19pt;
+  font-weight: 700;
+  color: var(--azul);
+  letter-spacing: -0.015em;
+  margin: 0 0 2mm 0;
+  padding-bottom: 3mm;
+  line-height: 1.2;
+}
+
+.secao-numero {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ambar);
+  display: block;
+  margin-bottom: 2.5mm;
+}
+
+.secao-cabecalho {
+  border-bottom: 2.5px solid var(--azul);
+  padding-bottom: 3mm;
+  margin-bottom: 7mm;
+}
+
+h2 {
+  font-size: 12.5pt;
+  font-weight: 700;
+  color: var(--azul-medio);
+  margin: 8mm 0 3mm 0;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 10.5pt;
+  font-weight: 700;
+  color: var(--azul);
+  margin: 6mm 0 2mm 0;
+}
+
+h4 {
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: var(--cinza);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 5mm 0 2mm 0;
+}
+
+p { margin: 0 0 3.2mm 0; orphans: 2; widows: 2; }
+
+.lead {
+  font-size: 11.5pt;
+  line-height: 1.6;
+  color: var(--azul-medio);
+  border-left: 3px solid var(--ambar);
+  padding-left: 5mm;
+  margin-bottom: 6mm;
+}
+
+ul, ol { margin: 0 0 3.5mm 0; padding-left: 6mm; }
+li { margin-bottom: 1.6mm; }
+
+ul.limpa { list-style: none; padding-left: 0; }
+ul.limpa li {
+  padding-left: 6mm;
+  position: relative;
+  margin-bottom: 2.2mm;
+}
+ul.limpa li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--ambar);
+  font-weight: 700;
+}
+
+strong { font-weight: 700; color: #000; }
+em { font-style: italic; }
+
+/* -------------------------------------------------------------- tabelas --- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 8.2pt;
+  margin: 3mm 0 6mm 0;
+  text-align: left;
+}
+
+thead { display: table-header-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+
+th {
+  background: var(--azul);
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+  padding: 2.6mm 2.4mm;
+  border: none;
+  line-height: 1.3;
+  font-size: 7.8pt;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 2.2mm 2.4mm;
+  border-bottom: 0.5px solid var(--linha);
+  vertical-align: top;
+  line-height: 1.42;
+}
+
+tbody tr:nth-child(even) { background: var(--fundo-suave); }
+
+td.num, th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.centro, th.centro { text-align: center; }
+
+tr.etapa-cabecalho td {
+  background: var(--azul-claro);
+  font-weight: 700;
+  color: var(--azul);
+  font-size: 8.4pt;
+  padding: 2.8mm 2.4mm;
+  border-bottom: 1px solid var(--azul-medio);
+  letter-spacing: 0.02em;
+}
+
+tr.subtotal td {
+  background: #EEF2F6;
+  font-weight: 700;
+  color: var(--azul);
+  border-top: 1px solid var(--azul-medio);
+  border-bottom: 1px solid var(--azul-medio);
+}
+
+tr.total td {
+  background: var(--azul);
+  color: #fff;
+  font-weight: 700;
+  font-size: 9.5pt;
+  padding: 3.2mm 2.4mm;
+  border: none;
+}
+
+tr.total td strong { color: #F2D492; }
+
+table.compacta { font-size: 7.8pt; }
+table.compacta td, table.compacta th { padding: 1.8mm 2mm; }
+
+/* tabela de dados chave/valor */
+table.dados td:first-child {
+  width: 34%;
+  font-weight: 600;
+  color: var(--azul-medio);
+  background: var(--fundo-suave);
+}
+
+.rubrica-just {
+  display: block;
+  font-size: 7pt;
+  color: var(--cinza);
+  line-height: 1.4;
+  margin-top: 1.2mm;
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- caixas -- */
+
+.caixa {
+  background: var(--fundo-suave);
+  border: 0.5px solid var(--linha);
+  border-left: 3px solid var(--azul-medio);
+  padding: 4.5mm 5mm;
+  margin: 4mm 0 5mm 0;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.caixa-destaque {
+  background: var(--ambar-claro);
+  border: 0.5px solid #E8D5A3;
+  border-left: 3px solid var(--ambar);
+}
+
+.caixa-legal {
+  background: #F2F6FA;
+  border-left: 3px solid var(--ambar);
+  font-size: 9pt;
+}
+
+.caixa h4 { margin-top: 0; color: var(--azul); }
+.caixa p:last-child, .caixa ul:last-child { margin-bottom: 0; }
+
+.caixa-titulo {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ambar);
+  margin-bottom: 2.5mm;
+  display: block;
+}
+
+.citacao {
+  font-size: 12pt;
+  font-style: italic;
+  color: var(--azul-medio);
+  line-height: 1.5;
+  text-align: left;
+  border: none;
+  padding: 5mm 0 5mm 8mm;
+  margin: 6mm 0;
+  border-left: 2px solid var(--ambar);
+}
+.citacao cite {
+  display: block;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 8.5pt;
+  font-style: normal;
+  color: var(--cinza);
+  margin-top: 3mm;
+  letter-spacing: 0.04em;
+}
+
+/* ------------------------------------------------------------ indicadores - */
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3mm;
+  margin: 5mm 0 6mm 0;
+  break-inside: avoid;
+}
+
+.numeros.tres { grid-template-columns: repeat(3, 1fr); }
+.numeros.dois { grid-template-columns: repeat(2, 1fr); }
+
+.numero-card {
+  background: var(--fundo-suave);
+  border-top: 2.5px solid var(--ambar);
+  padding: 4mm 3.5mm;
+  text-align: center;
+}
+.numero-card .valor {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 19pt;
+  font-weight: 700;
+  color: var(--azul);
+  line-height: 1.05;
+  display: block;
+  letter-spacing: -0.02em;
+}
+.numero-card .rotulo {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 7.2pt;
+  color: var(--cinza);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1.35;
+  display: block;
+  margin-top: 1.8mm;
+}
+
+/* ------------------------------------------------------------- sumário ---- */
+
+.sumario-lista {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 9.5pt;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  columns: 2;
+  column-gap: 10mm;
+}
+.sumario-lista li {
+  margin-bottom: 2.6mm;
+  break-inside: avoid;
+  padding-left: 9mm;
+  position: relative;
+  line-height: 1.35;
+}
+.sumario-lista li .n {
+  position: absolute;
+  left: 0;
+  color: var(--ambar);
+  font-weight: 700;
+  font-size: 8.5pt;
+}
+.sumario-lista li span.t { color: var(--azul); }
+
+/* ------------------------------------------------------------ cronograma -- */
+
+table.gantt { font-size: 6.6pt; }
+table.gantt th { padding: 1.6mm 0.6mm; text-align: center; font-size: 6.4pt; }
+table.gantt th:first-child { text-align: left; width: 40%; padding-left: 2mm; }
+table.gantt td { padding: 1.5mm 0.6mm; text-align: center; }
+table.gantt td:first-child { text-align: left; padding-left: 2mm; line-height: 1.3; }
+.m-on  { background: var(--ambar) !important; }
+.m-key { background: var(--azul) !important; }
+
+.legenda {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 7.5pt;
+  color: var(--cinza);
+  margin-top: -3mm;
+  margin-bottom: 5mm;
+}
+.legenda .chip {
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin: 0 1.5mm 0 4mm;
+  vertical-align: middle;
+}
+.legenda .chip:first-child { margin-left: 0; }
+
+/* ------------------------------------------------------------- checklist -- */
+
+.check td:first-child { width: 7mm; text-align: center; font-weight: 700; }
+.ok  { color: var(--verde); font-weight: 700; }
+.na  { color: var(--cinza-claro); font-weight: 700; }
+
+.status-ok {
+  display: inline-block;
+  background: #E6F4EC;
+  color: var(--verde);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  padding: 1mm 2.5mm;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- notas --- */
+
+.nota {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 7.6pt;
+  color: var(--cinza);
+  line-height: 1.5;
+  margin-top: 2mm;
+  text-align: left;
+}
+
+.fonte {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 7.2pt;
+  color: var(--cinza-claro);
+  margin-top: -3mm;
+  margin-bottom: 5mm;
+  text-align: left;
+}
+
+.referencias { font-size: 8.6pt; line-height: 1.5; }
+.referencias li { margin-bottom: 2.4mm; }
+
+/* ------------------------------------------------------------- assinatura - */
+
+.assinatura {
+  margin-top: 22mm;
+  text-align: center;
+  break-inside: avoid;
+}
+.assinatura .linha {
+  width: 78mm;
+  border-top: 0.8px solid var(--tinta);
+  margin: 0 auto 2.5mm auto;
+}
+.assinatura .nome {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 9.5pt;
+  color: var(--azul);
+}
+.assinatura .cargo {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 8.2pt;
+  color: var(--cinza);
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------- contracapa ---- */
+
+.encerramento {
+  background: var(--azul);
+  color: #fff;
+  padding: 14mm 12mm;
+  text-align: center;
+  margin-top: 10mm;
+  break-inside: avoid;
+}
+.encerramento .frase {
+  font-size: 15pt;
+  font-style: italic;
+  line-height: 1.45;
+  color: #F2D492;
+  margin-bottom: 6mm;
+}
+.encerramento .contato {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 8.6pt;
+  line-height: 1.9;
+  color: #C9D6E3;
+}
+.encerramento .contato strong { color: #fff; }

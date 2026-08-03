@@ -1,0 +1,91 @@
+﻿Etapa;Item;Descrição;Unidade;Quantidade;Ocorrências;Valor unitário (R$);Valor total (R$);Justificativa de precificação
+ETAPA 1 — PRÉ-PRODUÇÃO E IMPLANTAÇÃO;;;;;;;;
+1;1.01;Coordenação geral — etapa de pré-produção;mês;1;2;7500,00;15000,00;Profissional sênior responsável pela direção do programa, interlocução institucional e conformidade normativa. Referência: CBO 262105 (produtor cultural) acrescida de responsabilidade de coordenação de programa.
+1;1.02;Produção executiva — etapa de pré-produção;mês;1;2;6000,00;12000,00;Responsável por contratos, cotações, logística e implantação dos núcleos.
+1;1.03;Coordenação pedagógica — etapa de pré-produção;mês;1;2;5500,00;11000,00;Desenho da metodologia de mediação de leitura e da trilha formativa.
+1;1.04;Consultoria de diagnóstico territorial e linha de base;serviço;1;1;14000,00;14000,00;Pesquisa de campo nos territórios: perfil populacional, equipamentos existentes, escolas parceiras e linha de base dos indicadores de leitura. Produto: relatório diagnóstico que baliza a avaliação de impacto.
+1;1.05;Elaboração de metodologia e material pedagógico (3 cadernos);produto;3;1;7000,00;21000,00;Caderno do Mediador, Caderno de Rodas de Leitura e Caderno de Acessibilidade na Mediação. Inclui redação, revisão, ilustração e diagramação acessível.
+1;1.06;Consultoria especializada em acessibilidade — plano e laudo;serviço;1;1;12000,00;12000,00;Elaboração do Plano de Acessibilidade (física, comunicacional, atitudinal e metodológica) e laudo dos espaços conforme ABNT NBR 9050. Exigência da IN MinC nº 29/2026.
+1;1.07;Articulação comunitária e mobilização de participantes;mês;1;2;3500,00;7000,00;Agente de território responsável pela mobilização de famílias, escolas, associações de bairro e equipamentos públicos socioassistenciais.
+1;1.08;Adequação e adaptação acessível dos espaços — 2 núcleos;núcleo;2;1;15000,00;30000,00;"Rampa, sinalização tátil e visual, piso podotátil, adequação de sanitário, pintura, instalação elétrica e iluminação. Espaços cedidos em regime de parceria; o recurso custeia exclusivamente a adequação."
+1;1.09;Mobiliário e equipamentos dos núcleos — 2 núcleos;núcleo;2;1;19000,00;38000,00;Estantes, mesas, cadeiras, pufes, 2 computadores com leitor de tela, projetor, caixa de som, lupa eletrônica e armário. Média de três cotações.
+1;1.10;Identidade visual, projeto gráfico e sinalização do programa;serviço;1;1;13000,00;13000,00;Marca do programa, manual de aplicação, sinalização dos núcleos e templates acessíveis (contraste mínimo AA e tipografia legível).
+;;SUBTOTAL ETAPA 1;;;;;173000,00;
+ETAPA 2 — PRODUÇÃO E EXECUÇÃO;;;;;;;;
+2;2.01;Coordenação geral — etapa de produção;mês;1;12;7500,00;90000,00;Direção do programa durante os 12 meses de operação continuada.
+2;2.02;Produção executiva — etapa de produção;mês;1;12;6000,00;72000,00;Gestão operacional, contratos, compras e logística.
+2;2.03;Coordenação pedagógica — etapa de produção;mês;1;12;5500,00;66000,00;Supervisão metodológica, formação continuada e avaliação pedagógica.
+2;2.04;Bibliotecário(a) responsável técnico (registro no CRB);mês;1;12;5000,00;60000,00;Formação e tratamento técnico do acervo, catalogação, política de empréstimo e capacitação das equipes. Exigência técnica para acervos abertos ao público.
+2;2.05;Mediador-coordenador de núcleo;profissional/mês;2;12;3500,00;84000,00;Um profissional por núcleo, responsável pelo funcionamento diário, pela programação e pela supervisão dos jovens mediadores.
+2;2.06;Assistente de produção;mês;1;12;2800,00;33600,00;Apoio administrativo e logístico à operação dos núcleos e do circuito.
+2;2.07;Articulador comunitário — etapa de produção;mês;1;12;3500,00;42000,00;Manutenção das parcerias territoriais e busca ativa de participantes.
+2;2.08;Analista de monitoramento e avaliação;mês;1;12;3800,00;45600,00;"Coleta, tratamento e análise dos indicadores; produção dos relatórios de impacto exigidos pelo patrocinador e pelo MinC."
+2;2.09;Bolsa-formação Jovem Mediador de Leitura;bolsa/mês;24;6;700,00;100800,00;"24 jovens de 16 a 29 anos moradores dos territórios, em trilha formativa de 6 meses. Bolsa de incentivo à permanência; não configura vínculo empregatício, conforme instrumento de bolsa-formação."
+2;2.10;Oficineiros — escrita criativa, slam e contação de histórias;hora/aula;288;1;165,00;47520,00;288 horas/aula distribuídas nos 2 núcleos ao longo de 12 meses (6h semanais por núcleo). Valor hora/aula compatível com tabelas referenciais de projetos culturais.
+2;2.11;Escritores e mediadores convidados — encontros literários;cachê;16;1;2200,00;35200,00;16 encontros com autores, com prioridade para autores da literatura periférica, negra, indígena e regional. Cachê médio de mercado para atividade de 3 horas, incluindo deslocamento.
+2;2.12;Formação inicial dos Jovens Mediadores — 120h (2 turmas);turma;2;1;16000,00;32000,00;Mediação de leitura, acessibilidade, direitos humanos e gestão de acervo. Inclui formadores, material didático e certificação.
+2;2.13;Aquisição de acervo literário para os núcleos;exemplar;3000;1;38,00;114000,00;3.000 exemplares (1.500 por núcleo), com curadoria diversificada: literatura brasileira, africana e indígena, infantojuvenil, quadrinhos, mangás e obras de direitos humanos. Preço médio com desconto institucional de distribuidoras.
+2;2.14;Aquisição de acervo acessível — braile, letra ampliada e audiolivro;exemplar;400;1;92,00;36800,00;400 exemplares em formatos acessíveis (200 por núcleo). Custo unitário superior em razão da produção especializada.
+2;2.15;Acervo digital acessível — licenças de plataforma de leitura;licença/ano;2;1;6500,00;13000,00;Assinatura anual de biblioteca digital compatível com leitores de tela.
+2;2.16;Circuito Literário Itinerante — produção de 12 sessões;sessão;12;1;4800,00;57600,00;Sessões em escolas públicas, praças, CRAS, unidades socioeducativas e unidades prisionais. Inclui transporte, montagem, equipe de apoio, seguro e material. Média de três cotações.
+2;2.17;Seminário Franz de Castro: Literatura, Memória e Direitos Humanos;evento;1;1;38000,00;38000,00;Evento de dois dias com mesas, oficinas e lançamento da antologia. Inclui locação, estrutura, equipe técnica, passagens e hospedagem de convidados.
+2;2.18;Participação na Feira Internacional do Livro de Ribeirão Preto;ativação;1;1;28000,00;28000,00;Estande institucional, programação de saraus e slams dos núcleos e distribuição gratuita da antologia. A 24ª FIL reuniu 274 mil pessoas.
+2;2.19;Manutenção e custeio dos núcleos — energia, água, internet e limpeza;núcleo/mês;2;12;1250,00;30000,00;Custeio operacional dos dois espaços durante a execução.
+2;2.20;Material de consumo pedagógico e de oficinas;núcleo/mês;2;12;520,00;12480,00;Papelaria, materiais de escrita, insumos de oficina e higiene.
+2;2.21;Transporte de participantes e equipe;mês;1;12;4800,00;57600,00;Deslocamento de participantes em situação de vulnerabilidade, incluindo veículo adaptado para pessoas com deficiência, e da equipe entre núcleos e pontos do circuito.
+2;2.22;Alimentação em atividades formativas e eventos;mês;1;12;3500,00;42000,00;Lanche em oficinas, formações e sessões do circuito. Item essencial para a permanência de participantes em situação de vulnerabilidade.
+2;2.23;Seguro de responsabilidade civil e de participantes;mês;1;12;780,00;9360,00;Cobertura obrigatória para atividades com público e com menores de idade.
+2;2.24;Registro audiovisual e fotográfico das ações;mês;1;12;2400,00;28800,00;Documentação das atividades para prestação de contas, comunicação e memória do projeto.
+;;SUBTOTAL ETAPA 2;;;;;1176360,00;
+ETAPA 3 — PÓS-PRODUÇÃO, PUBLICAÇÃO E AVALIAÇÃO;;;;;;;;
+3;3.01;Coordenação editorial da antologia;serviço;1;1;18000,00;18000,00;Curadoria dos textos produzidos nas oficinas, organização da obra e acompanhamento de todo o processo editorial.
+3;3.02;Preparação de originais e revisão de texto;serviço;1;1;11000,00;11000,00;Preparação e duas rodadas de revisão da antologia (cerca de 180 páginas).
+3;3.03;Projeto gráfico, diagramação e capa;serviço;1;1;14000,00;14000,00;Projeto gráfico original com requisitos de legibilidade e contraste.
+3;3.04;Ilustração da antologia;serviço;1;1;9000,00;9000,00;Ilustrações originais, com prioridade para artistas dos territórios.
+3;3.05;Impressão da antologia — 3.000 exemplares;exemplar;3000;1;14,50;43500,00;Formato 14x21cm, cerca de 180 páginas, miolo offset 90g, capa 250g com laminação. Preço unitário dentro da faixa de mercado para a tiragem (R$ 6,00 a R$ 15,00). Média de três cotações gráficas.
+3;3.06;Registro de ISBN, ficha catalográfica e depósito legal;serviço;1;1;3200,00;3200,00;Obrigações legais da produção editorial.
+3;3.07;Produção do audiolivro da antologia;produto;1;1;22000,00;22000,00;Narração profissional, direção, estúdio, edição e masterização. Medida de acessibilidade comunicacional integrada ao produto principal.
+3;3.08;E-book acessível em EPUB3 e edição em braile;produto;1;1;13000,00;13000,00;Versão digital navegável compatível com leitores de tela e edição reduzida em braile para os núcleos e bibliotecas parceiras.
+3;3.09;Logística de distribuição gratuita da antologia;serviço;1;1;8000,00;8000,00;Embalagem, transporte e entrega a participantes, escolas públicas, bibliotecas, unidades prisionais e socioeducativas.
+3;3.10;Avaliação externa de impacto;serviço;1;1;26000,00;26000,00;Instituição independente responsável pela avaliação de resultados, com linha de base e medição final. Relatório de acesso público.
+3;3.11;Relatório final e documentário curto do projeto;produto;1;1;18000,00;18000,00;Relatório de resultados em versão acessível e videodocumentário de 12 minutos com legendas, janela de Libras e audiodescrição.
+3;3.12;Coordenação geral e produção executiva — pós-produção;mês;1;2;13500,00;27000,00;Coordenação geral e produção executiva nos dois meses de encerramento, publicação e prestação de contas.
+;;SUBTOTAL ETAPA 3;;;;;212700,00;
+ETAPA 4 — ACESSIBILIDADE, COMUNICAÇÃO E DIVULGAÇÃO ACESSÍVEL;;;;;;;;
+4;4.01;Intérprete de Libras nas atividades públicas;hora;280;1;185,00;51800,00;Cobertura de 100% das sessões públicas, formações e eventos, conforme a IN MinC nº 29/2026. Dupla de intérpretes em atividades superiores a 1 hora.
+4;4.02;Audiodescrição ao vivo e roteirizada;hora;120;1;200,00;24000,00;Audiodescrição das atividades e dos materiais visuais do projeto.
+4;4.03;Legendagem descritiva de conteúdos audiovisuais;minuto;420;1;30,00;12600,00;Legendagem para surdos e ensurdecidos de todo o material audiovisual.
+4;4.04;Guia-intérprete e apoio a pessoas com deficiência;diária;40;1;400,00;16000,00;Suporte individualizado em atividades com participação de pessoas com deficiência visual e surdocegueira.
+4;4.05;Consultoria de acessibilidade atitudinal e formação da equipe;serviço;1;1;14000,00;14000,00;Formação de 16 horas para toda a equipe e para os jovens mediadores, conduzida por consultores com deficiência.
+4;4.06;Assessoria de imprensa e comunicação;mês;1;12;3800,00;45600,00;Relacionamento com veículos regionais e nacionais e produção de conteúdo.
+4;4.07;Gestão de mídias sociais e conteúdo acessível;mês;1;12;3200,00;38400,00;Publicações com texto alternativo, legendas e janela de Libras.
+4;4.08;Peças gráficas e sinalização acessível;serviço;1;1;21000,00;21000,00;Cartazes, banners, folders em formato acessível, materiais em braile e peças com QR code para versão em áudio.
+4;4.09;Site do projeto com padrão de acessibilidade digital;produto;1;1;16000,00;16000,00;Portal conforme WCAG 2.1 nível AA, com repositório público dos resultados e da prestação de contas.
+4;4.10;Vídeo institucional acessível;produto;1;1;14000,00;14000,00;Vídeo de 3 minutos com Libras, audiodescrição e legendas.
+4;4.11;Veiculação de peças publicitárias;serviço;1;1;32000,00;32000,00;Mídia regional e digital. Rubrica limitada a 5% dos recursos captados e ao teto de R$ 100.000,00, conforme a IN MinC nº 29/2026.
+;;SUBTOTAL ETAPA 4;;;;;285400,00;
+ETAPA 5 — CUSTOS ADMINISTRATIVOS;;;;;;;;
+5;5.01;Assessoria contábil do projeto;mês;1;16;2600,00;41600,00;Contador com registro no CRC, responsável pela escrituração segregada do projeto e pela prestação de contas no SALIC.
+5;5.02;Assessoria jurídica;serviço;1;1;18000,00;18000,00;Contratos, direitos autorais, cessão de imagem e conformidade com a LGPD. Honorários referenciados na tabela URH da OAB.
+5;5.03;Auditoria independente das contas do projeto;serviço;1;1;22000,00;22000,00;Auditoria externa voluntária, além do exigido, como diferencial de governança para o patrocinador.
+5;5.04;Despesas bancárias e tarifas da conta vinculada;mês;1;16;300,00;4800,00;Conta corrente exclusiva do PRONAC, exigida pela legislação.
+5;5.05;Apoio administrativo e financeiro;mês;1;14;3000,00;42000,00;Rotinas de pagamento, conciliação, arquivo de comprovantes e alimentação do sistema de prestação de contas.
+5;5.06;Material de escritório, licenças de software e correios;mês;1;14;750,00;10500,00;Custeio administrativo da gestão do projeto.
+5;5.07;Elaboração do projeto e adequação ao SALIC;serviço;1;1;22000,00;22000,00;Concepção, redação técnica, planilha orçamentária e submissão no sistema.
+;;SUBTOTAL ETAPA 5;;;;;160900,00;
+ETAPA 6 — CAPTAÇÃO DE RECURSOS;;;;;;;;
+6;6.01;Serviços de captação de recursos incentivados;serviço;1;1;92000,00;92000,00;Remuneração vinculada ao efetivamente captado, respeitados o limite de 10% do valor do projeto e o teto de R$ 150.000,00 previstos na IN MinC nº 29/2026. Não há pagamento sem captação correspondente.
+;;SUBTOTAL ETAPA 6;;;;;92000,00;
+
+;;BASE DE CÁLCULO (etapas 1+2+3);;;;;1562060,00;
+;;VALOR TOTAL DO PROJETO;;;;;2100360,00;
+
+VERIFICAÇÃO DOS LIMITES — IN MinC nº 29/2026
+Item;Limite;Apurado;Situação
+Custos administrativos;até 15% do valor do projeto;7.66% — R$ 160.900,00;CONFORME
+Maior despesa isolada dentro dos custos administrativos;até 50% do total da etapa;26.1% — R$ 42.000,00;CONFORME
+Acessibilidade, comunicação e divulgação acessível;até 20% do valor do projeto;13.59% — R$ 285.400,00;CONFORME
+Veiculação de peças publicitárias;até 5% do captado, teto de R$ 100.000,00;1.52% — R$ 32.000,00;CONFORME
+Captação de recursos;até 10% do valor do projeto, teto de R$ 150.000,00;4.38% — R$ 92.000,00;CONFORME
+Valor total do projeto;até R$ 15.000.000,00 por projeto (demais pessoas jurídicas);R$ 2.100.360,00;CONFORME
+Prazo de execução;até 36 meses;16 meses;CONFORME
