@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Protótipo - Fazenda Cartoon</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #4a8bc2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif;
+    color: #4a3018;
+  }
+  #wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0;
+    letter-spacing: 0.5px;
+    color: #fff6e0;
+    text-shadow: 2px 2px 0 #d4761a, -1px -1px 0 #7a4a10;
+  }
+  #hint {
+    font-size: 13px;
+    color: #fff6e0;
+    text-align: center;
+    max-width: 640px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+  }
+  #canvasWrap {
+    position: relative;
+  }
+  canvas {
+    border: 8px solid #a8712e;
+    border-radius: 16px;
+    box-shadow: 0 8px 0 #7a4a10, 0 12px 24px rgba(0,0,0,0.4);
+    image-rendering: auto;
+    cursor: default;
+    display: block;
+  }
+  #hud {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #4a3018;
+    background: #ffe4a3;
+    padding: 10px 18px;
+    border-radius: 20px;
+    border: 3px solid #a8712e;
+    box-shadow: 0 4px 0 #a8712e;
+  }
+  #hud b { color: #c0392b; }
+  #toast {
+    position: relative;
+    height: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff6e0;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+  }
+
+  /* Menu de contexto estilo placa de madeira */
+  #contextMenu {
+    position: absolute;
+    z-index: 10;
+    background: #d9a35c;
+    border: 3px solid #7a4a10;
+    border-radius: 14px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    box-shadow: 0 6px 0 #7a4a10, 0 10px 18px rgba(0,0,0,0.4);
+    min-width: 180px;
+    transform: translate(-50%, -115%);
+  }
+  #contextMenu.hidden { display: none; }
+  #contextMenu button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 2px solid #7a4a10;
+    background: #ffdd8a;
+    color: #4a3018;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.08s, background 0.12s;
+  }
+  #contextMenu button:hover:not(:disabled) {
+    background: #ffc93c;
+    transform: scale(1.03);
+  }
+  #contextMenu button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  #contextMenu button.cancel {
+    background: transparent;
+    border-color: transparent;
+    color: #7a4a10;
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+  #contextMenu button.cancel:hover {
+    color: #4a3018;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>🌻 Fazendinha — Estilo Cartoon</h1>
+  <div id="canvasWrap">
+    <canvas id="game" width="640" height="480"></canvas>
+    <div id="contextMenu" class="hidden"></div>
+  </div>
+  <div id="hud">
+    <div>💰 <b id="money">0</b></div>
+    <div>🌾 Colhido: <b id="crops">0</b></div>
+  </div>
+  <div id="toast"></div>
+  <div id="hint">
+    <b>WASD/Setas</b> pra mover • <b>Shift</b> pra correr • <b>Clique</b> num quadrado perto de você
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const moneyEl = document.getElementById('money');
+const cropsEl = document.getElementById('crops');
+const toastEl = document.getElementById('toast');
+const menuEl = document.getElementById('contextMenu');
+
+const W = canvas.width, H = canvas.height;
+const TILE = 40;
+const COLS = W / TILE;
+const ROWS = H / TILE;
+
+let money = 0;
+let cropsHarvested = 0;
+let toastTimer = 0;
+let selectedTile = null;
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastTimer = 90;
+}
+
+// ---------- Textura de grama determinística (sem recalcular toda hora) ----------
+function seeded(r, c, salt) {
+  const x = Math.sin(r * 127.1 + c * 311.7 + salt) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+const MAX_GROWTH = 3;
+const GROWTH_TICKS = 100;
+
+const grid = [];
+for (let r = 0; r < ROWS; r++) {
+  const row = [];
+  for (let c = 0; c < COLS; c++) {
+    row.push({ type: 'soil', growth: 0, timer: 0 });
+  }
+  grid.push(row);
+}
+
+const player = {
+  x: W/2,
+  y: H/2,
+  speed: 2.3,
+  runMultiplier: 1.8,
+  dir: 'down',
+  moving: false,
+  animFrame: 0,
+  animTimer: 0,
+  size: 34
+};
+
+const keys = {};
+window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+function isDown(...names) { return names.some(n => keys[n]); }
+
+function playerTile() {
+  return { col: Math.floor(player.x / TILE), row: Math.floor(player.y / TILE) };
+}
+function inRange(row, col) {
+  const p = playerTile();
+  return Math.abs(row - p.row) <= 1 && Math.abs(col - p.col) <= 1;
+}
+
+function doTill(tile) { tile.type = 'tilled'; showToast('Terra fofinha pronta! 🟤'); }
+function doPlant(tile) { tile.type = 'planted'; tile.growth = 0; tile.timer = 0; showToast('Sementinha plantada! 🌱'); }
+function doHarvest(tile) {
+  tile.type = 'tilled'; tile.growth = 0;
+  money += 12; cropsHarvested++;
+  showToast('Colhido! +$12 🌽');
+}
+
+function openMenu(row, col, pageX, pageY) {
+  selectedTile = { row, col };
+  const tile = grid[row][col];
+  let html = '';
+  if (tile.type === 'soil') {
+    html += `<button data-action="till">🟤 Arar terra</button>`;
+  } else if (tile.type === 'tilled') {
+    html += `<button data-action="plant">🌱 Plantar semente</button>`;
+  } else if (tile.type === 'planted') {
+    if (tile.growth >= MAX_GROWTH) {
+      html += `<button data-action="harvest">🌽 Colher (+$12)</button>`;
+    } else {
+      html += `<button disabled>⏳ Crescendo (${tile.growth}/${MAX_GROWTH})</button>`;
+    }
+  }
+  html += `<button class="cancel" data-action="cancel">✕ Cancelar</button>`;
+  menuEl.innerHTML = html;
+  menuEl.style.left = pageX + 'px';
+  menuEl.style.top = pageY + 'px';
+  menuEl.classList.remove('hidden');
+}
+function closeMenu() { menuEl.classList.add('hidden'); selectedTile = null; }
+
+menuEl.addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn || !selectedTile || btn.disabled) return;
+  const { row, col } = selectedTile;
+  const tile = grid[row][col];
+  const action = btn.dataset.action;
+  if (action === 'till') doTill(tile);
+  else if (action === 'plant') doPlant(tile);
+  else if (action === 'harvest') doHarvest(tile);
+  closeMenu();
+});
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const col = Math.floor(mx / TILE), row = Math.floor(my / TILE);
+  if (col < 0 || col >= COLS || row < 0 || row >= ROWS) { closeMenu(); return; }
+  if (!inRange(row, col)) { showToast('Muito longe! Chegue mais perto.'); closeMenu(); return; }
+  openMenu(row, col, mx, my);
+});
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const col = Math.floor(mx / TILE), row = Math.floor(my / TILE);
+  canvas.style.cursor = inRange(row, col) ? 'pointer' : 'default';
+});
+document.addEventListener('click', e => {
+  if (e.target === canvas) return;
+  if (!menuEl.contains(e.target)) closeMenu();
+});
+
+function updateCrops() {
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const t = grid[r][c];
+      if (t.type === 'planted' && t.growth < MAX_GROWTH) {
+        t.timer++;
+        if (t.timer >= GROWTH_TICKS) { t.timer = 0; t.growth++; }
+      }
+    }
+  }
+}
+
+// ---------- Desenho: grama cartoon ----------
+function drawField() {
+  // base de grama vibrante
+  ctx.fillStyle = '#8fd14f';
+  ctx.fillRect(0, 0, W, H);
+
+  const p = playerTile();
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const x = c * TILE, y = r * TILE;
+      const t = grid[r][c];
+
+      if (t.type === 'soil') {
+        // grama com tufos decorativos (determinísticos)
+        for (let i = 0; i < 3; i++) {
+          const sx = x + 6 + seeded(r, c, i) * (TILE - 12);
+          const sy = y + 6 + seeded(r, c, i + 10) * (TILE - 12);
+          ctx.fillStyle = i % 2 === 0 ? '#79ba3f' : '#a2de6a';
+          ctx.beginPath();
+          ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        // terra arada/plantada: retângulo arredondado marrom com contorno
+        roundRect(x + 3, y + 3, TILE - 6, TILE - 6, 8, '#a8712e', '#7a4a10', 2);
+        // sulcos claros
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x + 8, y + TILE/2);
+        ctx.lineTo(x + TILE - 8, y + TILE/2);
+        ctx.stroke();
+      }
+
+      if (Math.abs(r - p.row) <= 1 && Math.abs(c - p.col) <= 1) {
+        ctx.fillStyle = 'rgba(255,255,255,0.10)';
+        ctx.fillRect(x, y, TILE, TILE);
+      }
+
+      if (t.type === 'planted') drawCrop(x, y, t.growth);
+    }
+  }
+
+  if (selectedTile) {
+    ctx.strokeStyle = '#ffdd00';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(selectedTile.col * TILE + 2, selectedTile.row * TILE + 2, TILE - 4, TILE - 4);
+  }
+
+  // cerca de madeira nas bordas
+  drawFence();
+}
+
+function roundRect(x, y, w, h, r, fill, stroke, lw) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2; ctx.stroke(); }
+}
+
+function drawFence() {
+  ctx.fillStyle = '#c98a3c';
+  ctx.strokeStyle = '#7a4a10';
+  ctx.lineWidth = 2;
+  const postW = 8, postH = 14;
+  for (let x = 4; x < W; x += 36) {
+    ctx.fillRect(x, 2, postW, postH);
+    ctx.strokeRect(x, 2, postW, postH);
+    ctx.fillRect(x, H - postH - 2, postW, postH);
+    ctx.strokeRect(x, H - postH - 2, postW, postH);
+  }
+  for (let y = 4; y < H; y += 36) {
+    ctx.fillRect(2, y, postH, postW);
+    ctx.strokeRect(2, y, postH, postW);
+    ctx.fillRect(W - postH - 2, y, postH, postW);
+    ctx.strokeRect(W - postH - 2, y, postH, postW);
+  }
+}
+
+function drawCrop(x, y, growth) {
+  const cx = x + TILE/2, cy = y + TILE/2;
+  ctx.strokeStyle = '#4a3018';
+  ctx.lineWidth = 1.5;
+
+  if (growth === 0) {
+    ctx.fillStyle = '#9be26b';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + 4, 3, 7, 0, 0, Math.PI*2);
+    ctx.fill(); ctx.stroke();
+  } else if (growth === 1) {
+    ctx.fillStyle = '#6fc94a';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + 10);
+    ctx.lineTo(cx - 6, cy - 6);
+    ctx.lineTo(cx + 6, cy - 6);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+  } else if (growth === 2) {
+    ctx.fillStyle = '#4fae3a';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + 12);
+    ctx.lineTo(cx - 8, cy - 8);
+    ctx.lineTo(cx + 8, cy - 8);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+  } else {
+    // milho fofo pronto pra colher
+    ctx.fillStyle = '#ffd23c';
+    roundRect(cx - 6, cy - 12, 12, 22, 6, '#ffd23c', '#4a3018', 1.5);
+    ctx.fillStyle = '#5fae52';
+    ctx.beginPath();
+    ctx.moveTo(cx - 6, cy - 10);
+    ctx.lineTo(cx - 12, cy - 16);
+    ctx.lineTo(cx - 4, cy - 12);
+    ctx.closePath();
+    ctx.fill();
+    // brilho de "pronto"
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath();
+    ctx.arc(cx - 2, cy - 6, 6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// ---------- Personagem cartoon (chapéu + macacão) ----------
+function drawPlayer() {
+  const { x, y, size, animFrame, moving } = player;
+  const bob = moving ? Math.sin(animFrame * 0.9) * 2 : 0;
+
+  ctx.save();
+  ctx.translate(x, y + bob);
+
+  // sombra
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.beginPath();
+  ctx.ellipse(0, size*0.58, size*0.42, size*0.14, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = '#3a2a15';
+
+  // pernas
+  const legOffset = moving ? Math.sin(animFrame * 0.9) * 4 : 0;
+  ctx.fillStyle = '#f2c88c';
+  ctx.fillRect(-size*0.18, size*0.15 + legOffset*0.3, size*0.15, size*0.28);
+  ctx.strokeRect(-size*0.18, size*0.15 + legOffset*0.3, size*0.15, size*0.28);
+  ctx.fillRect(size*0.03, size*0.15 - legOffset*0.3, size*0.15, size*0.28);
+  ctx.strokeRect(size*0.03, size*0.15 - legOffset*0.3, size*0.15, size*0.28);
+
+  // corpo (macacão azul)
+  roundRect(-size*0.3, -size*0.1, size*0.6, size*0.45, 8, '#3a7bd5', '#3a2a15', 2.5);
+  // alças do macacão
+  ctx.fillStyle = '#3a7bd5';
+  ctx.strokeStyle = '#3a2a15';
+  ctx.beginPath(); ctx.moveTo(-size*0.15, -size*0.1); ctx.lineTo(-size*0.1, -size*0.32); ctx.lineTo(-size*0.02, -size*0.32); ctx.lineTo(-size*0.07, -size*0.1); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(size*0.15, -size*0.1); ctx.lineTo(size*0.1, -size*0.32); ctx.lineTo(size*0.02, -size*0.32); ctx.lineTo(size*0.07, -size*0.1); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // camisa por baixo
+  ctx.fillStyle = '#e8433a';
+  roundRect(-size*0.28, -size*0.28, size*0.56, size*0.2, 6, '#e8433a', '#3a2a15', 2);
+
+  // cabeça
+  ctx.fillStyle = '#f2c88c';
+  ctx.beginPath();
+  ctx.arc(0, -size*0.5, size*0.26, 0, Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+
+  // chapéu de palha
+  ctx.fillStyle = '#e8b84b';
+  ctx.beginPath();
+  ctx.ellipse(0, -size*0.68, size*0.36, size*0.12, 0, 0, Math.PI*2);
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, -size*0.78, size*0.2, Math.PI, 0);
+  ctx.fill(); ctx.stroke();
+
+  // rosto simples
+  ctx.fillStyle = '#3a2a15';
+  ctx.beginPath();
+  ctx.arc(-size*0.08, -size*0.5, 2, 0, Math.PI*2);
+  ctx.arc(size*0.08, -size*0.5, 2, 0, Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(0, -size*0.44, size*0.08, 0, Math.PI);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function update() {
+  let dx = 0, dy = 0;
+  if (isDown('w', 'arrowup')) dy -= 1;
+  if (isDown('s', 'arrowdown')) dy += 1;
+  if (isDown('a', 'arrowleft')) dx -= 1;
+  if (isDown('d', 'arrowright')) dx += 1;
+
+  player.moving = (dx !== 0 || dy !== 0);
+
+  if (player.moving) {
+    closeMenu();
+    const len = Math.sqrt(dx*dx + dy*dy);
+    dx /= len; dy /= len;
+    const running = isDown('shift');
+    const spd = player.speed * (running ? player.runMultiplier : 1);
+    player.x += dx * spd;
+    player.y += dy * spd;
+
+    if (Math.abs(dx) > Math.abs(dy)) player.dir = dx > 0 ? 'right' : 'left';
+    else player.dir = dy > 0 ? 'down' : 'up';
+
+    player.animTimer++;
+    if (player.animTimer % 4 === 0) player.animFrame++;
+  }
+
+  const margin = 22;
+  player.x = Math.max(margin, Math.min(W - margin, player.x));
+  player.y = Math.max(margin, Math.min(H - margin, player.y));
+
+  updateCrops();
+
+  moneyEl.textContent = money;
+  cropsEl.textContent = cropsHarvested;
+
+  if (toastTimer > 0) {
+    toastTimer--;
+    toastEl.style.opacity = Math.min(1, toastTimer / 20);
+  } else {
+    toastEl.textContent = '';
+  }
+}
+
+function render() {
+  drawField();
+  drawPlayer();
+}
+
+function loop() {
+  update();
+  render();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
