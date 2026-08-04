@@ -1,0 +1,2694 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Central de Cardápios &amp; Marketing para Restaurantes</title>
+<meta name="description" content="Modelos prontos de cardápio digital e impresso, peças de marketing, guia de engenharia de cardápio e ferramentas de precificação.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600;700&family=Oswald:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media=&#39;all&#39;">
+<style>
+/* ============================================================
+   HUB — estilos da central (não afetam os modelos, que rodam
+   isolados dentro de iframes com seu próprio CSS)
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#0b0c0f; --bg2:#101319; --card:#151922; --card2:#1b202b;
+  --line:#242a36; --line2:#323a4a;
+  --txt:#e9ebef; --mut:#98a0ae; --mut2:#6b7484;
+  --acc:#f2a33c; --acc2:#e0614a; --ok:#4ec08a; --info:#5aa9e6;
+  --r:14px; --r2:20px;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Playfair Display',Georgia,serif;
+  --shadow:0 10px 40px rgba(0,0,0,.45);
+}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(900px 500px at 12% -8%,rgba(242,163,60,.10),transparent 60%),
+                   radial-gradient(800px 500px at 90% 0%,rgba(224,97,74,.09),transparent 55%);
+  background-attachment:fixed;
+}
+img{max-width:100%}
+a{color:inherit}
+h1,h2,h3,h4{line-height:1.2;margin:0}
+p{margin:0}
+.wrap{width:min(1240px,92vw);margin-inline:auto}
+
+/* ---------- Topo ---------- */
+.top{
+  position:sticky;top:0;z-index:60;backdrop-filter:blur(14px);
+  background:rgba(11,12,15,.82);border-bottom:1px solid var(--line);
+}
+.top-in{display:flex;align-items:center;gap:18px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;font-size:17px;white-space:nowrap}
+.logo .mark{
+  width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:17px;
+  background:linear-gradient(140deg,var(--acc),var(--acc2));box-shadow:0 4px 14px rgba(242,163,60,.3)
+}
+.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav a{
+  text-decoration:none;color:var(--mut);font-size:14px;font-weight:500;
+  padding:8px 13px;border-radius:9px;transition:.16s;white-space:nowrap
+}
+.nav a:hover{color:var(--txt);background:var(--card2)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  font-family:inherit;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;
+  border:1px solid var(--line2);background:var(--card2);color:var(--txt);transition:.16s;text-decoration:none
+}
+.btn:hover{border-color:var(--mut2);background:#222937;transform:translateY(-1px)}
+.btn-p{background:linear-gradient(135deg,var(--acc),#e08b2a);border-color:transparent;color:#241703;box-shadow:0 6px 20px rgba(242,163,60,.26)}
+.btn-p:hover{background:linear-gradient(135deg,#ffb552,#ef9832);color:#241703}
+.btn-sm{padding:7px 11px;font-size:12.5px;border-radius:8px}
+.btn-gh{background:transparent}
+
+/* ---------- Hero ---------- */
+.hero{padding:64px 0 40px;text-align:center}
+.pill{
+  display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--acc);background:rgba(242,163,60,.10);
+  border:1px solid rgba(242,163,60,.28);padding:6px 14px;border-radius:999px
+}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(34px,5.6vw,60px);font-weight:700;letter-spacing:-.02em;margin:20px 0 0
+}
+.hero h1 em{font-style:italic;color:var(--acc)}
+.hero p.sub{color:var(--mut);font-size:clamp(15px,1.6vw,18.5px);max-width:680px;margin:16px auto 0}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:38px}
+.stat{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 22px;min-width:132px
+}
+.stat b{display:block;font-family:var(--serif);font-size:26px;color:var(--acc)}
+.stat span{font-size:12.5px;color:var(--mut)}
+
+/* ---------- Seções ---------- */
+section{scroll-margin-top:78px}
+.sec{padding:56px 0}
+.sec-head{margin-bottom:26px}
+.sec-head .kicker{
+  font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:8px
+}
+.sec-head h2{font-family:var(--serif);font-size:clamp(26px,3.4vw,38px);font-weight:600}
+.sec-head p{color:var(--mut);margin-top:10px;max-width:760px}
+
+/* ---------- Personalizador ---------- */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r2);padding:26px;box-shadow:var(--shadow)}
+.grid-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.f label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.f input,.f select,.f textarea{
+  width:100%;background:#0e1116;border:1px solid var(--line2);color:var(--txt);border-radius:9px;
+  padding:10px 12px;font-family:inherit;font-size:14px;transition:.14s
+}
+.f textarea{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;line-height:1.65;min-height:280px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(242,163,60,.14)}
+.sub-h{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:24px 0 12px}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.sw{
+  cursor:pointer;border:1.5px solid var(--line2);border-radius:11px;padding:9px;background:#0e1116;
+  transition:.16s;text-align:left
+}
+.sw:hover{border-color:var(--mut2)}
+.sw.on{border-color:var(--acc);box-shadow:0 0 0 3px rgba(242,163,60,.15)}
+.sw .bars{display:flex;height:26px;border-radius:6px;overflow:hidden;margin-bottom:7px}
+.sw .bars i{flex:1}
+.sw .bars i:nth-child(2){flex:.7}
+.sw .bars i:nth-child(3){flex:.45}
+.sw small{font-size:11.5px;color:var(--mut);display:block;line-height:1.35}
+.fonts{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+.fo{cursor:pointer;border:1.5px solid var(--line2);border-radius:11px;padding:11px 13px;background:#0e1116;transition:.16s;text-align:left}
+.fo:hover{border-color:var(--mut2)}
+.fo.on{border-color:var(--acc);box-shadow:0 0 0 3px rgba(242,163,60,.15)}
+.fo b{display:block;font-size:19px;font-weight:600;line-height:1.25}
+.fo small{font-size:11.5px;color:var(--mut)}
+details.adv{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
+details.adv summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--acc);list-style:none;display:flex;gap:8px;align-items:center}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary::before{content:'▸';transition:.2s}
+details.adv[open] summary::before{transform:rotate(90deg)}
+.hint{font-size:12.5px;color:var(--mut2);margin-top:8px;line-height:1.55}
+.panel-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+
+/* ---------- Filtros + grid de modelos ---------- */
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px;flex-wrap:wrap}
+.tab{
+  cursor:pointer;border:0;background:transparent;color:var(--mut);font-family:inherit;font-size:13.5px;
+  font-weight:600;padding:8px 15px;border-radius:8px;transition:.16s;white-space:nowrap
+}
+.tab:hover{color:var(--txt)}
+.tab.on{background:var(--acc);color:#241703}
+.search{position:relative;flex:1;min-width:190px}
+.search input{
+  width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);
+  border-radius:12px;padding:11px 14px 11px 38px;font-family:inherit;font-size:14px
+}
+.search input:focus{outline:none;border-color:var(--acc)}
+.search::before{content:'⌕';position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:19px}
+.count{font-size:13px;color:var(--mut2);white-space:nowrap}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px}
+.mcard{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;
+  display:flex;flex-direction:column;transition:.2s
+}
+.mcard:hover{border-color:var(--line2);transform:translateY(-3px);box-shadow:var(--shadow)}
+.thumb{
+  position:relative;height:236px;overflow:hidden;background:#0a0b0e;
+  border-bottom:1px solid var(--line);cursor:pointer;display:block
+}
+.thumb iframe{border:0;position:absolute;top:0;left:0;z-index:0;transform-origin:0 0;pointer-events:none;background:#fff}
+.thumb .skel{position:absolute;inset:0;z-index:1;display:grid;place-items:center;color:var(--mut2);font-size:13px}
+.thumb .hov{
+  position:absolute;inset:0;z-index:3;background:rgba(8,9,12,.62);display:grid;place-items:center;
+  opacity:0;transition:.18s;backdrop-filter:blur(2px)
+}
+.thumb:hover .hov{opacity:1}
+.thumb .hov span{
+  background:var(--acc);color:#241703;font-weight:700;font-size:13px;padding:10px 18px;border-radius:9px
+}
+.badges{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap;z-index:2}
+.bdg{
+  font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 8px;
+  border-radius:6px;background:rgba(10,11,14,.82);color:#dfe3ea;border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(6px)
+}
+.bdg.digital{color:#8fd0ff;border-color:rgba(90,169,230,.4)}
+.bdg.fisico{color:#ffc98f;border-color:rgba(242,163,60,.4)}
+.bdg.marketing{color:#9ce8bd;border-color:rgba(78,192,138,.4)}
+.mbody{padding:16px 17px 17px;display:flex;flex-direction:column;flex:1}
+.mbody h3{font-size:16.5px;font-weight:650;letter-spacing:-.01em}
+.mbody .fmt{font-size:12px;color:var(--acc);font-weight:600;margin-top:3px}
+.mbody p{font-size:13.4px;color:var(--mut);margin-top:8px;flex:1}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.tg{font-size:11px;color:var(--mut2);border:1px solid var(--line);padding:3px 8px;border-radius:6px}
+.mactions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
+.empty{text-align:center;padding:60px 20px;color:var(--mut);grid-column:1/-1}
+
+/* ---------- Guia ---------- */
+.gcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r2);padding:24px}
+.gcard .ic{font-size:26px;margin-bottom:12px;display:block}
+.gcard h3{font-family:var(--serif);font-size:21px;font-weight:600;margin-bottom:10px}
+.gcard p{color:var(--mut);font-size:14.2px}
+.gcard ul{margin:12px 0 0;padding-left:18px;color:var(--mut);font-size:14px}
+.gcard li{margin-bottom:8px}
+.gcard li b,.gcard p b{color:var(--txt);font-weight:600}
+.gcard li:last-child{margin-bottom:0}
+
+.matrix{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px}
+.mq{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--card2)}
+.mq h4{font-size:15px;margin-bottom:4px}
+.mq .lab{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.mq p{font-size:13px;color:var(--mut)}
+.mq.star{border-color:rgba(242,163,60,.4)} .mq.star .lab{color:var(--acc)}
+.mq.horse{border-color:rgba(90,169,230,.4)} .mq.horse .lab{color:var(--info)}
+.mq.puzzle{border-color:rgba(78,192,138,.4)} .mq.puzzle .lab{color:var(--ok)}
+.mq.dog{border-color:rgba(224,97,74,.4)} .mq.dog .lab{color:var(--acc2)}
+
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.cmp>div{border-radius:11px;padding:14px;font-size:13.4px;line-height:1.55}
+.cmp .bad{background:rgba(224,97,74,.08);border:1px solid rgba(224,97,74,.28)}
+.cmp .good{background:rgba(78,192,138,.08);border:1px solid rgba(78,192,138,.28)}
+.cmp b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+.cmp .bad b{color:var(--acc2)} .cmp .good b{color:var(--ok)}
+
+table.tb{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.4px}
+table.tb th{
+  text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);
+  padding:9px 10px;border-bottom:1px solid var(--line2)
+}
+table.tb td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--mut);vertical-align:top}
+table.tb td:first-child{color:var(--txt);font-weight:600;width:38%}
+table.tb tr:last-child td{border-bottom:0}
+.gcard.wide{grid-column:span 2}
+@media (max-width:1040px){.gcard.wide{grid-column:auto}}
+
+.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:6px}
+.mo{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:13px 14px}
+.mo b{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:6px}
+.mo span{font-size:13px;color:var(--mut);display:block;line-height:1.5}
+
+.chk{list-style:none;padding:0;margin:14px 0 0}
+.chk li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--mut);margin-bottom:9px}
+.chk li::before{content:'✓';color:var(--ok);font-weight:700;flex:none;margin-top:-1px}
+
+/* ---------- Ferramentas ---------- */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.calc-out{background:var(--card2);border:1px solid var(--line2);border-radius:var(--r);padding:20px;align-self:start}
+.calc-out .big{font-family:var(--serif);font-size:44px;color:var(--acc);line-height:1.05}
+.calc-out .lbl{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+.calc-row{display:flex;justify-content:space-between;gap:12px;font-size:13.6px;padding:8px 0;border-bottom:1px dashed var(--line2);color:var(--mut)}
+.calc-row:last-child{border-bottom:0}
+.calc-row b{color:var(--txt);font-weight:600}
+.warn{margin-top:12px;font-size:12.8px;padding:10px 12px;border-radius:9px;line-height:1.5}
+.warn.ok{background:rgba(78,192,138,.09);border:1px solid rgba(78,192,138,.3);color:#9ce8bd}
+.warn.no{background:rgba(224,97,74,.09);border:1px solid rgba(224,97,74,.3);color:#ffab9a}
+
+/* ---------- Modal ---------- */
+.modal{position:fixed;inset:0;z-index:100;display:none}
+.modal.on{display:block}
+.modal-bg{position:absolute;inset:0;background:rgba(5,6,8,.86);backdrop-filter:blur(6px)}
+.modal-in{
+  position:relative;height:100%;display:flex;flex-direction:column;
+  width:min(1300px,96vw);margin-inline:auto;padding:16px 0 20px
+}
+.modal-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.modal-top h3{font-size:18px;font-weight:650}
+.modal-top .fmt{font-size:12.5px;color:var(--acc);font-weight:600}
+.modal-tools{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.stage{
+  flex:1;background:#0a0b0e;border:1px solid var(--line);border-radius:var(--r2);overflow:auto;
+  display:flex;justify-content:center;align-items:flex-start;padding:22px
+}
+.stage iframe{border:0;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.6);border-radius:6px;flex:none}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:200;opacity:0;
+  background:var(--acc);color:#241703;font-weight:650;font-size:14px;padding:11px 20px;border-radius:10px;
+  transition:.24s;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.4)
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+footer{border-top:1px solid var(--line);padding:34px 0;margin-top:40px;color:var(--mut2);font-size:13.4px}
+footer .fin{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap;align-items:center}
+
+@media (max-width:820px){
+  .calc,.cmp,.matrix{grid-template-columns:1fr}
+  .nav a{padding:8px 10px;font-size:13px}
+  .hero{padding:44px 0 28px}
+}
+@media (max-width:640px){
+  .top-in{gap:10px}
+  .logo .txt{display:none}
+  .nav{flex-wrap:nowrap;overflow-x:auto;min-width:0;scrollbar-width:none;-ms-overflow-style:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{flex:none}
+  .nav .btn-p{display:none}
+  .modal-in{width:100vw;padding-inline:10px}
+  .stage{padding:12px}
+  .modal-top h3{font-size:16px}
+}
+@media print{
+  .top,.hero,.panel,.toolbar,.mactions,footer{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="logo"><span class="mark">🍽</span><span class="txt">Central de Cardápios</span></div>
+    <nav class="nav">
+      <a href="#personalizar">Personalizar</a>
+      <a href="#modelos">Modelos</a>
+      <a href="#guia">Guia</a>
+      <a href="#ferramentas">Ferramentas</a>
+      <a class="btn btn-p btn-sm" href="#modelos" style="margin-left:6px">Ver os modelos</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <span class="pill">● 25 modelos prontos · 100% editáveis</span>
+    <h1>Do <em>QR Code</em> na mesa ao cardápio <em>impresso</em></h1>
+    <p class="sub">Escolha o modelo, coloque o nome e os pratos do seu restaurante, e baixe o arquivo pronto para publicar ou imprimir. Tudo em um único arquivo HTML, sem instalar nada.</p>
+    <div class="hero-cta">
+      <a class="btn btn-p" href="#personalizar">✎ Personalizar com meus dados</a>
+      <a class="btn" href="#modelos">Ver catálogo de modelos</a>
+      <a class="btn btn-gh" href="#guia">Guia de cardápio</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="s1">7</b><span>Cardápios digitais</span></div>
+      <div class="stat"><b id="s2">9</b><span>Cardápios impressos</span></div>
+      <div class="stat"><b id="s3">9</b><span>Peças de marketing</span></div>
+      <div class="stat"><b>0</b><span>Mensalidade</span></div>
+    </div>
+  </section>
+
+  <!-- ============ PERSONALIZADOR ============ -->
+  <section id="personalizar" class="sec">
+    <div class="sec-head">
+      <div class="kicker">Passo 1</div>
+      <h2>Personalize com os dados do seu restaurante</h2>
+      <p>Tudo que você digitar aqui é aplicado <b>ao mesmo tempo em todos os 25 modelos</b>, na hora. As informações ficam salvas no seu navegador.</p>
+    </div>
+
+    <div class="panel">
+      <div class="grid-f f">
+        <div><label for="c_nome">Nome do restaurante</label><input id="c_nome" data-k="nome" autocomplete="off"></div>
+        <div><label for="c_tag">Assinatura / tipo de cozinha</label><input id="c_tag" data-k="tagline" autocomplete="off"></div>
+        <div><label for="c_tel">Telefone / WhatsApp</label><input id="c_tel" data-k="telefone" autocomplete="off"></div>
+        <div><label for="c_ig">Instagram</label><input id="c_ig" data-k="instagram" autocomplete="off"></div>
+        <div><label for="c_end">Endereço</label><input id="c_end" data-k="endereco" autocomplete="off"></div>
+        <div><label for="c_site">Site / link do cardápio</label><input id="c_site" data-k="site" autocomplete="off"></div>
+        <div><label for="c_hor">Horário de funcionamento</label><input id="c_hor" data-k="horario" autocomplete="off"></div>
+        <div><label for="c_del">Tempo de entrega</label><input id="c_del" data-k="entrega" autocomplete="off"></div>
+        <div><label for="c_promo">Chamada promocional</label><input id="c_promo" data-k="promo" autocomplete="off"></div>
+        <div><label for="c_cup">Código de cupom</label><input id="c_cup" data-k="cupom" autocomplete="off"></div>
+      </div>
+
+      <div class="sub-h">Paleta de cores</div>
+      <div class="swatches" id="paletas"></div>
+
+      <div class="sub-h">Combinação de fontes</div>
+      <div class="fonts" id="fontes"></div>
+
+      <details class="adv">
+        <summary>Editar os pratos, preços e categorias (avançado)</summary>
+        <p class="hint">Formato JSON. Cada categoria tem <code>nome</code>, <code>nota</code> e uma lista de <code>itens</code> com <code>nome</code>, <code>desc</code>, <code>preco</code>, <code>emoji</code>, <code>tags</code> (<code>vegano</code>, <code>vegetariano</code>, <code>sem-gluten</code>, <code>picante</code>, <code>novo</code>) e <code>destaque</code> (true marca o prato como o mais vendido). Clique em “Aplicar cardápio” para atualizar todos os modelos.</p>
+        <div class="f" style="margin-top:12px"><textarea id="c_json" spellcheck="false"></textarea></div>
+        <div class="panel-actions" style="border:0;padding-top:14px;margin-top:0">
+          <button class="btn btn-p btn-sm" id="btnJson">Aplicar cardápio</button>
+          <button class="btn btn-sm" id="btnJsonReset">Voltar ao cardápio de exemplo</button>
+          <span class="hint" id="jsonMsg" style="margin:0;align-self:center"></span>
+        </div>
+      </details>
+
+      <div class="panel-actions">
+        <a class="btn btn-p" href="#modelos">✓ Aplicar e ver os modelos</a>
+        <button class="btn" id="btnReset">Restaurar tudo ao padrão</button>
+        <button class="btn" id="btnExport">↓ Exportar meus dados (.json)</button>
+        <label class="btn" for="fileImp">↑ Importar dados</label>
+        <input type="file" id="fileImp" accept="application/json,.json" hidden>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODELOS ============ -->
+  <section id="modelos" class="sec">
+    <div class="sec-head">
+      <div class="kicker">Passo 2</div>
+      <h2>Catálogo de modelos</h2>
+      <p>Clique na miniatura para ver em tamanho real. Depois é só <b>baixar o HTML</b> (funciona sozinho, sem internet) ou <b>imprimir/salvar em PDF</b> pelo próprio navegador.</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-f="todos">Todos</button>
+        <button class="tab" data-f="digital">📱 Digitais</button>
+        <button class="tab" data-f="fisico">🖨 Impressos</button>
+        <button class="tab" data-f="marketing">📣 Marketing</button>
+      </div>
+      <div class="search"><input id="busca" placeholder="Buscar modelo (ex.: QR, delivery, A4, story…)" autocomplete="off"></div>
+      <span class="count" id="cont"></span>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- ============ GUIA ============ -->
+  <section id="guia" class="sec">
+    <div class="sec-head">
+      <div class="kicker">Passo 3</div>
+      <h2>Guia prático: como fazer um cardápio que vende</h2>
+      <p>O modelo bonito é metade do trabalho. A outra metade é decidir <b>o que entra, onde fica e por quanto sai</b>. Abaixo está o essencial, direto ao ponto.</p>
+    </div>
+
+    <div class="gcards">
+
+      <div class="gcard" style="grid-column:1/-1">
+        <span class="ic">🎯</span>
+        <h3>Engenharia de cardápio: classifique cada prato</h3>
+        <p>Pegue os últimos 90 dias de vendas e cruze duas informações de cada prato: <b>quanto ele vende</b> (popularidade) e <b>quanto ele deixa de margem</b> (preço de venda menos custo dos ingredientes). Todo prato cai em um dos quatro quadrantes:</p>
+        <div class="matrix">
+          <div class="mq star"><div class="lab">Vende muito · Margem alta</div><h4>⭐ Estrelas</h4><p>Seus campeões. Coloque no melhor lugar do cardápio, com foto e descrição caprichada. Não mexa na receita nem baixe o preço — teste subir 5%.</p></div>
+          <div class="mq horse"><div class="lab">Vende muito · Margem baixa</div><h4>🐴 Cavalos de batalha</h4><p>O povo ama, mas dá pouco lucro. Renegocie insumos, reduza porção com elegância, crie combo com bebida ou acompanhamento de margem alta.</p></div>
+          <div class="mq puzzle"><div class="lab">Vende pouco · Margem alta</div><h4>🧩 Quebra-cabeças</h4><p>Dão dinheiro mas ninguém pede. Renomeie, reposicione no topo da categoria, treine o garçom para sugerir, transforme em “sugestão do chef”.</p></div>
+          <div class="mq dog"><div class="lab">Vende pouco · Margem baixa</div><h4>🍍 Abacaxis</h4><p>Só ocupam espaço, estoque e cabeça da cozinha. Tire do cardápio — a não ser que seja item de assinatura ou exigência de um público fiel.</p></div>
+        </div>
+        <ul>
+          <li><b>Regra prática:</b> um cardápio enxuto vende mais. Entre <b>5 e 9 itens por categoria</b> é o ponto em que o cliente decide rápido e a cozinha entrega bem.</li>
+          <li><b>Refaça esse exercício a cada 3 ou 4 meses.</b> Prato que era estrela vira cavalo de batalha quando o insumo sobe.</li>
+        </ul>
+      </div>
+
+      <div class="gcard">
+        <span class="ic">💰</span>
+        <h3>Precificação e psicologia de preços</h3>
+        <ul>
+          <li><b>Tire o cifrão.</b> “48” dói menos que “R$ 48,00”. Menos símbolo de dinheiro, menos lembrança de gasto.</li>
+          <li><b>Não alinhe os preços em coluna à direita</b> com pontinhos. Isso faz o cliente comparar valores e escolher o mais barato. Coloque o preço logo após a descrição, no mesmo tamanho de fonte do texto.</li>
+          <li><b>Use uma âncora.</b> Um prato caro no topo faz os demais parecerem justos. Não precisa vender muito — ele existe para dar referência.</li>
+          <li><b>Preço quebrado x redondo:</b> 39,90 comunica oferta; 40 comunica qualidade. Casual usa quebrado, sofisticado usa redondo.</li>
+          <li><b>Formação de preço:</b> divida o custo do prato pelo CMV desejado. Custo de R$ 14 com meta de 30% de CMV = <b>R$ 46,70</b> de preço de venda. Use a calculadora abaixo.</li>
+        </ul>
+      </div>
+
+      <div class="gcard">
+        <span class="ic">👁</span>
+        <h3>Para onde o olho do cliente vai</h3>
+        <ul>
+          <li><b>Cardápio de uma página:</b> o olhar cai primeiro no <b>terço superior</b>. É ali que ficam os pratos de maior margem.</li>
+          <li><b>Cardápio aberto (duas páginas):</b> o ponto nobre é o <b>topo da página da direita</b>.</li>
+          <li><b>Dentro de cada categoria</b>, o cliente lembra melhor do <b>primeiro e do último item</b>. Nunca desperdice essas duas posições com um abacaxi.</li>
+          <li><b>Destaque custa caro:</b> caixa, moldura, cor ou ícone chamam o olho — mas se tudo é destaque, nada é. No máximo <b>2 destaques por página</b>.</li>
+          <li><b>Espaço em branco vende.</b> Cardápio lotado passa sensação de bufê barato.</li>
+        </ul>
+      </div>
+
+      <div class="gcard">
+        <span class="ic">✍️</span>
+        <h3>Descrições que dão água na boca</h3>
+        <p>Uma boa descrição tem quatro ingredientes: <b>origem</b> (de onde vem), <b>método</b> (como é feito), <b>sensorial</b> (textura, aroma) e <b>afeto</b> (história, quem criou). Não precisa dos quatro em cada prato — dois já mudam o jogo.</p>
+        <div class="cmp">
+          <div class="bad"><b>✗ Fraco</b>Costela com purê.<br><br>Não diz nada. Podia ser de qualquer lugar.</div>
+          <div class="good"><b>✓ Forte</b>Costela bovina assada por 12 horas, desmanchando, sobre purê rústico de mandioquinha e farofa de bacon crocante.<br><br>Método + textura + detalhe.</div>
+        </div>
+        <ul>
+          <li><b>Máximo de 20 a 25 palavras.</b> Passou disso, o cliente pula.</li>
+          <li><b>Liste os alergênicos com clareza</b> — glúten, lactose, castanhas, frutos do mar, ovo. É obrigação legal informar sobre glúten e ajuda muito na confiança.</li>
+          <li><b>Marque com ícone</b> as opções vegana, vegetariana e sem glúten. Um grupo de 4 pessoas escolhe o restaurante pela pessoa com restrição.</li>
+        </ul>
+      </div>
+
+      <div class="gcard">
+        <span class="ic">📱</span>
+        <h3>Cardápio digital e QR Code: o que dá errado</h3>
+        <ul>
+          <li><b>Os QR Codes dos modelos são ilustrativos.</b> Eles são um desenho de exemplo e não abrem nada. Gere o seu apontando para o link do cardápio e substitua a imagem antes de imprimir — depois teste com o celular.</li>
+          <li><b>Nunca use PDF no QR Code.</b> O cliente abre, dá zoom, se irrita e desiste. Use uma página HTML responsiva (todos os modelos digitais daqui são).</li>
+          <li><b>Link fixo, não o do PDF do mês.</b> Use sempre o mesmo endereço e atualize o conteúdo. Assim você não precisa reimprimir os QR Codes da mesa.</li>
+          <li><b>QR Code com no mínimo 2,5 cm</b> de lado, alto contraste, e sempre com uma frase acompanhando (“Aponte a câmera para ver o cardápio”).</li>
+          <li><b>Página leve.</b> Se demorar mais de 3 segundos no 4G dentro do salão, você perdeu o cliente.</li>
+          <li><b>Preço sempre visível e atualizado</b> — divergência entre o que está na tela e o que vem na conta gera reclamação e é problema com o Código de Defesa do Consumidor.</li>
+          <li><b>Ofereça alternativa impressa.</b> Nem todo cliente tem celular com câmera boa, internet ou vontade. Tenha ao menos alguns cardápios físicos.</li>
+        </ul>
+      </div>
+
+      <div class="gcard wide">
+        <span class="ic">🖨</span>
+        <h3>Especificações para gráfica (cardápio impresso)</h3>
+        <table class="tb">
+          <tr><th>Item</th><th>Recomendação</th></tr>
+          <tr><td>Papel do cardápio</td><td>Couché fosco 250–300 g/m², ou supremo 300 g para mais rigidez</td></tr>
+          <tr><td>Acabamento</td><td>Laminação fosca (não marca dedo) ou <i>soft touch</i>; verniz localizado no logo</td></tr>
+          <tr><td>Sangria</td><td>3 mm em cada lado, com margem de segurança de 5 mm para textos</td></tr>
+          <tr><td>Resolução</td><td>300 dpi nas imagens · cores em CMYK, não RGB</td></tr>
+          <tr><td>Formatos usuais</td><td>A4 21×29,7 · A5 14,8×21 · DL 10×21 · A3 dobrado 29,7×42</td></tr>
+          <tr><td>Tamanho de fonte</td><td>Mínimo 10 pt para descrição; salão com luz baixa pede 11–12 pt</td></tr>
+          <tr><td>Higiene</td><td>Laminado permite álcool; alternativa é porta-cardápio ou papel descartável</td></tr>
+          <tr><td>Preços que mudam</td><td>Deixe a página de bebidas separada, ou use encarte solto — reimprime só ela</td></tr>
+        </table>
+        <p class="hint">Ao imprimir daqui: use o navegador, escolha “Salvar como PDF”, ative <b>Gráficos de plano de fundo</b> e deixe as margens em <b>Padrão/Nenhuma</b>.</p>
+      </div>
+
+      <div class="gcard">
+        <span class="ic">📣</span>
+        <h3>Marketing: o que realmente move a agulha</h3>
+        <ul>
+          <li><b>Google Meu Negócio é o seu melhor canal gratuito.</b> Foto atualizada, horário certo, cardápio linkado e resposta em <b>todas</b> as avaliações — inclusive as ruins, com educação.</li>
+          <li><b>Responder avaliação negativa em público</b> converte mais que dez posts. Peça desculpa, explique o que mudou, convide para voltar.</li>
+          <li><b>Fotografia importa mais que design.</b> Luz natural, lateral, fundo neutro, prato levemente inclinado. Celular moderno com boa luz vence câmera cara com luz ruim.</li>
+          <li><b>Frequência realista:</b> 3 posts por semana bem feitos batem 1 por dia de qualquer jeito. Combine 1 prato, 1 bastidor e 1 pessoa/cliente.</li>
+          <li><b>Fidelidade simples funciona:</b> cartão de 10 selos com a 10ª por conta da casa é mais eficaz que app complicado.</li>
+          <li><b>Nome e telefone do cliente valem ouro.</b> Uma lista de WhatsApp com 300 clientes enche uma terça-feira morta.</li>
+          <li><b>Parceria com microinfluenciador local</b> (5 a 30 mil seguidores da cidade) rende mais que perfil nacional gigante.</li>
+        </ul>
+      </div>
+
+      <div class="gcard">
+        <span class="ic">📈</span>
+        <h3>Como aumentar o ticket médio</h3>
+        <ul>
+          <li><b>Sugestão nomeada.</b> “Quer acompanhar com nossa limonada suíça?” vende muito mais que “quer bebida?”.</li>
+          <li><b>Combo com desconto pequeno.</b> Prato + bebida + sobremesa com 8% de desconto aumenta o valor da conta e a margem total.</li>
+          <li><b>Entrada para compartilhar.</b> Item de mesa é o upsell mais fácil de aceitar em grupo.</li>
+          <li><b>Sobremesa no fim, no papel.</b> Um cardápio pequeno de sobremesas levado à mesa depois do prato converte muito mais que a lista no cardápio principal.</li>
+          <li><b>Duas opções de porção</b> (individual e para dois) — quem ia gastar 40 gasta 68.</li>
+          <li><b>Treine o time no cardápio.</b> Garçom que já provou o prato descreve melhor e vende mais.</li>
+        </ul>
+      </div>
+
+      <div class="gcard" style="grid-column:1/-1">
+        <span class="ic">📅</span>
+        <h3>Calendário de campanhas do ano</h3>
+        <div class="cal">
+          <div class="mo"><b>Janeiro</b><span>Volta da rotina · pratos leves e menu executivo · promoção de terça e quarta</span></div>
+          <div class="mo"><b>Fevereiro</b><span>Carnaval · petiscos e combos para grupo · horário estendido</span></div>
+          <div class="mo"><b>Março</b><span>Outono no cardápio · Dia da Mulher · lançamento de sazonais</span></div>
+          <div class="mo"><b>Abril</b><span>Páscoa · menu de peixe e bacalhau · sobremesas de chocolate</span></div>
+          <div class="mo"><b>Maio</b><span>Dia das Mães — a data mais forte do ano · reserva antecipada e menu especial</span></div>
+          <div class="mo"><b>Junho</b><span>Festa junina · Dia dos Namorados · menu a dois com sobremesa</span></div>
+          <div class="mo"><b>Julho</b><span>Férias escolares · menu infantil · pratos quentes e caldos</span></div>
+          <div class="mo"><b>Agosto</b><span>Dia dos Pais · cortes de carne, chopp e clima de churrasco</span></div>
+          <div class="mo"><b>Setembro</b><span>Primavera · renovação do cardápio · aniversário da casa</span></div>
+          <div class="mo"><b>Outubro</b><span>Dia das Crianças · Oktoberfest · Dia do Cliente e fidelidade</span></div>
+          <div class="mo"><b>Novembro</b><span>Black Friday em combos e vouchers · pré-venda de ceia</span></div>
+          <div class="mo"><b>Dezembro</b><span>Confraternizações — feche pacotes de grupo em outubro · ceia e vale-presente</span></div>
+        </div>
+      </div>
+
+      <div class="gcard wide">
+        <span class="ic">🧮</span>
+        <h3>Números para acompanhar toda semana</h3>
+        <table class="tb">
+          <tr><th>Indicador</th><th>Referência saudável</th></tr>
+          <tr><td>CMV (custo da mercadoria)</td><td>28% a 35% da receita · bar e bebidas costumam ficar abaixo</td></tr>
+          <tr><td>Folha de pagamento</td><td>25% a 30% da receita</td></tr>
+          <tr><td>Custo total (CMV + folha)</td><td>Idealmente até 60% a 65%</td></tr>
+          <tr><td>Aluguel</td><td>Até 8% a 10% do faturamento</td></tr>
+          <tr><td>Ticket médio</td><td>Faturamento ÷ número de clientes — acompanhe por turno</td></tr>
+          <tr><td>Giro de mesa</td><td>Clientes atendidos ÷ lugares, por serviço</td></tr>
+          <tr><td>Desperdício</td><td>Abaixo de 4% do custo de insumos</td></tr>
+          <tr><td>Margem de contribuição</td><td>Preço − custo direto: é o que sobra por prato para pagar as contas fixas</td></tr>
+        </table>
+      </div>
+
+      <div class="gcard">
+        <span class="ic">✅</span>
+        <h3>Checklist antes de publicar o cardápio</h3>
+        <ul class="chk">
+          <li>Revisão ortográfica feita por outra pessoa — erro em cardápio destrói percepção de qualidade</li>
+          <li>Todos os preços conferidos com o sistema do caixa</li>
+          <li>Nenhum prato listado que a cozinha não consiga entregar hoje</li>
+          <li>Alergênicos e opções vegana / vegetariana / sem glúten sinalizados</li>
+          <li>Taxa de serviço, couvert e taxa de entrega informados com clareza</li>
+          <li>Telefone, endereço, redes sociais e horário atualizados</li>
+          <li>Testado no celular, em tela pequena, e impresso em papel comum antes de mandar para a gráfica</li>
+          <li>QR Code testado por pelo menos três celulares diferentes</li>
+          <li>Versão em arquivo guardada e datada, para saber o que mudou</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ FERRAMENTAS ============ -->
+  <section id="ferramentas" class="sec">
+    <div class="sec-head">
+      <div class="kicker">Ferramenta</div>
+      <h2>Calculadora de preço de venda</h2>
+      <p>Some o custo real dos ingredientes de uma porção, defina o CMV que você quer atingir e descubra por quanto o prato precisa ser vendido.</p>
+    </div>
+    <div class="panel">
+      <div class="calc">
+        <div class="f">
+          <div style="margin-bottom:14px"><label for="k_nome">Nome do prato</label><input id="k_nome" value="Costela braseada 12h"></div>
+          <div class="grid-f">
+            <div><label for="k_custo">Custo dos ingredientes (R$)</label><input id="k_custo" type="number" step="0.01" min="0" value="14.50"></div>
+            <div><label for="k_cmv">CMV desejado (%)</label><input id="k_cmv" type="number" step="1" min="5" max="80" value="30"></div>
+            <div><label for="k_perda">Perda / desperdício (%)</label><input id="k_perda" type="number" step="1" min="0" max="50" value="5"></div>
+            <div><label for="k_emb">Embalagem / descartáveis (R$)</label><input id="k_emb" type="number" step="0.01" min="0" value="0"></div>
+            <div><label for="k_imp">Impostos sobre a venda (%)</label><input id="k_imp" type="number" step="0.1" min="0" max="30" value="6"></div>
+            <div><label for="k_tx">Taxa do app/cartão (%)</label><input id="k_tx" type="number" step="0.1" min="0" max="40" value="0"></div>
+          </div>
+          <p class="hint">Dica: se o prato for vendido por aplicativo de entrega, coloque a comissão do app (geralmente 12% a 27%) no campo de taxa e o custo da embalagem — o preço de delivery quase sempre precisa ser diferente do preço do salão.</p>
+        </div>
+        <div class="calc-out">
+          <div class="lbl">Preço de venda sugerido</div>
+          <div class="big" id="k_preco">R$ 0,00</div>
+          <div style="margin:14px 0 6px" class="lbl">Preço psicológico</div>
+          <div style="font-size:20px;font-weight:600" id="k_psico">—</div>
+          <div style="margin-top:18px">
+            <div class="calc-row"><span>Custo com perda</span><b id="k_r1">—</b></div>
+            <div class="calc-row"><span>Custo total (com embalagem)</span><b id="k_r2">—</b></div>
+            <div class="calc-row"><span>Impostos e taxas</span><b id="k_r3">—</b></div>
+            <div class="calc-row"><span>Margem de contribuição</span><b id="k_r4">—</b></div>
+            <div class="calc-row"><span>CMV real no preço final</span><b id="k_r5">—</b></div>
+            <div class="calc-row"><span>Markup aplicado</span><b id="k_r6">—</b></div>
+          </div>
+          <div class="warn ok" id="k_diag">Preencha os campos ao lado.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap fin">
+    <span>Central de Cardápios &amp; Marketing — arquivo único, funciona offline. Personalize, baixe e use à vontade.</span>
+    <span>Feito para donos de restaurante, bares, cafés, pizzarias e food service.</span>
+  </div>
+</footer>
+
+<div class="modal" id="modal">
+  <div class="modal-bg" data-close></div>
+  <div class="modal-in">
+    <div class="modal-top">
+      <div>
+        <h3 id="mTitle">—</h3>
+        <div class="fmt" id="mFmt">—</div>
+      </div>
+      <div class="modal-tools">
+        <button class="btn btn-sm" id="mZoomOut">−</button>
+        <button class="btn btn-sm" id="mZoomIn">+</button>
+        <button class="btn btn-sm" id="mNew">↗ Nova aba</button>
+        <button class="btn btn-sm" id="mCopy">⧉ Copiar código</button>
+        <button class="btn btn-sm" id="mPrint">🖨 Imprimir / PDF</button>
+        <button class="btn btn-p btn-sm" id="mDown">↓ Baixar HTML</button>
+        <button class="btn btn-sm" data-close>✕</button>
+      </div>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   1. DADOS PADRÃO
+   ============================================================ */
+const PADRAO = {
+  nome:'Sabor & Arte',
+  tagline:'Cozinha Contemporânea Brasileira',
+  telefone:'(16) 3333-0000 · WhatsApp (16) 99999-0000',
+  instagram:'@saborearte',
+  endereco:'Rua das Palmeiras, 120 — Centro, Ribeirão Preto/SP',
+  site:'saborearte.com.br',
+  horario:'Terça a domingo · 11h30–15h e 19h–23h',
+  entrega:'Entrega em 35–50 min · raio de 6 km',
+  promo:'Terça e quarta: 2 pratos executivos por R$ 79',
+  cupom:'BEMVINDO10',
+  paleta:'elegante',
+  fonte:'classico'
+};
+
+const CARDAPIO_PADRAO = [
+  { nome:'Entradas', nota:'Para começar bem, de preferência dividindo.', itens:[
+    { nome:'Burrata com tomate confitado', desc:'Burrata cremosa, tomates assados lentamente no azeite, manjericão fresco e pão de fermentação natural.', preco:52, emoji:'🧀', tags:['vegetariano'], destaque:true },
+    { nome:'Bolinho de bacalhau da casa', desc:'Seis unidades, receita da avó, com aioli de limão siciliano.', preco:46, emoji:'🐟', tags:[] },
+    { nome:'Carpaccio de beterraba', desc:'Beterraba assada em fatias finas, castanha-do-pará tostada, rúcula e redução de balsâmico.', preco:38, emoji:'🥗', tags:['vegano','sem-gluten'] },
+    { nome:'Bruschetta de linguiça artesanal', desc:'Pão de fermentação natural, linguiça defumada, cebola caramelizada e queijo canastra.', preco:42, emoji:'🥖', tags:['novo'] }
+  ]},
+  { nome:'Pratos principais', nota:'Todos acompanham entrada de pão da casa e manteiga temperada.', itens:[
+    { nome:'Costela braseada 12 horas', desc:'Costela bovina desmanchando, purê rústico de mandioquinha e farofa crocante de bacon.', preco:89, emoji:'🥩', tags:[], destaque:true },
+    { nome:'Risoto de cogumelos frescos', desc:'Arroz arbóreo, mix de shimeji, shiitake e paris, finalizado com parmesão de 24 meses.', preco:76, emoji:'🍄', tags:['vegetariano','sem-gluten'] },
+    { nome:'Salmão grelhado com legumes', desc:'Posta alta selada na manteiga de ervas, legumes da estação e purê de couve-flor.', preco:94, emoji:'🐟', tags:['sem-gluten'] },
+    { nome:'Nhoque de mandioquinha ao sugo', desc:'Massa leve feita na hora, molho de tomate italiano cozido lentamente e basilico.', preco:68, emoji:'🍝', tags:['vegetariano'] },
+    { nome:'Frango caipira com quiabo', desc:'Frango caipira cozido no próprio caldo, quiabo tostado, angu cremoso e pimenta biquinho.', preco:72, emoji:'🍗', tags:['picante'] },
+    { nome:'Moqueca de banana-da-terra', desc:'Leite de coco, dendê, pimentões, coentro e arroz de castanha. Serve duas pessoas.', preco:98, emoji:'🥥', tags:['vegano'] }
+  ]},
+  { nome:'Sobremesas', nota:'Feitas na casa, todos os dias.', itens:[
+    { nome:'Petit gâteau de doce de leite', desc:'Bolo quente com recheio corrente e sorvete de creme artesanal.', preco:34, emoji:'🍫', tags:[], destaque:true },
+    { nome:'Pudim de leite queimado', desc:'Receita clássica, textura firme, calda escura amarga na medida.', preco:26, emoji:'🍮', tags:['sem-gluten'] },
+    { nome:'Cheesecake de frutas vermelhas', desc:'Base crocante de biscoito amanteigado e calda fresca de amora e framboesa.', preco:32, emoji:'🍰', tags:[] },
+    { nome:'Sorvete de tapioca com melado', desc:'Sorvete artesanal de tapioca, melado de cana e crocante de castanha.', preco:24, emoji:'🍨', tags:['vegetariano','sem-gluten'] }
+  ]},
+  { nome:'Bebidas', nota:'Consulte a carta completa de vinhos e drinks autorais.', itens:[
+    { nome:'Limonada suíça da casa', desc:'Limão siciliano batido com leite condensado e hortelã.', preco:16, emoji:'🍋', tags:[] },
+    { nome:'Suco natural da estação', desc:'Fruta fresca do dia, sem açúcar adicionado.', preco:14, emoji:'🍊', tags:['vegano'] },
+    { nome:'Chopp artesanal pilsen 500ml', desc:'Produção local, torneira gelada, colarinho na régua.', preco:19, emoji:'🍺', tags:[] },
+    { nome:'Caipirinha de cachaça envelhecida', desc:'Cachaça de alambique, limão-taiti e açúcar demerara.', preco:28, emoji:'🍸', tags:[] },
+    { nome:'Vinho tinto em taça', desc:'Seleção do sommelier, consulte o rótulo do dia.', preco:32, emoji:'🍷', tags:[] },
+    { nome:'Café espresso', desc:'Grãos especiais torrados na semana.', preco:9, emoji:'☕', tags:[] }
+  ]}
+];
+
+const VINHOS = [
+  { regiao:'Brasil · Serra Gaúcha', itens:[
+    { nome:'Chardonnay Reserva', prod:'Vinícola do Vale', uva:'Chardonnay', safra:'2022', taca:34, gf:148 },
+    { nome:'Merlot Gran Reserva', prod:'Casa Antiga', uva:'Merlot', safra:'2020', taca:38, gf:172 },
+    { nome:'Espumante Brut Nature', prod:'Alta Encosta', uva:'Chardonnay / Pinot Noir', safra:'—', taca:36, gf:158 }
+  ]},
+  { regiao:'Argentina · Mendoza', itens:[
+    { nome:'Malbec de Altura', prod:'Finca del Sol', uva:'Malbec', safra:'2021', taca:42, gf:186 },
+    { nome:'Cabernet Franc', prod:'Valle Andino', uva:'Cabernet Franc', safra:'2019', taca:48, gf:224 }
+  ]},
+  { regiao:'Portugal · Douro e Alentejo', itens:[
+    { nome:'Douro Tinto Colheita', prod:'Quinta da Pedra', uva:'Touriga Nacional', safra:'2019', taca:46, gf:212 },
+    { nome:'Alentejano Branco', prod:'Herdade Velha', uva:'Antão Vaz / Arinto', safra:'2022', taca:34, gf:146 }
+  ]},
+  { regiao:'Itália e França', itens:[
+    { nome:'Chianti Classico DOCG', prod:'Podere Vecchio', uva:'Sangiovese', safra:'2020', taca:52, gf:238 },
+    { nome:'Côtes du Rhône', prod:'Domaine Laurent', uva:'Syrah / Grenache', safra:'2021', taca:49, gf:226 }
+  ]}
+];
+
+const EXECUTIVO = [
+  { dia:'Segunda', prato:'Feijoada leve com couve e laranja', acomp:'Arroz, farofa e vinagrete' },
+  { dia:'Terça', prato:'Filé de frango grelhado ao molho de ervas', acomp:'Arroz integral, legumes no vapor e salada' },
+  { dia:'Quarta', prato:'Estrogonofe de carne com batata palha', acomp:'Arroz branco e salada da estação' },
+  { dia:'Quinta', prato:'Nhoque ao sugo com almôndegas', acomp:'Salada verde e pão de alho' },
+  { dia:'Sexta', prato:'Peixe do dia com purê de mandioquinha', acomp:'Arroz de castanha e legumes assados' },
+  { dia:'Sábado', prato:'Costela na panela com polenta cremosa', acomp:'Arroz, farofa e salada' }
+];
+
+/* ============================================================
+   2. PALETAS E FONTES
+   ============================================================ */
+const PALETAS = [
+  { id:'elegante', nome:'Elegante Dourado', desc:'Fine dining, jantar',
+    acc:'#B0872B', acc2:'#8A6A20', accSoft:'#EFE2BF',
+    night:{ bg:'#0F0E0C', ink:'#F5F1E7', mut:'#A99F8B', line:'#2C2721', card:'#171512' },
+    paper:{ bg:'#FCFAF4', ink:'#1A1713', mut:'#6C655A', line:'#DFD6C2', card:'#F4EFE3' } },
+  { id:'rustico', nome:'Rústico Artesanal', desc:'Grill, boteco, hamburgueria',
+    acc:'#B85C2E', acc2:'#8F4520', accSoft:'#F0D9C4',
+    night:{ bg:'#17100B', ink:'#F6EDE3', mut:'#B09B88', line:'#33241A', card:'#1F1610' },
+    paper:{ bg:'#FBF4EA', ink:'#2A1B10', mut:'#75604D', line:'#E3D3BE', card:'#F3E7D6' } },
+  { id:'fresh', nome:'Fresh Saudável', desc:'Saladas, natural, vegano',
+    acc:'#3E8E45', acc2:'#2C6B31', accSoft:'#D2EBD3',
+    night:{ bg:'#0C1510', ink:'#EEF6EE', mut:'#96AE99', line:'#1E2E22', card:'#121D16' },
+    paper:{ bg:'#F7FBF5', ink:'#12240F', mut:'#5B6E59', line:'#D5E4D1', card:'#EAF3E6' } },
+  { id:'minimal', nome:'Moderno Minimal', desc:'Contemporâneo, urbano',
+    acc:'#E03E3E', acc2:'#B32A2A', accSoft:'#F8D4D4',
+    night:{ bg:'#0D0D0F', ink:'#F4F4F5', mut:'#9C9CA3', line:'#26262B', card:'#151517' },
+    paper:{ bg:'#FFFFFF', ink:'#111113', mut:'#67676E', line:'#E2E2E6', card:'#F5F5F7' } },
+  { id:'cafe', nome:'Café Aconchegante', desc:'Cafeteria, padaria, brunch',
+    acc:'#9E6B48', acc2:'#7B5034', accSoft:'#EEDCCB',
+    night:{ bg:'#150F0C', ink:'#F7EFE8', mut:'#B49E8D', line:'#2E221B', card:'#1D1511' },
+    paper:{ bg:'#FDF7F0', ink:'#2C1E15', mut:'#7A6555', line:'#E7D8C8', card:'#F5EADD' } },
+  { id:'sushi', nome:'Oriental Contemporâneo', desc:'Sushi, asiático, izakaya',
+    acc:'#C6392F', acc2:'#96261E', accSoft:'#F3D2CE',
+    night:{ bg:'#101214', ink:'#F2F3F2', mut:'#98A0A4', line:'#232A2E', card:'#161A1D' },
+    paper:{ bg:'#F7F6F2', ink:'#15181A', mut:'#5F686C', line:'#DDDCD4', card:'#EDECE5' } },
+  { id:'trattoria', nome:'Trattoria Italiana', desc:'Massas, pizzaria, cantina',
+    acc:'#2F6B3E', acc2:'#1F4B2B', accSoft:'#D5E7D8',
+    night:{ bg:'#131512', ink:'#F6F3EC', mut:'#A6A797', line:'#272B24', card:'#1A1D19' },
+    paper:{ bg:'#FDFAF2', ink:'#1D2119', mut:'#6B7062', line:'#E1DECE', card:'#F3EFE0' } },
+  { id:'tropical', nome:'Tropical Vibrante', desc:'Praia, açaí, food truck',
+    acc:'#F08A24', acc2:'#CB6A0E', accSoft:'#FCE2C1',
+    night:{ bg:'#101318', ink:'#F6F2EC', mut:'#A2A6AE', line:'#232833', card:'#161A21' },
+    paper:{ bg:'#FFFBF4', ink:'#191A1C', mut:'#6E6A63', line:'#EDE2D2', card:'#FDF2E2' } }
+];
+
+const FONTES = [
+  { id:'classico', nome:'Clássico Elegante', amostra:'Menu',
+    titulo:"'Playfair Display',Georgia,'Times New Roman',serif",
+    corpo:"'Lora',Georgia,serif" },
+  { id:'moderno', nome:'Moderno Limpo', amostra:'Menu',
+    titulo:"'Space Grotesk','Inter',system-ui,sans-serif",
+    corpo:"'Inter',system-ui,-apple-system,sans-serif" },
+  { id:'editorial', nome:'Editorial Sofisticado', amostra:'Menu',
+    titulo:"'Cormorant Garamond',Garamond,Georgia,serif",
+    corpo:"'Montserrat',system-ui,sans-serif" },
+  { id:'impacto', nome:'Impacto Urbano', amostra:'MENU',
+    titulo:"'Bebas Neue','Oswald',Impact,sans-serif",
+    corpo:"'Inter',system-ui,sans-serif" },
+  { id:'artesanal', nome:'Artesanal Afetivo', amostra:'Menu',
+    titulo:"'DM Serif Display',Georgia,serif",
+    corpo:"'Lora',Georgia,serif" },
+  { id:'bistro', nome:'Bistrô Condensado', amostra:'Menu',
+    titulo:"'Oswald','Bebas Neue',sans-serif",
+    corpo:"'Lora',Georgia,serif" }
+];
+
+/* ============================================================
+   3. ESTADO
+   ============================================================ */
+const CHAVE = 'cardapios-hub-v1';
+let CFG = Object.assign({}, PADRAO);
+let MENU = JSON.parse(JSON.stringify(CARDAPIO_PADRAO));
+
+function carregar(){
+  try{
+    const raw = localStorage.getItem(CHAVE);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    if(d.cfg) CFG = Object.assign({}, PADRAO, d.cfg);
+    if(Array.isArray(d.menu) && d.menu.length) MENU = d.menu;
+  }catch(e){}
+}
+function salvar(){
+  try{ localStorage.setItem(CHAVE, JSON.stringify({cfg:CFG, menu:MENU})); }catch(e){}
+}
+
+/* ============================================================
+   4. HELPERS COMPARTILHADOS PELOS MODELOS
+   ============================================================ */
+const FONT_LINK = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600;700&family=Oswald:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media=&#39;all&#39;">';
+
+function P(){ return PALETAS.find(p=>p.id===CFG.paleta) || PALETAS[0]; }
+function F(){ return FONTES.find(f=>f.id===CFG.fonte) || FONTES[0]; }
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function pr(v){ return Number(v).toFixed(2).replace('.',','); }
+function prBR(v){ return 'R$ ' + pr(v); }
+function prInt(v){ return Number(v)%1===0 ? String(Number(v)) : pr(v); }
+
+/** Variáveis CSS injetadas em todos os modelos. modo: 'paper' | 'night' */
+function vars(modo){
+  const p = P(), f = F(), c = p[modo||'paper'];
+  return `--bg:${c.bg};--ink:${c.ink};--mut:${c.mut};--line:${c.line};--card:${c.card};`
+       + `--acc:${p.acc};--acc2:${p.acc2};--soft:${p.accSoft};`
+       + `--ft:${f.titulo};--fb:${f.corpo};--fs:'Caveat',cursive;`;
+}
+
+/** Monta um documento HTML completo e autônomo. */
+function doc(titulo, css, corpo){
+  return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<title>' + esc(titulo) + '</title>' + FONT_LINK
+    + '<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}'
+    + css + '</style></head><body>' + corpo + '</body></html>';
+}
+
+/** Etiquetas dietéticas. */
+const TAGMAP = {
+  'vegano':{t:'VG', full:'Vegano'},
+  'vegetariano':{t:'VEG', full:'Vegetariano'},
+  'sem-gluten':{t:'SG', full:'Sem glúten'},
+  'picante':{t:'🌶', full:'Picante'},
+  'novo':{t:'NOVO', full:'Novidade'}
+};
+function tagsHTML(tags, cls){
+  if(!tags || !tags.length) return '';
+  return '<span class="' + (cls||'tags') + '">' + tags.map(t=>{
+    const m = TAGMAP[t]; return m ? '<i title="'+m.full+'">'+m.t+'</i>' : '';
+  }).join('') + '</span>';
+}
+function legenda(){
+  return 'VG vegano · VEG vegetariano · SG sem glúten · 🌶 picante';
+}
+function itens(cat){ return (cat && cat.itens) || []; }
+function todosItens(){ return MENU.reduce((a,c)=>a.concat(itens(c)),[]); }
+function destaques(n){
+  const d = todosItens().filter(i=>i.destaque);
+  const r = d.length ? d : todosItens();
+  return r.slice(0, n||3);
+}
+
+/** QR Code decorativo desenhado em CSS (placeholder visual). */
+function qrFake(size, dark, light){
+  const d = dark||'#111', l = light||'#fff';
+  const pat = [
+    '1111111 0 1101 0 1111111','1000001 0 0110 0 1000001','1011101 0 1011 0 1011101',
+    '1011101 0 0101 0 1011101','1011101 0 1100 0 1011101','1000001 0 0011 0 1000001',
+    '1111111 1 0101 1 1111111','0000000 0 1100 0 0000000','1101101 1 0110 1 0110110',
+    '0010110 0 1011 0 1101001','1100101 1 0100 1 0011011','0011010 0 1101 0 1100100',
+    '0000000 0 0110 0 1011011','1111111 0 1001 0 1010010','1000001 0 0110 0 0110101',
+    '1011101 0 1010 0 1101010','1011101 0 0101 0 0011001','1000001 0 1100 0 1100110',
+    '1111111 0 0011 0 0101101'
+  ].map(r=>r.replace(/ /g,''));
+  const n = pat.length;
+  let cells = '';
+  for(let y=0;y<n;y++) for(let x=0;x<pat[y].length;x++){
+    if(pat[y][x]==='1') cells += '<rect x="'+x+'" y="'+y+'" width="1" height="1"/>';
+  }
+  return '<svg viewBox="0 0 '+n+' '+n+'" width="'+size+'" height="'+size+'" shape-rendering="crispEdges" role="img" aria-label="QR Code">'
+       + '<rect width="'+n+'" height="'+n+'" fill="'+l+'"/><g fill="'+d+'">'+cells+'</g></svg>';
+}
+
+/** Bloco visual de "foto" do prato: gradiente + emoji (sem arquivos externos). */
+function fotoBox(item, h, radius){
+  const p = P();
+  return '<div class="foto" style="height:'+(h||120)+'px;border-radius:'+(radius||10)+'px">'
+       + '<span>'+ (item.emoji||'🍽') +'</span></div>';
+}
+const CSS_FOTO = '.foto{display:grid;place-items:center;background:linear-gradient(140deg,var(--soft),var(--card));overflow:hidden;flex:none}'
+  + '.foto span{font-size:2.4em;filter:saturate(1.1)}';
+
+/* ============================================================
+   5. REGISTRO DE MODELOS
+   Cada modelo: { id, nome, cat, formato, desc, tags, w, h, build() }
+   w = largura do viewport de renderização (px)
+   ============================================================ */
+const MODELOS = [];
+
+/* ---------- CSS base reaproveitado ---------- */
+function baseCSS(modo){
+  return `:root{${vars(modo)}}
+  body{background:var(--bg);color:var(--ink);font-family:var(--fb);line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{margin:0;font-family:var(--ft);font-weight:600;line-height:1.15}
+  p{margin:0}
+  .tags i{font-style:normal;font-size:9px;font-weight:700;letter-spacing:.06em;border:1px solid var(--acc);
+    color:var(--acc);border-radius:4px;padding:1px 4px;margin-left:5px;vertical-align:1px;white-space:nowrap}
+  .noprint{position:fixed;right:12px;top:12px;z-index:99;background:#111;color:#fff;text-align:left;
+    font-family:system-ui,-apple-system,sans-serif;font-size:11px;line-height:1.5;padding:9px 12px;
+    border-radius:8px;max-width:210px;opacity:.92}
+  @media print{.noprint{display:none!important}}
+  ${CSS_FOTO}`;
+}
+
+/* ============================================================
+   5.1 — CARDÁPIOS DIGITAIS
+   ============================================================ */
+
+/* 1. QR Code elegante — o clássico do "aponte a câmera" */
+MODELOS.push({
+  id:'qr-elegante', cat:'digital', w:390, h:1400,
+  nome:'Cardápio QR Code Elegante',
+  formato:'Página mobile · para QR Code na mesa',
+  desc:'Fundo escuro, tipografia sofisticada e navegação por categorias fixa no topo. O modelo mais usado em restaurantes de jantar.',
+  tags:['mobile','QR Code','jantar','sem fotos'],
+  build(){
+    const nav = MENU.map((c,i)=>`<a href="#c${i}">${esc(c.nome)}</a>`).join('');
+    const secoes = MENU.map((c,i)=>`
+      <section id="c${i}" class="cat">
+        <div class="cat-h"><h2>${esc(c.nome)}</h2><span class="rule"></span></div>
+        ${c.nota?`<p class="nota">${esc(c.nota)}</p>`:''}
+        ${itens(c).map(it=>`
+          <div class="item${it.destaque?' dest':''}">
+            <div class="l">
+              <h3>${esc(it.nome)}${tagsHTML(it.tags)}</h3>
+              <p>${esc(it.desc)}</p>
+              ${it.destaque?'<span class="flag">O mais pedido</span>':''}
+            </div>
+            <div class="p">${prInt(it.preco)}</div>
+          </div>`).join('')}
+      </section>`).join('');
+    return doc(CFG.nome+' — Cardápio', baseCSS('night')+`
+      body{padding-bottom:88px}
+      .hero{padding:44px 26px 30px;text-align:center;border-bottom:1px solid var(--line);
+        background:radial-gradient(120% 80% at 50% 0%,rgba(255,255,255,.05),transparent 70%)}
+      .orn{color:var(--acc);letter-spacing:.5em;font-size:11px;margin-bottom:14px}
+      .hero h1{font-size:34px;letter-spacing:-.01em}
+      .hero .tl{color:var(--acc);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;margin-top:12px}
+      .hero .inf{color:var(--mut);font-size:12.5px;margin-top:16px;line-height:1.7}
+      nav{position:sticky;top:0;z-index:9;display:flex;gap:6px;overflow-x:auto;padding:12px 18px;
+        background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);
+        border-bottom:1px solid var(--line);scrollbar-width:none}
+      nav::-webkit-scrollbar{display:none}
+      nav a{flex:none;text-decoration:none;color:var(--mut);font-size:12.5px;font-weight:600;letter-spacing:.04em;
+        text-transform:uppercase;padding:7px 14px;border:1px solid var(--line);border-radius:999px}
+      nav a:first-child{color:var(--acc);border-color:var(--acc)}
+      .cat{padding:34px 26px 6px;scroll-margin-top:60px}
+      .cat-h{display:flex;align-items:center;gap:14px}
+      .cat-h h2{font-size:23px;color:var(--acc);white-space:nowrap}
+      .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+      .nota{color:var(--mut);font-size:12.5px;font-style:italic;margin-top:8px}
+      .item{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+      .item:last-child{border-bottom:0}
+      .item.dest{border-left:2px solid var(--acc);padding-left:14px;margin-left:-16px}
+      .item h3{font-size:16px;font-weight:600}
+      .item p{color:var(--mut);font-size:13px;margin-top:5px}
+      .item .p{font-family:var(--ft);font-size:17px;color:var(--acc);white-space:nowrap;padding-top:2px}
+      .flag{display:inline-block;margin-top:8px;font-size:9.5px;font-weight:700;letter-spacing:.1em;
+        text-transform:uppercase;color:var(--bg);background:var(--acc);padding:3px 8px;border-radius:4px}
+      footer{margin-top:34px;padding:28px 26px 40px;text-align:center;border-top:1px solid var(--line)}
+      footer .leg{color:var(--mut);font-size:11px;letter-spacing:.03em}
+      footer .obs{color:var(--mut);font-size:11.5px;margin-top:14px;line-height:1.7}
+      .bar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;padding:12px 18px 18px;
+        background:linear-gradient(180deg,transparent,var(--bg) 34%)}
+      .bar a{flex:1;text-align:center;text-decoration:none;font-size:13.5px;font-weight:700;padding:13px;border-radius:11px}
+      .bar .w{background:var(--acc);color:var(--bg)}
+      .bar .c{border:1px solid var(--line);color:var(--ink)}
+    `,`
+      <div class="hero">
+        <div class="orn">❦</div>
+        <h1>${esc(CFG.nome)}</h1>
+        <div class="tl">${esc(CFG.tagline)}</div>
+        <div class="inf">${esc(CFG.horario)}<br>${esc(CFG.endereco)}</div>
+      </div>
+      <nav>${nav}</nav>
+      ${secoes}
+      <footer>
+        <div class="leg">${legenda()}</div>
+        <div class="obs">Consulte o garçom sobre restrições alimentares.<br>
+        Serviço de 10% opcional · ${esc(CFG.instagram)}</div>
+      </footer>
+      <div class="bar">
+        <a class="c" href="tel:${esc(CFG.telefone.replace(/[^0-9+]/g,''))}">Ligar</a>
+        <a class="w" href="https://wa.me/">Pedir pelo WhatsApp</a>
+      </div>`);
+  }
+});
+
+/* 2. Delivery com fotos — cards, o formato de app de entrega */
+MODELOS.push({
+  id:'delivery-fotos', cat:'digital', w:390, h:1400,
+  nome:'Cardápio Delivery com Fotos',
+  formato:'Página mobile · delivery e retirada',
+  desc:'Cards grandes com imagem, preço em destaque e botão de pedido. Formato que o cliente já conhece dos aplicativos de entrega.',
+  tags:['mobile','delivery','com fotos','botão de pedido'],
+  build(){
+    const chips = MENU.map((c,i)=>`<a href="#d${i}"${i===0?' class="on"':''}>${esc(c.nome)}</a>`).join('');
+    const secoes = MENU.map((c,i)=>`
+      <section id="d${i}">
+        <h2>${esc(c.nome)} <b>${itens(c).length}</b></h2>
+        ${itens(c).map(it=>`
+          <article class="card">
+            ${fotoBox(it,92,12)}
+            <div class="txt">
+              <h3>${esc(it.nome)}${tagsHTML(it.tags)}</h3>
+              <p>${esc(it.desc)}</p>
+              <div class="row">
+                <span class="pr">${prBR(it.preco)}</span>
+                <button class="add">Adicionar +</button>
+              </div>
+            </div>
+            ${it.destaque?'<span class="top">🔥 Mais pedido</span>':''}
+          </article>`).join('')}
+      </section>`).join('');
+    return doc(CFG.nome+' — Delivery', baseCSS('paper')+`
+      body{padding-bottom:80px}
+      header{background:var(--card);padding:20px 18px 16px;border-bottom:1px solid var(--line)}
+      header h1{font-size:22px}
+      header .sub{color:var(--mut);font-size:12.5px;margin-top:4px}
+      .meta{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+      .meta span{font-size:11.5px;font-weight:600;background:var(--bg);border:1px solid var(--line);
+        padding:5px 10px;border-radius:999px;color:var(--mut)}
+      .meta span.ok{color:#1c7a44;border-color:#b6e0c6;background:#eefaf2}
+      .promo{background:var(--acc);color:#fff;padding:11px 18px;font-size:12.5px;font-weight:700;text-align:center}
+      .chips{position:sticky;top:0;z-index:9;display:flex;gap:7px;overflow-x:auto;padding:12px 18px;
+        background:var(--bg);border-bottom:1px solid var(--line);scrollbar-width:none}
+      .chips::-webkit-scrollbar{display:none}
+      .chips a{flex:none;text-decoration:none;font-size:12.5px;font-weight:600;color:var(--mut);
+        padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card)}
+      .chips a.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+      section{padding:22px 18px 4px;scroll-margin-top:56px}
+      section h2{font-size:17px;display:flex;align-items:center;gap:8px}
+      section h2 b{font-family:var(--fb);font-size:11px;font-weight:600;color:var(--mut);
+        background:var(--card);border-radius:999px;padding:2px 8px}
+      .card{position:relative;display:flex;gap:13px;background:var(--card);border:1px solid var(--line);
+        border-radius:14px;padding:12px;margin-top:12px}
+      .card .foto{width:92px}
+      .txt{flex:1;min-width:0}
+      .card h3{font-family:var(--fb);font-size:14.5px;font-weight:700;line-height:1.3}
+      .card p{color:var(--mut);font-size:12px;margin-top:4px;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+      .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px}
+      .pr{font-size:16px;font-weight:800;color:var(--acc2)}
+      .add{border:0;background:var(--acc);color:#fff;font-family:inherit;font-size:11.5px;font-weight:700;
+        padding:7px 12px;border-radius:8px;cursor:pointer}
+      .top{position:absolute;top:-8px;left:12px;background:#e0483a;color:#fff;font-size:9.5px;font-weight:800;
+        letter-spacing:.04em;padding:3px 8px;border-radius:5px}
+      .cart{position:fixed;left:0;right:0;bottom:0;padding:12px 18px 18px;background:var(--bg);
+        border-top:1px solid var(--line)}
+      .cart button{width:100%;border:0;background:var(--acc);color:#fff;font-family:inherit;font-size:14.5px;
+        font-weight:700;padding:15px;border-radius:12px;cursor:pointer;
+        display:flex;justify-content:space-between;padding-inline:18px}
+      footer{padding:26px 18px 20px;text-align:center;color:var(--mut);font-size:11.5px;line-height:1.7}
+    `,`
+      <header>
+        <h1>${esc(CFG.nome)}</h1>
+        <div class="sub">${esc(CFG.tagline)}</div>
+        <div class="meta">
+          <span class="ok">● Aberto agora</span>
+          <span>🛵 ${esc(CFG.entrega)}</span>
+          <span>★ 4,8 (612)</span>
+        </div>
+      </header>
+      <div class="promo">🎁 ${esc(CFG.promo)}</div>
+      <div class="chips">${chips}</div>
+      ${secoes}
+      <footer>
+        ${legenda()}<br><br>
+        ${esc(CFG.endereco)}<br>${esc(CFG.telefone)}<br>Pedido mínimo R$ 30 · Pagamento na entrega ou pelo site
+      </footer>
+      <div class="cart"><button><span>Ver sacola</span><span>R$ 0,00</span></button></div>`);
+  }
+});
+
+/* 3. Link na bio — hub de links do Instagram */
+MODELOS.push({
+  id:'linkbio', cat:'digital', w:390, h:1000,
+  nome:'Página "Link na Bio"',
+  formato:'Página mobile · link do Instagram',
+  desc:'Um único link que reúne cardápio, WhatsApp, reserva, apps de entrega e localização. Substitui os agregadores pagos.',
+  tags:['mobile','Instagram','links','WhatsApp'],
+  build(){
+    const links = [
+      ['📖','Ver o cardápio completo','Pratos, bebidas e sobremesas'],
+      ['🛵','Pedir delivery','Entrega própria, sem taxa de app'],
+      ['💬','Falar no WhatsApp','Reservas e encomendas'],
+      ['🗓','Reservar uma mesa','Grupos a partir de 6 pessoas'],
+      ['📍','Como chegar','Estacionamento no local'],
+      ['🎁','Clube de vantagens','Cupom de boas-vindas '+CFG.cupom]
+    ];
+    return doc(CFG.nome+' — Links', baseCSS('night')+`
+      body{min-height:100%;padding:38px 24px 44px;text-align:center;
+        background:radial-gradient(100% 60% at 50% 0%,color-mix(in srgb,var(--acc) 22%,var(--bg)),var(--bg) 70%)}
+      .av{width:92px;height:92px;border-radius:50%;margin:0 auto;display:grid;place-items:center;font-size:40px;
+        background:linear-gradient(140deg,var(--acc),var(--acc2));box-shadow:0 12px 34px rgba(0,0,0,.35)}
+      h1{font-size:26px;margin-top:18px}
+      .tl{color:var(--acc);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;margin-top:8px}
+      .bio{color:var(--mut);font-size:13px;margin-top:12px;line-height:1.65}
+      .lk{display:flex;align-items:center;gap:14px;text-align:left;text-decoration:none;color:var(--ink);
+        background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:12px}
+      .lk .ic{font-size:20px;width:26px;text-align:center;flex:none}
+      .lk b{display:block;font-size:14.5px;font-weight:650}
+      .lk small{color:var(--mut);font-size:11.5px}
+      .lk .ar{margin-left:auto;color:var(--acc);font-size:17px}
+      .hr{margin:30px 0 20px;height:1px;background:var(--line)}
+      .soc{display:flex;gap:10px;justify-content:center}
+      .soc span{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);display:grid;
+        place-items:center;font-size:17px}
+      .ft{color:var(--mut);font-size:11.5px;margin-top:22px;line-height:1.8}
+    `,`
+      <div class="av">🍽</div>
+      <h1>${esc(CFG.nome)}</h1>
+      <div class="tl">${esc(CFG.tagline)}</div>
+      <p class="bio">${esc(CFG.horario)}<br>${esc(CFG.endereco)}</p>
+      ${links.map(l=>`<a class="lk" href="#"><span class="ic">${l[0]}</span>
+        <span><b>${esc(l[1])}</b><small>${esc(l[2])}</small></span><span class="ar">›</span></a>`).join('')}
+      <div class="hr"></div>
+      <div class="soc"><span>📷</span><span>💬</span><span>📘</span><span>🎵</span></div>
+      <div class="ft">${esc(CFG.instagram)} · ${esc(CFG.site)}<br>${esc(CFG.telefone)}</div>`);
+  }
+});
+
+/* 4. Totem / tablet de autoatendimento */
+MODELOS.push({
+  id:'totem', cat:'digital', w:1024, h:768,
+  nome:'Totem / Tablet de Autoatendimento',
+  formato:'Tela 1024×768 · paisagem',
+  desc:'Categorias na lateral, grade de pratos com botões grandes e carrinho fixo. Para totem de fast-food, praça de alimentação ou tablet na mesa.',
+  tags:['tablet','totem','autoatendimento','tela cheia'],
+  build(){
+    const cat = MENU[1] || MENU[0];
+    return doc(CFG.nome+' — Autoatendimento', baseCSS('paper')+`
+      body{height:768px;display:flex;overflow:hidden}
+      aside{width:212px;flex:none;background:var(--card);border-right:1px solid var(--line);
+        display:flex;flex-direction:column;padding:22px 0}
+      aside .lg{padding:0 22px 22px;border-bottom:1px solid var(--line)}
+      aside .lg h1{font-size:20px;line-height:1.2}
+      aside .lg small{color:var(--mut);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+      aside nav{padding:14px 12px;flex:1;overflow:auto}
+      aside a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--mut);font-weight:600;
+        font-size:14px;padding:13px 14px;border-radius:11px;margin-bottom:4px}
+      aside a.on{background:var(--acc);color:#fff}
+      aside a em{font-style:normal;font-size:17px}
+      main{flex:1;display:flex;flex-direction:column;min-width:0}
+      .bar{display:flex;align-items:center;gap:14px;padding:18px 26px;border-bottom:1px solid var(--line)}
+      .bar h2{font-size:23px}
+      .bar .hint{margin-left:auto;color:var(--mut);font-size:12.5px}
+      .grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px 26px}
+      .it{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+        display:flex;flex-direction:column}
+      .it .foto{border-radius:0;height:112px}
+      .it .b{padding:13px 14px 14px;display:flex;flex-direction:column;flex:1}
+      .it h3{font-family:var(--fb);font-size:14.5px;font-weight:700;line-height:1.25}
+      .it p{color:var(--mut);font-size:11.5px;margin-top:5px;flex:1;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+      .it .f{display:flex;align-items:center;justify-content:space-between;margin-top:11px}
+      .it .pr{font-size:17px;font-weight:800;color:var(--acc2)}
+      .it button{border:0;background:var(--acc);color:#fff;font-family:inherit;font-weight:800;font-size:19px;
+        width:38px;height:38px;border-radius:10px;cursor:pointer}
+      .foot{display:flex;align-items:center;gap:16px;padding:14px 26px;border-top:1px solid var(--line);
+        background:var(--card)}
+      .foot .tt{font-size:13px;color:var(--mut)}
+      .foot .tt b{display:block;font-size:22px;color:var(--ink);font-family:var(--ft)}
+      .foot button{margin-left:auto;border:0;background:var(--acc);color:#fff;font-family:inherit;
+        font-size:16px;font-weight:700;padding:15px 40px;border-radius:12px;cursor:pointer}
+      .foot .ghost{background:transparent;color:var(--mut);border:1px solid var(--line);margin-left:0;padding:15px 24px}
+    `,`
+      <aside>
+        <div class="lg"><h1>${esc(CFG.nome)}</h1><small>${esc(CFG.tagline)}</small></div>
+        <nav>
+          ${MENU.map((c,i)=>`<a href="#"${i===1||MENU.length===1&&i===0?' class="on"':''}><em>${itens(c)[0]?(itens(c)[0].emoji||'🍽'):'🍽'}</em>${esc(c.nome)}</a>`).join('')}
+          <a href="#"><em>🎁</em>Combos</a>
+        </nav>
+      </aside>
+      <main>
+        <div class="bar"><h2>${esc(cat.nome)}</h2>
+          <span class="hint">Toque no prato para escolher os acompanhamentos</span></div>
+        <div class="grid">
+          ${itens(cat).slice(0,6).map(it=>`
+            <div class="it">${fotoBox(it,112,0)}
+              <div class="b"><h3>${esc(it.nome)}${tagsHTML(it.tags)}</h3><p>${esc(it.desc)}</p>
+                <div class="f"><span class="pr">${prBR(it.preco)}</span><button>+</button></div></div>
+            </div>`).join('')}
+        </div>
+        <div class="foot">
+          <button class="ghost">Cancelar</button>
+          <div class="tt">Sacola · 0 itens<b>R$ 0,00</b></div>
+          <button>Finalizar pedido →</button>
+        </div>
+      </main>`);
+  }
+});
+
+/* 5. Site one-page do restaurante */
+MODELOS.push({
+  id:'site-onepage', cat:'digital', w:1280, h:2600,
+  nome:'Site One-Page do Restaurante',
+  formato:'Site desktop e mobile · página única',
+  desc:'Site completo em uma página: capa, história, destaques do cardápio, avaliações, informações práticas e chamada para reserva.',
+  tags:['site','desktop','responsivo','institucional'],
+  build(){
+    const dest = destaques(3);
+    return doc(CFG.nome, baseCSS('night')+`
+      .nv{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:28px;padding:18px 56px;
+        background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+      .nv b{font-family:var(--ft);font-size:19px}
+      .nv a{margin-left:auto;text-decoration:none;color:var(--mut);font-size:13.5px}
+      .nv a+a{margin-left:0}
+      .nv .cta{background:var(--acc);color:var(--bg);font-weight:700;padding:10px 18px;border-radius:8px}
+      .hero{position:relative;min-height:520px;display:grid;place-items:center;text-align:center;padding:80px 56px;
+        background:radial-gradient(80% 100% at 50% 0%,color-mix(in srgb,var(--acc) 20%,var(--bg)),var(--bg))}
+      .hero .orn{color:var(--acc);letter-spacing:.6em;font-size:12px}
+      .hero h1{font-size:66px;margin:22px 0 0;letter-spacing:-.02em}
+      .hero .tl{color:var(--acc);letter-spacing:.28em;text-transform:uppercase;font-size:12.5px;margin-top:18px}
+      .hero p{color:var(--mut);max-width:560px;margin:22px auto 0;font-size:16px}
+      .hero .btns{display:flex;gap:12px;justify-content:center;margin-top:32px}
+      .b1,.b2{text-decoration:none;font-weight:700;font-size:14px;padding:14px 28px;border-radius:10px}
+      .b1{background:var(--acc);color:var(--bg)} .b2{border:1px solid var(--line);color:var(--ink)}
+      section{padding:76px 56px;max-width:1160px;margin:0 auto}
+      .kk{color:var(--acc);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:12px}
+      h2{font-size:40px}
+      .two{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+      .two p{color:var(--mut);margin-top:18px;font-size:15.5px}
+      .ph{height:340px;border-radius:18px;display:grid;place-items:center;font-size:96px;
+        background:linear-gradient(140deg,var(--soft),var(--card))}
+      .dg{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:38px}
+      .dc{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+      .dc .foto{border-radius:0;height:172px}
+      .dc .b{padding:18px 20px 22px}
+      .dc h3{font-size:19px}
+      .dc p{color:var(--mut);font-size:13.5px;margin-top:8px;min-height:56px}
+      .dc .pr{color:var(--acc);font-family:var(--ft);font-size:21px;margin-top:12px;display:block}
+      .center{text-align:center}
+      .rv{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:38px}
+      .rc{border:1px solid var(--line);border-radius:16px;padding:24px}
+      .rc .st{color:var(--acc);letter-spacing:.14em}
+      .rc p{color:var(--mut);font-size:14px;margin-top:12px;font-style:italic}
+      .rc b{display:block;margin-top:16px;font-size:13px}
+      .info{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:38px}
+      .ic{border:1px solid var(--line);border-radius:16px;padding:26px;text-align:center}
+      .ic em{font-style:normal;font-size:26px} .ic b{display:block;margin:12px 0 6px;font-size:15px}
+      .ic span{color:var(--mut);font-size:13.5px;line-height:1.7}
+      .cta-b{margin:0 56px 76px;border:1px solid var(--line);border-radius:22px;padding:60px;text-align:center;
+        background:radial-gradient(70% 120% at 50% 0%,color-mix(in srgb,var(--acc) 16%,var(--bg)),var(--bg))}
+      .cta-b h2{font-size:36px} .cta-b p{color:var(--mut);margin:14px 0 28px}
+      footer{border-top:1px solid var(--line);padding:36px 56px;display:flex;justify-content:space-between;
+        color:var(--mut);font-size:13px;flex-wrap:wrap;gap:12px}
+      @media(max-width:820px){.two,.dg,.rv,.info{grid-template-columns:1fr}.hero h1{font-size:40px}
+        section,.nv{padding-inline:24px}.cta-b{margin-inline:24px;padding:36px}}
+    `,`
+      <div class="nv"><b>${esc(CFG.nome)}</b>
+        <a href="#sobre">Sobre</a><a href="#menu">Cardápio</a><a href="#visita">Visite</a>
+        <a class="cta" href="#">Reservar mesa</a></div>
+      <div class="hero">
+        <div>
+          <div class="orn">❦</div>
+          <h1>${esc(CFG.nome)}</h1>
+          <div class="tl">${esc(CFG.tagline)}</div>
+          <p>Ingredientes de produtores locais, fogo baixo e tempo — a cozinha que a gente serviria em casa, feita todos os dias para você.</p>
+          <div class="btns"><a class="b1" href="#menu">Ver o cardápio</a><a class="b2" href="#">Pedir delivery</a></div>
+        </div>
+      </div>
+      <section id="sobre"><div class="two">
+        <div><div class="kk">Nossa casa</div><h2>Comida de verdade,<br>sem pressa</h2>
+          <p>Abrimos as portas com uma ideia simples: servir pratos que respeitam o ingrediente e o tempo de cozimento. Nossa carne descansa doze horas no forno, o pão é de fermentação natural e o molho de tomate cozinha desde cedo.</p>
+          <p>A horta é nossa, os produtores são vizinhos e o cardápio muda com a estação — por isso alguns pratos aparecem só em certas épocas do ano.</p></div>
+        <div class="ph">👨‍🍳</div>
+      </div></section>
+      <section id="menu" class="center">
+        <div class="kk">Do nosso cardápio</div><h2>Os pratos mais pedidos</h2>
+        <div class="dg">${dest.map(it=>`<div class="dc">${fotoBox(it,172,0)}
+          <div class="b"><h3>${esc(it.nome)}</h3><p>${esc(it.desc)}</p>
+          <span class="pr">${prBR(it.preco)}</span></div></div>`).join('')}</div>
+        <div style="margin-top:36px"><a class="b1" href="#">Cardápio completo</a></div>
+      </section>
+      <section class="center">
+        <div class="kk">Quem já veio</div><h2>O que dizem sobre nós</h2>
+        <div class="rv">
+          <div class="rc"><div class="st">★★★★★</div><p>“A costela desmancha no garfo. Voltamos três vezes no mesmo mês e o atendimento nunca caiu de nível.”</p><b>Marina R.</b></div>
+          <div class="rc"><div class="st">★★★★★</div><p>“Melhor risoto da cidade, e o único lugar onde a opção vegana não é só uma salada triste.”</p><b>Paulo H.</b></div>
+          <div class="rc"><div class="st">★★★★★</div><p>“Levei clientes para almoçar e todos pediram o contato do restaurante. Ambiente perfeito para conversar.”</p><b>Renata C.</b></div>
+        </div>
+      </section>
+      <section id="visita" class="center">
+        <div class="kk">Informações</div><h2>Venha nos visitar</h2>
+        <div class="info">
+          <div class="ic"><em>📍</em><b>Endereço</b><span>${esc(CFG.endereco)}</span></div>
+          <div class="ic"><em>🕐</em><b>Horário</b><span>${esc(CFG.horario)}</span></div>
+          <div class="ic"><em>📞</em><b>Contato</b><span>${esc(CFG.telefone)}<br>${esc(CFG.instagram)}</span></div>
+        </div>
+      </section>
+      <div class="cta-b"><h2>Mesa reservada, noite resolvida</h2>
+        <p>${esc(CFG.promo)}</p><a class="b1" href="#">Reservar agora</a></div>
+      <footer><span>© ${esc(CFG.nome)} · ${esc(CFG.site)}</span><span>${esc(CFG.instagram)} · ${esc(CFG.telefone)}</span></footer>`);
+  }
+});
+
+/* 6. Lista rápida — texto puro, super leve */
+MODELOS.push({
+  id:'lista-rapida', cat:'digital', w:390, h:1200,
+  nome:'Cardápio Lista Rápida',
+  formato:'Página mobile ultraleve',
+  desc:'Só texto e preço, carrega instantaneamente até em internet ruim. Ideal para bar, lanchonete, marmitaria e para copiar e colar no WhatsApp.',
+  tags:['mobile','leve','sem fotos','WhatsApp'],
+  build(){
+    return doc(CFG.nome+' — Cardápio', baseCSS('paper')+`
+      body{padding:24px 20px 40px;max-width:520px;margin:0 auto}
+      header{text-align:center;padding-bottom:20px;border-bottom:2px solid var(--ink)}
+      header h1{font-size:26px} header .tl{color:var(--mut);font-size:12.5px;margin-top:6px}
+      header .up{margin-top:12px;display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;
+        text-transform:uppercase;background:var(--soft);color:var(--acc2);padding:4px 10px;border-radius:5px}
+      h2{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
+        margin:28px 0 4px;padding-bottom:7px;border-bottom:1px solid var(--line);font-family:var(--fb);font-weight:700}
+      .li{display:flex;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px dotted var(--line)}
+      .li:last-child{border-bottom:0}
+      .li .n{font-weight:600;font-size:14.5px}
+      .li .n small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:2px}
+      .li .d{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-3px);min-width:16px}
+      .li .p{font-weight:700;font-size:14.5px;white-space:nowrap}
+      .obs{margin-top:30px;padding:16px;background:var(--card);border-radius:11px;font-size:12px;
+        color:var(--mut);line-height:1.75}
+      .wa{display:block;text-align:center;text-decoration:none;margin-top:22px;background:#25D366;color:#fff;
+        font-weight:700;padding:15px;border-radius:11px;font-size:14.5px}
+    `,`
+      <header><h1>${esc(CFG.nome)}</h1><div class="tl">${esc(CFG.tagline)}</div>
+        <span class="up">Cardápio atualizado</span></header>
+      ${MENU.map(c=>`<h2>${esc(c.nome)}</h2>
+        ${itens(c).map(it=>`<div class="li"><span class="n">${esc(it.nome)}${tagsHTML(it.tags)}
+          <small>${esc(it.desc)}</small></span><span class="d"></span>
+          <span class="p">${prBR(it.preco)}</span></div>`).join('')}`).join('')}
+      <div class="obs">${legenda()}<br><br>
+        <b>Horário:</b> ${esc(CFG.horario)}<br>
+        <b>Endereço:</b> ${esc(CFG.endereco)}<br>
+        <b>Pedidos:</b> ${esc(CFG.telefone)}<br>
+        Preços sujeitos a alteração sem aviso prévio. Taxa de serviço de 10% opcional.</div>
+      <a class="wa" href="https://wa.me/">💬 Fazer pedido pelo WhatsApp</a>`);
+  }
+});
+
+/* 7. Menu do dia / executivo semanal */
+MODELOS.push({
+  id:'menu-dia', cat:'digital', w:390, h:1100,
+  nome:'Menu do Dia / Executivo',
+  formato:'Página mobile · almoço da semana',
+  desc:'O prato de cada dia da semana em destaque, com o valor do executivo e as opções fixas. Perfeito para almoço comercial e marmitaria.',
+  tags:['mobile','almoço','semanal','executivo'],
+  build(){
+    return doc(CFG.nome+' — Menu do dia', baseCSS('paper')+`
+      body{padding-bottom:34px}
+      header{background:var(--acc);color:#fff;padding:26px 22px 22px;text-align:center}
+      header h1{font-size:24px;color:#fff}
+      header .tl{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;opacity:.9;margin-top:6px}
+      .preco{display:inline-block;margin-top:16px;background:#fff;color:var(--acc2);font-family:var(--ft);
+        font-size:26px;padding:8px 22px;border-radius:999px}
+      .preco small{display:block;font-family:var(--fb);font-size:10px;letter-spacing:.1em;
+        text-transform:uppercase;opacity:.65;margin-top:-2px}
+      .hoje{margin:20px 18px 0;background:var(--card);border:2px solid var(--acc);border-radius:16px;padding:20px}
+      .hoje .tag{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--acc2)}
+      .hoje h2{font-size:22px;margin-top:8px}
+      .hoje p{color:var(--mut);font-size:13px;margin-top:7px}
+      .semana{padding:26px 18px 0}
+      .semana h3{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);
+        font-family:var(--fb);font-weight:700;margin-bottom:12px}
+      .dia{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
+      .dia b{width:64px;flex:none;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc2);padding-top:2px}
+      .dia .t{font-size:14px;font-weight:600}
+      .dia .s{color:var(--mut);font-size:12px;margin-top:3px}
+      .inc{margin:26px 18px 0;background:var(--soft);border-radius:14px;padding:18px 20px}
+      .inc h3{font-size:14px;margin-bottom:10px;color:#3a2a10}
+      .inc ul{margin:0;padding-left:18px;color:#4b3a1e;font-size:13px;line-height:1.9}
+      .ft{padding:24px 20px;text-align:center;color:var(--mut);font-size:12px;line-height:1.8}
+    `,`
+      <header><h1>${esc(CFG.nome)}</h1><div class="tl">Almoço executivo</div>
+        <div class="preco">R$ 44,90<small>por pessoa</small></div></header>
+      <div class="hoje"><span class="tag">● Hoje</span>
+        <h2>${esc(EXECUTIVO[0].prato)}</h2><p>${esc(EXECUTIVO[0].acomp)}</p></div>
+      <div class="semana"><h3>O resto da semana</h3>
+        ${EXECUTIVO.slice(1).map(d=>`<div class="dia"><b>${esc(d.dia)}</b>
+          <div><div class="t">${esc(d.prato)}</div><div class="s">${esc(d.acomp)}</div></div></div>`).join('')}
+      </div>
+      <div class="inc"><h3>Todo executivo já inclui</h3>
+        <ul><li>Buffet de saladas à vontade</li><li>Suco natural ou refrigerante lata</li>
+        <li>Sobremesa do dia</li><li>Cafezinho</li></ul></div>
+      <div class="ft">Servimos de ${esc(CFG.horario)}<br>${esc(CFG.endereco)}<br>
+        Marmita para viagem: ${esc(CFG.telefone)}<br>${legenda()}</div>`);
+  }
+});
+/* ============================================================
+   5.2 — CARDÁPIOS IMPRESSOS
+   ============================================================ */
+
+/* CSS comum de impressão. tam: '210mm 297mm', 'A4 landscape', etc. */
+function printCSS(tam, margem){
+  return `@page{size:${tam};margin:${margem||'0'}}
+  body{background:#5a5d63;display:flex;flex-direction:column;align-items:center;gap:16px;padding:16px 0}
+  .page{background:var(--bg);color:var(--ink);position:relative;overflow:hidden;
+    box-shadow:0 8px 34px rgba(0,0,0,.35)}
+  @media print{body{background:none;padding:0;gap:0;display:block}
+    .page{box-shadow:none;break-after:page;page-break-after:always}
+    .page:last-child{break-after:auto;page-break-after:auto}}`;
+}
+const DICA_PRINT = '<div class="noprint"><b>Para imprimir:</b> Ctrl/⌘+P → ative “Gráficos de plano de fundo” e deixe as margens em “Nenhuma”.<br><br><b>Atenção:</b> o QR Code deste modelo é um desenho de exemplo e não abre nada. Gere o seu apontando para o link do cardápio e troque a imagem antes de mandar para a gráfica.<br><br>Este aviso não sai na impressão.</div>';
+
+/* 8. A4 clássico de jantar */
+MODELOS.push({
+  id:'a4-classico', cat:'fisico', w:794, h:1123,
+  nome:'Cardápio A4 Clássico',
+  formato:'A4 retrato · 21 × 29,7 cm',
+  desc:'Duas colunas, tipografia serifada e preço discreto ao lado do prato. O formato de restaurante de jantar, para papel couché fosco 300g.',
+  tags:['A4','jantar','2 colunas','sem fotos'],
+  build(){
+    const meio = Math.ceil(MENU.length/2);
+    const col = arr => arr.map(c=>`
+      <div class="cat">
+        <h2>${esc(c.nome)}</h2>
+        ${c.nota?`<p class="nota">${esc(c.nota)}</p>`:''}
+        ${itens(c).map(it=>`<div class="it">
+          <div class="hd"><span class="nm">${esc(it.nome)}${tagsHTML(it.tags)}</span>
+            <span class="pc">${prInt(it.preco)}</span></div>
+          <p>${esc(it.desc)}</p></div>`).join('')}
+      </div>`).join('');
+    return doc(CFG.nome+' — Cardápio A4', baseCSS('paper')+printCSS('210mm 297mm')+`
+      .page{width:210mm;height:297mm;padding:18mm 16mm 14mm}
+      .page::before{content:'';position:absolute;inset:8mm;border:1px solid var(--line);pointer-events:none}
+      header{text-align:center;padding-bottom:9mm;margin-bottom:8mm;border-bottom:1px solid var(--line);position:relative}
+      .orn{color:var(--acc);letter-spacing:.6em;font-size:10pt}
+      header h1{font-size:30pt;margin:4mm 0 0;letter-spacing:-.01em}
+      header .tl{color:var(--acc);font-size:8.5pt;letter-spacing:.32em;text-transform:uppercase;margin-top:3mm}
+      .cols{column-count:2;column-gap:11mm;column-rule:1px solid var(--line)}
+      .cat{break-inside:avoid;margin-bottom:8mm}
+      .cat h2{font-size:14pt;color:var(--acc2);text-align:center;letter-spacing:.16em;text-transform:uppercase;
+        font-family:var(--fb);font-weight:700;padding-bottom:2mm;border-bottom:1px solid var(--line);margin-bottom:3mm}
+      .nota{text-align:center;font-size:7.5pt;font-style:italic;color:var(--mut);margin-bottom:4mm}
+      .it{margin-bottom:4.5mm;break-inside:avoid}
+      .hd{display:flex;gap:3mm;align-items:baseline}
+      .nm{font-weight:600;font-size:10.5pt;flex:1}
+      .pc{font-size:10.5pt;color:var(--acc2);font-weight:600}
+      .it p{font-size:8.5pt;color:var(--mut);line-height:1.5;margin-top:1mm}
+      .tags i{font-size:6.5pt}
+      footer{position:absolute;left:16mm;right:16mm;bottom:12mm;text-align:center;
+        border-top:1px solid var(--line);padding-top:4mm}
+      footer .lg{font-size:7pt;color:var(--mut);letter-spacing:.05em}
+      footer .in{font-size:8pt;color:var(--mut);margin-top:2mm;line-height:1.7}
+    `, DICA_PRINT + `
+      <div class="page">
+        <header><div class="orn">❦</div><h1>${esc(CFG.nome)}</h1>
+          <div class="tl">${esc(CFG.tagline)}</div></header>
+        <div class="cols">${col(MENU.slice(0,meio))}${col(MENU.slice(meio))}</div>
+        <footer><div class="lg">${legenda()}</div>
+          <div class="in">${esc(CFG.endereco)} · ${esc(CFG.telefone)} · ${esc(CFG.instagram)}<br>
+          Serviço de 10% opcional · Informe o garçom sobre restrições alimentares</div></footer>
+      </div>`);
+  }
+});
+
+/* 9. A4 moderno minimalista */
+MODELOS.push({
+  id:'a4-moderno', cat:'fisico', w:794, h:1123,
+  nome:'Cardápio A4 Moderno',
+  formato:'A4 retrato · 21 × 29,7 cm',
+  desc:'Coluna única, muito espaço em branco e numeração dos pratos. Visual contemporâneo para bistrô, café e restaurante de autor.',
+  tags:['A4','minimalista','1 coluna','contemporâneo'],
+  build(){
+    let n = 0;
+    return doc(CFG.nome+' — Cardápio', baseCSS('paper')+printCSS('210mm 297mm')+`
+      .page{width:210mm;height:297mm;padding:20mm 22mm}
+      header{display:flex;justify-content:space-between;align-items:flex-end;
+        padding-bottom:6mm;border-bottom:2px solid var(--ink);margin-bottom:10mm}
+      header h1{font-size:26pt;letter-spacing:-.02em}
+      header .tl{font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);margin-top:2mm}
+      header .rt{text-align:right;font-size:7.5pt;color:var(--mut);line-height:1.7}
+      .cat{margin-bottom:9mm}
+      .cat h2{font-size:9pt;letter-spacing:.28em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;margin-bottom:4mm}
+      .it{display:flex;gap:5mm;padding:2.6mm 0;align-items:baseline}
+      .num{font-size:7.5pt;color:var(--acc);width:6mm;flex:none;font-variant-numeric:tabular-nums}
+      .bd{flex:1}
+      .bd b{font-size:11pt;font-weight:600;letter-spacing:-.01em}
+      .bd p{font-size:8.5pt;color:var(--mut);line-height:1.5;margin-top:.8mm}
+      .pc{font-size:11pt;font-weight:600;white-space:nowrap}
+      .tags i{font-size:6.5pt}
+      .box{margin-top:8mm;padding:6mm;background:var(--card);border-left:2px solid var(--acc)}
+      .box b{font-size:8pt;letter-spacing:.18em;text-transform:uppercase;color:var(--acc2)}
+      .box p{font-size:9pt;margin-top:2mm;color:var(--mut)}
+      footer{position:absolute;left:22mm;right:22mm;bottom:14mm;display:flex;justify-content:space-between;
+        font-size:7pt;color:var(--mut);letter-spacing:.04em;border-top:1px solid var(--line);padding-top:3mm}
+    `, DICA_PRINT + `
+      <div class="page">
+        <header><div><h1>${esc(CFG.nome)}</h1><div class="tl">${esc(CFG.tagline)}</div></div>
+          <div class="rt">${esc(CFG.horario)}<br>${esc(CFG.instagram)}</div></header>
+        ${MENU.map(c=>`<div class="cat"><h2>${esc(c.nome)}</h2>
+          ${itens(c).map(it=>{n++;return `<div class="it">
+            <span class="num">${String(n).padStart(2,'0')}</span>
+            <span class="bd"><b>${esc(it.nome)}</b>${tagsHTML(it.tags)}<p>${esc(it.desc)}</p></span>
+            <span class="pc">${prInt(it.preco)}</span></div>`;}).join('')}</div>`).join('')}
+        <div class="box"><b>Sugestão do chef</b>
+          <p>${esc((destaques(1)[0]||{}).nome||'')} — ${esc(CFG.promo)}</p></div>
+        <footer><span>${legenda()}</span><span>${esc(CFG.endereco)}</span></footer>
+      </div>`);
+  }
+});
+
+/* 10. Tríptico de 3 dobras */
+MODELOS.push({
+  id:'triptico', cat:'fisico', w:1123, h:794,
+  nome:'Cardápio Tríptico (3 dobras)',
+  formato:'A4 paisagem · 3 painéis · frente e verso',
+  desc:'Folder de três dobras: capa, contracapa e miolo. Imprime frente e verso em uma folha A4 e vira um cardápio de mão que cabe na mesa.',
+  tags:['A4 paisagem','folder','3 dobras','frente e verso'],
+  build(){
+    const c1 = MENU[0], c2 = MENU[1] || MENU[0], c3 = MENU[2] || MENU[0], c4 = MENU[3] || MENU[0];
+    const painel = c => `<div class="pn"><h2>${esc(c.nome)}</h2>
+      ${itens(c).slice(0,6).map(it=>`<div class="it"><div class="hd"><b>${esc(it.nome)}${tagsHTML(it.tags)}</b>
+        <span>${prInt(it.preco)}</span></div><p>${esc(it.desc)}</p></div>`).join('')}</div>`;
+    return doc(CFG.nome+' — Tríptico', baseCSS('paper')+printCSS('A4 landscape')+`
+      .page{width:297mm;height:210mm;display:flex}
+      .pn{flex:1;padding:14mm 10mm;border-right:1px dashed var(--line);position:relative}
+      .pn:last-child{border-right:0}
+      .pn h2{font-size:12pt;letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);text-align:center;
+        font-family:var(--fb);font-weight:700;padding-bottom:2.5mm;border-bottom:1px solid var(--line);margin-bottom:5mm}
+      .it{margin-bottom:4.5mm}
+      .hd{display:flex;gap:3mm;align-items:baseline;justify-content:space-between}
+      .hd b{font-size:9.5pt;font-weight:600} .hd span{font-size:9.5pt;color:var(--acc2);font-weight:600}
+      .it p{font-size:7.5pt;color:var(--mut);line-height:1.5;margin-top:.8mm}
+      .tags i{font-size:6pt}
+      .capa{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+        background:linear-gradient(160deg,var(--card),var(--bg))}
+      .capa .orn{color:var(--acc);letter-spacing:.6em;font-size:9pt;margin-bottom:6mm}
+      .capa h1{font-size:26pt;line-height:1.1}
+      .capa .tl{color:var(--acc);font-size:7.5pt;letter-spacing:.3em;text-transform:uppercase;margin-top:5mm}
+      .capa .ln{width:22mm;height:1px;background:var(--acc);margin:8mm 0}
+      .capa .inf{font-size:8pt;color:var(--mut);line-height:1.9}
+      .contra{padding-top:16mm}
+      .contra h3{font-size:10pt;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;margin-bottom:4mm}
+      .contra p{font-size:8pt;color:var(--mut);line-height:1.75;margin-bottom:5mm}
+      .qr{text-align:center;margin-top:8mm;padding-top:6mm;border-top:1px solid var(--line)}
+      .qr b{display:block;font-size:7.5pt;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3mm;color:var(--mut)}
+      .mark{position:absolute;bottom:6mm;left:0;right:0;text-align:center;font-size:6.5pt;
+        color:var(--mut);letter-spacing:.1em}
+      .lbl{position:absolute;top:4mm;left:0;right:0;text-align:center;font-size:6pt;color:var(--mut);
+        letter-spacing:.14em;text-transform:uppercase}
+    `, DICA_PRINT + `
+      <div class="page">
+        <div class="pn contra"><span class="lbl">Verso · painel interno</span>
+          <h3>Nossa cozinha</h3>
+          <p>Trabalhamos com produtores da região, carnes maturadas na casa e pão de fermentação natural feito diariamente. O cardápio muda com a estação.</p>
+          <h3>Como funciona</h3>
+          <p>Serviço de 10% opcional. Couvert artístico às sextas e sábados. Reservas para grupos acima de 6 pessoas pelo telefone.</p>
+          <div class="qr">${qrFake(88, P().paper.ink, P().paper.bg)}
+            <b style="margin-top:3mm">Cardápio completo e delivery</b></div>
+          <div class="mark">${esc(CFG.site)}</div></div>
+        ${painel(c1)}
+        <div class="pn capa"><span class="lbl">Frente · capa</span>
+          <div class="orn">❦</div><h1>${esc(CFG.nome)}</h1>
+          <div class="tl">${esc(CFG.tagline)}</div><div class="ln"></div>
+          <div class="inf">${esc(CFG.endereco)}<br>${esc(CFG.telefone)}<br>${esc(CFG.instagram)}</div></div>
+      </div>
+      <div class="page">
+        ${painel(c2)}${painel(c3)}${painel(c4)}
+      </div>`);
+  }
+});
+
+/* 11. Quadro-negro / bistrô */
+MODELOS.push({
+  id:'quadro-negro', cat:'fisico', w:794, h:1123,
+  nome:'Cardápio Quadro-Negro',
+  formato:'A4 ou A3 retrato · para moldura',
+  desc:'Estilo lousa de bistrô, com letra manuscrita e giz. Ótimo impresso em A3 e colocado em cavalete na porta ou em moldura na parede.',
+  tags:['lousa','bistrô','cavalete','A3'],
+  build(){
+    const p = P();
+    return doc(CFG.nome+' — Quadro', baseCSS('night')+printCSS('210mm 297mm')+`
+      .page{width:210mm;height:297mm;padding:16mm 15mm;
+        background:#20211d;color:#f3efe4;
+        background-image:radial-gradient(circle at 22% 18%,rgba(255,255,255,.05),transparent 34%),
+                         radial-gradient(circle at 76% 72%,rgba(255,255,255,.04),transparent 32%)}
+      .fr{position:absolute;inset:7mm;border:2px solid rgba(243,239,228,.35);border-radius:2mm}
+      .fr::after{content:'';position:absolute;inset:2.5mm;border:1px solid rgba(243,239,228,.18);border-radius:1mm}
+      header{text-align:center;position:relative;padding-bottom:6mm}
+      .hand{font-family:var(--fs);font-size:19pt;color:${p.acc};display:block}
+      header h1{font-size:32pt;color:#f8f5ec;margin-top:2mm;letter-spacing:.01em}
+      header .tl{font-size:8pt;letter-spacing:.3em;text-transform:uppercase;color:rgba(243,239,228,.6);margin-top:3mm}
+      .div{display:flex;align-items:center;gap:3mm;margin:5mm 0 7mm}
+      .div i{flex:1;height:1px;background:rgba(243,239,228,.28)}
+      .div span{font-size:9pt;color:${p.acc}}
+      .cat{margin-bottom:7mm}
+      .cat h2{font-family:var(--fs);font-size:17pt;color:${p.acc};margin-bottom:3mm}
+      .it{display:flex;gap:3mm;align-items:baseline;padding:1.8mm 0}
+      .it b{font-weight:600;font-size:10.5pt;color:#f6f2e8}
+      .it .dot{flex:1;border-bottom:1px dotted rgba(243,239,228,.32);transform:translateY(-1mm)}
+      .it .pc{font-family:var(--fs);font-size:14pt;color:${p.acc}}
+      .it small{display:block;font-size:7.5pt;color:rgba(243,239,228,.55);line-height:1.45;margin-top:.5mm}
+      .tags i{border-color:${p.acc};color:${p.acc};font-size:6pt}
+      footer{position:absolute;left:15mm;right:15mm;bottom:13mm;text-align:center}
+      footer .hand{font-size:15pt}
+      footer .in{font-size:7.5pt;color:rgba(243,239,228,.55);margin-top:2mm;letter-spacing:.06em}
+    `, DICA_PRINT + `
+      <div class="page"><div class="fr"></div>
+        <header><span class="hand">Bem-vindo ao</span>
+          <h1>${esc(CFG.nome)}</h1><div class="tl">${esc(CFG.tagline)}</div></header>
+        <div class="div"><i></i><span>✦</span><i></i></div>
+        ${MENU.slice(0,3).map(c=>`<div class="cat"><h2>${esc(c.nome)}</h2>
+          ${itens(c).slice(0,5).map(it=>`<div class="it">
+            <span><b>${esc(it.nome)}</b>${tagsHTML(it.tags)}<small>${esc(it.desc)}</small></span>
+            <span class="dot"></span><span class="pc">${prInt(it.preco)}</span></div>`).join('')}
+        </div>`).join('')}
+        <footer><span class="hand">${esc(CFG.promo)}</span>
+          <div class="in">${esc(CFG.endereco)} · ${esc(CFG.telefone)} · ${esc(CFG.instagram)}</div></footer>
+      </div>`);
+  }
+});
+
+/* 12. Cartão de mesa (tenda) */
+MODELOS.push({
+  id:'tent-card', cat:'fisico', w:756, h:600,
+  nome:'Cardápio de Mesa (tenda)',
+  formato:'10 × 15 cm · frente e verso, com vinco',
+  desc:'Aquele cartãozinho em pé na mesa. Frente com a promoção e o QR Code, verso com os destaques. Imprime dois por folha A4.',
+  tags:['mesa','tenda','QR Code','10x15'],
+  build(){
+    const d = destaques(4);
+    return doc(CFG.nome+' — Cartão de mesa', baseCSS('paper')+printCSS('A4')+`
+      body{gap:14px}
+      .row{display:flex;gap:8mm;background:transparent;box-shadow:none}
+      .card{width:100mm;height:150mm;background:var(--bg);position:relative;overflow:hidden;
+        box-shadow:0 8px 30px rgba(0,0,0,.32)}
+      .fold{position:absolute;left:0;right:0;top:75mm;border-top:1px dashed rgba(0,0,0,.28)}
+      .fold::after{content:'vinco — dobre aqui';position:absolute;right:2mm;top:-4mm;font-size:5.5pt;
+        color:rgba(0,0,0,.35);font-family:system-ui,sans-serif;letter-spacing:.1em}
+      .side{height:75mm;padding:10mm 9mm;display:flex;flex-direction:column}
+      .front{background:linear-gradient(165deg,var(--card),var(--bg));text-align:center;
+        align-items:center;justify-content:center}
+      .front .orn{color:var(--acc);letter-spacing:.5em;font-size:8pt}
+      .front h1{font-size:19pt;margin-top:3mm}
+      .front .tl{font-size:6.5pt;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-top:2.5mm}
+      .front .pm{margin-top:5mm;background:var(--acc);color:#fff;font-size:8pt;font-weight:700;
+        padding:2mm 5mm;border-radius:1.5mm;line-height:1.4}
+      .qr-s{display:flex;align-items:center;gap:5mm;justify-content:center}
+      .qr-s div{text-align:left;font-size:7pt;color:var(--mut);line-height:1.6}
+      .qr-s b{display:block;font-size:8.5pt;color:var(--ink)}
+      .back h2{font-size:10pt;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;text-align:center;padding-bottom:2mm;
+        border-bottom:1px solid var(--line);margin-bottom:3.5mm}
+      .li{display:flex;gap:2.5mm;align-items:baseline;margin-bottom:2.8mm}
+      .li b{font-size:8.5pt;font-weight:600;flex:1}
+      .li span{font-size:8.5pt;color:var(--acc2);font-weight:600}
+      .li small{display:block;font-weight:400;color:var(--mut);font-size:6.5pt;line-height:1.4}
+      .back .ft{margin-top:auto;text-align:center;font-size:6.5pt;color:var(--mut);line-height:1.6}
+      @media print{.row{gap:0}.card{box-shadow:none;outline:1px solid #ddd}}
+    `, DICA_PRINT + `
+      <div class="page row">
+        <div class="card">
+          <div class="side front">
+            <div class="orn">❦</div><h1>${esc(CFG.nome)}</h1>
+            <div class="tl">${esc(CFG.tagline)}</div>
+            <div class="pm">${esc(CFG.promo)}</div>
+          </div>
+          <div class="fold"></div>
+          <div class="side front">
+            <div class="qr-s">${qrFake(76, P().paper.ink, P().paper.bg)}
+              <div><b>Cardápio digital</b>Aponte a câmera<br>do celular para o código<br><br>${esc(CFG.site)}</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="side back">
+            <h2>Os mais pedidos</h2>
+            ${d.map(it=>`<div class="li"><b>${esc(it.nome)}<small>${esc(it.desc).slice(0,58)}…</small></b>
+              <span>${prInt(it.preco)}</span></div>`).join('')}
+            <div class="ft">${legenda()}</div>
+          </div>
+          <div class="fold"></div>
+          <div class="side back" style="justify-content:center;text-align:center">
+            <div style="font-size:8.5pt;color:var(--mut);line-height:1.9">
+              <b style="display:block;font-size:11pt;color:var(--ink);margin-bottom:3mm">Siga a gente</b>
+              ${esc(CFG.instagram)}<br>${esc(CFG.telefone)}<br>${esc(CFG.endereco)}<br><br>
+              <span style="font-size:7pt">Cupom de 10% na primeira compra pelo site: <b>${esc(CFG.cupom)}</b></span>
+            </div>
+          </div>
+        </div>
+      </div>`);
+  }
+});
+
+/* 13. Jogo americano / placemat */
+MODELOS.push({
+  id:'placemat', cat:'fisico', w:1123, h:794,
+  nome:'Jogo Americano (placemat)',
+  formato:'A3 paisagem · 42 × 29,7 cm',
+  desc:'Cardápio impresso no papel que forra a mesa. Barato, higiênico e trocado a cada cliente. Muito usado em pizzaria, hamburgueria e restaurante familiar.',
+  tags:['A3','descartável','mesa','família'],
+  build(){
+    return doc(CFG.nome+' — Jogo americano', baseCSS('paper')+printCSS('A3 landscape')+`
+      .page{width:420mm;height:297mm;padding:16mm 18mm;display:flex;flex-direction:column;
+        transform-origin:0 0}
+      .wrapper{width:297mm;height:210mm;overflow:hidden}
+      header{display:flex;align-items:flex-end;gap:8mm;padding-bottom:5mm;
+        border-bottom:3px solid var(--acc);margin-bottom:7mm}
+      header h1{font-size:34pt;line-height:1}
+      header .tl{font-size:9pt;letter-spacing:.26em;text-transform:uppercase;color:var(--acc2);margin-top:3mm}
+      header .rt{margin-left:auto;text-align:right;font-size:8.5pt;color:var(--mut);line-height:1.7}
+      .cols{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:9mm}
+      .cat h2{font-size:11pt;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:var(--acc2);
+        font-family:var(--fb);font-weight:700;padding:2mm 3mm;margin-bottom:4mm;border-radius:1mm}
+      .it{margin-bottom:3.6mm}
+      .hd{display:flex;gap:2mm;align-items:baseline;justify-content:space-between}
+      .hd b{font-size:9.5pt;font-weight:700} .hd span{font-size:9.5pt;font-weight:700;color:var(--acc2)}
+      .it p{font-size:7pt;color:var(--mut);line-height:1.45;margin-top:.6mm}
+      .tags i{font-size:5.5pt}
+      .strip{display:flex;gap:6mm;align-items:center;margin-top:7mm;padding-top:5mm;border-top:1px solid var(--line)}
+      .promo{flex:1;background:var(--soft);border-radius:2mm;padding:4mm 6mm}
+      .promo b{display:block;font-size:10pt;color:var(--acc2)}
+      .promo span{font-size:8pt;color:var(--mut)}
+      .qrb{display:flex;gap:4mm;align-items:center;font-size:7.5pt;color:var(--mut);line-height:1.6}
+      .kids{width:62mm;border:1px dashed var(--line);border-radius:2mm;padding:4mm;text-align:center}
+      .kids b{font-size:8.5pt;display:block;margin-bottom:1.5mm}
+      .kids span{font-size:6.5pt;color:var(--mut)}
+    `, DICA_PRINT + `
+      <div class="page">
+        <header><div><h1>${esc(CFG.nome)}</h1><div class="tl">${esc(CFG.tagline)}</div></div>
+          <div class="rt">${esc(CFG.horario)}<br>${esc(CFG.telefone)} · ${esc(CFG.instagram)}</div></header>
+        <div class="cols">
+          ${MENU.slice(0,4).map(c=>`<div class="cat"><h2>${esc(c.nome)}</h2>
+            ${itens(c).map(it=>`<div class="it"><div class="hd"><b>${esc(it.nome)}${tagsHTML(it.tags)}</b>
+              <span>${prInt(it.preco)}</span></div><p>${esc(it.desc)}</p></div>`).join('')}
+          </div>`).join('')}
+        </div>
+        <div class="strip">
+          <div class="promo"><b>${esc(CFG.promo)}</b><span>Válido no salão, mediante apresentação deste jogo americano.</span></div>
+          <div class="qrb">${qrFake(80, P().paper.ink, P().paper.bg)}
+            <div><b style="color:var(--ink)">Peça delivery</b><br>${esc(CFG.site)}<br>Cupom ${esc(CFG.cupom)}</div></div>
+          <div class="kids"><b>✎ Espaço da criançada</b><span>Desenhe aqui o seu prato favorito<br>e mostre para o garçom!</span></div>
+        </div>
+      </div>`);
+  }
+});
+
+/* 14. Menu degustação */
+MODELOS.push({
+  id:'degustacao', cat:'fisico', w:559, h:794,
+  nome:'Menu Degustação',
+  formato:'A5 retrato · 14,8 × 21 cm',
+  desc:'Menu em tempos, com harmonização de vinhos e valor único por pessoa. Para noite especial, jantar harmonizado e alta gastronomia.',
+  tags:['A5','degustação','harmonização','fine dining'],
+  build(){
+    const t = todosItens();
+    const tempos = [
+      ['Amuse-bouche','Cortesia da cozinha', t[0]],
+      ['Primeiro tempo','Entrada fria', t[2]||t[0]],
+      ['Segundo tempo','Entrada quente', t[1]||t[0]],
+      ['Terceiro tempo','Principal do mar', t.find(i=>/salm|peixe|bacalhau/i.test(i.nome))||t[3]||t[0]],
+      ['Quarto tempo','Principal da terra', t.find(i=>i.destaque)||t[4]||t[0]],
+      ['Pré-sobremesa','Refrescância', t[t.length-3]||t[0]],
+      ['Sobremesa','Para encerrar', t.find(i=>/gâteau|pudim|cheesecake|sorvete/i.test(i.nome))||t[t.length-1]]
+    ];
+    return doc(CFG.nome+' — Degustação', baseCSS('paper')+printCSS('148mm 210mm')+`
+      .page{width:148mm;height:210mm;padding:15mm 14mm 12mm;text-align:center}
+      .page::before{content:'';position:absolute;inset:6mm;border:1px solid var(--acc);opacity:.4;pointer-events:none}
+      .orn{color:var(--acc);letter-spacing:.5em;font-size:8pt}
+      h1{font-size:20pt;margin-top:3mm}
+      .tl{font-size:6.5pt;letter-spacing:.3em;text-transform:uppercase;color:var(--acc2);margin-top:2.5mm}
+      .nm{font-family:var(--ft);font-style:italic;font-size:12pt;color:var(--acc2);margin-top:6mm}
+      .ln{width:16mm;height:1px;background:var(--acc);margin:5mm auto}
+      .tp{margin-bottom:4.6mm}
+      .tp .lb{font-size:6pt;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:1mm}
+      .tp b{display:block;font-family:var(--ft);font-size:11pt;font-weight:600;line-height:1.25}
+      .tp p{font-size:7pt;color:var(--mut);line-height:1.45;margin-top:.8mm;padding:0 4mm}
+      .tp .hz{display:block;font-size:6.5pt;font-style:italic;color:var(--acc2);margin-top:1.2mm}
+      .val{margin-top:6mm;padding-top:5mm;border-top:1px solid var(--line)}
+      .val .p1{font-family:var(--ft);font-size:16pt;color:var(--acc2)}
+      .val .p2{font-size:7pt;color:var(--mut);margin-top:1.5mm;line-height:1.7}
+      footer{position:absolute;left:14mm;right:14mm;bottom:9mm;font-size:6pt;color:var(--mut);line-height:1.7}
+    `, DICA_PRINT + `
+      <div class="page">
+        <div class="orn">❦</div>
+        <h1>${esc(CFG.nome)}</h1>
+        <div class="tl">${esc(CFG.tagline)}</div>
+        <div class="nm">Menu Degustação · 7 tempos</div>
+        <div class="ln"></div>
+        ${tempos.map((t,i)=>`<div class="tp"><div class="lb">${esc(t[0])}</div>
+          <b>${esc((t[2]||{}).nome||'Criação do chef')}</b>
+          <p>${esc((t[2]||{}).desc||'')}</p>
+          <span class="hz">${['Espumante Brut Nature','Chardonnay Reserva','Alentejano Branco','Douro Tinto Colheita','Malbec de Altura','Moscatel','Vinho do Porto Tawny'][i]}</span></div>`).join('')}
+        <div class="val"><div class="p1">R$ 380 por pessoa</div>
+          <div class="p2">Harmonização completa + R$ 190 · Serviço de 10% não incluso<br>
+          Servido de terça a sábado, a partir das 19h30 · Reserva obrigatória</div></div>
+        <footer>${esc(CFG.endereco)} · ${esc(CFG.telefone)}<br>
+          Avise-nos com 24h de antecedência sobre restrições alimentares — adaptamos o menu.</footer>
+      </div>`);
+  }
+});
+
+/* 15. Carta de vinhos */
+MODELOS.push({
+  id:'carta-vinhos', cat:'fisico', w:794, h:1123,
+  nome:'Carta de Vinhos e Bebidas',
+  formato:'A4 retrato · encarte separado',
+  desc:'Organizada por região, com uva, safra, preço da taça e da garrafa. Deixe em encarte solto: quando o preço mudar, reimprime só esta folha.',
+  tags:['A4','vinhos','bebidas','encarte'],
+  build(){
+    return doc(CFG.nome+' — Carta de vinhos', baseCSS('paper')+printCSS('210mm 297mm')+`
+      .page{width:210mm;height:297mm;padding:18mm 18mm 14mm}
+      header{text-align:center;padding-bottom:6mm;border-bottom:1px solid var(--line);margin-bottom:7mm}
+      header h1{font-size:24pt} header .tl{font-size:7.5pt;letter-spacing:.28em;text-transform:uppercase;
+        color:var(--acc2);margin-top:2.5mm}
+      .cols{display:grid;grid-template-columns:1fr 1fr;gap:9mm}
+      .rg{margin-bottom:6mm;break-inside:avoid}
+      .rg h2{font-size:9pt;letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;padding-bottom:1.5mm;border-bottom:1px solid var(--acc);margin-bottom:3mm}
+      .vw{display:flex;gap:3mm;align-items:flex-start;margin-bottom:3.4mm}
+      .vw .in{flex:1}
+      .vw b{font-size:9.5pt;font-weight:600;display:block;line-height:1.25}
+      .vw small{font-size:7pt;color:var(--mut);display:block;margin-top:.5mm}
+      .vw .pp{text-align:right;white-space:nowrap;font-size:8pt}
+      .vw .pp i{font-style:normal;display:block;color:var(--mut);font-size:6pt;letter-spacing:.1em;text-transform:uppercase}
+      .vw .pp b{font-size:9pt;color:var(--acc2)}
+      .head-pr{display:flex;justify-content:flex-end;gap:6mm;font-size:6pt;letter-spacing:.14em;
+        text-transform:uppercase;color:var(--mut);margin-bottom:2mm}
+      .outros{margin-top:4mm;padding:5mm 6mm;background:var(--card);border-radius:2mm}
+      .outros h3{font-size:8.5pt;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;margin-bottom:3mm}
+      .outros .l{display:flex;justify-content:space-between;font-size:8.5pt;padding:1.4mm 0;
+        border-bottom:1px dotted var(--line)}
+      .outros .l:last-child{border-bottom:0}
+      footer{position:absolute;left:18mm;right:18mm;bottom:12mm;text-align:center;font-size:7pt;
+        color:var(--mut);line-height:1.7;border-top:1px solid var(--line);padding-top:3.5mm}
+    `, DICA_PRINT + `
+      <div class="page">
+        <header><h1>Carta de Vinhos</h1><div class="tl">${esc(CFG.nome)} · ${esc(CFG.tagline)}</div></header>
+        <div class="head-pr"><span>Taça</span><span>Garrafa</span></div>
+        <div class="cols">
+          <div>${VINHOS.slice(0,2).map(r=>`<div class="rg"><h2>${esc(r.regiao)}</h2>
+            ${r.itens.map(v=>`<div class="vw"><div class="in"><b>${esc(v.nome)}</b>
+              <small>${esc(v.prod)} · ${esc(v.uva)} · ${esc(v.safra)}</small></div>
+              <div class="pp"><b>${prInt(v.taca)}</b><b>${prInt(v.gf)}</b></div></div>`).join('')}
+          </div>`).join('')}</div>
+          <div>${VINHOS.slice(2).map(r=>`<div class="rg"><h2>${esc(r.regiao)}</h2>
+            ${r.itens.map(v=>`<div class="vw"><div class="in"><b>${esc(v.nome)}</b>
+              <small>${esc(v.prod)} · ${esc(v.uva)} · ${esc(v.safra)}</small></div>
+              <div class="pp"><b>${prInt(v.taca)}</b><b>${prInt(v.gf)}</b></div></div>`).join('')}
+          </div>`).join('')}</div>
+        </div>
+        <div class="outros"><h3>Outras bebidas</h3>
+          ${(MENU.find(c=>/bebida/i.test(c.nome))||MENU[MENU.length-1]).itens.map(b=>
+            `<div class="l"><span>${esc(b.nome)}</span><span>${prBR(b.preco)}</span></div>`).join('')}
+        </div>
+        <footer>Consulte o sommelier sobre harmonizações e rótulos fora de carta.<br>
+          Taxa de rolha R$ 60 por garrafa · ${esc(CFG.nome)} · ${esc(CFG.telefone)}</footer>
+      </div>`);
+  }
+});
+
+/* 16. Cardápio de sobremesas de mesa */
+MODELOS.push({
+  id:'sobremesas', cat:'fisico', w:454, h:794,
+  nome:'Cardápio de Sobremesas',
+  formato:'12 × 21 cm · levado à mesa depois do prato',
+  desc:'Cardápio pequeno e só de doces, entregue ao final da refeição. É o item de maior margem do restaurante e o que mais responde a um cardápio próprio.',
+  tags:['sobremesa','pequeno','upsell','margem alta'],
+  build(){
+    const sob = MENU.find(c=>/sobremesa|doce/i.test(c.nome)) || MENU[MENU.length-2] || MENU[0];
+    const beb = MENU.find(c=>/bebida/i.test(c.nome)) || MENU[MENU.length-1];
+    return doc(CFG.nome+' — Sobremesas', baseCSS('paper')+printCSS('120mm 210mm')+`
+      .page{width:120mm;height:210mm;padding:14mm 12mm}
+      .page::before{content:'';position:absolute;left:0;right:0;top:0;height:5mm;background:var(--acc)}
+      header{text-align:center;margin-bottom:7mm}
+      .orn{font-size:15pt}
+      header h1{font-size:19pt;margin-top:2mm}
+      header .tl{font-size:6.5pt;letter-spacing:.26em;text-transform:uppercase;color:var(--acc2);margin-top:2mm}
+      .it{display:flex;gap:4mm;padding:3.4mm 0;border-bottom:1px solid var(--line);align-items:flex-start}
+      .it:last-of-type{border-bottom:0}
+      .it .foto{width:17mm;height:17mm;border-radius:50%}
+      .it .foto span{font-size:15pt}
+      .it .tx{flex:1}
+      .it b{font-size:10pt;font-weight:600;display:block;line-height:1.25}
+      .it p{font-size:7.5pt;color:var(--mut);line-height:1.45;margin-top:.8mm}
+      .it .pc{font-size:10pt;font-weight:600;color:var(--acc2);white-space:nowrap;padding-top:.5mm}
+      .cafes{margin-top:6mm;padding:5mm;background:var(--card);border-radius:2mm}
+      .cafes h2{font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;margin-bottom:3mm}
+      .cafes .l{display:flex;justify-content:space-between;font-size:8.5pt;padding:1.3mm 0}
+      .tip{margin-top:5mm;text-align:center;font-family:var(--fs);font-size:12pt;color:var(--acc2)}
+      footer{position:absolute;left:12mm;right:12mm;bottom:9mm;text-align:center;font-size:6.5pt;
+        color:var(--mut);line-height:1.7}
+    `, DICA_PRINT + `
+      <div class="page">
+        <header><div class="orn">🍰</div><h1>Doces &amp; Cafés</h1>
+          <div class="tl">${esc(CFG.nome)}</div></header>
+        ${itens(sob).map(it=>`<div class="it">${fotoBox(it,0,0)}
+          <div class="tx"><b>${esc(it.nome)}${tagsHTML(it.tags)}</b><p>${esc(it.desc)}</p></div>
+          <span class="pc">${prInt(it.preco)}</span></div>`).join('')}
+        <div class="cafes"><h2>Para acompanhar</h2>
+          ${itens(beb).filter(b=>/caf|ch[áa]|licor|vinho/i.test(b.nome)).concat(itens(beb).slice(-2))
+            .slice(0,4).map(b=>`<div class="l"><span>${esc(b.nome)}</span><span>${prBR(b.preco)}</span></div>`).join('')}
+        </div>
+        <div class="tip">Peça para dividir — a gente traz duas colheres 🥄</div>
+        <footer>Todas as sobremesas são feitas na casa.<br>Contém glúten, lactose e derivados de castanha — consulte o garçom.</footer>
+      </div>`);
+  }
+});
+
+/* ============================================================
+   5.3 — MARKETING
+   ============================================================ */
+
+/* Dica de exportação de imagem para as peças de rede social */
+const DICA_IMG = '<div class="noprint"><b>Virar imagem:</b> Ctrl/⌘+P → “Salvar como PDF” → depois exporte em PNG, ou tire um print da tela em zoom 100%. Este aviso não sai na exportação.</div>';
+
+/* 17. Post de feed 1080×1080 */
+MODELOS.push({
+  id:'post-feed', cat:'marketing', w:1080, h:1080,
+  nome:'Post de Feed (Instagram)',
+  formato:'1080 × 1080 px · quadrado',
+  desc:'Post de divulgação de um prato, com nome, descrição curta, preço e chamada. Traz o prato em destaque do seu cardápio automaticamente.',
+  tags:['Instagram','1080x1080','prato','feed'],
+  build(){
+    const it = destaques(1)[0] || {nome:'Prato da casa', desc:'', preco:0, emoji:'🍽'};
+    return doc('Post — '+CFG.nome, baseCSS('night')+`
+      body{width:1080px;height:1080px;overflow:hidden;position:relative;
+        background:radial-gradient(90% 70% at 70% 20%,color-mix(in srgb,var(--acc) 26%,var(--bg)),var(--bg) 72%)}
+      .art{position:absolute;right:-58px;bottom:-58px;width:560px;height:560px;
+        border-radius:50%;display:grid;place-items:center;font-size:270px;
+        background:linear-gradient(150deg,var(--soft),var(--acc2));box-shadow:0 40px 120px rgba(0,0,0,.45)}
+      .ct{position:relative;z-index:2;padding:92px 88px;height:100%;display:flex;flex-direction:column;max-width:660px}
+      .br{display:flex;align-items:center;gap:16px}
+      .br .mk{width:56px;height:56px;border-radius:50%;background:var(--acc);color:var(--bg);
+        display:grid;place-items:center;font-size:26px}
+      .br b{font-family:var(--ft);font-size:26px}
+      .lab{margin-top:auto;font-size:17px;letter-spacing:.34em;text-transform:uppercase;color:var(--acc)}
+      h1{font-size:86px;line-height:1.02;margin-top:24px;letter-spacing:-.02em}
+      p{font-size:25px;color:var(--mut);margin-top:26px;line-height:1.5;max-width:470px}
+      .pr{display:flex;align-items:baseline;gap:14px;margin-top:38px}
+      .pr .v{font-family:var(--ft);font-size:66px;color:var(--acc)}
+      .pr .s{font-size:19px;color:var(--mut)}
+      .cta{margin-top:auto;display:flex;align-items:center;gap:22px}
+      .cta .b{background:var(--acc);color:var(--bg);font-size:23px;font-weight:800;padding:20px 38px;
+        border-radius:14px;white-space:nowrap;flex:none}
+      .cta .i{font-size:19px;color:var(--mut);line-height:1.6}
+      .noprint{font-family:system-ui,sans-serif}
+    `, DICA_IMG + `
+      <div class="art"><span>${esc(it.emoji||'🍽')}</span></div>
+      <div class="ct">
+        <div class="br"><span class="mk">🍽</span><b>${esc(CFG.nome)}</b></div>
+        <div class="lab">Destaque da semana</div>
+        <h1>${esc(it.nome)}</h1>
+        <p>${esc(it.desc)}</p>
+        <div class="pr"><span class="v">${prBR(it.preco)}</span><span class="s">no salão e no delivery</span></div>
+        <div class="cta"><span class="b">Peça o seu →</span>
+          <span class="i">${esc(CFG.instagram)}<br>${esc(CFG.telefone)}</span></div>
+      </div>`);
+  }
+});
+
+/* 18. Carrossel de 3 slides */
+MODELOS.push({
+  id:'carrossel', cat:'marketing', w:1080, h:3320,
+  nome:'Carrossel de 3 Slides',
+  formato:'3 × 1080 × 1080 px',
+  desc:'Sequência capa → conteúdo → chamada para ação. Formato que mais segura o cliente no Instagram porque ele precisa deslizar.',
+  tags:['Instagram','carrossel','3 slides','engajamento'],
+  build(){
+    const d = destaques(3);
+    return doc('Carrossel — '+CFG.nome, baseCSS('night')+`
+      body{width:1080px;background:#3a3d42;display:flex;flex-direction:column;gap:20px;padding:20px 0;align-items:center}
+      .sl{width:1080px;height:1080px;position:relative;overflow:hidden;background:var(--bg);color:var(--ink)}
+      .n{position:absolute;top:44px;right:52px;font-size:19px;letter-spacing:.3em;color:var(--mut);z-index:3}
+      .s1{display:grid;place-items:center;text-align:center;
+        background:radial-gradient(80% 70% at 50% 25%,color-mix(in srgb,var(--acc) 28%,var(--bg)),var(--bg) 72%)}
+      .s1 .orn{color:var(--acc);letter-spacing:.6em;font-size:24px}
+      .s1 h1{font-size:104px;line-height:1;margin-top:34px;letter-spacing:-.02em}
+      .s1 .sb{font-size:26px;color:var(--mut);margin-top:34px;max-width:640px}
+      .s1 .sw{margin-top:56px;font-size:20px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc)}
+      .s2{padding:88px}
+      .s2 h2{font-size:56px;margin-bottom:52px}
+      .s2 .rw{display:flex;gap:34px;align-items:center;padding:30px 0;border-bottom:1px solid var(--line)}
+      .s2 .rw:last-child{border-bottom:0}
+      .s2 .foto{width:150px;height:150px;border-radius:24px}
+      .s2 .foto span{font-size:74px}
+      .s2 .tx{flex:1}
+      .s2 .tx b{font-size:40px;font-family:var(--ft);font-weight:600;display:block;line-height:1.15}
+      .s2 .tx p{font-size:22px;color:var(--mut);margin-top:12px;line-height:1.45}
+      .s2 .pc{font-family:var(--ft);font-size:44px;color:var(--acc);white-space:nowrap}
+      .s3{display:grid;place-items:center;text-align:center;
+        background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 22%,var(--bg)),var(--bg))}
+      .s3 h2{font-size:76px;line-height:1.06;max-width:760px}
+      .s3 p{font-size:26px;color:var(--mut);margin-top:32px;max-width:620px}
+      .s3 .bt{margin-top:52px;background:var(--acc);color:var(--bg);font-size:28px;font-weight:800;
+        padding:26px 56px;border-radius:18px;display:inline-block}
+      .s3 .ft{margin-top:56px;font-size:22px;color:var(--mut);line-height:1.8}
+      .noprint{font-family:system-ui,sans-serif}
+    `, DICA_IMG + `
+      <div class="sl s1"><span class="n">1/3</span><div>
+        <div class="orn">❦</div><h1>Os 3 pratos<br>mais pedidos</h1>
+        <p class="sb">O que a nossa cozinha mais manda para o salão — e por quê.</p>
+        <div class="sw">deslize →</div></div></div>
+      <div class="sl s2"><span class="n">2/3</span>
+        <h2>Direto da cozinha</h2>
+        ${d.map(it=>`<div class="rw">${fotoBox(it,150,24)}
+          <div class="tx"><b>${esc(it.nome)}</b><p>${esc(it.desc)}</p></div>
+          <span class="pc">${prBR(it.preco)}</span></div>`).join('')}
+      </div>
+      <div class="sl s3"><span class="n">3/3</span><div>
+        <h2>Bora provar?</h2>
+        <p>${esc(CFG.promo)}</p>
+        <div class="bt">Reserve ou peça delivery</div>
+        <div class="ft">${esc(CFG.instagram)}<br>${esc(CFG.telefone)}<br>${esc(CFG.endereco)}</div></div></div>`);
+  }
+});
+
+/* 19. Story 1080×1920 */
+MODELOS.push({
+  id:'story-promo', cat:'marketing', w:1080, h:1920,
+  nome:'Story de Promoção',
+  formato:'1080 × 1920 px · vertical',
+  desc:'Story com a oferta do dia, cupom e chamada de arrasta pra cima. Deixe a área de baixo livre para o adesivo de link.',
+  tags:['Instagram','Stories','1080x1920','promoção'],
+  build(){
+    const it = destaques(1)[0] || {emoji:'🍽', nome:'', preco:0};
+    return doc('Story — '+CFG.nome, baseCSS('night')+`
+      body{width:1080px;height:1920px;overflow:hidden;position:relative;text-align:center;
+        background:linear-gradient(175deg,color-mix(in srgb,var(--acc) 30%,var(--bg)) 0%,var(--bg) 55%)}
+      .top{padding:130px 90px 0}
+      .kk{font-size:24px;letter-spacing:.36em;text-transform:uppercase;color:var(--acc)}
+      h1{font-size:120px;line-height:.98;margin-top:36px;letter-spacing:-.03em}
+      h1 em{font-style:italic;color:var(--acc)}
+      .sb{font-size:32px;color:var(--mut);margin-top:36px;line-height:1.45;padding:0 40px}
+      .art{width:560px;height:560px;border-radius:50%;margin:70px auto 0;display:grid;place-items:center;
+        font-size:280px;background:linear-gradient(150deg,var(--soft),var(--acc2));
+        box-shadow:0 40px 120px rgba(0,0,0,.5)}
+      .cup{margin:70px 90px 0;border:3px dashed var(--acc);border-radius:26px;padding:38px}
+      .cup .l{font-size:22px;letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+      .cup .c{font-family:var(--ft);font-size:76px;color:var(--acc);margin-top:12px;letter-spacing:.06em}
+      .cup .v{font-size:22px;color:var(--mut);margin-top:12px}
+      .bot{position:absolute;left:0;right:0;bottom:250px;text-align:center}
+      .bot .b{display:inline-block;background:var(--acc);color:var(--bg);font-size:34px;font-weight:800;
+        padding:32px 72px;border-radius:22px}
+      .bot .i{font-size:26px;color:var(--mut);margin-top:34px;line-height:1.7}
+      .safe{position:absolute;left:0;right:0;bottom:0;height:230px;border-top:2px dashed rgba(255,255,255,.14);
+        display:grid;place-items:center;color:rgba(255,255,255,.28);font-size:20px;letter-spacing:.2em;
+        text-transform:uppercase;font-family:system-ui,sans-serif}
+      .noprint{font-family:system-ui,sans-serif}
+    `, DICA_IMG + `
+      <div class="top"><div class="kk">${esc(CFG.nome)}</div>
+        <h1>Hoje tem<br><em>oferta</em></h1>
+        <p class="sb">${esc(CFG.promo)}</p></div>
+      <div class="art"><span>${esc(it.emoji||'🍽')}</span></div>
+      <div class="cup"><div class="l">Use o cupom</div><div class="c">${esc(CFG.cupom)}</div>
+        <div class="v">Válido hoje, no delivery e no salão</div></div>
+      <div class="bot"><span class="b">👆 Peça agora</span>
+        <div class="i">${esc(CFG.instagram)} · ${esc(CFG.telefone)}</div></div>
+      <div class="safe">área livre para o adesivo de link</div>`);
+  }
+});
+
+/* 20. Flyer A5 */
+MODELOS.push({
+  id:'flyer-a5', cat:'marketing', w:559, h:794,
+  nome:'Flyer Promocional A5',
+  formato:'A5 · 14,8 × 21 cm · frente e verso',
+  desc:'Panfleto para distribuir na rua, colocar na sacola do delivery ou deixar em balcão de parceiros. Frente com a oferta, verso com o mini cardápio.',
+  tags:['A5','panfleto','impresso','promoção'],
+  build(){
+    const d = destaques(4);
+    return doc('Flyer — '+CFG.nome, baseCSS('paper')+printCSS('148mm 210mm')+`
+      .page{width:148mm;height:210mm}
+      .fr{height:100%;display:flex;flex-direction:column;text-align:center;
+        background:linear-gradient(170deg,var(--acc) 0%,var(--acc2) 100%);color:#fff;padding:14mm 12mm}
+      .fr .kk{font-size:7pt;letter-spacing:.32em;text-transform:uppercase;opacity:.85}
+      .fr h1{font-size:26pt;color:#fff;line-height:1.05;margin-top:4mm}
+      .fr .art{width:48mm;height:48mm;border-radius:50%;background:rgba(255,255,255,.16);margin:8mm auto;
+        display:grid;place-items:center;font-size:34pt}
+      .fr .of{background:#fff;color:var(--acc2);border-radius:3mm;padding:5mm;margin-top:auto}
+      .fr .of b{display:block;font-family:var(--ft);font-size:15pt;line-height:1.2}
+      .fr .of span{font-size:8pt;display:block;margin-top:2mm;color:#5a4a2e}
+      .fr .cup{margin-top:4mm;border:1.5px dashed rgba(255,255,255,.6);border-radius:2mm;padding:3.5mm}
+      .fr .cup i{font-style:normal;font-size:6.5pt;letter-spacing:.2em;text-transform:uppercase;opacity:.8;display:block}
+      .fr .cup b{font-family:var(--ft);font-size:16pt;letter-spacing:.08em}
+      .fr .ft{margin-top:5mm;font-size:7.5pt;line-height:1.7;opacity:.9}
+      .bk{height:100%;padding:13mm 12mm;display:flex;flex-direction:column}
+      .bk h2{font-size:13pt;text-align:center;padding-bottom:2.5mm;border-bottom:2px solid var(--acc);margin-bottom:5mm}
+      .li{display:flex;gap:3mm;align-items:baseline;margin-bottom:3.5mm}
+      .li b{font-size:9.5pt;flex:1;font-weight:600}
+      .li b small{display:block;font-weight:400;font-size:7pt;color:var(--mut);line-height:1.4;margin-top:.5mm}
+      .li span{font-size:9.5pt;font-weight:700;color:var(--acc2)}
+      .qrb{margin-top:auto;display:flex;gap:5mm;align-items:center;padding-top:5mm;border-top:1px solid var(--line)}
+      .qrb .tx{font-size:7.5pt;color:var(--mut);line-height:1.65}
+      .qrb .tx b{display:block;font-size:9.5pt;color:var(--ink);margin-bottom:1mm}
+      .mapa{margin-top:4mm;background:var(--card);border-radius:2mm;padding:4mm;font-size:7.5pt;
+        color:var(--mut);text-align:center;line-height:1.7}
+    `, DICA_PRINT + `
+      <div class="page"><div class="fr">
+        <div class="kk">${esc(CFG.tagline)}</div>
+        <h1>${esc(CFG.nome)}</h1>
+        <div class="art">${esc((d[0]||{}).emoji||'🍽')}</div>
+        <div class="of"><b>${esc(CFG.promo)}</b>
+          <span>Apresente este panfleto no caixa ou informe o cupom no delivery.</span></div>
+        <div class="cup"><i>Cupom de primeira compra</i><b>${esc(CFG.cupom)}</b></div>
+        <div class="ft">${esc(CFG.telefone)}<br>${esc(CFG.instagram)} · ${esc(CFG.site)}</div>
+      </div></div>
+      <div class="page"><div class="bk">
+        <h2>Alguns dos nossos pratos</h2>
+        ${d.map(it=>`<div class="li"><b>${esc(it.nome)}<small>${esc(it.desc)}</small></b>
+          <span>${prBR(it.preco)}</span></div>`).join('')}
+        <div class="mapa">📍 ${esc(CFG.endereco)}<br>🕐 ${esc(CFG.horario)}<br>🛵 ${esc(CFG.entrega)}</div>
+        <div class="qrb">${qrFake(84, P().paper.ink, P().paper.bg)}
+          <div class="tx"><b>Cardápio completo</b>Aponte a câmera do celular<br>${esc(CFG.site)}</div></div>
+      </div></div>`);
+  }
+});
+
+/* 21. Cartão fidelidade */
+MODELOS.push({
+  id:'fidelidade', cat:'marketing', w:794, h:400,
+  nome:'Cartão Fidelidade (10 selos)',
+  formato:'8,5 × 5,5 cm · frente e verso',
+  desc:'O programa de fidelidade mais simples que existe e um dos que mais funciona: dez carimbos, o décimo por conta da casa. Cabe 10 por folha A4.',
+  tags:['fidelidade','cartão','carimbo','retenção'],
+  build(){
+    const selos = Array.from({length:10},(_,i)=>
+      `<span class="se${i===9?' fin':''}">${i===9?'🎁':(i+1)}</span>`).join('');
+    return doc('Fidelidade — '+CFG.nome, baseCSS('paper')+printCSS('A4')+`
+      body{gap:18px}
+      .row{display:flex;gap:8mm;background:transparent;box-shadow:none}
+      .cd{width:85mm;height:55mm;background:var(--bg);border-radius:3mm;overflow:hidden;position:relative;
+        box-shadow:0 6px 22px rgba(0,0,0,.3)}
+      .f1{height:100%;padding:6mm 7mm;display:flex;flex-direction:column;
+        background:linear-gradient(150deg,var(--acc),var(--acc2));color:#fff}
+      .f1 .kk{font-size:5.5pt;letter-spacing:.3em;text-transform:uppercase;opacity:.85}
+      .f1 h1{font-size:15pt;color:#fff;margin-top:2mm;line-height:1.1}
+      .f1 .tl{font-size:6pt;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin-top:1.5mm}
+      .f1 .bg{margin-top:auto;font-size:7.5pt;line-height:1.5;opacity:.95}
+      .f1 .cir{position:absolute;right:-14mm;top:-14mm;width:44mm;height:44mm;border-radius:50%;
+        background:rgba(255,255,255,.12)}
+      .f2{height:100%;padding:5mm 6mm;display:flex;flex-direction:column}
+      .f2 h2{font-size:8pt;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;text-align:center}
+      .f2 .sub{font-size:6pt;color:var(--mut);text-align:center;margin-top:1mm}
+      .sel{display:grid;grid-template-columns:repeat(5,1fr);gap:2.4mm;margin:3.5mm 0}
+      .se{aspect-ratio:1;border:1px dashed var(--line);border-radius:50%;display:grid;place-items:center;
+        font-size:6.5pt;color:var(--mut)}
+      .se.fin{border:1.5px solid var(--acc);color:var(--acc2);font-size:9pt;background:var(--card)}
+      .f2 .rg{margin-top:auto;font-size:5.5pt;color:var(--mut);line-height:1.5;text-align:center}
+      .f2 .nm{display:flex;gap:2mm;font-size:6pt;color:var(--mut);margin-bottom:2mm}
+      .f2 .nm i{flex:1;font-style:normal;border-bottom:.5px solid var(--line)}
+      @media print{.cd{box-shadow:none;outline:.5px solid #ccc}}
+    `, DICA_PRINT + `
+      <div class="page row">
+        <div class="cd"><div class="f1"><div class="cir"></div>
+          <div class="kk">Cartão fidelidade</div>
+          <h1>${esc(CFG.nome)}</h1>
+          <div class="tl">${esc(CFG.tagline)}</div>
+          <div class="bg">A cada visita, um carimbo.<br><b>O 10º prato é por nossa conta.</b></div>
+        </div></div>
+        <div class="cd"><div class="f2">
+          <h2>Seus carimbos</h2>
+          <div class="sub">Peça o carimbo ao pagar a conta</div>
+          <div class="sel">${selos}</div>
+          <div class="nm"><span>Nome:</span><i></i></div>
+          <div class="nm"><span>WhatsApp:</span><i></i></div>
+          <div class="rg">Válido para pratos principais, exceto em datas comemorativas.<br>
+            Não cumulativo com outras promoções · ${esc(CFG.telefone)}</div>
+        </div></div>
+      </div>`);
+  }
+});
+
+/* 22. Folha de cupons destacáveis */
+MODELOS.push({
+  id:'cupons', cat:'marketing', w:794, h:1123,
+  nome:'Folha de Cupons Destacáveis',
+  formato:'A4 · 4 cupons por folha',
+  desc:'Quatro cupons diferentes na mesma folha, com validade e regra. Para colocar na sacola do delivery, no balcão ou entregar em ação na rua.',
+  tags:['A4','cupom','desconto','delivery'],
+  build(){
+    const cups = [
+      ['10% OFF','na primeira compra pelo nosso site',CFG.cupom,'Pedido mínimo de R$ 40'],
+      ['SOBREMESA GRÁTIS','em pedidos acima de R$ 90','DOCE90','Uma por pedido, a escolher entre 3 opções'],
+      ['FRETE GRÁTIS','para entregas até 4 km','FRETE0','De segunda a quinta, exceto feriados'],
+      ['LEVE 2 PAGUE 1','no executivo de terça e quarta','EXEC2X1','Válido apenas no salão, das 11h30 às 15h']
+    ];
+    return doc('Cupons — '+CFG.nome, baseCSS('paper')+printCSS('210mm 297mm')+`
+      .page{width:210mm;height:297mm;padding:12mm;display:grid;grid-template-rows:repeat(4,1fr);gap:4mm}
+      .cp{display:flex;border:1.5px dashed var(--acc);border-radius:3mm;overflow:hidden;position:relative}
+      .lft{width:52mm;flex:none;background:var(--acc);color:#fff;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;text-align:center;padding:5mm}
+      .lft b{font-family:var(--ft);font-size:19pt;line-height:1.05}
+      .lft span{font-size:7pt;margin-top:2mm;opacity:.92;line-height:1.4}
+      .rgt{flex:1;padding:6mm 8mm;display:flex;flex-direction:column;justify-content:center}
+      .rgt h3{font-size:12pt}
+      .rgt .tl{font-size:6.5pt;letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);margin-top:1.5mm}
+      .cod{margin-top:3mm;display:inline-block;align-self:flex-start;border:1px solid var(--line);
+        background:var(--card);border-radius:1.5mm;padding:2mm 4mm;font-family:ui-monospace,monospace;
+        font-size:10pt;letter-spacing:.14em;color:var(--acc2)}
+      .rgt .rg{font-size:6.5pt;color:var(--mut);margin-top:3mm;line-height:1.55}
+      .qrc{width:26mm;display:grid;place-items:center;border-left:1px dashed var(--line);padding:3mm}
+      .sci{position:absolute;left:52mm;top:-2mm;font-size:8pt;color:var(--acc);transform:rotate(90deg)}
+    `, DICA_PRINT + `
+      <div class="page">
+        ${cups.map(c=>`<div class="cp">
+          <div class="lft"><b>${esc(c[0])}</b><span>${esc(c[1])}</span></div>
+          <div class="rgt"><h3>${esc(CFG.nome)}</h3><div class="tl">${esc(CFG.tagline)}</div>
+            <span class="cod">${esc(c[2])}</span>
+            <div class="rg">${esc(c[3])} · Válido por 30 dias a partir da retirada.<br>
+              ${esc(CFG.endereco)} · ${esc(CFG.telefone)} · ${esc(CFG.site)}</div></div>
+          <div class="qrc">${qrFake(60, P().paper.ink, P().paper.bg)}</div>
+        </div>`).join('')}
+      </div>`);
+  }
+});
+
+/* 23. E-mail marketing */
+MODELOS.push({
+  id:'email-mkt', cat:'marketing', w:600, h:1300,
+  nome:'E-mail Marketing / Newsletter',
+  formato:'600 px de largura · padrão de e-mail',
+  desc:'Newsletter com novidade do cardápio, cupom e informações da casa. Largura de 600 px, que é o padrão que funciona em todos os aplicativos de e-mail.',
+  tags:['e-mail','newsletter','600px','base de clientes'],
+  build(){
+    const d = destaques(2);
+    return doc('E-mail — '+CFG.nome, baseCSS('paper')+`
+      body{background:#e8e6e1;padding:20px 0;font-family:var(--fb)}
+      .wr{width:600px;margin:0 auto;background:var(--bg)}
+      .pre{text-align:center;font-size:11px;color:#999;padding:0 0 14px}
+      .hd{background:var(--acc2);color:#fff;text-align:center;padding:30px 34px}
+      .hd h1{font-size:26px;color:#fff}
+      .hd .tl{font-size:10px;letter-spacing:.26em;text-transform:uppercase;opacity:.85;margin-top:8px}
+      .hero{padding:36px 40px;text-align:center;border-bottom:1px solid var(--line)}
+      .hero .kk{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc2)}
+      .hero h2{font-size:30px;margin-top:12px;line-height:1.15}
+      .hero p{font-size:15px;color:var(--mut);margin-top:14px;line-height:1.65}
+      .btn{display:inline-block;background:var(--acc);color:#fff;text-decoration:none;font-weight:700;
+        font-size:15px;padding:15px 34px;border-radius:8px;margin-top:24px}
+      .bl{padding:32px 40px;border-bottom:1px solid var(--line)}
+      .bl h3{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;margin-bottom:18px}
+      .pd{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+      .pd:last-child{margin-bottom:0}
+      .pd .foto{width:88px;height:88px;border-radius:10px}
+      .pd .foto span{font-size:36px}
+      .pd b{font-size:17px;font-family:var(--ft);font-weight:600;display:block}
+      .pd p{font-size:13px;color:var(--mut);margin-top:5px;line-height:1.5}
+      .pd .pc{font-size:16px;font-weight:700;color:var(--acc2);white-space:nowrap}
+      .cup{margin:0;padding:30px 40px;text-align:center;background:var(--card)}
+      .cup .box{border:2px dashed var(--acc);border-radius:12px;padding:22px}
+      .cup .l{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+      .cup .c{font-family:var(--ft);font-size:34px;color:var(--acc2);letter-spacing:.08em;margin-top:6px}
+      .cup .v{font-size:12px;color:var(--mut);margin-top:8px}
+      .inf{padding:28px 40px;display:flex;gap:24px;font-size:13px;color:var(--mut);line-height:1.7}
+      .inf b{display:block;color:var(--ink);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+      .ft{background:var(--card);padding:26px 40px;text-align:center;font-size:11.5px;color:var(--mut);line-height:1.8}
+      .ft a{color:var(--acc2)}
+      .noprint{font-family:system-ui,sans-serif}
+    `, DICA_IMG.replace('Virar imagem','Usar como e-mail').replace(/Ctrl.*?tela em zoom 100%/, 'copie o código HTML pelo botão “Copiar código” e cole na sua ferramenta de disparo') + `
+      <div class="wr">
+        <div class="pre">Não está vendo direito? Abra no navegador.</div>
+        <div class="hd"><h1>${esc(CFG.nome)}</h1><div class="tl">${esc(CFG.tagline)}</div></div>
+        <div class="hero"><div class="kk">Novidade da semana</div>
+          <h2>Chegaram pratos novos<br>na nossa cozinha</h2>
+          <p>Renovamos o cardápio com ingredientes da estação. Separamos abaixo o que está saindo mais — e um cupom para você experimentar.</p>
+          <a class="btn" href="#">Ver o cardápio completo</a></div>
+        <div class="bl"><h3>Em destaque agora</h3>
+          ${d.map(it=>`<div class="pd">${fotoBox(it,88,10)}
+            <div style="flex:1"><b>${esc(it.nome)}</b><p>${esc(it.desc)}</p></div>
+            <span class="pc">${prBR(it.preco)}</span></div>`).join('')}
+        </div>
+        <div class="cup"><div class="box"><div class="l">Seu cupom exclusivo</div>
+          <div class="c">${esc(CFG.cupom)}</div>
+          <div class="v">${esc(CFG.promo)}</div></div></div>
+        <div class="inf">
+          <div style="flex:1"><b>Onde estamos</b>${esc(CFG.endereco)}</div>
+          <div style="flex:1"><b>Horário</b>${esc(CFG.horario)}</div>
+        </div>
+        <div class="ft">${esc(CFG.nome)} · ${esc(CFG.telefone)} · ${esc(CFG.instagram)}<br>
+          Você recebe este e-mail porque se cadastrou na nossa casa.<br>
+          <a href="#">Descadastrar</a> · <a href="#">Atualizar preferências</a></div>
+      </div>`);
+  }
+});
+
+/* 24. Placa de mesa com QR Code */
+MODELOS.push({
+  id:'placa-qr', cat:'marketing', w:559, h:794,
+  nome:'Placa de Mesa com QR Code',
+  formato:'A5 ou A6 · para display acrílico',
+  desc:'Placa grande e limpa: QR Code do cardápio, WhatsApp e avaliação no Google. É o jeito mais barato de conseguir mais avaliações positivas.',
+  tags:['QR Code','mesa','avaliação','Google'],
+  build(){
+    return doc('Placa QR — '+CFG.nome, baseCSS('paper')+printCSS('148mm 210mm')+`
+      .page{width:148mm;height:210mm;padding:14mm 12mm;text-align:center;display:flex;flex-direction:column}
+      .page::before{content:'';position:absolute;inset:6mm;border:1px solid var(--line);pointer-events:none}
+      header h1{font-size:19pt} header .tl{font-size:6.5pt;letter-spacing:.26em;text-transform:uppercase;
+        color:var(--acc2);margin-top:2mm}
+      .qbig{margin:9mm auto 0;padding:5mm;background:#fff;border-radius:3mm;border:1px solid var(--line);
+        display:inline-block;line-height:0}
+      .cta{font-family:var(--ft);font-size:15pt;margin-top:6mm;line-height:1.25}
+      .cta small{display:block;font-family:var(--fb);font-size:8pt;color:var(--mut);margin-top:2.5mm;line-height:1.6}
+      .two{display:flex;gap:5mm;margin-top:auto;padding-top:7mm;border-top:1px solid var(--line)}
+      .mini{flex:1;border:1px solid var(--line);border-radius:2.5mm;padding:4mm;text-align:center}
+      .mini .ic{font-size:13pt} .mini b{display:block;font-size:8pt;margin:1.5mm 0}
+      .mini span{font-size:6.5pt;color:var(--mut);line-height:1.5;display:block}
+      .mini .q{margin-top:2.5mm;line-height:0}
+      .ft{font-size:6.5pt;color:var(--mut);margin-top:5mm;line-height:1.7}
+    `, DICA_PRINT + `
+      <div class="page">
+        <header><h1>${esc(CFG.nome)}</h1><div class="tl">${esc(CFG.tagline)}</div></header>
+        <div class="qbig">${qrFake(150,'#111','#fff')}</div>
+        <div class="cta">Aponte a câmera<br>e veja o cardápio
+          <small>Sem app, sem cadastro. Precisa de ajuda?<br>É só chamar a gente. 😊</small></div>
+        <div class="two">
+          <div class="mini"><div class="ic">⭐</div><b>Avalie no Google</b>
+            <span>Sua opinião ajuda muito<br>a nossa casa</span>
+            <div class="q">${qrFake(46,'#111','#fff')}</div></div>
+          <div class="mini"><div class="ic">💬</div><b>Peça pelo WhatsApp</b>
+            <span>Delivery e retirada<br>${esc(CFG.telefone)}</span>
+            <div class="q">${qrFake(46,'#111','#fff')}</div></div>
+        </div>
+        <div class="ft">${esc(CFG.instagram)} · ${esc(CFG.site)} · Wi-Fi liberado, peça a senha</div>
+      </div>`);
+  }
+});
+
+/* 25. Encarte de delivery para a sacola */
+MODELOS.push({
+  id:'encarte-delivery', cat:'marketing', w:559, h:794,
+  nome:'Encarte de Delivery (sacola)',
+  formato:'A5 · vai dentro da embalagem',
+  desc:'O papel que acompanha o pedido: agradece, ensina a pedir direto (sem taxa de app), dá cupom da próxima e pede avaliação. Recompra em estado puro.',
+  tags:['delivery','sacola','recompra','sem app'],
+  build(){
+    return doc('Encarte — '+CFG.nome, baseCSS('paper')+printCSS('148mm 210mm')+`
+      .page{width:148mm;height:210mm;padding:13mm 12mm;display:flex;flex-direction:column}
+      .hand{font-family:var(--fs);font-size:17pt;color:var(--acc2);text-align:center}
+      h1{font-size:17pt;text-align:center;margin-top:2mm}
+      .msg{font-size:8.5pt;color:var(--mut);text-align:center;margin-top:3mm;line-height:1.65;padding:0 4mm}
+      .box{margin-top:6mm;background:var(--card);border-radius:3mm;padding:6mm}
+      .box h2{font-size:9pt;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
+        font-family:var(--fb);font-weight:700;margin-bottom:3.5mm;text-align:center}
+      .st{display:flex;gap:3.5mm;margin-bottom:3mm;align-items:flex-start}
+      .st .n{width:6mm;height:6mm;flex:none;border-radius:50%;background:var(--acc);color:#fff;
+        display:grid;place-items:center;font-size:7pt;font-weight:700}
+      .st b{font-size:8.5pt;display:block} .st span{font-size:7pt;color:var(--mut);line-height:1.5}
+      .eco{display:flex;gap:5mm;align-items:center;margin-top:5mm;border:1.5px dashed var(--acc);
+        border-radius:3mm;padding:5mm}
+      .eco .tx{flex:1} .eco .l{font-size:6.5pt;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+      .eco .c{font-family:var(--ft);font-size:19pt;color:var(--acc2);letter-spacing:.06em;line-height:1.1}
+      .eco .v{font-size:7pt;color:var(--mut);margin-top:1mm}
+      .rev{margin-top:auto;text-align:center;padding-top:6mm;border-top:1px solid var(--line)}
+      .rev b{font-size:9.5pt;display:block} .rev p{font-size:7.5pt;color:var(--mut);margin-top:1.5mm;line-height:1.6}
+      .stars{color:var(--acc);font-size:13pt;letter-spacing:.18em;margin-top:2mm}
+      .ft{text-align:center;font-size:7pt;color:var(--mut);margin-top:4mm;line-height:1.7}
+      .aq{margin-top:3mm;text-align:center;font-size:6.5pt;color:var(--mut)}
+    `, DICA_PRINT + `
+      <div class="page">
+        <div class="hand">Obrigado por pedir na nossa casa!</div>
+        <h1>${esc(CFG.nome)}</h1>
+        <p class="msg">Cada pedido é preparado na hora, por gente que se importa com o que faz. Se algo não saiu como você esperava, fale com a gente antes de qualquer coisa — a gente resolve.</p>
+
+        <div class="box"><h2>Da próxima vez, peça direto</h2>
+          <div class="st"><span class="n">1</span><div><b>Chame no WhatsApp ${esc(CFG.telefone)}</b>
+            <span>ou acesse ${esc(CFG.site)}</span></div></div>
+          <div class="st"><span class="n">2</span><div><b>Preço menor que no aplicativo</b>
+            <span>Sem a comissão do app, a gente repassa a diferença para você.</span></div></div>
+          <div class="st"><span class="n">3</span><div><b>Entrega feita pela nossa equipe</b>
+            <span>${esc(CFG.entrega)}</span></div></div>
+        </div>
+
+        <div class="eco">${qrFake(72, P().paper.ink, P().paper.bg)}
+          <div class="tx"><div class="l">Cupom da próxima</div><div class="c">${esc(CFG.cupom)}</div>
+            <div class="v">${esc(CFG.promo)}</div></div></div>
+
+        <div class="rev"><b>Ficou bom? Conta pra gente!</b>
+          <p>Uma avaliação no Google leva 20 segundos<br>e ajuda demais um restaurante de bairro.</p>
+          <div class="stars">★★★★★</div></div>
+        <div class="ft">${esc(CFG.endereco)}<br>${esc(CFG.instagram)} · ${esc(CFG.horario)}</div>
+        <div class="aq">Embalagem reciclável — separe para a coleta seletiva ♻</div>
+      </div>`);
+  }
+});
+
+
+/* ============================================================
+   6. INTERFACE DA CENTRAL
+   ============================================================ */
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
+let filtro = 'todos', busca = '';
+
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('on'), 2100);
+}
+
+/* ---- painel de personalização ---- */
+function montarPainel(){
+  $$('[data-k]').forEach(inp=>{
+    inp.value = CFG[inp.dataset.k] || '';
+    inp.addEventListener('input', ()=>{
+      CFG[inp.dataset.k] = inp.value;
+      salvar(); renderGrid(true);
+    });
+  });
+
+  $('#paletas').innerHTML = PALETAS.map(p=>
+    '<button class="sw'+(p.id===CFG.paleta?' on':'')+'" data-p="'+p.id+'">'
+    + '<div class="bars"><i style="background:'+p.night.bg+'"></i><i style="background:'+p.acc+'"></i><i style="background:'+p.accSoft+'"></i></div>'
+    + '<b style="font-size:13px">'+p.nome+'</b><small>'+p.desc+'</small></button>').join('');
+  $$('#paletas .sw').forEach(b=>b.onclick=()=>{
+    CFG.paleta = b.dataset.p; salvar();
+    $$('#paletas .sw').forEach(x=>x.classList.toggle('on', x===b));
+    renderGrid(true);
+  });
+
+  $('#fontes').innerHTML = FONTES.map(f=>
+    '<button class="fo'+(f.id===CFG.fonte?' on':'')+'" data-f="'+f.id+'">'
+    + '<b style="font-family:'+f.titulo.replace(/"/g,"'")+'">'+f.amostra+'</b>'
+    + '<small style="font-family:'+f.corpo.replace(/"/g,"'")+'">'+f.nome+'</small></button>').join('');
+  $$('#fontes .fo').forEach(b=>b.onclick=()=>{
+    CFG.fonte = b.dataset.f; salvar();
+    $$('#fontes .fo').forEach(x=>x.classList.toggle('on', x===b));
+    renderGrid(true);
+  });
+
+  $('#c_json').value = JSON.stringify(MENU, null, 2);
+}
+
+$('#btnJson') && ($('#btnJson').onclick = ()=>{
+  try{
+    const d = JSON.parse($('#c_json').value);
+    if(!Array.isArray(d) || !d.length) throw new Error('A lista precisa ter pelo menos uma categoria.');
+    d.forEach(c=>{ if(!c.nome || !Array.isArray(c.itens)) throw new Error('Cada categoria precisa de "nome" e de uma lista "itens".'); });
+    MENU = d; salvar(); renderGrid(true);
+    $('#jsonMsg').textContent = '✓ Cardápio aplicado em todos os modelos.';
+    $('#jsonMsg').style.color = '#4ec08a';
+    toast('Cardápio atualizado');
+  }catch(e){
+    $('#jsonMsg').textContent = '✗ ' + e.message;
+    $('#jsonMsg').style.color = '#e0614a';
+  }
+});
+$('#btnJsonReset') && ($('#btnJsonReset').onclick = ()=>{
+  MENU = JSON.parse(JSON.stringify(CARDAPIO_PADRAO));
+  $('#c_json').value = JSON.stringify(MENU, null, 2);
+  $('#jsonMsg').textContent = ''; salvar(); renderGrid(true); toast('Cardápio de exemplo restaurado');
+});
+$('#btnReset').onclick = ()=>{
+  if(!confirm('Isso apaga os dados que você digitou e volta tudo ao exemplo. Continuar?')) return;
+  CFG = Object.assign({}, PADRAO);
+  MENU = JSON.parse(JSON.stringify(CARDAPIO_PADRAO));
+  salvar(); montarPainel(); renderGrid(true); toast('Tudo restaurado');
+};
+$('#btnExport').onclick = ()=>{
+  baixar('meus-dados-cardapio.json', JSON.stringify({cfg:CFG, menu:MENU}, null, 2), 'application/json');
+};
+$('#fileImp').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const d = JSON.parse(r.result);
+      if(d.cfg) CFG = Object.assign({}, PADRAO, d.cfg);
+      if(Array.isArray(d.menu) && d.menu.length) MENU = d.menu;
+      salvar(); montarPainel(); renderGrid(true); toast('Dados importados');
+    }catch(err){ toast('Arquivo inválido'); }
+  };
+  r.readAsText(f); e.target.value='';
+};
+
+/* ---- grade de modelos ---- */
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ pintar(e.target); io.unobserve(e.target); } });
+}, {rootMargin:'260px'});
+
+function pintar(thumb){
+  const m = MODELOS.find(x=>x.id===thumb.dataset.id); if(!m) return;
+  const cw = thumb.clientWidth || 320, ch = thumb.clientHeight || 236;
+  /* modelos de celular aparecem menores e centralizados, para caber mais tela na miniatura */
+  const alvo = m.w <= 520 ? Math.min(cw*0.66, 240) : cw;
+  const escala = alvo / m.w;
+  const f = document.createElement('iframe');
+  f.setAttribute('scrolling','no'); f.setAttribute('title', m.nome); f.setAttribute('aria-hidden','true');
+  f.style.width = m.w + 'px';
+  f.style.height = Math.ceil(ch / escala) + 'px';
+  f.style.left = Math.round((cw - alvo)/2) + 'px';
+  f.style.transform = 'scale(' + escala + ')';
+  f.addEventListener('load', ()=>{
+    const sk = thumb.querySelector('.skel'); if(sk) sk.remove();
+  });
+  /* o iframe entra no DOM antes de receber o conteúdo: com o srcdoc definido
+     antes da inserção, a camada com transform não repinta quando o documento carrega */
+  thumb.appendChild(f);
+  /* na miniatura o aviso de impressão só atrapalha — ele continua na visualização grande */
+  f.srcdoc = m.build().replace('</style></head>', '.noprint{display:none!important}</style></head>');
+}
+
+function visiveis(){
+  const q = busca.trim().toLowerCase();
+  return MODELOS.filter(m=>{
+    if(filtro!=='todos' && m.cat!==filtro) return false;
+    if(!q) return true;
+    return (m.nome+' '+m.desc+' '+m.formato+' '+(m.tags||[]).join(' ')).toLowerCase().includes(q);
+  });
+}
+
+function renderGrid(manterPos){
+  const y = manterPos ? window.scrollY : null;
+  const lista = visiveis();
+  const g = $('#grid');
+  g.innerHTML = lista.length ? lista.map(m=>
+    '<article class="mcard">'
+    + '<div class="thumb" data-id="'+m.id+'">'
+      + '<div class="badges"><span class="bdg '+m.cat+'">'+({digital:'Digital',fisico:'Impresso',marketing:'Marketing'}[m.cat])+'</span></div>'
+      + '<div class="skel">carregando pré-visualização…</div>'
+      + '<div class="hov"><span>Ver em tamanho real</span></div>'
+    + '</div>'
+    + '<div class="mbody">'
+      + '<h3>'+esc(m.nome)+'</h3>'
+      + '<div class="fmt">'+esc(m.formato)+'</div>'
+      + '<p>'+esc(m.desc)+'</p>'
+      + '<div class="tags">'+(m.tags||[]).map(t=>'<span class="tg">'+esc(t)+'</span>').join('')+'</div>'
+      + '<div class="mactions">'
+        + '<button class="btn btn-p btn-sm" data-open="'+m.id+'">Abrir</button>'
+        + '<button class="btn btn-sm" data-down="'+m.id+'">↓ HTML</button>'
+        + '<button class="btn btn-sm" data-print="'+m.id+'">🖨</button>'
+      + '</div>'
+    + '</div></article>').join('')
+    : '<div class="empty">Nenhum modelo encontrado para “'+esc(busca)+'”.</div>';
+
+  $('#cont').textContent = lista.length + ' de ' + MODELOS.length + ' modelos';
+  $$('#grid .thumb').forEach(t=>{ io.observe(t); t.onclick = ()=>abrir(t.dataset.id); });
+  $$('#grid [data-open]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); abrir(b.dataset.open); });
+  $$('#grid [data-down]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); baixarModelo(b.dataset.down); });
+  $$('#grid [data-print]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); imprimirModelo(b.dataset.print); });
+  if(y!==null) window.scrollTo(0,y);
+}
+
+$$('#tabs .tab').forEach(t=>t.onclick=()=>{
+  filtro = t.dataset.f;
+  $$('#tabs .tab').forEach(x=>x.classList.toggle('on', x===t));
+  renderGrid(true);
+});
+$('#busca').addEventListener('input', e=>{ busca = e.target.value; renderGrid(true); });
+
+/* ---- download / impressão ---- */
+function baixar(nome, conteudo, tipo){
+  const b = new Blob([conteudo], {type:(tipo||'text/html')+';charset=utf-8'});
+  const u = URL.createObjectURL(b);
+  const a = document.createElement('a');
+  a.href = u; a.download = nome; document.body.appendChild(a); a.click();
+  a.remove(); setTimeout(()=>URL.revokeObjectURL(u), 4000);
+}
+function slug(s){
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+function baixarModelo(id){
+  const m = MODELOS.find(x=>x.id===id); if(!m) return;
+  baixar(slug(CFG.nome)+'-'+m.id+'.html', m.build());
+  toast('Arquivo baixado — abra no navegador');
+}
+function imprimirModelo(id){
+  const m = MODELOS.find(x=>x.id===id); if(!m) return;
+  const f = document.createElement('iframe');
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;opacity:0';
+  f.onload = ()=>{ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){}
+    setTimeout(()=>f.remove(), 60000); };
+  document.body.appendChild(f);
+  f.srcdoc = m.build();
+  toast('Abrindo a janela de impressão…');
+}
+
+/* ---- modal ---- */
+let atual = null, zoom = 1;
+function abrir(id){
+  const m = MODELOS.find(x=>x.id===id); if(!m) return;
+  atual = m; zoom = 1;
+  $('#mTitle').textContent = m.nome;
+  $('#mFmt').textContent = m.formato + ' · ' + m.desc;
+  /* o palco precisa estar visível antes de medir a largura disponível */
+  $('#modal').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  render_stage();
+}
+function render_stage(){
+  if(!atual) return;
+  const st = $('#stage');
+  const util = Math.max(280, st.clientWidth - 46);
+  const disp = Math.max(.12, Math.min(1, util/atual.w) * zoom);
+  st.innerHTML = '';
+  const f = document.createElement('iframe');
+  f.id = 'mFrame'; f.setAttribute('title', atual.nome);
+  f.style.width = atual.w+'px';
+  f.style.height = (atual.h||900)+'px';
+  f.style.transform = 'scale('+disp+')';
+  f.style.transformOrigin = '50% 0';
+  f.style.marginBottom = ((disp-1)*(atual.h||900))+'px';
+  st.appendChild(f);
+  f.srcdoc = atual.build();
+}
+function fechar(){
+  $('#modal').classList.remove('on'); $('#stage').innerHTML='';
+  document.body.style.overflow=''; atual=null;
+}
+$$('[data-close]').forEach(b=>b.onclick=fechar);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && atual) fechar(); });
+$('#mZoomIn').onclick = ()=>{ zoom = Math.min(2.5, zoom+0.2); render_stage(); };
+$('#mZoomOut').onclick = ()=>{ zoom = Math.max(0.3, zoom-0.2); render_stage(); };
+$('#mDown').onclick = ()=> atual && baixarModelo(atual.id);
+$('#mPrint').onclick = ()=>{
+  const f = document.getElementById('mFrame');
+  if(f){ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ imprimirModelo(atual.id); } }
+};
+$('#mNew').onclick = ()=>{
+  if(!atual) return;
+  const b = new Blob([atual.build()], {type:'text/html;charset=utf-8'});
+  window.open(URL.createObjectURL(b), '_blank');
+};
+$('#mCopy').onclick = async ()=>{
+  if(!atual) return;
+  try{ await navigator.clipboard.writeText(atual.build()); toast('Código HTML copiado'); }
+  catch(e){ toast('Não foi possível copiar — use “Baixar HTML”'); }
+};
+window.addEventListener('resize', ()=>{ if(atual) render_stage(); });
+
+/* ---- calculadora ---- */
+function calcular(){
+  const num = id => parseFloat($(id).value.replace(',','.')) || 0;
+  const custo = num('#k_custo'), cmv = num('#k_cmv'), perda = num('#k_perda');
+  const emb = num('#k_emb'), imp = num('#k_imp'), tx = num('#k_tx');
+  const custoPerda = custo * (1 + perda/100);
+  const custoTotal = custoPerda + emb;
+  const encargos = (imp + tx)/100;
+  let preco = 0;
+  if(cmv > 0 && (cmv/100 + encargos) < 1) preco = custoTotal / (cmv/100);
+  if(encargos > 0 && preco > 0) preco = custoTotal / (cmv/100 * (1 - encargos) + 0);
+  if(!isFinite(preco) || preco <= 0) preco = 0;
+
+  const valEncargos = preco * encargos;
+  const margem = preco - custoTotal - valEncargos;
+  const cmvReal = preco > 0 ? (custoTotal / preco * 100) : 0;
+  const markup = custoTotal > 0 ? (preco / custoTotal) : 0;
+
+  const psico = preco>0 ? (Math.floor(preco) + 0.90) : 0;
+  const redondo = preco>0 ? Math.ceil(preco) : 0;
+
+  $('#k_preco').textContent = prBR(preco);
+  $('#k_psico').innerHTML = preco>0
+    ? prBR(psico) + ' <span style="color:var(--mut);font-size:14px;font-weight:400">casual</span> &nbsp;·&nbsp; '
+      + prBR(redondo) + ' <span style="color:var(--mut);font-size:14px;font-weight:400">sofisticado</span>'
+    : '—';
+  $('#k_r1').textContent = prBR(custoPerda);
+  $('#k_r2').textContent = prBR(custoTotal);
+  $('#k_r3').textContent = prBR(valEncargos);
+  $('#k_r4').textContent = prBR(margem);
+  $('#k_r5').textContent = cmvReal.toFixed(1).replace('.',',') + '%';
+  $('#k_r6').textContent = markup ? markup.toFixed(2).replace('.',',') + '×' : '—';
+
+  const d = $('#k_diag');
+  if(preco<=0){ d.className='warn no'; d.textContent='Confira os campos: o CMV precisa ser maior que zero e os encargos não podem consumir toda a receita.'; }
+  else if(cmv>40){ d.className='warn no'; d.innerHTML='CMV de <b>'+cmv+'%</b> é alto para prato de salão. Acima de 40% sobra pouco para folha, aluguel e lucro.'; }
+  else if(margem < custoTotal*0.8){ d.className='warn no'; d.innerHTML='A margem de <b>'+prBR(margem)+'</b> é apertada. Revise a porção, o fornecedor ou o preço.'; }
+  else { d.className='warn ok'; d.innerHTML='Cada '+esc($('#k_nome').value||'prato')+' vendido deixa <b>'+prBR(margem)+'</b> para cobrir custos fixos e lucro.'; }
+}
+['#k_custo','#k_cmv','#k_perda','#k_emb','#k_imp','#k_tx','#k_nome'].forEach(s=>{
+  const el = $(s); if(el) el.addEventListener('input', calcular);
+});
+
+/* ---- boot ---- */
+carregar();
+montarPainel();
+renderGrid();
+calcular();
+$('#s1').textContent = MODELOS.filter(m=>m.cat==='digital').length;
+$('#s2').textContent = MODELOS.filter(m=>m.cat==='fisico').length;
+$('#s3').textContent = MODELOS.filter(m=>m.cat==='marketing').length;
+</script>
+</body>
+</html>
