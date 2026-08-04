@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fazenda 25</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100%;
+    background: #14171a;
+    color: #F3F6E8;
+    font-family: "Nunito Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 12px;
+  }
+  #shell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  h1 {
+    font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 3px;
+    text-transform: uppercase; color: #9CC406;
+  }
+  h1 span { color: #7B7B7B; letter-spacing: 1px; font-weight: 400; }
+  #wrap { position: relative; line-height: 0; touch-action: none; }
+  canvas { display: block; background: #4F7A34; border-radius: 4px; touch-action: none; }
+
+  /* ---------- controles de toque (só aparecem em dispositivo com toque) ---------- */
+  /* --k = escala do canvas (largura exibida / 800). Tudo aqui é medido em
+     unidades lógicas do jogo e multiplicado por --k, então os controles
+     mantêm a proporção em qualquer tela. */
+  #touch { position: absolute; inset: 0; display: none; touch-action: none; user-select: none; -webkit-user-select: none; --k: 1; }
+  body.toque #touch { display: block; }
+  body.toque #tip, body.toque h1 { display: none; }
+  body.toque { padding: 0; overflow: hidden; }
+  body.toque #shell { gap: 0; }
+  .tbtn {
+    position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.55); color: #F3F6E8; border: 1.5px solid rgba(255,255,255,0.22);
+    border-radius: calc(7px * var(--k));
+    font-family: "Nunito Sans", -apple-system, "Segoe UI", sans-serif; font-weight: 700;
+    font-size: calc(11px * var(--k)); line-height: 1;
+    text-align: center; pointer-events: auto; -webkit-tap-highlight-color: transparent;
+  }
+  .tbtn.press { background: rgba(156,196,6,0.78); color: #14171a; border-color: #9CC406; }
+  .tbtn small { font-size: calc(7px * var(--k)); font-weight: 400; opacity: 0.72; margin-top: calc(2px * var(--k)); }
+  #tsteer {
+    position: absolute; left: calc(16px * var(--k)); top: 50%; transform: translateY(-50%);
+    width: calc(118px * var(--k)); height: calc(118px * var(--k)); border-radius: 50%;
+    background: rgba(0,0,0,0.40); border: 2px solid rgba(255,255,255,0.16);
+    pointer-events: auto; -webkit-tap-highlight-color: transparent;
+  }
+  #tknob {
+    position: absolute; left: 50%; top: 50%;
+    width: calc(48px * var(--k)); height: calc(48px * var(--k));
+    margin: calc(-24px * var(--k)) 0 0 calc(-24px * var(--k));
+    border-radius: 50%; background: rgba(156,196,6,0.55); border: 2px solid #9CC406;
+    transition: background 0.1s;
+  }
+  #tsteer::after {
+    content: "DIREÇÃO"; position: absolute; left: 0; right: 0; bottom: calc(-14px * var(--k));
+    text-align: center; font: 400 calc(8px * var(--k)) "Nunito Sans", sans-serif;
+    color: rgba(243,246,232,0.45); letter-spacing: 1px;
+  }
+  #tacel, #tfreio {
+    right: calc(16px * var(--k)); width: calc(62px * var(--k)); height: calc(62px * var(--k));
+    border-radius: 50%; font-size: calc(20px * var(--k));
+  }
+  #tacel { top: 28%; } #tfreio { top: 60%; }
+  .tact { width: calc(54px * var(--k)); height: calc(34px * var(--k)); right: calc(88px * var(--k)); }
+  #tR { top: 24%; } #tQ { top: 38%; } #tT { top: 52%; } #tE { top: 66%; }
+  .tmini {
+    width: calc(40px * var(--k)); height: calc(24px * var(--k));
+    font-size: calc(9px * var(--k)); left: calc(10px * var(--k));
+  }
+  #tP { top: calc(34px * var(--k)); } #tM { top: calc(64px * var(--k)); } #tH { top: calc(94px * var(--k)); }
+  #girar {
+    position: fixed; inset: 0; background: #14171a; color: #F3F6E8; z-index: 99;
+    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    font: 700 15px "Nunito Sans", sans-serif; text-align: center; padding: 24px;
+  }
+  body.retrato #girar { display: flex; }
+  #girar .ph { width: 54px; height: 88px; border: 3px solid #9CC406; border-radius: 8px; animation: gira 1.8s ease-in-out infinite; }
+  @keyframes gira { 0%, 40% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+  #tip { font-size: 11px; color: #7B7B7B; max-width: 800px; text-align: center; line-height: 1.7; }
+  #tip b { color: #F3F6E8; font-weight: 700; }
+  kbd {
+    background: rgba(0,0,0,0.8); border: 1px solid #3D3D3D; border-radius: 2px;
+    padding: 1px 5px; font: 700 10px/1 inherit; color: #F3F6E8;
+  }
+</style>
+</head>
+<body>
+<div id="shell">
+  <h1>Fazenda 25 <span>— simulador agrícola</span></h1>
+  <div id="wrap">
+    <canvas id="c" width="800" height="560"></canvas>
+    <div id="touch">
+      <div id="tsteer"><div id="tknob"></div></div>
+      <div class="tbtn" id="tacel">▲</div>
+      <div class="tbtn" id="tfreio">▼</div>
+      <div class="tbtn tact" id="tR" data-k="r">LIGA<small>implem.</small></div>
+      <div class="tbtn tact" id="tQ" data-k="q">ENGATA</div>
+      <div class="tbtn tact" id="tT" data-k="t">AÇÃO</div>
+      <div class="tbtn tact" id="tE" data-k="e">TROCA<small>veículo</small></div>
+      <div class="tbtn tmini" id="tP" data-k="p">LOJA</div>
+      <div class="tbtn tmini" id="tM" data-k="m">MAPA</div>
+      <div class="tbtn tmini" id="tH" data-k="h">?</div>
+    </div>
+  </div>
+  <div id="girar"><div class="ph"></div>Gire o aparelho<br><span style="font-weight:400;font-size:12px;opacity:.7">Fazenda 25 é jogado na horizontal</span></div>
+  <div id="tip">
+    <kbd>W</kbd><kbd>S</kbd> acelerar/frear · <kbd>A</kbd><kbd>D</kbd> esterçar · <kbd>R</kbd> ligar implemento ·
+    <kbd>Q</kbd> engatar · <kbd>T</kbd> ação (encher/descarregar/vender) · <kbd>E</kbd> trocar de veículo ·
+    <kbd>P</kbd> loja · <kbd>Tab</kbd> camadas · <kbd>H</kbd> ajuda
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   §1  CONSTANTES E TOKENS
+   ============================================================ */
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const VIEW_W = 800, VIEW_H = 560;
+
+const dpr = Math.min(2, window.devicePixelRatio || 1);
+cv.width = VIEW_W * dpr; cv.height = VIEW_H * dpr;
+ctx.scale(dpr, dpr);
+
+const TOQUE = ('ontouchstart' in window) || navigator.maxTouchPoints > 0
+              || matchMedia('(pointer: coarse)').matches;
+if (TOQUE) document.body.classList.add('toque');
+
+// o buffer é sempre 800x560; o CSS escala pra caber na tela
+function ajustarEscala() {
+  const wrapEl = document.getElementById('wrap');
+  // no celular o visualViewport é menor que innerHeight (barra de endereço)
+  const vv = window.visualViewport;
+  const vw = vv ? vv.width : window.innerWidth;
+  const vh = vv ? vv.height : window.innerHeight;
+  const dispW = Math.max(280, vw - (TOQUE ? 2 : 24));
+  const dispH = Math.max(200, vh - (TOQUE ? 4 : 120));
+  const esc = Math.min(dispW / VIEW_W, dispH / VIEW_H, TOQUE ? 4 : 1);
+  const w = Math.round(VIEW_W * esc), h = Math.round(VIEW_H * esc);
+  cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  wrapEl.style.width = w + 'px'; wrapEl.style.height = h + 'px';
+  // os controles de toque são medidos em unidades lógicas × esta escala
+  document.getElementById('touch').style.setProperty('--k', esc.toFixed(3));
+  document.body.classList.toggle('retrato', TOQUE && window.innerHeight > window.innerWidth);
+}
+addEventListener('resize', ajustarEscala);
+addEventListener('orientationchange', () => setTimeout(ajustarEscala, 120));
+addEventListener('load', () => { ajustarEscala(); setTimeout(ajustarEscala, 200); });
+ajustarEscala();
+
+// converte ponto da tela para coordenadas do canvas lógico (800x560)
+function paraCanvas(clientX, clientY) {
+  const r = cv.getBoundingClientRect();
+  return { x: (clientX - r.left) / r.width * VIEW_W, y: (clientY - r.top) / r.height * VIEW_H };
+}
+
+const TILE = 20, WC = 120, WR = 90, N = WC * WR;
+const WORLD_W = WC * TILE, WORLD_H = WR * TILE;
+
+const UI = {
+  green: "#9CC406", greenDark: "#81AA14", text: "#F3F6E8",
+  grey: "#3D3D3D", greyLight: "#7B7B7B", disabled: "#A8A8A8",
+  panel: "rgba(0,0,0,0.55)", panelStrong: "rgba(0,0,0,0.80)",
+  glass: "rgba(20,24,26,0.55)", hairline: "rgba(255,255,255,0.25)",
+  fuel: "#FFAE09", cond: "#1FAED1", crit: "#FF6200",
+  mission: "#FFB900", fieldSel: "#7DE4FF"
+};
+
+// estados de solo
+const G_NATIVO = 0, G_RESTOLHO = 1, G_ARADO = 2, G_CULTIVADO = 3, G_SEMEADO = 4,
+      G_CRESC = 5, G_MADURO = 6, G_MURCHO = 7, G_ASFALTO = 8, G_CONCRETO = 9,
+      G_AGUA = 10, G_TERRA = 11;
+
+// flags de bit
+const F_CAMPO = 1, F_PLOWED = 2, F_SOLIDO = 4;
+
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+const wrapPi = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
+function hash(a, b, s) {
+  let h = (a * 374761393 + b * 668265263 + s * 2246822519) | 0;
+  h = (h ^ (h >>> 13)) * 1274126177 | 0;
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+const fmt = n => Math.round(n).toLocaleString('pt-BR');
+const fmtL = n => Math.round(n).toLocaleString('pt-BR');
+
+function mixHex(hex, f) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = clamp(Math.round(((n >> 16) & 255) * f), 0, 255);
+  const g = clamp(Math.round(((n >> 8) & 255) * f), 0, 255);
+  const b = clamp(Math.round((n & 255) * f), 0, 255);
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+const escurecer = (hex, f) => mixHex(hex, f);
+const clarear = (hex, f) => mixHex(hex, f);
+
+/* ============================================================
+   §2  DADOS
+   ============================================================ */
+const MESES = ["Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez", "Jan", "Fev"];
+const ESTACOES = ["Primavera", "Primavera", "Primavera", "Verão", "Verão", "Verão",
+                  "Outono", "Outono", "Outono", "Inverno", "Inverno", "Inverno"];
+
+const SAZONAL = {
+  cereal:   [1.00, 1.07, 0.99, 0.94, 0.85, 0.81, 0.86, 0.99, 1.08, 1.13, 1.21, 1.08],
+  soja:     [0.99, 1.05, 1.16, 1.42, 1.59, 1.13, 0.87, 0.81, 0.77, 0.87, 0.74, 0.64],
+  milho:    [1.12, 1.08, 1.04, 1.14, 1.31, 0.98, 0.88, 0.71, 0.61, 0.92, 1.33, 0.98],
+  girassol: [1.05, 1.02, 0.98, 1.06, 1.20, 1.02, 0.90, 0.78, 0.65, 0.88, 1.15, 1.08],
+  raiz:     [0.94, 0.90, 0.92, 0.98, 1.03, 1.06, 1.10, 1.12, 1.15, 1.13, 1.05, 0.98]
+};
+
+// litrosPorTile = L/ha do FS25 / 100 · precoBaseL = preço XML × 1,8 (Normal)
+const CULTURAS = [
+  { id: 1, key: "trigo",     nome: "Trigo",     litros: 90,  preco: 0.607, semente: 5.0, ciclo: 4, colhedora: "grao",  sazonal: "cereal",
+    cores: ["#6E8C3A", "#5A8130", "#4E7A2E", "#C9A227", "#7A6A4E"], dens: 14 },
+  { id: 2, key: "cevada",    nome: "Cevada",    litros: 96,  preco: 0.563, semente: 5.0, ciclo: 4, colhedora: "grao",  sazonal: "cereal",
+    cores: ["#6E8C3A", "#5A8130", "#4E7A2E", "#D2B14A", "#7A6A4E"], dens: 14 },
+  { id: 3, key: "aveia",     nome: "Aveia",     litros: 57,  preco: 0.958, semente: 5.0, ciclo: 3, colhedora: "grao",  sazonal: "cereal",
+    cores: ["#719040", "#5F8734", "#527F30", "#CBAE55", "#7A6A4E"], dens: 12 },
+  { id: 4, key: "canola",    nome: "Canola",    litros: 58,  preco: 1.085, semente: 2.0, ciclo: 4, colhedora: "grao",  sazonal: "cereal",
+    cores: ["#6E8C3A", "#568A34", "#4A8A30", "#E0C21E", "#7A6A4E"], dens: 16 },
+  { id: 5, key: "soja",      nome: "Soja",      litros: 45,  preco: 1.400, semente: 3.0, ciclo: 4, colhedora: "grao",  sazonal: "soja",
+    cores: ["#7A9A44", "#5E8632", "#4C7228", "#6E7A2E", "#7A6A4E"], dens: 12 },
+  { id: 6, key: "milho",     nome: "Milho",     litros: 92,  preco: 0.684, semente: 4.0, ciclo: 4, colhedora: "milho", sazonal: "milho",
+    cores: ["#6E9A3C", "#4E8A2A", "#3E7A22", "#A8901F", "#7A6A4E"], dens: 8 },
+  { id: 7, key: "girassol",  nome: "Girassol",  litros: 52,  preco: 1.211, semente: 3.0, ciclo: 4, colhedora: "milho", sazonal: "girassol",
+    cores: ["#6E8C3A", "#4E7A2E", "#3F6B26", "#C8A415", "#7A6A4E"], dens: 6 },
+  { id: 8, key: "batata",    nome: "Batata",    litros: 413, preco: 0.400, semente: 37.3, ciclo: 4, colhedora: "raiz", sazonal: "raiz",
+    cores: ["#5E8A34", "#437028", "#3E6B2B", "#3E6B2B", "#6E6448"], dens: 10, exigeArado: true },
+  { id: 9, key: "beterraba", nome: "Beterraba", litros: 578, preco: 0.310, semente: 4.0, ciclo: 5, colhedora: "raiz",  sazonal: "raiz",
+    cores: ["#6E9440", "#4C7A33", "#3F6E2C", "#4C7A33", "#6E6448"], dens: 9, exigeArado: true }
+];
+const CROP_BY_ID = {}; CULTURAS.forEach(c => CROP_BY_ID[c.id] = c);
+
+const INSUMOS = { diesel: 1.05, semente: 0.63, fertilizante: 1.12, herbicida: 0.84, calcario: 0.16 };
+
+const MAQUINAS = [
+  // tratores
+  { id: "t90",  nome: "Trator Compacto T-90",       cat: "trator", cv: 90,  preco: 9800,  velLivre: 132, tanque: 120, consumo: 0.28, upkeep: 22, wb: 24 },
+  { id: "t160", nome: "Trator Utilitário T-160",    cat: "trator", cv: 160, preco: 22000, velLivre: 150, tanque: 220, consumo: 0.42, upkeep: 48, wb: 28 },
+  { id: "t320", nome: "Trator Pesado T-320",        cat: "trator", cv: 320, preco: 58000, velLivre: 165, tanque: 400, consumo: 0.70, upkeep: 95, wb: 32 },
+  // preparo
+  { id: "ar2",  nome: "Arado Reversível 2 Sulcos",  cat: "arado",      larg: 1, cvMin: 90,  velTrab: 55,  preco: 6500,  upkeep: 9,  op: "arar", montado: true },
+  { id: "ar5",  nome: "Arado Reversível 5 Sulcos",  cat: "arado",      larg: 2, cvMin: 200, velTrab: 60,  preco: 16000, upkeep: 20, op: "arar", montado: true },
+  { id: "cu2",  nome: "Cultivador Rápido 2T",       cat: "cultivador", larg: 2, cvMin: 90,  velTrab: 80,  preco: 4200,  upkeep: 6,  op: "cultivar" },
+  { id: "cu4",  nome: "Cultivador Rápido 4T",       cat: "cultivador", larg: 4, cvMin: 200, velTrab: 85,  preco: 13500, upkeep: 16, op: "cultivar" },
+  // plantio
+  { id: "se2",  nome: "Semeadora Pneumática 2T",    cat: "semeadora",  larg: 2, cvMin: 100, velTrab: 70,  preco: 8900,  cap: 900,  upkeep: 12, op: "semear", fill: "semente" },
+  { id: "se4",  nome: "Semeadora Pneumática 4T",    cat: "semeadora",  larg: 4, cvMin: 180, velTrab: 75,  preco: 19500, cap: 2800, upkeep: 24, op: "semear", fill: "semente" },
+  // aplicação
+  { id: "ad3",  nome: "Distribuidor de Adubo 3T",   cat: "adubadeira", larg: 3, cvMin: 90,  velTrab: 100, preco: 3900,  cap: 3000, upkeep: 5,  op: "adubar", fill: "fertilizante", montado: true },
+  { id: "pv4",  nome: "Pulverizador 4T",            cat: "pulverizador", larg: 4, cvMin: 110, velTrab: 95, preco: 6400, cap: 1800, upkeep: 8,  op: "herbicida", fill: "herbicida" },
+  // colheita
+  { id: "c350", nome: "Colheitadeira C-350",        cat: "colheitadeira", larg: 2, cv: 180, velLivre: 96, velTrab: 50, preco: 34000, tanqueGrao: 3500, tanque: 180, consumo: 0.55, upkeep: 60, wb: 30, aceita: ["grao"] },
+  { id: "c900", nome: "Colheitadeira C-900",        cat: "colheitadeira", larg: 4, cv: 420, velLivre: 104, velTrab: 55, preco: 86000, tanqueGrao: 9000, tanque: 340, consumo: 0.85, upkeep: 130, wb: 36, aceita: ["grao", "milho"] },
+  { id: "cr2",  nome: "Colhedora de Raízes CR-2",   cat: "colheitadeira", larg: 2, cv: 300, velLivre: 82, velTrab: 35, preco: 52000, tanqueGrao: 5000, tanque: 260, consumo: 0.75, upkeep: 90, wb: 32, aceita: ["raiz"] },
+  // transporte
+  { id: "rb8",  nome: "Reboque Basculante 8k",      cat: "reboque", preco: 4200,  cap: 8000,  upkeep: 5 },
+  { id: "rb21", nome: "Reboque Basculante 21k",     cat: "reboque", preco: 11000, cap: 21000, upkeep: 12 }
+];
+const MAQ = {}; MAQUINAS.forEach(m => MAQ[m.id] = m);
+
+const CLIMAS = {
+  sol:        { p: 0.42, nome: "Sol",        tint: null,                       ico: "sol" },
+  nublado:    { p: 0.24, nome: "Nublado",    tint: "rgba(150,160,170,0.12)",   ico: "nuvem" },
+  chuva:      { p: 0.18, nome: "Chuva",      tint: "rgba(90,110,130,0.22)",    ico: "chuva", colheita: 0.5 },
+  tempestade: { p: 0.05, nome: "Tempestade", tint: "rgba(60,70,90,0.34)",      ico: "raio",  colheita: 0.5 },
+  neblina:    { p: 0.06, nome: "Neblina",    tint: "rgba(220,225,230,0.30)",   ico: "nevoa" },
+  neve:       { p: 0.05, nome: "Neve",       tint: "rgba(230,238,246,0.18)",   ico: "neve",  colheita: 0.5, soInverno: true }
+};
+const CLIMA_KEYS = Object.keys(CLIMAS);
+
+const CONTRATO_VAL = { arar: 28, colher: 25, cultivar: 23, semear: 20, adubar: 15 };
+
+/* ============================================================
+   §3  ESTADO DO MUNDO (SoA)
+   ============================================================ */
+const W = {
+  ground: new Uint8Array(N), crop: new Uint8Array(N), stage: new Uint8Array(N),
+  flags: new Uint8Array(N), lime: new Uint8Array(N), fert: new Uint8Array(N),
+  weeds: new Uint8Array(N), weedBon: new Uint8Array(N), angle: new Uint8Array(N),
+  rut: new Uint8Array(N), snow: new Uint8Array(N), fieldId: new Uint8Array(N),
+  matMes: new Int16Array(N)
+};
+
+const S = {
+  dinheiro: 8000, divida: 0,
+  minutos: 8 * 60, frac: 0, mesAbs: 0,
+  escala: 1, escalaIdx: 2,
+  clima: "sol", proxClima: "nublado", climaTimer: 6 * 60,
+  overlay: 0, minimapa: 3, ajuda: true,
+  litrosColhidos: 0, ganhoTotal: 0,
+  silo: {}, siloCap: 60000,
+  vendido: {}, faseRuido: {},
+  contratos: [], contratoTimer: 30,
+  msgs: [], acao: null, acaoAlpha: 0,
+  moneyFlash: 0, moneyFlashCol: null,
+  pausa: false, loja: false, lojaAba: 0, lojaSel: 0,
+  toast: null, toastT: 0
+};
+const ESCALAS = [0, 0.5, 1, 2, 4, 8];
+
+const FIELDS = [
+  { id: 1, x0: 36, y0: 8,  x1: 47, y1: 15, preco: 0,     dono: true },
+  { id: 2, x0: 52, y0: 6,  x1: 67, y1: 15, preco: 0,     dono: true },
+  { id: 3, x0: 36, y0: 28, x1: 45, y1: 35, preco: 12000, dono: false },
+  { id: 4, x0: 52, y0: 26, x1: 71, y1: 37, preco: 36000, dono: false },
+  { id: 5, x0: 80, y0: 10, x1: 93, y1: 20, preco: 29400, dono: false },
+  { id: 6, x0: 12, y0: 30, x1: 19, y1: 35, preco: 7200,  dono: false }
+];
+
+const POSTOS = [
+  { id: "coop",   nome: "Cooperativa de Grãos", x: 100, y: 60, w: 7, h: 5, scale: 1.00, queda: 40000, rec: 18,
+    aceita: ["trigo", "cevada", "aveia", "canola", "soja", "milho", "girassol"] },
+  { id: "moinho", nome: "Moinho",               x: 26,  y: 52, w: 6, h: 5, scale: 1.15, queda: 12000, rec: 24,
+    aceita: ["trigo", "cevada", "aveia"] },
+  { id: "feira",  nome: "Central de Hortifrúti", x: 64, y: 76, w: 7, h: 5, scale: 1.10, queda: 30000, rec: 20,
+    aceita: ["batata", "beterraba"] },
+  { id: "usina",  nome: "Usina de Açúcar",      x: 106, y: 20, w: 7, h: 5, scale: 1.05, queda: 90000, rec: 12,
+    aceita: ["beterraba"] }
+];
+
+const PATIO = { x0: 8, y0: 6, x1: 24, y1: 18 };
+const BOMBA = { x: 20, y: 15 };           // combustível
+const SILO_POS = { x: 11, y: 14 };        // encher semente/adubo + armazenar grão
+const LOJA_POS = { x: 15, y: 8 };
+
+const trees = [], predios = [], particulas = [], flutuantes = [];
+
+/* ============================================================
+   §4  GERAÇÃO DO MUNDO + CANVAS OFFSCREEN
+   ============================================================ */
+const world = document.createElement('canvas');
+world.width = WORLD_W; world.height = WORLD_H;
+const wc = world.getContext('2d');
+
+const mapa = document.createElement('canvas');   // versão reduzida p/ minimapa
+mapa.width = 240; mapa.height = 180;
+const mc = mapa.getContext('2d');
+
+function idx(c, r) { return r * WC + c; }
+function dentro(c, r) { return c >= 0 && r >= 0 && c < WC && r < WR; }
+
+function gerarMundo() {
+  for (let i = 0; i < N; i++) { W.ground[i] = G_NATIVO; W.lime[i] = 0; }
+
+  // rio na borda esquerda
+  for (let r = 0; r < WR; r++) {
+    const larg = 4 + Math.round(Math.sin(r * 0.15) * 1.6);
+    for (let c = 0; c < larg; c++) { const i = idx(c, r); W.ground[i] = G_AGUA; W.flags[i] |= F_SOLIDO; }
+  }
+
+  // estradas
+  for (let c = 0; c < WC; c++) { W.ground[idx(c, 22)] = G_ASFALTO; W.ground[idx(c, 23)] = G_ASFALTO; }
+  for (let c = 0; c < WC; c++) { W.ground[idx(c, 58)] = G_ASFALTO; W.ground[idx(c, 59)] = G_ASFALTO; }
+  for (let r = 0; r < WR; r++) { W.ground[idx(30, r)] = G_ASFALTO; W.ground[idx(31, r)] = G_ASFALTO; }
+  for (let r = 0; r < WR; r++) { W.ground[idx(90, r)] = G_ASFALTO; W.ground[idx(91, r)] = G_ASFALTO; }
+
+  // pátio de concreto
+  for (let r = PATIO.y0; r <= PATIO.y1; r++) for (let c = PATIO.x0; c <= PATIO.x1; c++) {
+    if (W.ground[idx(c, r)] === G_AGUA) continue;
+    W.ground[idx(c, r)] = (r > PATIO.y0 + 2 && c > PATIO.x0 + 1) ? G_CONCRETO : G_TERRA;
+  }
+  // acesso do pátio à estrada
+  for (let r = PATIO.y1; r <= 23; r++) { W.ground[idx(20, r)] = G_TERRA; W.ground[idx(21, r)] = G_TERRA; }
+
+  // campos (retângulo com cantos cortados p/ não ficar quadrado)
+  FIELDS.forEach(f => {
+    const cutA = Math.floor(hash(f.id, 1, 3) * 4) + 2;
+    const cutB = Math.floor(hash(f.id, 2, 7) * 4) + 2;
+    const canto = Math.floor(hash(f.id, 3, 11) * 4);
+    for (let r = f.y0; r <= f.y1; r++) for (let c = f.x0; c <= f.x1; c++) {
+      const lx = c - f.x0, ly = r - f.y0;
+      const rx = f.x1 - c, ry = f.y1 - r;
+      if (canto === 0 && lx + ly < cutA) continue;
+      if (canto === 1 && rx + ly < cutA) continue;
+      if (canto === 2 && lx + ry < cutA) continue;
+      if (canto === 3 && rx + ry < cutA) continue;
+      if (canto !== 3 && rx + ry < cutB) continue;
+      const i = idx(c, r);
+      if (W.ground[i] === G_ASFALTO || W.ground[i] === G_AGUA) continue;
+      W.ground[i] = G_RESTOLHO;
+      W.flags[i] |= F_CAMPO;
+      W.fieldId[i] = f.id;
+      W.lime[i] = 1;
+      W.angle[i] = Math.floor(hash(f.id, 0, 5) * 255);
+    }
+    // centroide p/ rótulo
+    let sx = 0, sy = 0, n = 0;
+    for (let r = f.y0; r <= f.y1; r++) for (let c = f.x0; c <= f.x1; c++)
+      if (W.fieldId[idx(c, r)] === f.id) { sx += c; sy += r; n++; }
+    f.cx = sx / n; f.cy = sy / n; f.tiles = n;
+    f.preco = f.dono ? 0 : Math.round(n * 150 / 100) * 100;
+  });
+
+  // prédios do pátio
+  predios.push({ tipo: "galpao", x: 9,  y: 8,  w: 5, h: 4 });
+  predios.push({ tipo: "silo",   x: SILO_POS.x, y: SILO_POS.y - 1, w: 3, h: 3 });
+  predios.push({ tipo: "oficina", x: 17, y: 12, w: 4, h: 3 });
+  predios.push({ tipo: "loja",   x: LOJA_POS.x - 1, y: LOJA_POS.y - 1, w: 4, h: 3 });
+  predios.push({ tipo: "bomba",  x: BOMBA.x - 1, y: BOMBA.y - 1, w: 2, h: 2 });
+  POSTOS.forEach(p => predios.push({ tipo: "posto", x: p.x, y: p.y, w: p.w, h: p.h, posto: p }));
+
+  predios.forEach(b => {
+    for (let r = b.y; r < b.y + b.h; r++) for (let c = b.x; c < b.x + b.w; c++) {
+      if (!dentro(c, r)) continue;
+      const i = idx(c, r);
+      if (b.tipo !== "bomba") W.flags[i] |= F_SOLIDO;
+      if (W.ground[i] === G_NATIVO) W.ground[i] = G_TERRA;
+    }
+    // faixa de manobra na frente dos postos
+    if (b.tipo === "posto") for (let r = b.y + b.h; r < b.y + b.h + 2; r++)
+      for (let c = b.x - 1; c < b.x + b.w + 1; c++) if (dentro(c, r)) W.ground[idx(c, r)] = G_TERRA;
+  });
+
+  // árvores
+  for (let r = 1; r < WR - 1; r++) for (let c = 1; c < WC - 1; c++) {
+    const i = idx(c, r);
+    if (W.ground[i] !== G_NATIVO || W.flags[i]) continue;
+    let perto = false;
+    for (let dr = -2; dr <= 2 && !perto; dr++) for (let dc = -2; dc <= 2; dc++) {
+      const j = idx(clamp(c + dc, 0, WC - 1), clamp(r + dr, 0, WR - 1));
+      if (W.ground[j] === G_ASFALTO || W.ground[j] === G_CONCRETO || (W.flags[j] & F_CAMPO)) { perto = true; break; }
+    }
+    if (perto) continue;
+    if (hash(c, r, 17) > 0.955) {
+      trees.push({ x: c * TILE + TILE / 2, y: r * TILE + TILE / 2, s: 0.8 + hash(c, r, 19) * 0.5 });
+      W.flags[i] |= F_SOLIDO;
+    }
+  }
+}
+
+/* ---------- pintura de tile ---------- */
+function grassCol(mes) {
+  const est = ESTACOES[mes];
+  // variação baixa de propósito: quem dá textura é o ruído, não o tom do tile
+  if (est === "Primavera") return ["#5E8C3E", "#5A883A", "#628F42"];
+  if (est === "Verão") return ["#4F7A34", "#4C7631", "#537E38"];
+  if (est === "Outono") return ["#7E8446", "#7A8042", "#82884A"];
+  return ["#6E7460", "#6A705C", "#727864"];
+}
+let GRASS = grassCol(0);
+
+function drawTile(i) {
+  const c = i % WC, r = (i / WC) | 0;
+  const x = c * TILE, y = r * TILE;
+  const g = W.ground[i];
+  const ang = W.angle[i] / 255 * Math.PI * 2;
+  const dx = Math.cos(ang), dy = Math.sin(ang);
+  const px = -dy, py = dx;
+  const cx = x + TILE / 2, cy = y + TILE / 2;
+
+  wc.save();
+  wc.beginPath(); wc.rect(x, y, TILE, TILE); wc.clip();
+
+  const linhas = (passo, off, cor, lw) => {
+    wc.strokeStyle = cor; wc.lineWidth = lw;
+    for (let k = -2; k <= 2; k++) {
+      const o = k * passo + off;
+      wc.beginPath();
+      wc.moveTo(cx + px * o - dx * 16, cy + py * o - dy * 16);
+      wc.lineTo(cx + px * o + dx * 16, cy + py * o + dy * 16);
+      wc.stroke();
+    }
+  };
+  const granulado = (n, claro, escuro) => {
+    for (let k = 0; k < n; k++) {
+      wc.fillStyle = hash(c, r, k + 30) > 0.5 ? claro : escuro;
+      wc.fillRect(x + hash(c, r, k + 10) * TILE, y + hash(c, r, k + 20) * TILE, 1.6, 1.6);
+    }
+  };
+
+  if (g === G_AGUA) {
+    wc.fillStyle = "#24485C"; wc.fillRect(x, y, TILE, TILE);
+    if (hash(c, r, 3) > 0.7) {
+      wc.strokeStyle = "rgba(62,110,130,0.55)"; wc.lineWidth = 1.4;
+      wc.beginPath(); wc.moveTo(x + 3, y + 8 + hash(c, r, 4) * 6);
+      wc.lineTo(x + TILE - 3, y + 6 + hash(c, r, 5) * 8); wc.stroke();
+    }
+  } else if (g === G_ASFALTO) {
+    wc.fillStyle = "#3A3D40"; wc.fillRect(x, y, TILE, TILE);
+    granulado(4, "rgba(255,255,255,0.05)", "rgba(0,0,0,0.18)");
+    if ((r === 22 && c % 4 < 2) || (c === 30 && r % 4 < 2)) {
+      wc.fillStyle = "#9AA0A3";
+      if (r === 22) wc.fillRect(x, y + TILE - 1, TILE, 2);
+      else wc.fillRect(x + TILE - 1, y, 2, TILE);
+    }
+  } else if (g === G_CONCRETO) {
+    wc.fillStyle = "#6E6E6A"; wc.fillRect(x, y, TILE, TILE);
+    wc.strokeStyle = "rgba(0,0,0,0.16)"; wc.lineWidth = 1;
+    wc.strokeRect(x + 0.5, y + 0.5, TILE - 1, TILE - 1);
+    granulado(3, "rgba(255,255,255,0.06)", "rgba(0,0,0,0.10)");
+  } else if (g === G_TERRA) {
+    wc.fillStyle = "#6E5C45"; wc.fillRect(x, y, TILE, TILE);
+    granulado(6, "#82705A", "#57472F");
+  } else if (g === G_ARADO) {
+    wc.fillStyle = "#4A3527"; wc.fillRect(x, y, TILE, TILE);
+    linhas(6, 0, "#33241A", 3.2);
+    linhas(6, 2.2, "#5C4433", 1.8);
+  } else if (g === G_CULTIVADO) {
+    wc.fillStyle = "#6B4F38"; wc.fillRect(x, y, TILE, TILE);
+    granulado(14, "#7A5C43", "#5C4330");
+  } else if (g === G_SEMEADO) {
+    wc.fillStyle = "#6B4F38"; wc.fillRect(x, y, TILE, TILE);
+    granulado(8, "#7A5C43", "#5C4330");
+    linhas(5, 0, "#7E6047", 1);
+  } else if (g === G_CRESC || g === G_MADURO) {
+    const cr = CROP_BY_ID[W.crop[i]];
+    if (cr) {
+      const st = clamp(W.stage[i] - 1, 0, 3);
+      const cor = cr.cores[st];
+      // jovem deixa o solo aparecer entre as linhas; adulto fecha o dossel
+      wc.fillStyle = st >= 2 ? escurecer(cor, 0.62) : "#6B4F38";
+      wc.fillRect(x, y, TILE, TILE);
+      if (st < 2) { granulado(6, "#7A5C43", "#5C4330"); }
+
+      wc.lineCap = "round";
+      wc.lineWidth = st === 0 ? 1.5 : st === 1 ? 2.4 : st === 2 ? 3.4 : 4.0;
+      const passo = TILE / clamp(cr.dens / 3.4, 1.8, 5);
+      const nk = Math.ceil(14 / passo);
+      for (let k = -nk; k <= nk; k++) {
+        const o = k * passo + (hash(c, r, k + 40) - 0.5) * 1.3;
+        const j = (hash(c, r, k + 50) - 0.5) * 2.2;
+        wc.strokeStyle = hash(c, r, k + 55) > 0.45 ? cor : escurecer(cor, 0.80);
+        wc.beginPath();
+        wc.moveTo(cx + px * o - dx * 13 + j, cy + py * o - dy * 13);
+        wc.lineTo(cx + px * o + dx * 13 + j, cy + py * o + dy * 13);
+        wc.stroke();
+      }
+      if (st === 3) {
+        // espigas: pontinhos claros dão o granulado de campo maduro
+        for (let k = 0; k < 10; k++) {
+          wc.fillStyle = hash(c, r, k + 120) > 0.5 ? clarear(cor, 1.18) : escurecer(cor, 0.85);
+          wc.fillRect(x + hash(c, r, k + 130) * TILE, y + hash(c, r, k + 140) * TILE, 1.8, 1.8);
+        }
+      }
+    } else { wc.fillStyle = "#6B4F38"; wc.fillRect(x, y, TILE, TILE); }
+  } else if (g === G_RESTOLHO) {
+    wc.fillStyle = "#8A7A4E"; wc.fillRect(x, y, TILE, TILE);
+    linhas(5, 0, "#6E5F3C", 1.2);
+    for (let k = 0; k < 5; k++) {
+      wc.fillStyle = "#C8B87A";
+      wc.fillRect(x + hash(c, r, k + 60) * TILE, y + hash(c, r, k + 70) * TILE, 1.8, 1.8);
+    }
+  } else if (g === G_MURCHO) {
+    wc.fillStyle = "#7A6A4E"; wc.fillRect(x, y, TILE, TILE);
+    granulado(10, "#8E7E60", "#5E5240");
+  } else {
+    // grama nativa — manchas de 2×2 tiles pra não virar xadrez
+    const p = hash(c >> 1, r >> 1, 1);
+    wc.fillStyle = GRASS[p > 0.62 ? 1 : p > 0.28 ? 0 : 2]; wc.fillRect(x, y, TILE, TILE);
+    for (let k = 0; k < 5; k++) {
+      wc.fillStyle = hash(c, r, k + 80) > 0.5 ? "rgba(30,55,20,0.22)" : "rgba(150,180,100,0.16)";
+      wc.fillRect(x + hash(c, r, k + 85) * TILE, y + hash(c, r, k + 90) * TILE, 2, 2);
+    }
+  }
+
+  // ervas daninhas por cima
+  if (W.weeds[i] > 0 && (g === G_SEMEADO || g === G_CRESC || g === G_MADURO)) {
+    const n = W.weeds[i] * 3;
+    for (let k = 0; k < n; k++) {
+      wc.fillStyle = "rgba(94,138,110,0.85)";
+      wc.beginPath();
+      wc.arc(x + hash(c, r, k + 100) * TILE, y + hash(c, r, k + 110) * TILE, 1.6, 0, 6.3);
+      wc.fill();
+    }
+  }
+  // sulco de pneu
+  if (W.rut[i] > 20) {
+    wc.fillStyle = `rgba(30,22,14,${Math.min(0.30, W.rut[i] / 255 * 0.34)})`;
+    wc.fillRect(x, y, TILE, TILE);
+  }
+  // neve
+  if (W.snow[i] > 0) {
+    wc.fillStyle = `rgba(232,238,245,${W.snow[i] / 255 * 0.85})`;
+    wc.fillRect(x, y, TILE, TILE);
+  }
+  wc.restore();
+}
+
+function repintarTudo() { for (let i = 0; i < N; i++) drawTile(i); atualizarMinimapa(); }
+function atualizarMinimapa() { mc.drawImage(world, 0, 0, WORLD_W, WORLD_H, 0, 0, 240, 180); }
+
+/* ---------- textura de mottling (quebra a grade de 20px) ---------- */
+function makeMottle(size) {
+  const m = document.createElement('canvas'); m.width = m.height = size;
+  const g = m.getContext('2d');
+  for (let i = 0; i < 90; i++) {
+    const x = hash(i, 1, 2) * size, y = hash(i, 3, 4) * size, r = 20 + hash(i, 5, 6) * 70;
+    const escuro = hash(i, 7, 8) > 0.5;
+    for (let ox = -1; ox <= 1; ox++) for (let oy = -1; oy <= 1; oy++) {
+      const bx = x + ox * size, by = y + oy * size;
+      if (bx < -r || bx > size + r || by < -r || by > size + r) continue;
+      const gr = g.createRadialGradient(bx, by, 0, bx, by, r);
+      gr.addColorStop(0, escuro ? "rgba(0,0,0,0.16)" : "rgba(255,245,225,0.10)");
+      gr.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = gr; g.beginPath(); g.arc(bx, by, r, 0, 6.3); g.fill();
+    }
+  }
+  return m;
+}
+let mottlePat = null;
+
+/* ============================================================
+   §5  VEÍCULOS
+   ============================================================ */
+const veiculos = [];
+let atual = 0;
+
+function novoVeiculo(defId, x, y, th) {
+  const d = MAQ[defId];
+  const v = {
+    def: d, x, y, th: th || 0, v: 0, steer: 0,
+    wb: d.wb || 26, fuel: d.tanque || 0, wear: 0, dirt: 0,
+    impl: null, on: false, tank: 0, tankTipo: null,
+    grao: 0, graoTipo: null, luz: false, lastX: x, lastY: y
+  };
+  veiculos.push(v);
+  return v;
+}
+function novoImplemento(defId, x, y) {
+  const d = MAQ[defId];
+  const im = {
+    def: d, x, y, th: 0, tank: 0, tankTipo: d.fill || null,
+    carga: 0, cargaTipo: null, engatado: null, lastX: x, lastY: y, L: 10 + (d.larg || 2) * 3
+  };
+  implementos.push(im);
+  return im;
+}
+const implementos = [];
+
+function autoPropelido(v) { return v.def.cat === "trator" || v.def.cat === "colheitadeira"; }
+
+function velMax(v) {
+  const im = v.impl;
+  let base = v.def.velLivre || 120;
+  if (v.def.cat === "colheitadeira" && v.on) base = v.def.velTrab;
+  if (im && v.on) {
+    base = im.def.velTrab;
+    if (im.def.cvMin) base *= Math.max(0.30, v.def.cv / im.def.cvMin);
+  }
+  const i = idx(clamp((v.x / TILE) | 0, 0, WC - 1), clamp((v.y / TILE) | 0, 0, WR - 1));
+  base *= 1 - 0.25 * (W.rut[i] / 255);
+  if (S.clima === "chuva" || S.clima === "tempestade") base *= 0.92;
+  if (v.wear > 0.8) base *= 0.85;
+  return base;
+}
+
+function solidoPx(x, y) {
+  const c = (x / TILE) | 0, r = (y / TILE) | 0;
+  if (!dentro(c, r)) return true;
+  return (W.flags[idx(c, r)] & F_SOLIDO) !== 0;
+}
+
+const D_MAX = 0.62, D_RATE = 2.6, A_ACEL = 90, A_FREIO = 220, DRAG = 0.9;
+
+function stepVeiculo(v, inp, dt) {
+  const alvo = inp.dir * D_MAX * (1 - 0.45 * Math.min(1, Math.abs(v.v) / 160));
+  const dd = clamp(alvo - v.steer, -D_RATE * dt, D_RATE * dt);
+  v.steer += dd;
+  if (inp.dir === 0) v.steer -= clamp(v.steer, -D_RATE * 1.4 * dt, D_RATE * 1.4 * dt);
+
+  const vm = velMax(v);
+  if (v.fuel <= 0 && (v.def.tanque)) { inp.acel = 0; }
+  let a = inp.acel * A_ACEL - inp.freio * A_FREIO - DRAG * v.v;
+  v.v = clamp(v.v + a * dt, -vm * 0.45, vm);
+  if (inp.mao) v.v *= 0.82;
+
+  const nth = v.th + (v.v / v.wb) * Math.tan(v.steer) * dt;
+  const nx = v.x + v.v * Math.cos(nth) * dt;
+  const ny = v.y + v.v * Math.sin(nth) * dt;
+
+  const frente = 14;
+  if (!solidoPx(nx + Math.cos(nth) * frente, ny + Math.sin(nth) * frente) && !solidoPx(nx, ny)) {
+    v.x = clamp(nx, 12, WORLD_W - 12); v.y = clamp(ny, 12, WORLD_H - 12); v.th = nth;
+  } else {
+    v.v *= -0.15;
+  }
+
+  // combustível e desgaste
+  if (v.def.consumo) {
+    const trab = v.on ? 1 : 0.35;
+    const uso = Math.abs(v.v) > 3 || v.on ? v.def.consumo * (0.4 + trab) : v.def.consumo * 0.08;
+    v.fuel = Math.max(0, v.fuel - uso * dt * (1 + (W.rut[idx(clamp((v.x / TILE) | 0, 0, WC - 1), clamp((v.y / TILE) | 0, 0, WR - 1))] > 180 ? 0.15 : 0)));
+  }
+  v.wear = Math.min(1, v.wear + dt / 600 * (v.on ? 6 : 1) * (emCampo(v) ? 2 : 1) / 60);
+  if (Math.abs(v.v) > 5) v.dirt = Math.min(1, v.dirt + dt * (emCampo(v) ? 0.004 : 0.0004));
+
+  // rastro de pneu
+  if (Math.abs(v.v) > 4) marcarRastro(v);
+}
+
+function emCampo(v) {
+  const c = clamp((v.x / TILE) | 0, 0, WC - 1), r = clamp((v.y / TILE) | 0, 0, WR - 1);
+  return (W.flags[idx(c, r)] & F_CAMPO) !== 0;
+}
+
+function marcarRastro(v) {
+  const px = -Math.sin(v.th), py = Math.cos(v.th);
+  for (const off of [-8, 8]) {
+    const x = v.x + px * off, y = v.y + py * off;
+    const c = (x / TILE) | 0, r = (y / TILE) | 0;
+    if (!dentro(c, r)) continue;
+    const i = idx(c, r);
+    const antes = W.rut[i];
+    const inc = Math.abs(v.v) < 40 ? 36 : 26;
+    W.rut[i] = Math.min(255, W.rut[i] + inc * 0.28);
+    if ((W.rut[i] > 20) !== (antes > 20) || Math.abs(W.rut[i] - antes) > 12) drawTile(i);
+  }
+}
+
+function stepImplemento(v) {
+  const im = v.impl; if (!im) return;
+  const hx = v.x - 14 * Math.cos(v.th), hy = v.y - 14 * Math.sin(v.th);
+  if (im.def.montado) {
+    im.th = v.th;
+    im.x = hx - im.L * Math.cos(v.th);
+    im.y = hy - im.L * Math.sin(v.th);
+    im.rel = 0;
+    return;
+  }
+  let a = Math.atan2(hy - im.y, hx - im.x);
+  const rel = wrapPi(a - v.th);
+  if (Math.abs(rel) > 1.40) a = v.th + Math.sign(rel) * 1.40;
+  im.th = a; im.rel = wrapPi(a - v.th);
+  im.x = hx - im.L * Math.cos(a);
+  im.y = hy - im.L * Math.sin(a);
+}
+
+/* ---------- aplicação de trabalho ---------- */
+function aplicarTrabalho(v) {
+  const im = v.impl;
+  const colheita = v.def.cat === "colheitadeira";
+  const def = colheita ? v.def : (im ? im.def : null);
+  if (!def) return;
+  const op = colheita ? "colher" : def.op;
+  if (!op) return;
+  if (!colheita && im && Math.abs(im.rel || 0) > 1.05) return;   // jack-knife: não pinta
+
+  const largPx = def.larg * TILE;
+  const cx = colheita ? v.x + Math.cos(v.th) * 22 : im.x - 6 * Math.cos(im.th);
+  const cy = colheita ? v.y + Math.sin(v.th) * 22 : im.y - 6 * Math.sin(im.th);
+  const th = colheita ? v.th : im.th;
+  const px = -Math.sin(th), py = Math.cos(th);
+
+  // estado por INSTÂNCIA (nunca no def — ele é compartilhado entre unidades iguais)
+  const alvo = colheita ? v : im;
+  let lx = alvo._lx, ly = alvo._ly;
+  let dist = (lx === undefined) ? 0 : Math.hypot(cx - lx, cy - ly);
+  // salto grande = teleporte/religou longe: reposiciona sem pintar rastro fantasma
+  if (lx === undefined || dist > TILE * 4) { lx = cx; ly = cy; dist = 0; }
+
+  const nA = Math.max(1, Math.min(24, Math.ceil(dist / (TILE * 0.5))));
+  const nL = Math.max(2, Math.ceil(largPx / (TILE * 0.5)));
+
+  for (let a = 1; a <= nA; a++) {
+    const t = a / nA;
+    const bx = lerp(lx, cx, t), by = lerp(ly, cy, t);
+    for (let j = 0; j <= nL; j++) {
+      const s = (j / nL - 0.5) * largPx;
+      marcarTile(((bx + px * s) / TILE) | 0, ((by + py * s) / TILE) | 0, op, th, v);
+    }
+  }
+  alvo._lx = cx; alvo._ly = cy;
+}
+
+let avisoTimer = 0;
+function aviso(txt) { if (avisoTimer <= 0) { toast(txt); avisoTimer = 90; } }
+
+function marcarTile(c, r, op, th, v) {
+  if (!dentro(c, r)) return;
+  const i = idx(c, r);
+  const f = W.flags[i];
+  if (!(f & F_CAMPO)) return;
+  const fld = FIELDS[W.fieldId[i] - 1];
+  if (!fld || !fld.dono) { aviso("Terreno não é seu — compre o campo na loja (P)"); return; }
+  const g = W.ground[i];
+  const ang = Math.floor(((th % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2) * 255);
+
+  if (op === "arar") {
+    if (g === G_CRESC || g === G_MADURO || g === G_SEMEADO) return;
+    if (g === G_ARADO) return;
+    W.ground[i] = G_ARADO; W.flags[i] |= F_PLOWED; W.weeds[i] = 0; W.angle[i] = ang;
+    W.crop[i] = 0; W.stage[i] = 0;
+    drawTile(i); contaContrato("arar", 1);
+    if (Math.random() < 0.06) poeira(c * TILE + 10, r * TILE + 10, "#4A3527");
+  } else if (op === "cultivar") {
+    if (g === G_CRESC || g === G_MADURO || g === G_SEMEADO) return;
+    if (g === G_CULTIVADO) return;
+    W.ground[i] = G_CULTIVADO; W.weeds[i] = 0; W.angle[i] = ang;
+    W.crop[i] = 0; W.stage[i] = 0;
+    drawTile(i); contaContrato("cultivar", 1);
+    if (Math.random() < 0.05) poeira(c * TILE + 10, r * TILE + 10, "#6B4F38");
+  } else if (op === "semear") {
+    if (g !== G_ARADO && g !== G_CULTIVADO) { aviso("Solo precisa estar arado ou cultivado"); return; }
+    const im = v.impl;
+    const cr = CROP_BY_ID[im.cargaTipo];
+    if (!cr) { aviso("Semeadora sem semente — encha no silo (T)"); return; }
+    if (cr.exigeArado && !(W.flags[i] & F_PLOWED)) { aviso(cr.nome + " exige solo arado"); return; }
+    if (im.tank < cr.semente) { aviso("Semeadora vazia — encha no silo (T)"); return; }
+    im.tank -= cr.semente;
+    W.ground[i] = G_SEMEADO; W.crop[i] = cr.id; W.stage[i] = 0; W.angle[i] = ang;
+    W.matMes[i] = -1;
+    drawTile(i); contaContrato("semear", 1);
+  } else if (op === "adubar") {
+    if (g !== G_SEMEADO && g !== G_CRESC && g !== G_MADURO && g !== G_ARADO && g !== G_CULTIVADO) return;
+    const im = v.impl;
+    if (im.tankTipo === "calcario") {
+      if (W.lime[i] >= 3) return;
+      if (im.tank < 1) { aviso("Sem calcário — encha no silo (T)"); return; }
+      im.tank -= 1; W.lime[i] = 3;
+      if (S.overlay === 2) drawTile(i);
+      return;
+    }
+    if (W.fert[i] >= 2) return;
+    if (im.tank < 1.5) { aviso("Sem fertilizante — encha no silo (T)"); return; }
+    im.tank -= 1.5; W.fert[i] = Math.min(2, W.fert[i] + 1);
+    contaContrato("adubar", 1);
+    if (Math.random() < 0.10) poeira(c * TILE + 10, r * TILE + 10, "#B8C4CE");
+  } else if (op === "herbicida") {
+    if (W.weeds[i] === 0) return;
+    const im = v.impl;
+    if (im.tank < 0.5) { aviso("Sem herbicida — encha no silo (T)"); return; }
+    im.tank -= 0.5;
+    W.weedBon[i] = W.weeds[i] === 1 ? 20 : W.weeds[i] === 2 ? 10 : 5;
+    W.weeds[i] = 0; drawTile(i);
+  } else if (op === "colher") {
+    if (g !== G_MADURO) return;
+    const cr = CROP_BY_ID[W.crop[i]];
+    if (!cr) return;
+    if (!v.def.aceita.includes(cr.colhedora)) { aviso("Esta colheitadeira não colhe " + cr.nome); return; }
+    if (v.grao >= v.def.tanqueGrao * 0.999) { aviso("Tanque cheio! Descarregue no reboque (T)"); return; }
+    if (v.graoTipo && v.graoTipo !== cr.id && v.grao > 0) { aviso("Tanque tem outro produto — descarregue"); return; }
+    const chuva = CLIMAS[S.clima].colheita ? CLIMAS[S.clima].colheita : 1;
+    let b = 1 + 0.15 * ((W.flags[i] & F_PLOWED) ? 1 : 0) + 0.15 * (W.lime[i] > 0 ? 1 : 0)
+              + 0.225 * W.fert[i] + W.weedBon[i] / 100;
+    b = Math.min(b, 2.0);
+    const litros = cr.litros * b * chuva;
+    v.grao = Math.min(v.def.tanqueGrao, v.grao + litros);
+    v.graoTipo = cr.id;
+    S.litrosColhidos += litros;
+    W.ground[i] = G_RESTOLHO; W.crop[i] = 0; W.stage[i] = 0;
+    W.lime[i] = Math.max(0, W.lime[i] - 1); W.fert[i] = 0; W.weedBon[i] = 0;
+    W.flags[i] &= ~F_PLOWED; W.angle[i] = ang;
+    drawTile(i); contaContrato("colher", 1);
+    if (Math.random() < 0.25) graoParticula(v);
+  }
+}
+
+/* ============================================================
+   §6  PARTÍCULAS
+   ============================================================ */
+function poeira(x, y, cor) {
+  particulas.push({ x, y, vx: (Math.random() - 0.5) * 12, vy: -6 - Math.random() * 10, vida: 0.7, max: 0.7, cor, r: 2 + Math.random() * 2 });
+}
+function graoParticula(v) {
+  particulas.push({ x: v.x + Math.cos(v.th) * 10, y: v.y + Math.sin(v.th) * 10, vx: (Math.random() - 0.5) * 8, vy: -14 - Math.random() * 8, vida: 0.5, max: 0.5, cor: "#C9A227", r: 1.6 });
+}
+function flutuar(x, y, txt, cor) { flutuantes.push({ x, y, txt, cor, vida: 1.4 }); }
+function toast(t) { S.toast = t; S.toastT = 2.4; }
+function notif(t, cor) { S.msgs.unshift({ t, cor: cor || UI.text, vida: 6 }); if (S.msgs.length > 5) S.msgs.pop(); }
+
+/* ============================================================
+   §7  ECONOMIA
+   ============================================================ */
+function mesFrac() { return (S.minutos / 1440); }
+function precoBase(cropKey) {
+  const cr = CULTURAS.find(c => c.key === cropKey);
+  if (!cr) return 0;
+  const t = S.mesAbs % 12 + mesFrac();
+  const cur = SAZONAL[cr.sazonal];
+  const m0 = Math.floor(t) % 12, m1 = (m0 + 1) % 12;
+  const s = lerp(cur[m0], cur[m1], t - Math.floor(t));
+  return cr.preco * s;
+}
+function ruidoPosto(postoId, cropKey) {
+  const k = postoId + "|" + cropKey;
+  if (!S.faseRuido[k]) S.faseRuido[k] = [hash(k.length, 7, 3) * 6.28, hash(k.length, 11, 5) * 6.28];
+  const [f1, f2] = S.faseRuido[k];
+  const h = S.mesAbs * 24 + S.minutos / 60;
+  return 0.04 * Math.sin(2 * Math.PI * (h / 48) + f1) + 0.02 * Math.sin(2 * Math.PI * (h / 168) + f2);
+}
+function quedaVolume(posto, cropKey) {
+  const k = posto.id + "|" + cropKey;
+  const v = S.vendido[k] || 0;
+  return Math.max(0.60, 1 - 0.4 * (v / posto.queda));
+}
+function precoEfetivo(posto, cropKey) {
+  if (!posto.aceita.includes(cropKey)) return 0;
+  return precoBase(cropKey) * posto.scale * (1 + ruidoPosto(posto.id, cropKey) * 0.3) * quedaVolume(posto, cropKey);
+}
+
+function ganhar(v, txt) {
+  S.dinheiro += v; S.ganhoTotal += v;
+  S.moneyFlash = 1; S.moneyFlashCol = UI.green;
+  if (txt) notif(txt, UI.green);
+}
+function gastar(v, txt) {
+  S.dinheiro -= v;
+  S.moneyFlash = 1; S.moneyFlashCol = UI.crit;
+  if (txt) notif(txt, UI.crit);
+}
+
+/* ---------- contratos ---------- */
+function gerarContrato() {
+  if (S.contratos.length >= 3) return;
+  const tipos = ["cultivar", "arar", "semear", "colher", "adubar"];
+  const t = tipos[Math.floor(Math.random() * tipos.length)];
+  if (S.contratos.some(c => c.tipo === t)) return;
+  const fld = FIELDS[Math.floor(Math.random() * FIELDS.length)];
+  const tiles = Math.round(fld.tiles * (0.5 + Math.random() * 0.5));
+  S.contratos.push({
+    tipo: t, campo: fld.id, meta: tiles, feito: 0,
+    valor: Math.round(CONTRATO_VAL[t] * tiles * 1.1), aceito: false
+  });
+}
+function contaContrato(tipo, n) {
+  for (const c of S.contratos) {
+    if (c.aceito && c.tipo === tipo) {
+      c.feito += n;
+      if (c.feito >= c.meta) {
+        ganhar(c.valor, `Contrato de ${c.tipo} concluído: +$${fmt(c.valor)}`);
+        flutuar(veiculos[atual].x, veiculos[atual].y - 30, "+$" + fmt(c.valor), UI.green);
+        S.contratos.splice(S.contratos.indexOf(c), 1);
+      }
+      return;
+    }
+  }
+}
+
+/* ============================================================
+   §8  TEMPO, CRESCIMENTO E CLIMA
+   ============================================================ */
+const MES_SEG = 30;
+function tickTempo(dt) {
+  if (S.escala === 0) return;
+  const antesMes = S.mesAbs;
+  S.frac += dt * (1440 / MES_SEG) * S.escala;
+  const add = Math.floor(S.frac);
+  if (add > 0) {
+    S.frac -= add;
+    S.minutos += add;
+    while (S.minutos >= 1440) { S.minutos -= 1440; S.mesAbs++; }
+  }
+  if (S.mesAbs !== antesMes) tickMensal();
+
+  S.climaTimer -= dt * (1440 / MES_SEG) * S.escala;
+  if (S.climaTimer <= 0) { trocarClima(); S.climaTimer = 6 * 60; }
+
+  S.contratoTimer -= dt;
+  if (S.contratoTimer <= 0) { S.contratoTimer = 90; gerarContrato(); }
+
+  // recupera queda de volume
+  for (const k in S.vendido) {
+    S.vendido[k] = Math.max(0, S.vendido[k] - dt * S.escala * 40);
+  }
+}
+
+function trocarClima() {
+  const inv = ESTACOES[S.mesAbs % 12] === "Inverno";
+  const pool = CLIMA_KEYS.filter(k => !CLIMAS[k].soInverno || inv);
+  let total = 0; pool.forEach(k => total += CLIMAS[k].p);
+  let x = Math.random() * total, esc = pool[0];
+  for (const k of pool) { x -= CLIMAS[k].p; if (x <= 0) { esc = k; break; } }
+  S.clima = S.proxClima;
+  S.proxClima = esc;
+  if (S.clima === "chuva") notif("Chuva — colheita rende 50%", UI.cond);
+  if (S.clima === "tempestade") notif("Tempestade! Risco de perda de lavoura", UI.crit);
+  if (S.clima === "neve") notif("Neve — colheita rende 50%", UI.cond);
+}
+
+function tickMensal() {
+  const mes = S.mesAbs % 12;
+  GRASS = grassCol(mes);
+  let mudouGrama = false;
+
+  for (let i = 0; i < N; i++) {
+    const g = W.ground[i];
+    if (g === G_SEMEADO || g === G_CRESC) {
+      const cr = CROP_BY_ID[W.crop[i]];
+      if (cr) {
+        W.stage[i]++;
+        if (W.stage[i] >= cr.ciclo) { W.ground[i] = G_MADURO; W.stage[i] = 4; W.matMes[i] = S.mesAbs; }
+        else W.ground[i] = G_CRESC;
+        drawTile(i);
+      }
+    } else if (g === G_MADURO) {
+      if (S.mesAbs - W.matMes[i] >= 3) { W.ground[i] = G_MURCHO; W.crop[i] = 0; drawTile(i); }
+    }
+    // ervas
+    if ((g === G_SEMEADO || g === G_CRESC) && W.weeds[i] < 3) {
+      if (Math.random() < 0.22 * ((W.flags[i] & F_PLOWED) ? 0.3 : 1)) { W.weeds[i]++; drawTile(i); }
+    }
+    if (W.rut[i] > 0) { W.rut[i] = Math.max(0, W.rut[i] - 8); }
+    // neve (não acumula sobre a água)
+    if (ESTACOES[mes] === "Inverno" && S.clima === "neve" && W.ground[i] !== G_AGUA) {
+      if (W.snow[i] < 200) { W.snow[i] = Math.min(200, W.snow[i] + 60); drawTile(i); }
+    } else if (W.snow[i] > 0) { W.snow[i] = Math.max(0, W.snow[i] - 70); drawTile(i); }
+    if (W.ground[i] === G_NATIVO && !mudouGrama) mudouGrama = true;
+  }
+  // repinta grama na virada de estação
+  if (mes % 3 === 0) for (let i = 0; i < N; i++) if (W.ground[i] === G_NATIVO) drawTile(i);
+
+  // tempestade destrói lavoura
+  if (S.clima === "tempestade") {
+    let perdidos = 0;
+    for (let i = 0; i < N; i++) {
+      if ((W.ground[i] === G_CRESC || W.ground[i] === G_MADURO) && Math.random() < 0.18) {
+        W.ground[i] = G_MURCHO; W.crop[i] = 0; drawTile(i); perdidos++;
+      }
+    }
+    if (perdidos) notif(`Tempestade destruiu ${perdidos} tiles de lavoura`, UI.crit);
+  }
+
+  // custos diários
+  let up = 0;
+  veiculos.forEach(v => up += v.def.upkeep || 0);
+  implementos.forEach(im => up += im.def.upkeep || 0);
+  const juros = S.divida * 0.08 / 12;
+  const siloUso = Object.values(S.silo).reduce((a, b) => a + b, 0);
+  const custoSilo = siloUso > 0 ? 18 : 0;
+  const tot = up + juros + custoSilo;
+  if (tot > 0) gastar(tot, `Custos do mês: -$${fmt(tot)}`);
+
+  atualizarMinimapa();
+}
+
+/* ============================================================
+   §9  AÇÕES CONTEXTUAIS (tecla T)
+   ============================================================ */
+function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+function pertoDe(v, tx, ty, raio) { return Math.hypot(v.x - tx * TILE, v.y - ty * TILE) < raio; }
+
+function acaoContextual() {
+  const v = veiculos[atual];
+  if (!v) return null;
+
+  // combustível
+  if (pertoDe(v, BOMBA.x, BOMBA.y, 70) && v.def.tanque && v.fuel < v.def.tanque * 0.99)
+    return { txt: "Abastecer diesel", fn: () => {
+      const l = v.def.tanque - v.fuel;
+      gastar(l * INSUMOS.diesel, `Diesel: -$${fmt(l * INSUMOS.diesel)}`);
+      v.fuel = v.def.tanque; toast("Tanque cheio");
+    }};
+
+  // oficina — reparo
+  if (pertoDe(v, 18, 13, 70) && v.wear > 0.02)
+    return { txt: `Reparar (${Math.round(v.wear * 100)}%)`, fn: () => {
+      const c = v.def.preco * 0.09 * Math.pow(v.wear, 1.585);
+      gastar(c, `Reparo: -$${fmt(c)}`); v.wear = 0; v.dirt = 0; toast("Máquina reparada");
+    }};
+
+  // silo — encher implemento
+  if (pertoDe(v, SILO_POS.x, SILO_POS.y, 80)) {
+    const im = v.impl;
+    if (im && im.def.cap && im.tank < im.def.cap * 0.99) {
+      return { txt: "Encher " + im.def.nome.split(" ")[0], fn: () => encherImplemento(v, im) };
+    }
+    if (v.def.cat === "colheitadeira" && v.grao > 0)
+      return { txt: "Descarregar no silo", fn: () => {
+        const k = CROP_BY_ID[v.graoTipo].key;
+        S.silo[k] = (S.silo[k] || 0) + v.grao;
+        toast(`${fmtL(v.grao)} L de ${k} no silo`);
+        v.grao = 0; v.graoTipo = null;
+      }};
+    if (v.impl && v.impl.def.cat === "reboque" && v.impl.carga > 0)
+      return { txt: "Descarregar no silo", fn: () => {
+        const k = CROP_BY_ID[v.impl.cargaTipo].key;
+        S.silo[k] = (S.silo[k] || 0) + v.impl.carga;
+        toast(`${fmtL(v.impl.carga)} L de ${k} no silo`);
+        v.impl.carga = 0; v.impl.cargaTipo = null;
+      }};
+  }
+
+  // colheitadeira → reboque
+  if (v.def.cat === "colheitadeira" && v.grao > 0) {
+    const alvo = acharReboque(v);
+    if (alvo) return { txt: "Transbordar para o reboque", fn: () => transbordar(v, alvo) };
+  }
+
+  // reboque no posto de venda
+  const reb = v.impl && v.impl.def.cat === "reboque" ? v.impl : null;
+  if (reb && reb.carga > 0) {
+    for (const p of POSTOS) {
+      if (Math.hypot(v.x - (p.x + p.w / 2) * TILE, v.y - (p.y + p.h + 1) * TILE) < 110) {
+        const k = CROP_BY_ID[reb.cargaTipo].key;
+        const pr = precoEfetivo(p, k);
+        if (pr <= 0) return { txt: p.nome + " não compra " + k, fn: null };
+        return { txt: `Vender ${fmtL(reb.carga)} L (+$${fmt(reb.carga * pr)})`, fn: () => venderCarga(v, reb, p) };
+      }
+    }
+  }
+  return null;
+}
+
+function encherImplemento(v, im) {
+  const falta = im.def.cap - im.tank;
+  let tipo = im.def.fill, custoL = INSUMOS[tipo] || 0.5;
+  if (tipo === "semente") {
+    const cr = CULTURAS.find(c => c.id === im.cargaTipo) || CULTURAS[0];
+    im.cargaTipo = cr.id;
+    custoL = INSUMOS.semente;
+    toast(`Semeadora cheia de ${cr.nome} — troque com [ ]`);
+  }
+  gastar(falta * custoL, `${tipo}: -$${fmt(falta * custoL)}`);
+  im.tank = im.def.cap;
+}
+
+function acharReboque(v) {
+  let melhor = null, md = 90;
+  for (const im of implementos) {
+    if (im.def.cat !== "reboque") continue;
+    if (im.carga >= im.def.cap * 0.999) continue;
+    if (im.cargaTipo && v.graoTipo && im.cargaTipo !== v.graoTipo) continue;
+    const d = Math.hypot(im.x - v.x, im.y - v.y);
+    if (d < md) { md = d; melhor = im; }
+  }
+  return melhor;
+}
+function transbordar(v, reb) {
+  const q = Math.min(v.grao, reb.def.cap - reb.carga);
+  reb.carga += q; reb.cargaTipo = v.graoTipo; v.grao -= q;
+  toast(`Transbordou ${fmtL(q)} L`);
+  for (let i = 0; i < 14; i++) particulas.push({
+    x: reb.x + (Math.random() - 0.5) * 20, y: reb.y + (Math.random() - 0.5) * 14,
+    vx: (Math.random() - 0.5) * 10, vy: -20 - Math.random() * 10, vida: 0.6, max: 0.6, cor: "#C9A227", r: 1.8
+  });
+  if (v.grao < 1) { v.grao = 0; v.graoTipo = null; }
+}
+function venderCarga(v, reb, p) {
+  const k = CROP_BY_ID[reb.cargaTipo].key;
+  const pr = precoEfetivo(p, k);
+  const total = reb.carga * pr;
+  ganhar(total, `${p.nome}: +$${fmt(total)} (${fmtL(reb.carga)} L de ${k})`);
+  flutuar(v.x, v.y - 30, "+$" + fmt(total), UI.green);
+  S.vendido[p.id + "|" + k] = (S.vendido[p.id + "|" + k] || 0) + reb.carga;
+  reb.carga = 0; reb.cargaTipo = null;
+  reb.bascula = 1;
+}
+
+/* ============================================================
+   §10  ENTRADA
+   ============================================================ */
+const keys = {};
+addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "tab"].includes(k)) e.preventDefault();
+  if (!keys[k]) onPress(k);
+  keys[k] = true;
+});
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+
+function onPress(k) {
+  if (S.loja) {
+    if (k === "escape" || k === "p") { S.loja = false; return; }
+    if (k === "arrowleft" || k === "a") { S.lojaAba = (S.lojaAba + 2) % 3; S.lojaSel = 0; return; }
+    if (k === "arrowright" || k === "d") { S.lojaAba = (S.lojaAba + 1) % 3; S.lojaSel = 0; return; }
+    if (k === "arrowup" || k === "w") { S.lojaSel = Math.max(0, S.lojaSel - 1); return; }
+    if (k === "arrowdown" || k === "s") { S.lojaSel = Math.min(itensLoja().length - 1, S.lojaSel + 1); return; }
+    if (k === "enter" || k === "t") { comprarSel(); return; }
+    return;
+  }
+  if (k === "p") { S.loja = true; S.lojaSel = 0; return; }
+  if (k === "escape") { S.loja = false; return; }
+  if (k === "h") { S.ajuda = !S.ajuda; return; }
+  if (k === "tab") { S.overlay = (S.overlay + 1) % 5; return; }
+  if (k === "m") { S.minimapa = (S.minimapa + 1) % 4; return; }
+  if (k === "r") { const v = veiculos[atual]; if (v) { v.on = !v.on; if (v.impl) v.impl._lx = undefined; v._lx = undefined; } return; }
+  if (k === "q") { engatar(); return; }
+  if (k === "e") { trocarVeiculo(); return; }
+  if (k === "l") { const v = veiculos[atual]; if (v) v.luz = !v.luz; return; }
+  if (k === "t") { const a = acaoContextual(); if (a && a.fn) a.fn(); return; }
+  if (k === "7") { S.escalaIdx = Math.max(0, S.escalaIdx - 1); S.escala = ESCALAS[S.escalaIdx]; return; }
+  if (k === "8") { S.escalaIdx = Math.min(ESCALAS.length - 1, S.escalaIdx + 1); S.escala = ESCALAS[S.escalaIdx]; return; }
+  if (k === "[" || k === "]") {   // troca semente da semeadora
+    const v = veiculos[atual];
+    if (v && v.impl && v.impl.def.fill === "semente") {
+      let i = CULTURAS.findIndex(c => c.id === v.impl.cargaTipo);
+      i = (i + (k === "]" ? 1 : CULTURAS.length - 1) + CULTURAS.length) % CULTURAS.length;
+      v.impl.cargaTipo = CULTURAS[i].id;
+      toast("Semente: " + CULTURAS[i].nome);
+    }
+    return;
+  }
+  if (k === "f") {   // alterna adubo/calcário
+    const v = veiculos[atual];
+    if (v && v.impl && v.impl.def.op === "adubar") {
+      v.impl.tankTipo = v.impl.tankTipo === "calcario" ? "fertilizante" : "calcario";
+      v.impl.tank = 0;
+      toast("Distribuidor: " + v.impl.tankTipo);
+    }
+    return;
+  }
+  if (k >= "1" && k <= "3" && !S.loja) {   // aceitar contrato
+    const c = S.contratos[+k - 1];
+    if (c && !c.aceito) { c.aceito = true; toast(`Contrato aceito: ${c.tipo} · ${c.meta} tiles`); }
+    return;
+  }
+}
+
+/* ============================================================
+   §10b  CONTROLES DE TOQUE
+   ============================================================ */
+const TOQ = { steer: 0, acel: 0, freio: 0 };
+
+function ligarToque() {
+  const steer = document.getElementById('tsteer');
+  const knob = document.getElementById('tknob');
+  let steerId = null;
+
+  const moverKnob = (clientX) => {
+    const r = steer.getBoundingClientRect();
+    const rel = (clientX - (r.left + r.width / 2)) / (r.width / 2);
+    TOQ.steer = clamp(rel, -1, 1);
+    knob.style.left = (50 + TOQ.steer * 32) + '%';
+    knob.style.background = Math.abs(TOQ.steer) > 0.15 ? 'rgba(156,196,6,0.85)' : 'rgba(156,196,6,0.55)';
+  };
+  const soltarKnob = () => {
+    steerId = null; TOQ.steer = 0;
+    knob.style.left = '50%'; knob.style.background = 'rgba(156,196,6,0.55)';
+  };
+  const capturar = (el, id) => { try { el.setPointerCapture(id); } catch (_) { /* nem todo pointer é capturável */ } };
+  steer.addEventListener('pointerdown', e => {
+    e.preventDefault(); steerId = e.pointerId; capturar(steer, e.pointerId); moverKnob(e.clientX);
+  });
+  steer.addEventListener('pointermove', e => { if (e.pointerId === steerId) moverKnob(e.clientX); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev =>
+    steer.addEventListener(ev, e => { if (e.pointerId === steerId) soltarKnob(); }));
+
+  // pedais: mantêm pressionado
+  const pedal = (id, campo) => {
+    const el = document.getElementById(id);
+    const on = e => { e.preventDefault(); TOQ[campo] = 1; el.classList.add('press'); capturar(el, e.pointerId); };
+    const off = () => { TOQ[campo] = 0; el.classList.remove('press'); };
+    el.addEventListener('pointerdown', on);
+    ['pointerup', 'pointercancel', 'lostpointercapture', 'pointerleave'].forEach(ev => el.addEventListener(ev, off));
+  };
+  pedal('tacel', 'acel');
+  pedal('tfreio', 'freio');
+
+  // botões de ação: disparam uma vez
+  document.querySelectorAll('.tbtn[data-k]').forEach(el => {
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      el.classList.add('press');
+      onPress(el.dataset.k);
+      if (el.dataset.k === 'r') el.classList.toggle('press', !!(veiculos[atual] && veiculos[atual].on));
+      else setTimeout(() => el.classList.remove('press'), 130);
+    });
+  });
+
+  // no celular a caixa de ajuda ocupa meia tela: começa recolhida
+  S.ajuda = false;
+}
+
+/* toque no canvas: abre/opera a loja e aceita contratos sem teclado */
+cv.addEventListener('pointerdown', e => {
+  const p = paraCanvas(e.clientX, e.clientY);
+  if (S.loja) {
+    const bx = 80, by = 50, bw = 640, bh = 460;
+    if (p.x < bx || p.x > bx + bw || p.y < by || p.y > by + bh) { S.loja = false; return; }
+    // abas
+    for (let i = 0; i < 3; i++) {
+      const ax = bx + 20 + i * 110;
+      if (p.x >= ax && p.x <= ax + 100 && p.y >= by + 42 && p.y <= by + 64) {
+        S.lojaAba = i; S.lojaSel = 0; return;
+      }
+    }
+    // itens (mesma matemática do drawLoja)
+    const itens = itensLoja();
+    const start = clamp(S.lojaSel - 6, 0, Math.max(0, itens.length - 14));
+    for (let k = 0; k < Math.min(14, itens.length - start); k++) {
+      const ry = by + 78 + k * 25;
+      if (p.x >= bx + 16 && p.x <= bx + bw - 16 && p.y >= ry - 2 && p.y <= ry + 21) {
+        const i = start + k;
+        if (S.lojaSel === i) comprarSel(); else S.lojaSel = i;   // 1º toque seleciona, 2º compra
+        return;
+      }
+    }
+    return;
+  }
+  // fora da loja: tocar no painel de contratos aceita o contrato
+  if (S.contratos.length && p.x >= 196 && p.x <= 370 && p.y >= 26 && p.y <= 26 + S.contratos.length * 16 + 8) {
+    const k = Math.floor((p.y - 26) / 16);
+    const c = S.contratos[k];
+    if (c && !c.aceito) { c.aceito = true; toast(`Contrato aceito: ${c.tipo} · ${c.meta} tiles`); }
+  }
+});
+
+function trocarVeiculo() {
+  const cands = veiculos.map((v, i) => i).filter(i => autoPropelido(veiculos[i]));
+  if (cands.length < 2) return;
+  const cur = cands.indexOf(atual);
+  atual = cands[(cur + 1) % cands.length];
+  toast("Agora dirigindo: " + veiculos[atual].def.nome);
+}
+
+function engatar() {
+  const v = veiculos[atual];
+  if (!v || v.def.cat === "colheitadeira") { toast("Colheitadeira não engata implemento"); return; }
+  if (v.impl) { v.impl.engatado = null; v.impl = null; v.on = false; toast("Implemento desengatado"); return; }
+  const hx = v.x - 20 * Math.cos(v.th), hy = v.y - 20 * Math.sin(v.th);
+  let melhor = null, md = 70;
+  for (const im of implementos) {
+    if (im.engatado) continue;
+    const d = Math.hypot(im.x - hx, im.y - hy);
+    if (d < md) { md = d; melhor = im; }
+  }
+  if (melhor) {
+    v.impl = melhor; melhor.engatado = v; melhor._lx = undefined;
+    toast("Engatado: " + melhor.def.nome);
+  } else toast("Nenhum implemento por perto");
+}
+
+/* ============================================================
+   §11  LOJA
+   ============================================================ */
+function itensLoja() {
+  if (S.lojaAba === 0) return MAQUINAS.filter(m => m.cat === "trator" || m.cat === "colheitadeira");
+  if (S.lojaAba === 1) return MAQUINAS.filter(m => m.cat !== "trator" && m.cat !== "colheitadeira");
+  return FIELDS.filter(f => !f.dono);
+}
+function comprarSel() {
+  const it = itensLoja()[S.lojaSel];
+  if (!it) return;
+  if (S.lojaAba === 2) {
+    if (S.dinheiro < it.preco) { toast("Dinheiro insuficiente"); return; }
+    gastar(it.preco, `Campo ${it.id} comprado: -$${fmt(it.preco)}`);
+    it.dono = true;
+    atualizarMinimapa();
+    toast(`Campo ${it.id} agora é seu (${it.tiles} tiles)`);
+    return;
+  }
+  if (S.dinheiro < it.preco) { toast("Dinheiro insuficiente"); return; }
+  gastar(it.preco, `${it.nome}: -$${fmt(it.preco)}`);
+  const px = (PATIO.x0 + 4) * TILE + Math.random() * 60, py = (PATIO.y1 - 2) * TILE;
+  if (it.cat === "trator" || it.cat === "colheitadeira") novoVeiculo(it.id, px, py, 0);
+  else novoImplemento(it.id, px, py + 40);
+  toast(it.nome + " entregue no pátio");
+}
+
+/* ============================================================
+   §12  CÂMERA E RENDER DO MUNDO
+   ============================================================ */
+const cam = { x: 0, y: 0 };
+function updateCam(dt) {
+  const v = veiculos[atual]; if (!v) return;
+  const alvoX = clamp(v.x + Math.cos(v.th) * 40 - VIEW_W / 2, 0, WORLD_W - VIEW_W);
+  const alvoY = clamp(v.y + Math.sin(v.th) * 40 - VIEW_H / 2, 0, WORLD_H - VIEW_H);
+  cam.x = lerp(cam.x, alvoX, Math.min(1, dt * 4));
+  cam.y = lerp(cam.y, alvoY, Math.min(1, dt * 4));
+}
+
+/* ---------- sprites ---------- */
+function rr(x, y, w, h, r, fill, stroke, lw) {
+  const rad = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rad);
+  ctx.arcTo(x + w, y + h, x, y + h, rad);
+  ctx.arcTo(x, y + h, x, y, rad);
+  ctx.arcTo(x, y, x + w, y, rad);
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 1.4; ctx.stroke(); }
+}
+function roda(x, y, w, h) {
+  rr(x - w / 2, y - h / 2, w, h, 2, "#1b1b1d", "#0c0c0d", 1.2);
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x - w / 2, y - h / 2, w, h); ctx.clip();
+  ctx.strokeStyle = "rgba(150,150,155,0.28)"; ctx.lineWidth = 1.3;
+  for (let i = -h / 2; i < h / 2; i += 4) {
+    ctx.beginPath(); ctx.moveTo(x - w / 2, y + i); ctx.lineTo(x + w / 2, y + i + 2.4); ctx.stroke();
+  }
+  ctx.restore();
+}
+function sombra(x, y, w, h, ang) {
+  ctx.save(); ctx.translate(x + 3, y + 3); ctx.rotate(ang);
+  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  rr(-w / 2, -h / 2, w, h, 4, "rgba(0,0,0,0.25)", null);
+  ctx.restore();
+}
+
+const CORES_VEIC = {
+  t90: { a: "#3F8C46", b: "#2E6B34" }, t160: { a: "#2F5F9E", b: "#254B7D" }, t320: { a: "#B5442A", b: "#8E3421" },
+  c350: { a: "#2C6E3F", b: "#1F5230" }, c900: { a: "#2C6E3F", b: "#1F5230" }, cr2: { a: "#B5442A", b: "#8E3421" }
+};
+
+function drawTrator(v) {
+  const col = CORES_VEIC[v.def.id] || CORES_VEIC.t90;
+  const s = v.def.cv > 250 ? 1.18 : v.def.cv > 120 ? 1.06 : 0.94;
+  sombra(v.x, v.y, 62 * s, 40 * s, v.th);
+  ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.th); ctx.scale(s, s);
+  roda(-15, -17, 24, 14); roda(-15, 17, 24, 14);
+  roda(17, -14, 15, 10); roda(17, 14, 15, 10);
+  rr(-27, -12, 56, 24, 4, col.b, "#111", 1.4);
+  rr(2, -10, 25, 20, 4, col.a, "#111", 1.4);
+  ctx.fillStyle = "rgba(255,255,255,0.10)"; ctx.fillRect(4, -8, 21, 4);
+  rr(-18, -11, 21, 22, 3, "#2C2F33", "#111", 1.4);
+  rr(-15, -8, 16, 16, 2, "#8FA3B0", "#111", 1.2);
+  ctx.fillStyle = "rgba(255,255,255,0.22)";
+  ctx.beginPath(); ctx.moveTo(-14, -7); ctx.lineTo(-6, -7); ctx.lineTo(-14, 3); ctx.closePath(); ctx.fill();
+  rr(21, -9, 4, 4, 1, "#3A3A3C", "#111", 1);
+  if (v.dirt > 0.15) { ctx.fillStyle = `rgba(90,72,48,${v.dirt * 0.5})`; rr(-27, -12, 56, 24, 4, `rgba(90,72,48,${v.dirt * 0.5})`, null); }
+  ctx.fillStyle = "#FFE9A8"; ctx.fillRect(27, -8, 3, 3); ctx.fillRect(27, 5, 3, 3);
+  ctx.restore();
+}
+
+function drawColheitadeira(v) {
+  const s = v.def.id === "c900" ? 1.15 : 1;
+  sombra(v.x, v.y, 88 * s, 40 * s, v.th);
+  ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.th); ctx.scale(s, s);
+  const col = CORES_VEIC[v.def.id] || CORES_VEIC.c350;
+  roda(-20, -19, 22, 13); roda(-20, 19, 22, 13);
+  roda(14, -16, 27, 16); roda(14, 16, 27, 16);
+  rr(-31, -17, 68, 34, 5, col.a, "#0d0d0d", 1.6);
+  rr(-27, -14, 24, 28, 3, "#C9CCC9", "#111", 1.2);
+  // nível de grão visível
+  const pct = v.def.tanqueGrao ? v.grao / v.def.tanqueGrao : 0;
+  if (pct > 0) { ctx.fillStyle = "#C2A24E"; ctx.fillRect(-26, 13 - 26 * pct, 22, 26 * pct); }
+  rr(3, -12, 24, 24, 3, "#1F2427", "#111", 1.2);
+  rr(6, -9, 17, 18, 2, "#8FA3B0", "#111", 1.2);
+  // tubo de descarga
+  ctx.strokeStyle = col.b; ctx.lineWidth = 8;
+  ctx.beginPath(); ctx.moveTo(-14, -8); ctx.lineTo(-14, -31); ctx.stroke();
+  ctx.strokeStyle = "#111"; ctx.lineWidth = 1.2; ctx.strokeRect(-18, -31, 8, 23);
+  // plataforma
+  const lw = v.def.larg * TILE;
+  ctx.save(); ctx.translate(34, 0);
+  rr(0, -lw / 2, 14, lw, 2, "#3A7F4C", "#0d0d0d", 1.6);
+  rr(12, -lw / 2 + 2, 4, lw - 4, 1, "#B9BDC0", "#111", 1);
+  ctx.strokeStyle = "rgba(220,215,180,0.8)"; ctx.lineWidth = 2;
+  for (let i = -lw / 2 + 6; i < lw / 2; i += 9) { ctx.beginPath(); ctx.moveTo(2, i); ctx.lineTo(10, i); ctx.stroke(); }
+  ctx.restore();
+  ctx.restore();
+}
+
+function drawImplemento(im) {
+  const d = im.def, lw = (d.larg || 3) * TILE;
+  sombra(im.x, im.y, 24, lw, im.th);
+  ctx.save(); ctx.translate(im.x, im.y); ctx.rotate(im.th);
+  ctx.strokeStyle = "#3A3A3C"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(im.L, 0); ctx.stroke();
+
+  if (d.cat === "arado") {
+    rr(-5, -lw / 2, 9, lw, 2, "#2B2F7A", "#111", 1.2);
+    for (let i = -lw / 2 + 6; i < lw / 2; i += 11) {
+      ctx.fillStyle = "#6F7479";
+      ctx.beginPath(); ctx.moveTo(-5, i); ctx.lineTo(-17, i + 4); ctx.lineTo(-15, i + 10); ctx.lineTo(-5, i + 6);
+      ctx.closePath(); ctx.fill(); ctx.strokeStyle = "#111"; ctx.lineWidth = 0.9; ctx.stroke();
+    }
+  } else if (d.cat === "cultivador") {
+    rr(-11, -lw / 2, 10, lw, 2, "#7A2F26", "#111", 1.2);
+    for (let i = -lw / 2 + 6; i < lw / 2; i += 10) {
+      rr(-4, i - 2, 8, 3.5, 1, "#8F3A2E", "#111", 0.8);
+      ctx.fillStyle = "#9AA0A6"; ctx.beginPath(); ctx.arc(-13, i + 4, 3.6, 0, 6.3); ctx.fill();
+      ctx.strokeStyle = "#111"; ctx.lineWidth = 0.8; ctx.stroke();
+    }
+  } else if (d.cat === "semeadora") {
+    rr(-20, -lw / 2 + 4, 17, lw - 8, 3, "#C9C9CC", "#111", 1.2);
+    const pct = im.tank / d.cap;
+    ctx.fillStyle = "rgba(90,70,40,0.5)"; ctx.fillRect(-18, -lw / 2 + 6, 13 * pct, lw - 12);
+    rr(-3, -lw / 2, 7, lw, 2, "#2F6F3F", "#111", 1.2);
+    for (let i = -lw / 2 + 5; i < lw / 2; i += 7) {
+      ctx.fillStyle = "#8A8F95"; ctx.beginPath(); ctx.arc(2, i, 2.8, 0, 6.3); ctx.fill();
+    }
+  } else if (d.cat === "adubadeira") {
+    rr(-14, -14, 16, 28, 4, "#C9C9CC", "#111", 1.2);
+    const pct = im.tank / d.cap;
+    ctx.fillStyle = im.tankTipo === "calcario" ? "rgba(230,230,235,0.8)" : "rgba(120,150,190,0.75)";
+    ctx.fillRect(-12, 12 - 24 * pct, 12, 24 * pct);
+    ctx.fillStyle = "#6F7479";
+    ctx.beginPath(); ctx.arc(-16, -6, 4, 0, 6.3); ctx.arc(-16, 6, 4, 0, 6.3); ctx.fill();
+  } else if (d.cat === "pulverizador") {
+    rr(-16, -10, 18, 20, 4, "#E8E8EA", "#111", 1.2);
+    const pct = im.tank / d.cap;
+    ctx.fillStyle = "rgba(150,190,120,0.7)"; ctx.fillRect(-14, 8 - 16 * pct, 14, 16 * pct);
+    rr(-4, -lw / 2, 4, lw, 1, "#6F7479", "#111", 1);
+    for (let i = -lw / 2 + 8; i < lw / 2; i += 12) { ctx.fillStyle = "#9AA0A6"; ctx.fillRect(-3, i, 2, 2); }
+  } else if (d.cat === "reboque") {
+    roda(-8, -17, 20, 12); roda(-8, 17, 20, 12);
+    roda(10, -17, 20, 12); roda(10, 17, 20, 12);
+    const bx = im.bascula ? -im.bascula * 6 : 0;
+    rr(-30 + bx, -16, 62, 32, 2, "#8D9298", "#0d0d0d", 1.4);
+    rr(-27 + bx, -13, 56, 26, 1, "#3B3F44", "#111", 1);
+    const pct = im.carga / d.cap;
+    if (pct > 0) {
+      ctx.save(); ctx.beginPath(); ctx.rect(-27 + bx, -13, 56 * pct, 26); ctx.clip();
+      const cr = CROP_BY_ID[im.cargaTipo];
+      ctx.fillStyle = cr ? cr.cores[3] : "#C2A24E";
+      ctx.fillRect(-27 + bx, -13, 56, 26);
+      for (let i = 0; i < 40; i++) {
+        ctx.fillStyle = hash(i, 3, 7) > 0.5 ? "rgba(255,240,190,0.35)" : "rgba(90,70,25,0.35)";
+        ctx.fillRect(-27 + bx + hash(i, 1, 2) * 56, -13 + hash(i, 5, 9) * 26, 2, 2);
+      }
+      ctx.restore();
+    }
+  }
+  ctx.restore();
+}
+
+function drawPredio(b) {
+  const x = b.x * TILE, y = b.y * TILE, w = b.w * TILE, h = b.h * TILE;
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.fillRect(x + 4, y + 5, w, h);
+  if (b.tipo === "silo") {
+    ctx.fillStyle = "#8E9296";
+    ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w / 2, 0, 6.3); ctx.fill();
+    ctx.strokeStyle = "#5E6266"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = "#B4B8BC";
+    ctx.beginPath(); ctx.arc(x + w / 2 - 4, y + h / 2 - 4, w / 3.4, 0, 6.3); ctx.fill();
+    ctx.fillStyle = "#3A3D40";
+    ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, 4, 0, 6.3); ctx.fill();
+  } else if (b.tipo === "bomba") {
+    rr(x, y, w, h, 3, "#B5442A", "#2A2A2C", 1.6);
+    ctx.fillStyle = "#F3F6E8"; ctx.fillRect(x + 5, y + 5, w - 10, 6);
+    ctx.fillStyle = "#1F2427"; ctx.fillRect(x + 6, y + 6, w - 12, 4);
+  } else if (b.tipo === "posto") {
+    rr(x, y, w, h, 2, "#8E9296", "#3A3D40", 2);
+    ctx.fillStyle = "#4A5258"; ctx.fillRect(x + 3, y + 3, w - 6, h * 0.55);
+    ctx.fillStyle = "#B4B8BC";
+    for (let i = 0; i < 3; i++) ctx.fillRect(x + 8 + i * (w - 16) / 3, y + h * 0.6, (w - 16) / 4, h * 0.3);
+    ctx.fillStyle = UI.text; ctx.font = "700 9px system-ui, sans-serif"; ctx.textAlign = "center";
+    ctx.fillText(b.posto.nome, x + w / 2, y + h + 12);
+    ctx.textAlign = "left";
+  } else {
+    const telhado = b.tipo === "galpao" ? "#7A4A38" : b.tipo === "loja" ? "#4A5258" : "#5E5248";
+    rr(x, y, w, h, 2, "#B8A88E", "#3A3D40", 1.6);
+    ctx.fillStyle = telhado;
+    ctx.beginPath(); ctx.moveTo(x - 3, y + h * 0.55); ctx.lineTo(x + w / 2, y - 6);
+    ctx.lineTo(x + w + 3, y + h * 0.55); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#2A2A2C"; ctx.lineWidth = 1.4; ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.10)";
+    ctx.beginPath(); ctx.moveTo(x - 3, y + h * 0.55); ctx.lineTo(x + w / 2, y - 6); ctx.lineTo(x + w / 2, y + h * 0.55); ctx.closePath(); ctx.fill();
+    if (b.tipo === "galpao") { ctx.fillStyle = "#3A3D40"; ctx.fillRect(x + w / 2 - 12, y + h - 14, 24, 14); }
+    if (b.tipo === "loja") {
+      ctx.fillStyle = UI.green; ctx.font = "700 9px system-ui, sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("LOJA", x + w / 2, y + h + 11); ctx.textAlign = "left";
+    }
+    if (b.tipo === "oficina") {
+      ctx.fillStyle = UI.cond; ctx.font = "700 8px system-ui, sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("OFICINA", x + w / 2, y + h + 10); ctx.textAlign = "left";
+    }
+  }
+  ctx.restore();
+}
+
+function drawArvore(t) {
+  const est = ESTACOES[S.mesAbs % 12];
+  const copa = est === "Outono" ? "#B07A2E" : est === "Inverno" ? "#5A4E3E" : "#3E6B2A";
+  ctx.fillStyle = "rgba(0,0,0,0.28)";
+  ctx.beginPath(); ctx.ellipse(t.x + 4, t.y + 5, 12 * t.s, 9 * t.s, 0, 0, 6.3); ctx.fill();
+  ctx.fillStyle = "#4A3A2A";
+  ctx.beginPath(); ctx.arc(t.x, t.y, 4 * t.s, 0, 6.3); ctx.fill();
+  ctx.fillStyle = copa;
+  ctx.beginPath(); ctx.arc(t.x - 5 * t.s, t.y - 2 * t.s, 8 * t.s, 0, 6.3);
+  ctx.arc(t.x + 5 * t.s, t.y - 1 * t.s, 8 * t.s, 0, 6.3);
+  ctx.arc(t.x, t.y - 7 * t.s, 9 * t.s, 0, 6.3); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,0.10)";
+  ctx.beginPath(); ctx.arc(t.x - 3 * t.s, t.y - 9 * t.s, 4 * t.s, 0, 6.3); ctx.fill();
+}
+
+/* ---------- overlays de camada ---------- */
+const OVERLAYS = ["", "Fertilizante", "Calcário", "Ervas daninhas", "Precisa arar"];
+function drawOverlay() {
+  if (!S.overlay) return;
+  const c0 = Math.max(0, (cam.x / TILE) | 0), c1 = Math.min(WC - 1, ((cam.x + VIEW_W) / TILE | 0) + 1);
+  const r0 = Math.max(0, (cam.y / TILE) | 0), r1 = Math.min(WR - 1, ((cam.y + VIEW_H) / TILE | 0) + 1);
+  for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+    const i = idx(c, r);
+    if (!(W.flags[i] & F_CAMPO)) continue;
+    let col = null;
+    if (S.overlay === 1) col = W.fert[i] === 2 ? "rgba(30,95,168,0.45)" : W.fert[i] === 1 ? "rgba(111,183,232,0.45)" : null;
+    else if (S.overlay === 2) col = W.lime[i] === 0 ? "rgba(192,57,43,0.40)" : null;
+    else if (S.overlay === 3) col = W.weeds[i] ? ["", "rgba(127,168,96,0.45)", "rgba(94,138,78,0.45)", "rgba(62,107,58,0.45)"][W.weeds[i]] : null;
+    else if (S.overlay === 4) col = !(W.flags[i] & F_PLOWED) ? "rgba(192,57,43,0.35)" : null;
+    if (col) { ctx.fillStyle = col; ctx.fillRect(c * TILE, r * TILE, TILE, TILE); }
+  }
+}
+
+/* ---------- iluminação ---------- */
+function horaDoDia() { return S.minutos / 60; }
+function drawLuz() {
+  const mes = S.mesAbs % 12;
+  const verao = ESTACOES[mes] === "Verão" ? 1 : ESTACOES[mes] === "Inverno" ? 0 : 0.5;
+  const nascer = lerp(8.0, 5.0, verao), poente = lerp(16.5, 21.5, verao);
+  const h = horaDoDia();
+  const alt = Math.max(0, Math.sin(Math.PI * (h - nascer) / (poente - nascer)));
+  // platô de dia claro: escurece só no início da manhã e no fim da tarde
+  const escuro = clamp(1 - alt * 2.6, 0, 1) * 0.55;
+  const golden = alt > 0.02 && alt < 0.30;
+
+  if (escuro > 0.01) {
+    ctx.save();
+    ctx.fillStyle = `rgba(11,26,58,${escuro})`;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    ctx.globalCompositeOperation = 'destination-out';
+    for (const v of veiculos) {
+      if (!v.luz) continue;
+      const sx = v.x - cam.x, sy = v.y - cam.y;
+      if (sx < -160 || sx > VIEW_W + 160 || sy < -160 || sy > VIEW_H + 160) continue;
+      ctx.save(); ctx.translate(sx, sy); ctx.rotate(v.th);
+      const g = ctx.createLinearGradient(0, 0, 140, 0);
+      g.addColorStop(0, "rgba(0,0,0,0.9)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.moveTo(8, -6); ctx.lineTo(140, -50); ctx.lineTo(140, 50); ctx.lineTo(8, 6);
+      ctx.closePath(); ctx.fill();
+      const h2 = ctx.createRadialGradient(0, 0, 4, 0, 0, 46);
+      h2.addColorStop(0, "rgba(0,0,0,0.55)"); h2.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = h2; ctx.beginPath(); ctx.arc(0, 0, 46, 0, 6.3); ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  if (golden) { ctx.fillStyle = "rgba(255,154,77,0.18)"; ctx.fillRect(0, 0, VIEW_W, VIEW_H); }
+  const cl = CLIMAS[S.clima];
+  if (cl.tint) { ctx.fillStyle = cl.tint; ctx.fillRect(0, 0, VIEW_W, VIEW_H); }
+  // giroflex
+  const v = veiculos[atual];
+  if (v && v.on) {
+    const a = Math.abs(Math.sin(performance.now() / 400));
+    ctx.fillStyle = `rgba(255,185,0,${a * 0.5})`;
+    ctx.beginPath(); ctx.arc(v.x - cam.x, v.y - cam.y, 16, 0, 6.3); ctx.fill();
+  }
+}
+
+const gotas = [];
+for (let i = 0; i < 170; i++) gotas.push({ x: Math.random() * VIEW_W, y: Math.random() * VIEW_H, l: 8 + Math.random() * 10, s: 6 + Math.random() * 5 });
+function drawChuva(neve) {
+  if (neve) {
+    ctx.fillStyle = "rgba(240,246,252,0.85)";
+    for (const d of gotas) {
+      d.y += d.s * 0.25; d.x += Math.sin(d.y * 0.02) * 0.5;
+      if (d.y > VIEW_H) { d.y = -6; d.x = Math.random() * VIEW_W; }
+      ctx.fillRect(d.x, d.y, 2, 2);
+    }
+    return;
+  }
+  ctx.strokeStyle = "rgba(200,235,255,0.5)"; ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  for (const d of gotas) {
+    d.y += d.s * 2.4; d.x += d.s * 0.5;
+    if (d.y > VIEW_H) { d.y = -12; d.x = Math.random() * VIEW_W - 40; }
+    if (d.x > VIEW_W) d.x = -10;
+    ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - d.l * 0.25, d.y - d.l);
+  }
+  ctx.stroke();
+}
+
+function render() {
+  ctx.clearRect(0, 0, VIEW_W, VIEW_H);
+  const cx = Math.round(cam.x), cy = Math.round(cam.y);
+  ctx.drawImage(world, cx, cy, VIEW_W, VIEW_H, 0, 0, VIEW_W, VIEW_H);
+
+  // mottling ancorado no mundo
+  if (mottlePat) {
+    ctx.save();
+    ctx.globalAlpha = 0.32;
+    ctx.translate(-cx % 256, -cy % 256);
+    ctx.fillStyle = mottlePat;
+    ctx.fillRect(0, 0, VIEW_W + 256, VIEW_H + 256);
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.translate(-cx, -cy);
+  drawOverlay();
+
+  // entidades ordenadas por y
+  const lista = [];
+  const vis = (x, y, m) => x > cam.x - m && x < cam.x + VIEW_W + m && y > cam.y - m && y < cam.y + VIEW_H + m;
+  for (const b of predios) if (vis(b.x * TILE, b.y * TILE, 200)) lista.push({ y: (b.y + b.h) * TILE, f: () => drawPredio(b) });
+  for (const t of trees) if (vis(t.x, t.y, 60)) lista.push({ y: t.y + 8, f: () => drawArvore(t) });
+  for (const im of implementos) if (vis(im.x, im.y, 120)) lista.push({ y: im.y, f: () => drawImplemento(im) });
+  for (const v of veiculos) if (vis(v.x, v.y, 120))
+    lista.push({ y: v.y + 1, f: () => v.def.cat === "colheitadeira" ? drawColheitadeira(v) : drawTrator(v) });
+  lista.sort((a, b) => a.y - b.y);
+  lista.forEach(o => o.f());
+
+  // partículas
+  for (const p of particulas) {
+    ctx.globalAlpha = Math.max(0, p.vida / p.max);
+    ctx.fillStyle = p.cor;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.3); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  ctx.font = "700 12px system-ui, sans-serif"; ctx.textAlign = "center";
+  for (const f of flutuantes) {
+    ctx.globalAlpha = Math.min(1, f.vida);
+    ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillText(f.txt, f.x + 1, f.y + 1);
+    ctx.fillStyle = f.cor; ctx.fillText(f.txt, f.x, f.y);
+  }
+  ctx.globalAlpha = 1; ctx.textAlign = "left";
+  ctx.restore();
+
+  if (S.clima === "chuva" || S.clima === "tempestade") drawChuva(false);
+  if (S.clima === "neve") drawChuva(true);
+  drawLuz();
+  drawHUD();
+  if (S.loja) drawLoja();
+}
+
+/* ============================================================
+   §13  HUD
+   ============================================================ */
+function painel(x, y, w, h, forte) {
+  rr(x, y, w, h, 3, forte ? UI.panelStrong : UI.panel, null);
+}
+function chip(x, y, txt) {
+  ctx.font = "700 8px system-ui, sans-serif";
+  const w = Math.max(18, ctx.measureText(txt).width + 8);
+  rr(x, y, w, 11, 2, UI.panelStrong, null);
+  ctx.fillStyle = UI.text; ctx.textAlign = "center";
+  ctx.fillText(txt, x + w / 2, y + 8);
+  ctx.textAlign = "left";
+  return w;
+}
+
+function drawHUD() {
+  const v = veiculos[atual];
+
+  /* ----- dinheiro (bloco mais opaco) ----- */
+  painel(560, 8, 96, 28, true);
+  ctx.font = "700 12px system-ui, sans-serif";
+  ctx.textAlign = "right";
+  let corD = UI.text;
+  if (S.moneyFlash > 0) corD = S.moneyFlashCol;
+  ctx.fillStyle = corD;
+  ctx.fillText("$ " + fmt(S.dinheiro), 650, 26 - (S.moneyFlash > 0 ? 2 : 0));
+  ctx.textAlign = "left";
+  if (S.divida > 0) {
+    ctx.font = "400 7px system-ui, sans-serif"; ctx.fillStyle = UI.crit;
+    ctx.textAlign = "right"; ctx.fillText("dívida " + fmt(S.divida), 650, 33); ctx.textAlign = "left";
+  }
+
+  /* ----- info: data, clima, relógio ----- */
+  painel(660, 8, 132, 28, false);
+  const mes = S.mesAbs % 12;
+  ctx.font = "400 10px system-ui, sans-serif"; ctx.fillStyle = UI.text;
+  ctx.fillText(MESES[mes] + " · " + ESTACOES[mes].slice(0, 4), 666, 26);
+  ctx.strokeStyle = UI.greyLight; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(716, 14); ctx.lineTo(716, 29); ctx.stroke();
+  drawClimaIcone(724, 22, CLIMAS[S.clima].ico, UI.text);
+  drawClimaIcone(740, 22, CLIMAS[S.proxClima].ico, "rgba(255,255,255,0.22)");
+  ctx.beginPath(); ctx.moveTo(750, 14); ctx.lineTo(750, 29); ctx.stroke();
+  // relógio analógico
+  const hx = 762, hy = 22;
+  ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(hx, hy, 8, 0, 6.3); ctx.stroke();
+  const hh = (S.minutos / 60) % 12, mm = S.minutos % 60;
+  ctx.strokeStyle = UI.text; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(hx, hy);
+  ctx.lineTo(hx + Math.cos(hh / 12 * 6.283 - 1.571) * 4, hy + Math.sin(hh / 12 * 6.283 - 1.571) * 4); ctx.stroke();
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(hx, hy);
+  ctx.lineTo(hx + Math.cos(mm / 60 * 6.283 - 1.571) * 6.5, hy + Math.sin(mm / 60 * 6.283 - 1.571) * 6.5); ctx.stroke();
+  ctx.font = "400 10px system-ui, sans-serif"; ctx.fillStyle = UI.text;
+  const hs = String(Math.floor(S.minutos / 60)).padStart(2, "0") + ":" + String(Math.floor(S.minutos % 60)).padStart(2, "0");
+  ctx.fillText(hs, 772, 26);
+  if (S.escala !== 1) {
+    ctx.font = "700 8px system-ui, sans-serif"; ctx.fillStyle = UI.green;
+    ctx.fillText(S.escala + "x", 772, 34);
+  }
+
+  /* ----- velocímetro ----- */
+  if (v) {
+    const cx = 742, cy = 502;
+    ctx.strokeStyle = "rgba(255,255,255,0.18)"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx, cy, 44, Math.PI * 140 / 180, Math.PI * 40 / 180); ctx.stroke();
+    const kmh = Math.abs(v.v) * 0.36;
+    const t = clamp(kmh / 60, 0, 1);
+    const ang = Math.PI * 140 / 180 + t * (Math.PI * 2 - Math.PI * 100 / 180);
+    ctx.font = "400 7px system-ui, sans-serif"; ctx.fillStyle = UI.greyLight;
+    const offs = [[-24, -14], [-27, -3], [-25, 8], [-19, 17], [-9, 23], [9, 23], [19, 17], [25, 8], [27, -3], [24, -14]];
+    offs.forEach((o, i) => {
+      ctx.textAlign = i < 5 ? "right" : "left";
+      ctx.fillText(String(i * 10), cx + o[0], cy + o[1]);
+    });
+    ctx.textAlign = "left";
+    ctx.strokeStyle = UI.green; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(ang) * 28, cy + Math.sin(ang) * 28); ctx.stroke();
+    ctx.fillStyle = UI.text; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, 6.3); ctx.fill();
+    ctx.font = "700 24px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = UI.text;
+    ctx.fillText(String(Math.round(kmh)), cx, cy + 2);
+    ctx.font = "400 7px system-ui, sans-serif"; ctx.fillStyle = UI.greyLight;
+    ctx.fillText("km/h", cx, cy + 12);
+    ctx.textAlign = "left";
+
+    /* ----- barras verticais ----- */
+    const barra = (x, val, cor, critico, ico) => {
+      ctx.fillStyle = "rgba(0,0,0,0.75)"; ctx.fillRect(x, 456, 4, 56);
+      let c2 = cor, a = 1;
+      if (critico && val < 0.1) { c2 = UI.crit; a = Math.abs(Math.cos(performance.now() / 300)); }
+      else if (critico === 2 && val < 0.2) c2 = UI.crit;
+      ctx.globalAlpha = a; ctx.fillStyle = c2;
+      ctx.fillRect(x, 456 + 56 * (1 - val), 4, 56 * val);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = UI.greyLight; ctx.font = "400 8px system-ui, sans-serif"; ctx.textAlign = "center";
+      ctx.fillText(ico, x + 2, 450); ctx.textAlign = "left";
+    };
+    barra(688, v.def.tanque ? v.fuel / v.def.tanque : 1, UI.fuel, 1, "D");
+    barra(674, 1 - v.wear, UI.cond, 2, "C");
+    barra(660, v.dirt, UI.greyLight, 0, "S");
+
+    /* ----- barra de preenchimento ----- */
+    let fillInfo = null;
+    if (v.def.cat === "colheitadeira") {
+      const cr = CROP_BY_ID[v.graoTipo];
+      fillInfo = { cor: cr ? cr.cores[3] : UI.greyLight, cur: v.grao, max: v.def.tanqueGrao, nome: cr ? cr.nome : "vazio" };
+    } else if (v.impl && v.impl.def.cap) {
+      const im = v.impl;
+      if (im.def.cat === "reboque") {
+        const cr = CROP_BY_ID[im.cargaTipo];
+        fillInfo = { cor: cr ? cr.cores[3] : UI.greyLight, cur: im.carga, max: im.def.cap, nome: cr ? cr.nome : "vazio" };
+      } else {
+        const nome = im.def.fill === "semente" ? (CROP_BY_ID[im.cargaTipo] || {}).nome || "semente" : (im.tankTipo || im.def.fill);
+        fillInfo = { cor: im.def.fill === "semente" ? "#C9A227" : im.tankTipo === "calcario" ? "#E8EEF5" : "#6FB7E8", cur: im.tank, max: im.def.cap, nome };
+      }
+    }
+    if (fillInfo) {
+      painel(556, 484, 120, 24, false);
+      const pct = clamp(fillInfo.cur / fillInfo.max, 0, 1);
+      ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(562, 498, 82, 5);
+      ctx.fillStyle = pct > 0.95 ? UI.crit : fillInfo.cor;
+      ctx.fillRect(562, 498, 82 * pct, 5);
+      ctx.font = "400 9px system-ui, sans-serif"; ctx.fillStyle = UI.text;
+      ctx.fillText(fillInfo.nome, 562, 494);
+      ctx.textAlign = "right";
+      ctx.fillText(fmtL(fillInfo.cur) + " / " + fmtL(fillInfo.max) + " l", 670, 494);
+      ctx.textAlign = "left";
+    }
+
+    /* ----- info do campo ----- */
+    const c = clamp((v.x / TILE) | 0, 0, WC - 1), r = clamp((v.y / TILE) | 0, 0, WR - 1);
+    const i = idx(c, r);
+    if (W.flags[i] & F_CAMPO) {
+      const f = FIELDS[W.fieldId[i] - 1];
+      const cr = CROP_BY_ID[W.crop[i]];
+      let b = 1 + 0.15 * ((W.flags[i] & F_PLOWED) ? 1 : 0) + 0.15 * (W.lime[i] > 0 ? 1 : 0)
+                + 0.225 * W.fert[i] + W.weedBon[i] / 100;
+      b = Math.min(b, 2.0);
+      const qual = Math.round((b - 1) * 100);
+      const linhas = [
+        ["Campo " + f.id, (f.tiles / 100).toFixed(2) + " ha"],
+        ["Cultura", cr ? cr.nome + " · E" + W.stage[i] : "—"],
+        ["Fertilização", W.fert[i] * 50 + "%"],
+        ["Ervas", ["Nenhuma", "Baixa", "Média", "Alta"][W.weeds[i]]],
+        ["Proprietário", f.dono ? "Você" : "$" + fmt(f.preco)]
+      ];
+      // +1 linha reservada para a barra de qualidade, senão ela colide com a última
+      const h = (linhas.length + 1) * 14 + 18;
+      painel(642, 444 - h, 150, h, false);
+      ctx.font = "400 9px system-ui, sans-serif";
+      linhas.forEach((l, k) => {
+        const y = 444 - h + 14 + k * 14;
+        ctx.fillStyle = UI.greyLight; ctx.fillText(l[0], 648, y);
+        ctx.textAlign = "right"; ctx.fillStyle = UI.text; ctx.fillText(l[1], 786, y); ctx.textAlign = "left";
+      });
+      const qy = 444 - 15;
+      ctx.fillStyle = UI.greyLight; ctx.fillText("Qualidade", 648, qy);
+      ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(714, qy - 5, 50, 4);
+      ctx.fillStyle = UI.green; ctx.fillRect(714, qy - 5, 50 * (qual / 100), 4);
+      ctx.textAlign = "right"; ctx.fillStyle = UI.text; ctx.fillText(qual + "%", 786, qy); ctx.textAlign = "left";
+    }
+  }
+
+  /* ----- ajuda ----- */
+  if (S.ajuda) {
+    const linhas = [
+      ["W / S", "acelerar · frear"], ["A / D", "esterçar"], ["R", v && v.on ? "DESLIGAR implemento" : "ligar implemento"],
+      ["Q", "engatar / desengatar"], ["T", "ação contextual"], ["E", "trocar de veículo"],
+      ["[ ]", "trocar semente"], ["F", "adubo / calcário"], ["L", "faróis"],
+      ["P", "loja"], ["Tab", "camadas do mapa"], ["M", "minimapa"], ["7 / 8", "velocidade do tempo"], ["H", "ocultar ajuda"]
+    ];
+    const h = linhas.length * 14 + 10;
+    painel(8, 8, 176, h, false);
+    linhas.forEach((l, k) => {
+      const y = 14 + k * 14;
+      const w = chip(15, y, l[0]);
+      ctx.font = "400 9px system-ui, sans-serif"; ctx.fillStyle = UI.text;
+      ctx.fillText(l[1], 15 + w + 6, y + 8);
+    });
+  } else {
+    painel(8, 8, 62, 20, false);
+    ctx.font = "400 9px system-ui, sans-serif"; ctx.fillStyle = UI.greyLight;
+    ctx.fillText("[H] ajuda", 14, 21);
+  }
+
+  /* ----- contratos ----- */
+  if (S.contratos.length) {
+    const h = S.contratos.length * 16 + 22;
+    painel(196, 8, 174, h, false);
+    ctx.font = "700 9px system-ui, sans-serif"; ctx.fillStyle = UI.mission;
+    ctx.fillText("CONTRATOS", 202, 21);
+    ctx.font = "400 9px system-ui, sans-serif";
+    S.contratos.forEach((c, k) => {
+      const y = 34 + k * 16;
+      ctx.fillStyle = c.aceito ? UI.green : UI.greyLight;
+      ctx.fillText(`${c.aceito ? "▶" : k + 1}`, 202, y);
+      ctx.fillStyle = UI.text;
+      ctx.fillText(`${c.tipo} campo ${c.campo}`, 214, y);
+      ctx.textAlign = "right";
+      ctx.fillStyle = c.aceito ? UI.green : UI.mission;
+      ctx.fillText(c.aceito ? `${c.feito}/${c.meta}` : "$" + fmt(c.valor), 364, y);
+      ctx.textAlign = "left";
+    });
+  }
+
+  /* ----- notificações ----- */
+  ctx.font = "400 10px system-ui, sans-serif";
+  S.msgs.forEach((m, k) => {
+    ctx.globalAlpha = Math.min(1, m.vida / 1.2);
+    ctx.fillStyle = m.cor; ctx.textAlign = "right";
+    ctx.fillText(m.t, 792, 52 + k * 14);
+    ctx.textAlign = "left";
+  });
+  ctx.globalAlpha = 1;
+
+  /* ----- ação contextual ----- */
+  const a = acaoContextual();
+  S.acaoAlpha = lerp(S.acaoAlpha, a ? 1 : 0, 0.18);
+  if (S.acaoAlpha > 0.02 && a) {
+    ctx.globalAlpha = S.acaoAlpha;
+    ctx.font = "700 13px system-ui, sans-serif";
+    const w = ctx.measureText(a.txt).width;
+    chip(400 - w / 2 - 30, 512, "T");
+    ctx.fillStyle = UI.text; ctx.textAlign = "left";
+    ctx.shadowColor = "rgba(0,0,0,0.9)"; ctx.shadowBlur = 4;
+    ctx.fillText(a.txt, 400 - w / 2, 522);
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  }
+
+  /* ----- overlay ativo ----- */
+  if (S.overlay) {
+    painel(196, 534, 150, 20, false);
+    ctx.font = "400 9px system-ui, sans-serif"; ctx.fillStyle = UI.green;
+    ctx.fillText("Camada: " + OVERLAYS[S.overlay], 204, 547);
+  }
+
+  /* ----- toast ----- */
+  if (S.toastT > 0) {
+    ctx.globalAlpha = Math.min(1, S.toastT);
+    ctx.font = "700 11px system-ui, sans-serif";
+    const w = ctx.measureText(S.toast).width + 20;
+    painel(400 - w / 2, 470, w, 22, true);
+    ctx.fillStyle = UI.text; ctx.textAlign = "center";
+    ctx.fillText(S.toast, 400, 485);
+    ctx.textAlign = "left"; ctx.globalAlpha = 1;
+  }
+
+  drawMinimapa();
+}
+
+function drawClimaIcone(x, y, tipo, cor) {
+  ctx.save();
+  ctx.strokeStyle = cor; ctx.fillStyle = cor; ctx.lineWidth = 1.2;
+  if (tipo === "sol") {
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, 6.3); ctx.fill();
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4;
+      ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * 5.5, y + Math.sin(a) * 5.5);
+      ctx.lineTo(x + Math.cos(a) * 7.5, y + Math.sin(a) * 7.5); ctx.stroke();
+    }
+  } else {
+    ctx.beginPath();
+    ctx.arc(x - 3, y - 1, 3.4, 0, 6.3); ctx.arc(x + 2, y - 2, 4, 0, 6.3); ctx.arc(x + 5, y + 1, 3, 0, 6.3);
+    ctx.fill();
+    ctx.fillRect(x - 6, y, 12, 3);
+    if (tipo === "chuva" || tipo === "raio") {
+      ctx.lineWidth = 1.4;
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath(); ctx.moveTo(x + i * 4, y + 4); ctx.lineTo(x + i * 4 - 1.5, y + 8); ctx.stroke();
+      }
+    }
+    if (tipo === "neve") { for (let i = -1; i <= 1; i++) ctx.fillRect(x + i * 4 - 1, y + 5, 2, 2); }
+    if (tipo === "nevoa") { ctx.fillRect(x - 6, y + 4, 12, 1.5); ctx.fillRect(x - 4, y + 7, 10, 1.5); }
+  }
+  ctx.restore();
+}
+
+function drawMinimapa() {
+  if (!S.minimapa) return;
+  const cfgs = [null,
+    { x: 12, y: 420, s: 96, circ: true },
+    { x: 8, y: 444, s: 100, circ: false },
+    { x: 8, y: 412, s: 132, circ: false }];
+  const cfg = cfgs[S.minimapa];
+  const { x, y, s } = cfg;
+  ctx.save();
+  rr(x - 3, y - 3, s + 6, s + 6, 3, UI.panel, null);
+  ctx.beginPath();
+  if (cfg.circ) ctx.arc(x + s / 2, y + s / 2, s / 2, 0, 6.3); else ctx.rect(x, y, s, s);
+  ctx.clip();
+  const esc = s / Math.max(WORLD_W, WORLD_H);
+  const mw = WORLD_W * esc, mh = WORLD_H * esc;
+  const ox = x + (s - mw) / 2, oy = y + (s - mh) / 2;
+  ctx.drawImage(mapa, 0, 0, 240, 180, ox, oy, mw, mh);
+
+  // campos coloridos por propriedade
+  FIELDS.forEach(f => {
+    const fx = ox + f.x0 * TILE * esc, fy = oy + f.y0 * TILE * esc;
+    const fw = (f.x1 - f.x0 + 1) * TILE * esc, fh = (f.y1 - f.y0 + 1) * TILE * esc;
+    ctx.fillStyle = f.dono ? "rgba(156,196,6,0.30)" : "rgba(125,228,255,0.28)";
+    ctx.fillRect(fx, fy, fw, fh);
+    ctx.strokeStyle = UI.greyLight; ctx.lineWidth = 1; ctx.strokeRect(fx, fy, fw, fh);
+    ctx.font = "700 8px system-ui, sans-serif"; ctx.fillStyle = UI.text; ctx.textAlign = "center";
+    ctx.fillText(String(f.id), ox + f.cx * TILE * esc, oy + f.cy * TILE * esc + 3);
+    ctx.textAlign = "left";
+  });
+  // postos
+  POSTOS.forEach(p => {
+    ctx.fillStyle = UI.text;
+    ctx.fillRect(ox + p.x * TILE * esc - 2, oy + p.y * TILE * esc - 2, 4, 4);
+  });
+  // veículos
+  veiculos.forEach((v, i) => {
+    const vx = ox + v.x * esc, vy = oy + v.y * esc;
+    if (i === atual) {
+      ctx.fillStyle = UI.green;
+      ctx.save(); ctx.translate(vx, vy); ctx.rotate(v.th);
+      ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(-3, -3.4); ctx.lineTo(-3, 3.4); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    } else {
+      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      ctx.fillRect(vx - 1.5, vy - 1.5, 3, 3);
+    }
+  });
+  ctx.restore();
+  ctx.font = "400 8px system-ui, sans-serif"; ctx.fillStyle = UI.greyLight;
+  ctx.fillText("[M]", x + s - 16, y + s - 4);
+}
+
+/* ---------- loja ---------- */
+function drawLoja() {
+  ctx.fillStyle = "rgba(10,12,14,0.72)"; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  const x = 80, y = 50, w = 640, h = 460;
+  rr(x, y, w, h, 4, "rgba(18,22,24,0.96)", null);
+  ctx.font = "700 14px system-ui, sans-serif"; ctx.fillStyle = UI.green;
+  ctx.fillText("CONCESSIONÁRIA", x + 20, y + 28);
+  ctx.font = "700 12px system-ui, sans-serif"; ctx.fillStyle = UI.text;
+  ctx.textAlign = "right"; ctx.fillText("$ " + fmt(S.dinheiro), x + w - 20, y + 28); ctx.textAlign = "left";
+
+  const abas = ["Veículos", "Implementos", "Terrenos"];
+  abas.forEach((a, i) => {
+    const ax = x + 20 + i * 110;
+    rr(ax, y + 42, 100, 22, 3, i === S.lojaAba ? UI.green : "rgba(255,255,255,0.08)", null);
+    ctx.font = "700 10px system-ui, sans-serif";
+    ctx.fillStyle = i === S.lojaAba ? "#14171a" : UI.text;
+    ctx.textAlign = "center"; ctx.fillText(a, ax + 50, y + 57); ctx.textAlign = "left";
+  });
+
+  const itens = itensLoja();
+  const maxVis = 14;
+  const start = clamp(S.lojaSel - 6, 0, Math.max(0, itens.length - maxVis));
+  itens.slice(start, start + maxVis).forEach((it, k) => {
+    const i = start + k;
+    const ry = y + 78 + k * 25;
+    const sel = i === S.lojaSel;
+    if (sel) rr(x + 16, ry - 2, w - 32, 23, 3, "rgba(156,196,6,0.16)", null);
+    const podeComprar = S.dinheiro >= (it.preco || 0);
+    ctx.font = "400 11px system-ui, sans-serif";
+    ctx.fillStyle = sel ? UI.text : (podeComprar ? UI.text : UI.disabled);
+    if (S.lojaAba === 2) {
+      ctx.fillText(`Campo ${it.id}  ·  ${it.tiles} tiles  ·  ${(it.tiles / 100).toFixed(2)} ha`, x + 26, ry + 14);
+    } else {
+      ctx.fillText(it.nome, x + 26, ry + 14);
+      ctx.font = "400 9px system-ui, sans-serif"; ctx.fillStyle = UI.greyLight;
+      let det = "";
+      if (it.cv) det += it.cv + " cv  ";
+      if (it.cvMin) det += "min " + it.cvMin + " cv  ";
+      if (it.larg) det += it.larg + " tiles  ";
+      if (it.cap) det += fmtL(it.cap) + " l  ";
+      if (it.tanqueGrao) det += "tanque " + fmtL(it.tanqueGrao) + " l  ";
+      ctx.fillText(det, x + 300, ry + 14);
+    }
+    ctx.font = "700 11px system-ui, sans-serif";
+    ctx.fillStyle = podeComprar ? UI.green : UI.crit;
+    ctx.textAlign = "right"; ctx.fillText("$ " + fmt(it.preco), x + w - 26, ry + 14); ctx.textAlign = "left";
+  });
+
+  ctx.font = "400 9px system-ui, sans-serif"; ctx.fillStyle = UI.greyLight;
+  ctx.fillText("↑↓ navegar · ←→ aba · Enter comprar · P/Esc fechar", x + 20, y + h - 16);
+
+  // preços do mercado
+  const px2 = x + w - 210, py2 = y + h - 150;
+  ctx.font = "700 9px system-ui, sans-serif"; ctx.fillStyle = UI.green;
+  ctx.fillText("PREÇOS HOJE ($/L)", px2, py2);
+  ctx.font = "400 9px system-ui, sans-serif";
+  CULTURAS.slice(0, 6).forEach((c, k) => {
+    const yy = py2 + 14 + k * 13;
+    const base = precoBase(c.key);
+    const ref = c.preco;
+    ctx.fillStyle = UI.greyLight; ctx.fillText(c.nome, px2, yy);
+    ctx.fillStyle = base > ref ? UI.green : UI.crit;
+    ctx.textAlign = "right";
+    ctx.fillText(base.toFixed(3) + (base > ref ? " ↑" : " ↓"), px2 + 190, yy);
+    ctx.textAlign = "left";
+  });
+}
+
+/* ============================================================
+   §14  LOOP
+   ============================================================ */
+function simular(dt) {
+  if (S.loja) return;
+  tickTempo(dt);
+
+  const v = veiculos[atual];
+  if (v) {
+    const inp = {
+      acel: Math.max(keys['w'] || keys['arrowup'] ? 1 : 0, TOQ.acel),
+      freio: Math.max(keys['s'] || keys['arrowdown'] ? 1 : 0, TOQ.freio),
+      dir: clamp((keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0) + TOQ.steer, -1, 1),
+      mao: keys[' ']
+    };
+    if (inp.freio && v.v <= 0.5) { inp.acel = -0.6; inp.freio = 0; }
+    stepVeiculo(v, inp, dt);
+    stepImplemento(v);
+    if (v.on && Math.abs(v.v) > 2) aplicarTrabalho(v);
+    if (v.def.cat === "colheitadeira" && v.on && v.grao >= v.def.tanqueGrao * 0.95) {
+      if (!v._avisou) { notif("Tanque cheio — descarregue", UI.crit); v._avisou = true; }
+    } else if (v.def.cat === "colheitadeira") v._avisou = false;
+  }
+  // implementos soltos acompanham quem os puxa
+  for (const im of implementos) if (im.bascula) im.bascula = Math.max(0, im.bascula - dt * 1.2);
+
+  for (let i = particulas.length - 1; i >= 0; i--) {
+    const p = particulas[i];
+    p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 40 * dt; p.vida -= dt;
+    if (p.vida <= 0) particulas.splice(i, 1);
+  }
+  for (let i = flutuantes.length - 1; i >= 0; i--) {
+    const f = flutuantes[i]; f.y -= 24 * dt; f.vida -= dt;
+    if (f.vida <= 0) flutuantes.splice(i, 1);
+  }
+  for (let i = S.msgs.length - 1; i >= 0; i--) { S.msgs[i].vida -= dt; if (S.msgs[i].vida <= 0) S.msgs.splice(i, 1); }
+  if (S.toastT > 0) S.toastT -= dt;
+  if (S.moneyFlash > 0) S.moneyFlash -= dt;
+  if (avisoTimer > 0) avisoTimer--;
+  updateCam(dt);
+}
+
+let last = performance.now(), acc = 0;
+const STEP = 1 / 60;
+let mapTimer = 0;
+function frame(now) {
+  acc += Math.min(0.25, (now - last) / 1000);
+  last = now;
+  while (acc >= STEP) { simular(STEP); acc -= STEP; }
+  mapTimer += STEP;
+  if (mapTimer > 1.5) { mapTimer = 0; atualizarMinimapa(); }
+  render();
+  requestAnimationFrame(frame);
+}
+
+/* ============================================================
+   §15  INÍCIO
+   ============================================================ */
+gerarMundo();
+repintarTudo();
+mottlePat = ctx.createPattern(makeMottle(256), 'repeat');
+
+// frota inicial (kit herdado)
+const t0 = novoVeiculo("t90", 16 * TILE, 17 * TILE, -Math.PI / 2);
+novoVeiculo("c350", 12 * TILE, 19 * TILE, 0);
+const cul = novoImplemento("cu2", 18.5 * TILE, 17 * TILE);
+novoImplemento("se2", 21 * TILE, 19 * TILE);
+novoImplemento("rb8", 13 * TILE, 21 * TILE);
+cul.cargaTipo = CULTURAS[0].id;
+implementos.forEach(im => { if (im.def.fill === "semente") im.cargaTipo = CULTURAS[0].id; });
+
+cam.x = clamp(t0.x - VIEW_W / 2, 0, WORLD_W - VIEW_W);
+cam.y = clamp(t0.y - VIEW_H / 2, 0, WORLD_H - VIEW_H);
+
+gerarContrato(); gerarContrato();
+notif("Bem-vindo à Fazenda 25", UI.green);
+toast(TOQUE ? "ENGATA no cultivador, LIGA e acelere ▲"
+            : "Engate o cultivador (Q), ligue com R e trabalhe o Campo 1");
+if (TOQUE) ligarToque();
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

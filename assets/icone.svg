@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Fazenda 25">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#20261A"/>
+      <stop offset="0.55" stop-color="#161A12"/>
+      <stop offset="1" stop-color="#0E110C"/>
+    </linearGradient>
+    <linearGradient id="terra" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5C4433"/>
+      <stop offset="1" stop-color="#33241A"/>
+    </linearGradient>
+    <linearGradient id="verde" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B8E016"/>
+      <stop offset="1" stop-color="#8FB606"/>
+    </linearGradient>
+    <clipPath id="badge">
+      <rect x="0" y="0" width="512" height="512" rx="112" ry="112"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#badge)">
+    <rect width="512" height="512" fill="url(#fundo)"/>
+
+    <!-- sol baixo no horizonte -->
+    <circle cx="256" cy="196" r="150" fill="#9CC406" opacity="0.07"/>
+    <circle cx="256" cy="196" r="96" fill="#9CC406" opacity="0.07"/>
+
+    <!-- campo arado em perspectiva: sulcos que abrem em direção ao observador -->
+    <path d="M0 512 L0 402 L512 402 L512 512 Z" fill="url(#terra)"/>
+    <g stroke="#251A12" stroke-linecap="round" opacity="0.85">
+      <path d="M256 402 L-40 512"  stroke-width="9"/>
+      <path d="M256 402 L104 512"  stroke-width="8"/>
+      <path d="M256 402 L216 512"  stroke-width="7"/>
+      <path d="M256 402 L296 512"  stroke-width="7"/>
+      <path d="M256 402 L408 512"  stroke-width="8"/>
+      <path d="M256 402 L552 512"  stroke-width="9"/>
+    </g>
+    <g stroke="#6E5540" stroke-linecap="round" opacity="0.55">
+      <path d="M256 402 L32 512"   stroke-width="3"/>
+      <path d="M256 402 L160 512"  stroke-width="3"/>
+      <path d="M256 402 L352 512"  stroke-width="3"/>
+      <path d="M256 402 L480 512"  stroke-width="3"/>
+    </g>
+    <!-- linha do horizonte -->
+    <rect x="0" y="398" width="512" height="7" fill="#9CC406" opacity="0.28"/>
+
+    <!-- ================= TRATOR (vista lateral, virado à direita) =================
+         escalado 1,08 e recentrado para ocupar melhor o badge -->
+    <g transform="translate(256,290) scale(1.08) translate(-275,-300)">
+      <!-- sombra no chão -->
+      <ellipse cx="252" cy="404" rx="176" ry="20" fill="#000" opacity="0.42"/>
+
+      <!-- escapamento -->
+      <rect x="264" y="126" width="26" height="106" rx="10" fill="url(#verde)"/>
+      <rect x="258" y="118" width="38" height="20" rx="9" fill="url(#verde)"/>
+
+      <!-- cabine -->
+      <path d="M136 168 h150 a18 18 0 0 1 18 18 v104 h-186 v-104 a18 18 0 0 1 18 -18 z" fill="url(#verde)"/>
+      <!-- vidros -->
+      <path d="M152 190 h58 v62 h-58 z" fill="#12160F" opacity="0.92"/>
+      <path d="M228 190 h58 v62 h-58 z" fill="#12160F" opacity="0.92"/>
+
+      <!-- capô -->
+      <path d="M304 214 h104 a16 16 0 0 1 16 16 v70 h-120 z" fill="url(#verde)"/>
+      <!-- grade do radiador -->
+      <g fill="#12160F" opacity="0.85">
+        <rect x="404" y="238" width="18" height="8" rx="4"/>
+        <rect x="404" y="254" width="18" height="8" rx="4"/>
+        <rect x="404" y="270" width="18" height="8" rx="4"/>
+      </g>
+
+      <!-- chassi -->
+      <rect x="118" y="290" width="306" height="46" rx="12" fill="url(#verde)"/>
+
+      <!-- roda traseira -->
+      <circle cx="186" cy="336" r="96" fill="#0F120D"/>
+      <circle cx="186" cy="336" r="96" fill="none" stroke="#9CC406" stroke-width="10"/>
+      <circle cx="186" cy="336" r="42" fill="url(#verde)"/>
+      <circle cx="186" cy="336" r="16" fill="#0F120D"/>
+      <!-- garras do pneu -->
+      <g stroke="#9CC406" stroke-width="9" stroke-linecap="round" opacity="0.75">
+        <path d="M186 250 v22"/><path d="M247 275 l-15 16"/><path d="M272 336 h-22"/>
+        <path d="M247 397 l-15 -16"/><path d="M186 422 v-22"/><path d="M125 397 l15 -16"/>
+        <path d="M100 336 h22"/><path d="M125 275 l15 16"/>
+      </g>
+
+      <!-- roda dianteira -->
+      <circle cx="398" cy="368" r="62" fill="#0F120D"/>
+      <circle cx="398" cy="368" r="62" fill="none" stroke="#9CC406" stroke-width="9"/>
+      <circle cx="398" cy="368" r="26" fill="url(#verde)"/>
+      <circle cx="398" cy="368" r="10" fill="#0F120D"/>
+    </g>
+  </g>
+</svg>

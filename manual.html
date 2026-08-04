@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Fazenda 25 — Manual do Jogador</title>
+<style>
+  @page { size: A4; margin: 15mm 15mm 17mm; }
+
+  :root {
+    --verde: #6E8C06;
+    --verde-claro: #9CC406;
+    --tinta: #1A1D18;
+    --cinza: #5F6660;
+    --cinza-cl: #8A918B;
+    --linha: #DDE2D8;
+    --papel: #FFFFFF;
+    --caixa: #F4F6F0;
+    --terra: #4A3527;
+    --ambar: #C77F00;
+    --alerta: #C0392B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--papel); color: var(--tinta);
+    font-family: "Nunito Sans", -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif;
+    font-size: 9.7pt; line-height: 1.46;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  img { max-width: 100%; display: block; }
+  .pagina { break-after: page; }
+  .pagina:last-child { break-after: auto; }
+  .nb { break-inside: avoid; }
+
+  h1, h2, h3, h4 { margin: 0; line-height: 1.2; }
+  h2 {
+    font-size: 17.5pt; font-weight: 900; letter-spacing: -0.4pt; margin-bottom: 2.4mm;
+    padding-bottom: 1.6mm; border-bottom: 2.2pt solid var(--verde-claro);
+  }
+  h3 { font-size: 11.6pt; font-weight: 800; margin: 4.6mm 0 1.6mm; color: var(--verde); }
+  h4 { font-size: 10.5pt; font-weight: 800; margin: 4mm 0 1.5mm; }
+  p { margin: 0 0 2.2mm; }
+  .olho {
+    font-size: 7.6pt; font-weight: 800; letter-spacing: 1.8pt; text-transform: uppercase;
+    color: var(--verde-claro); margin-bottom: 1.5mm;
+  }
+  .lead { font-size: 10.4pt; color: var(--cinza); }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.1mm; }
+  b, strong { font-weight: 800; }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.8pt; background: var(--caixa); padding: 0.3mm 1.2mm; border-radius: 1mm;
+  }
+
+  /* ---------- capa ---------- */
+  .capa {
+    height: 258mm; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center; background: #12150F; color: #F3F6E8;
+    margin: -15mm -15mm 0; padding: 0 22mm;
+  }
+  .capa img.ico { width: 42mm; height: 42mm; margin-bottom: 9mm; }
+  .capa h1 { font-size: 40pt; font-weight: 900; letter-spacing: -1.6pt; }
+  .capa .tag {
+    font-size: 9.5pt; letter-spacing: 4.4pt; text-transform: uppercase;
+    color: var(--verde-claro); font-weight: 800; margin-top: 3mm;
+  }
+  .capa .titulo-manual {
+    margin-top: 16mm; font-size: 15pt; font-weight: 300; color: #C9CFC0;
+    border-top: 1pt solid rgba(255,255,255,0.16); padding-top: 7mm; width: 74mm;
+  }
+  .capa .rodape { margin-top: auto; padding-bottom: 12mm; font-size: 8.5pt; color: #6B7263; }
+
+  /* ---------- caixas ---------- */
+  .caixa {
+    background: var(--caixa); border-left: 3pt solid var(--verde-claro);
+    padding: 2.8mm 3.4mm; margin: 2.8mm 0; border-radius: 0 1.5mm 1.5mm 0;
+  }
+  .caixa.alerta { border-left-color: var(--alerta); background: #FBF0EF; }
+  .caixa.dica { border-left-color: var(--ambar); background: #FDF6EA; }
+  .caixa p:last-child { margin-bottom: 0; }
+  .caixa .rot {
+    font-size: 7.4pt; font-weight: 900; letter-spacing: 1.4pt; text-transform: uppercase;
+    color: var(--verde); display: block; margin-bottom: 1mm;
+  }
+  .caixa.alerta .rot { color: var(--alerta); }
+  .caixa.dica .rot { color: var(--ambar); }
+
+  /* ---------- tabelas ---------- */
+  table { border-collapse: collapse; width: 100%; font-size: 8.6pt; margin: 2mm 0 3.2mm; }
+  th, td { padding: 1.35mm 2.2mm; text-align: left; border-bottom: 0.6pt solid var(--linha); }
+  th {
+    background: #EDF1E6; font-size: 7.6pt; text-transform: uppercase; letter-spacing: 0.7pt;
+    font-weight: 900; color: var(--verde); border-bottom: 1.4pt solid var(--verde-claro);
+  }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:nth-child(even) td { background: #FAFBF7; }
+  .tecla {
+    display: inline-block; background: var(--tinta); color: #F3F6E8; font-weight: 800;
+    font-size: 8pt; padding: 0.6mm 1.8mm; border-radius: 1.2mm; min-width: 6mm;
+    text-align: center; font-family: inherit;
+  }
+  .tecla.verde { background: var(--verde-claro); color: #14170F; }
+  .pastilha { display: inline-block; width: 2.6mm; height: 2.6mm; border-radius: 0.6mm; margin-right: 1.6mm; vertical-align: -0.2mm; }
+
+  /* ---------- passos ---------- */
+  .passo { display: flex; gap: 3.4mm; margin-bottom: 3.4mm; break-inside: avoid; }
+  .passo .num {
+    flex: 0 0 8.5mm; height: 8.5mm; border-radius: 50%; background: var(--verde-claro);
+    color: #14170F; font-weight: 900; font-size: 11pt; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .passo .txt { flex: 1; }
+  .passo h4 { margin: 0.6mm 0 1.2mm; }
+  .passo p { margin-bottom: 1.2mm; font-size: 9.2pt; }
+
+  /* ---------- figura com chamadas ---------- */
+  .fig { margin: 2.4mm 0 1.6mm; break-inside: avoid; }
+  .fig img { border: 0.8pt solid var(--linha); border-radius: 1.5mm;
+    max-height: 62mm; width: auto; margin-inline: auto; }
+  .fig.larga img { max-height: none; width: 100%; }
+  .fig figcaption { font-size: 8.2pt; color: var(--cinza); margin-top: 1.6mm; }
+  .anat { position: relative; }
+  .anat .m {
+    position: absolute; width: 5.4mm; height: 5.4mm; border-radius: 50%;
+    background: var(--verde-claro); color: #14170F; border: 0.8pt solid #14170F;
+    font-size: 7.6pt; font-weight: 900; display: flex; align-items: center; justify-content: center;
+    transform: translate(-50%, -50%);
+  }
+  .legenda { columns: 2; column-gap: 7mm; font-size: 8.8pt; margin-top: 3mm; }
+  .legenda div { break-inside: avoid; margin-bottom: 1.6mm; padding-left: 6.6mm; position: relative; }
+  .legenda .n2 {
+    position: absolute; left: 0; top: 0.2mm; width: 4.6mm; height: 4.6mm; border-radius: 50%;
+    background: var(--tinta); color: #fff; font-size: 6.8pt; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .tres { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; }
+  .tira-leg { display: grid; grid-template-columns: repeat(7, 1fr); font-size: 7.4pt;
+    text-align: center; color: var(--cinza); margin-top: 1.2mm; }
+
+  .rodape-secao { font-size: 8pt; color: var(--cinza-cl); margin-top: 2mm; }
+</style>
+</head>
+<body>
+
+<!-- ================= CAPA ================= -->
+<div class="pagina">
+  <div class="capa">
+    <img class="ico" src="assets/icone-512.png" alt="">
+    <h1>Fazenda 25</h1>
+    <div class="tag">Simulador Agrícola</div>
+    <div class="titulo-manual">Manual do Jogador<br>
+      <span style="font-size:10pt;color:#8A918B">Passo a passo, do restolho à primeira venda</span></div>
+    <div class="rodape">Computador e celular · Português do Brasil</div>
+  </div>
+</div>
+
+<!-- ================= O OBJETIVO ================= -->
+<div class="pagina">
+  <div class="olho">Comece por aqui</div>
+  <h2>O que você tem que fazer</h2>
+
+  <p class="lead">
+    Você herdou dois campos, um trator, uma colheitadeira e três implementos. O objetivo é
+    simples de dizer e difícil de fazer bem: <b>transformar terra em dinheiro</b> — e usar esse
+    dinheiro para comprar máquinas maiores.
+  </p>
+
+  <div class="caixa">
+    <span class="rot">O ciclo inteiro em uma frase</span>
+    <p>Prepare o solo → plante → cuide da lavoura → espere crescer → colha →
+      leve até o reboque → venda no posto que estiver pagando melhor.</p>
+  </div>
+
+  <h3>Com o que você começa</h3>
+  <table>
+    <tr><th>Item</th><th>O que é</th><th class="n">Detalhe</th></tr>
+    <tr><td><b>$ 8.000</b></td><td>Dinheiro em caixa</td><td class="n">sem dívida</td></tr>
+    <tr><td>Trator T-90</td><td>Puxa os implementos</td><td class="n">90 cv</td></tr>
+    <tr><td>Colheitadeira C-350</td><td>Colhe grãos</td><td class="n">tanque 3.500 L</td></tr>
+    <tr><td>Cultivador 2T</td><td>Prepara o solo, rápido</td><td class="n">2 quadras de largura</td></tr>
+    <tr><td>Semeadora 2T</td><td>Planta</td><td class="n">tanque 900 L</td></tr>
+    <tr><td>Reboque 8k</td><td>Leva a colheita até o posto</td><td class="n">8.000 L</td></tr>
+    <tr><td>Campos 1 e 2</td><td>Já são seus, em restolho</td><td class="n">71 e 150 quadras</td></tr>
+  </table>
+
+  <h3>As três coisas que mais confundem no começo</h3>
+  <ol>
+    <li><b>Colher não dá dinheiro.</b> A colheita vai para o tanque da máquina. Dinheiro só entra
+      quando você leva o produto até um ponto de venda e descarrega lá.</li>
+    <li><b>O implemento precisa estar ligado.</b> Engatar não basta — enquanto ele estiver desligado,
+      você passa por cima do campo sem trabalhar nada.</li>
+    <li><b>Cada posto compra coisas diferentes.</b> A cooperativa compra quase tudo; o moinho só
+      compra cereal, mas paga 15% a mais.</li>
+  </ol>
+
+  <h3>O caminho até a primeira venda</h3>
+  <p>As páginas seguintes seguem exatamente esta ordem. Se você fizer só isso, já fecha o ciclo:</p>
+  <table>
+    <tr><th class="n">#</th><th>Etapa</th><th>Máquina</th><th>Obrigatório?</th></tr>
+    <tr><td class="n">1</td><td>Engatar o cultivador</td><td>Trator</td><td>sim</td></tr>
+    <tr><td class="n">2</td><td>Cultivar o campo</td><td>Cultivador</td><td>sim</td></tr>
+    <tr><td class="n">3</td><td>Encher a semeadora</td><td>Silo do pátio</td><td>sim</td></tr>
+    <tr><td class="n">4</td><td>Semear</td><td>Semeadora</td><td>sim</td></tr>
+    <tr><td class="n">5</td><td>Adubar e capinar</td><td>Distribuidor / Pulverizador</td><td>não, mas dobra o lucro</td></tr>
+    <tr><td class="n">6</td><td>Esperar crescer</td><td>—</td><td>sim</td></tr>
+    <tr><td class="n">7</td><td>Colher</td><td>Colheitadeira</td><td>sim</td></tr>
+    <tr><td class="n">8</td><td>Transbordar para o reboque</td><td>Colheitadeira + reboque</td><td>sim</td></tr>
+    <tr><td class="n">9</td><td>Vender no posto</td><td>Trator + reboque</td><td>sim</td></tr>
+  </table>
+
+
+</div>
+
+<!-- ================= CONTROLES ================= -->
+<div class="pagina">
+  <div class="olho">Controles</div>
+  <h2>Como se mexe</h2>
+
+  <h3>No computador</h3>
+  <table>
+    <tr><th style="width:24mm">Tecla</th><th>O que faz</th></tr>
+    <tr><td><span class="tecla">W</span> <span class="tecla">S</span></td><td>Acelerar e frear. Com o veículo parado, <span class="tecla">S</span> engata a ré.</td></tr>
+    <tr><td><span class="tecla">A</span> <span class="tecla">D</span></td><td>Esterçar para a esquerda e para a direita.</td></tr>
+    <tr><td><span class="tecla">Espaço</span></td><td>Freio de mão — segura a máquina na hora da manobra.</td></tr>
+    <tr><td><span class="tecla verde">Q</span></td><td><b>Engatar / desengatar</b> o implemento que estiver atrás de você.</td></tr>
+    <tr><td><span class="tecla verde">R</span></td><td><b>Ligar / desligar</b> o implemento. Desligado, ele não trabalha.</td></tr>
+    <tr><td><span class="tecla verde">T</span></td><td><b>Ação contextual</b>: encher, abastecer, reparar, transbordar ou vender —
+      o jogo mostra na parte de baixo da tela o que a tecla vai fazer naquele lugar.</td></tr>
+    <tr><td><span class="tecla">E</span></td><td>Trocar entre o trator e a colheitadeira.</td></tr>
+    <tr><td><span class="tecla">[</span> <span class="tecla">]</span></td><td>Trocar a semente carregada na semeadora.</td></tr>
+    <tr><td><span class="tecla">F</span></td><td>Alternar o distribuidor entre adubo e calcário.</td></tr>
+    <tr><td><span class="tecla">L</span></td><td>Faróis (para trabalhar de noite).</td></tr>
+    <tr><td><span class="tecla">P</span></td><td>Abrir a loja.</td></tr>
+    <tr><td><span class="tecla">Tab</span></td><td>Alternar as camadas do mapa (adubo, calcário, erva, o que falta arar).</td></tr>
+    <tr><td><span class="tecla">M</span></td><td>Mudar o tamanho do minimapa.</td></tr>
+    <tr><td><span class="tecla">7</span> <span class="tecla">8</span></td><td>Diminuir e aumentar a velocidade do tempo (até 8×).</td></tr>
+    <tr><td><span class="tecla">1</span>–<span class="tecla">3</span></td><td>Aceitar o contrato correspondente da lista.</td></tr>
+    <tr><td><span class="tecla">H</span></td><td>Esconder ou mostrar a caixa de ajuda.</td></tr>
+  </table>
+
+</div>
+
+<div class="pagina">
+  <div class="olho">Controles</div>
+  <h2>No celular</h2>
+  <p>Abra o jogo no navegador do celular e <b>gire o aparelho para a horizontal</b> — se estiver na
+    vertical, o jogo avisa. Os controles de toque aparecem sozinhos.</p>
+
+  <div class="fig">
+    <img src="assets/tela_mobile.png" alt="O jogo no celular na horizontal, com volante à esquerda e pedais à direita">
+    <figcaption>No celular os controles são desenhados por cima do jogo e acompanham o tamanho da tela.</figcaption>
+  </div>
+
+  <table>
+    <tr><th style="width:34mm">Controle</th><th>Onde fica</th><th>O que faz</th></tr>
+    <tr><td><b>Volante</b></td><td>Círculo grande à esquerda</td>
+      <td>Arraste o polegar para os lados. Quanto mais longe do centro, mais fecha a curva.
+        Solte e ele volta sozinho ao centro.</td></tr>
+    <tr><td><b>▲ Acelerar</b></td><td>Círculo à direita, em cima</td><td>Segure para andar para a frente.</td></tr>
+    <tr><td><b>▼ Frear / ré</b></td><td>Círculo à direita, embaixo</td><td>Segure para frear. Parado, engata a ré.</td></tr>
+    <tr><td><b>ENGATA</b></td><td>Coluna à direita</td><td>Mesmo que a tecla <span class="tecla">Q</span>.</td></tr>
+    <tr><td><b>LIGA</b></td><td>Coluna à direita</td><td>Liga o implemento. O botão fica verde enquanto está ligado.</td></tr>
+    <tr><td><b>AÇÃO</b></td><td>Coluna à direita</td><td>Mesmo que a tecla <span class="tecla">T</span>.</td></tr>
+    <tr><td><b>TROCA</b></td><td>Coluna à direita</td><td>Troca de veículo.</td></tr>
+    <tr><td><b>LOJA · MAPA · ?</b></td><td>Canto superior esquerdo</td><td>Loja, tamanho do minimapa e caixa de ajuda.</td></tr>
+    <tr><td><b>Loja</b></td><td>Na própria tela</td><td>Toque na aba para trocar. Toque no item para selecionar e
+      <b>toque de novo para comprar</b>.</td></tr>
+    <tr><td><b>Contratos</b></td><td>Painel no alto</td><td>Toque no contrato para aceitar.</td></tr>
+  </table>
+
+  <div class="caixa dica">
+    <span class="rot">Dica de celular</span>
+    <p>Os dois polegares trabalham ao mesmo tempo: o esquerdo mantém a linha reta no campo enquanto
+      o direito segura o acelerador. Para a manobra de cabeceira, solte o acelerador antes de
+      esterçar — igual a um trator de verdade.</p>
+  </div>
+</div>
+
+<!-- ================= ANATOMIA DA TELA ================= -->
+<div class="pagina">
+  <div class="olho">A tela</div>
+  <h2>O que cada canto está te dizendo</h2>
+
+  <div class="fig larga anat">
+    <img src="assets/tela_anatomia.png" alt="Tela do jogo com todos os painéis visíveis">
+    <div class="m" style="left:2.6%; top:45%">1</div>
+    <div class="m" style="left:25%; top:13.5%">2</div>
+    <div class="m" style="left:70%; top:3%">3</div>
+    <div class="m" style="left:95%; top:3%">4</div>
+    <div class="m" style="left:95%; top:12%">5</div>
+    <div class="m" style="left:77%; top:60%">6</div>
+    <div class="m" style="left:82%; top:79%">7</div>
+    <div class="m" style="left:67%; top:87%">8</div>
+    <div class="m" style="left:96%; top:88%">9</div>
+    <div class="m" style="left:3%;  top:73%">10</div>
+    <div class="m" style="left:33%; top:92%">11</div>
+  </div>
+
+  <div class="legenda">
+    <div><span class="n2">1</span><b>Ajuda.</b> Lista de teclas. Some com <span class="tecla">H</span>.</div>
+    <div><span class="n2">2</span><b>Contratos.</b> Serviços que rendem dinheiro rápido. O verde com ▶ é o que você aceitou, com o andamento.</div>
+    <div><span class="n2">3</span><b>Dinheiro.</b> Pisca verde quando entra e vermelho quando sai.</div>
+    <div><span class="n2">4</span><b>Mês, clima e hora.</b> O ícone apagado ao lado do clima é a <b>previsão</b> do próximo tempo.</div>
+    <div><span class="n2">5</span><b>Avisos.</b> Vendas, contratos concluídos, tanque cheio, custos do mês.</div>
+    <div><span class="n2">6</span><b>Informação do campo.</b> Aparece quando você está em cima de um campo: cultura, estágio, adubo, erva e a <b>qualidade</b>.</div>
+    <div><span class="n2">7</span><b>Barras.</b> <b>S</b> sujeira, <b>C</b> condição da máquina, <b>D</b> diesel. A de diesel pisca em vermelho abaixo de 10%.</div>
+    <div><span class="n2">8</span><b>Carga.</b> O que está no tanque e quanto cabe. Fica laranja quando passa de 95%.</div>
+    <div><span class="n2">9</span><b>Velocímetro.</b> Velocidade atual em km/h.</div>
+    <div><span class="n2">10</span><b>Minimapa.</b> Campos numerados: verde é seu, azul está à venda. A seta verde é você.</div>
+    <div><span class="n2">11</span><b>Ação contextual.</b> O que a tecla <span class="tecla">T</span> faz agora. Se não aparece nada, não há ação disponível ali.</div>
+  </div>
+
+  <div class="caixa">
+    <span class="rot">O painel mais importante é o 6</span>
+    <p>A linha <b>Qualidade</b> é o resumo de tudo que você fez de certo naquele pedaço de terra.
+      Ela vai de 0% a 100% e multiplica sua colheita por até <b>2×</b>. Um campo a 75% de qualidade
+      rende quase o dobro de um campo largado.</p>
+  </div>
+</div>
+
+<!-- ================= PASSO A PASSO 1 ================= -->
+<div class="pagina">
+  <div class="olho">Passo a passo</div>
+  <h2>Sua primeira colheita</h2>
+  <p class="lead">Siga na ordem. Do começo do jogo até o dinheiro no bolso.</p>
+  <div class="caixa dica">
+    <span class="rot">Quanto tempo leva</span>
+    <p>Um mês do jogo passa em 30 segundos reais. Uma cultura leva de 3 a 5 meses para ficar madura,
+      ou seja, de 1,5 a 2,5 minutos. Uma partida completa — sair do zero e comprar sua segunda
+      máquina — leva por volta de <b>15 minutos</b>.</p>
+  </div>
+
+  <div class="passo">
+    <div class="num">1</div>
+    <div class="txt">
+      <h4>Engate o cultivador</h4>
+      <p>Você começa no pátio, dentro do trator. O cultivador está parado logo atrás.
+        Dê ré devagar até encostar nele e aperte <span class="tecla verde">Q</span>
+        (ou <b>ENGATA</b> no celular).</p>
+      <p>Se aparecer <i>"Nenhum implemento por perto"</i>, você está longe demais: chegue mais perto e
+        tente de novo.</p>
+    </div>
+  </div>
+
+  <div class="passo">
+    <div class="num">2</div>
+    <div class="txt">
+      <h4>Vá até o Campo 1</h4>
+      <p>Saia do pátio, pegue a estrada e siga para a direita. O Campo 1 é o retângulo de
+        <b>restolho</b> (terra clara com restos de palha) do outro lado da estrada. O número do campo
+        aparece no minimapa.</p>
+    </div>
+  </div>
+
+  <div class="passo">
+    <div class="num">3</div>
+    <div class="txt">
+      <h4>Ligue o implemento e trabalhe o campo</h4>
+      <p>Já dentro do campo, aperte <span class="tecla verde">R</span> (ou <b>LIGA</b>). Agora ande:
+        atrás do cultivador o solo vira terra marrom trabalhada.</p>
+      <p>Vá e volte em faixas paralelas, encostando uma na outra. Não precisa ficar perfeito — o que
+        não for trabalhado simplesmente não produz.</p>
+    </div>
+  </div>
+
+  <div class="fig">
+    <img src="assets/tela_cultivando.png" alt="Trator com cultivador abrindo faixas de solo trabalhado">
+    <figcaption>A faixa escura é o solo cultivado — os riscos seguem a direção da sua passada.</figcaption>
+  </div>
+
+  <div class="caixa dica">
+    <span class="rot">Arar ou cultivar?</span>
+    <p><b>Cultivar</b> é rápido e barato, e serve para plantar. <b>Arar</b> é mais lento, exige o arado
+      (que você ainda não tem), mas dá <b>+15% de rendimento</b> e mata a erva daninha.
+      No começo, cultive. Compre o arado com o dinheiro da primeira colheita.</p>
+  </div>
+
+  <div class="passo">
+    <div class="num">4</div>
+    <div class="txt">
+      <h4>Troque para a semeadora e encha de semente</h4>
+      <p>Volte ao pátio. Aperte <span class="tecla verde">Q</span> para largar o cultivador, encoste
+        na semeadora e aperte <span class="tecla verde">Q</span> de novo para engatá-la.</p>
+      <p>Chegue perto do <b>silo</b> (o cilindro cinza do pátio). Vai aparecer embaixo da tela
+        <i>"Encher Semeadora"</i> — aperte <span class="tecla verde">T</span>. A semente é cobrada
+        na hora de encher.</p>
+      <p>Para escolher o que plantar, use <span class="tecla">[</span> e <span class="tecla">]</span>.
+        Comece com <b>trigo</b>: é barato e cresce em 4 meses.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="pagina">
+  <div class="olho">Passo a passo</div>
+  <h2>Sua primeira colheita <span style="font-weight:400;color:#8A918B">· continuação</span></h2>
+
+  <div class="passo">
+    <div class="num">5</div>
+    <div class="txt">
+      <h4>Semeie</h4>
+      <p>Volte ao campo cultivado, ligue com <span class="tecla verde">R</span> e refaça as faixas.
+        O solo ganha linhas de plantio.</p>
+      <p>Se aparecer <i>"Solo precisa estar arado ou cultivado"</i>, você está tentando plantar em
+        cima do mato: prepare aquele pedaço antes.</p>
+    </div>
+  </div>
+  <div class="passo">
+    <div class="num">6</div>
+    <div class="txt">
+      <h4>Espere crescer — e ganhe dinheiro enquanto isso</h4>
+      <p>A lavoura avança <b>um estágio por mês</b>, e cada mês leva 30 segundos. O trigo precisa de
+        4 meses. Use <span class="tecla">8</span> para acelerar o tempo até 8×.</p>
+      <p>Enquanto espera, aceite um <b>contrato</b> no painel do alto (teclas
+        <span class="tecla">1</span> a <span class="tecla">3</span>, ou toque no contrato).
+        Um contrato de cultivo paga por volta de <b>$2.000</b> — mais do que sua primeira colheita.</p>
+    </div>
+  </div>
+
+  <div class="passo">
+    <div class="num">7</div>
+    <div class="txt">
+      <h4>Colha</h4>
+      <p>Quando o campo ficar dourado, aperte <span class="tecla">E</span> para trocar para a
+        colheitadeira, vá até o campo, ligue com <span class="tecla verde">R</span> e passe por cima
+        da lavoura madura.</p>
+      <p>A barra de carga vai subindo. Quando ficar <b>laranja</b>, o tanque está quase cheio e a
+        máquina para de colher.</p>
+    </div>
+  </div>
+
+  <div class="passo">
+    <div class="num">8</div>
+    <div class="txt">
+      <h4>Transborde para o reboque</h4>
+      <p>Leve o reboque para perto (engatado no trator) e chegue com a colheitadeira ao lado dele.
+        Aparece <i>"Transbordar para o reboque"</i> — aperte <span class="tecla verde">T</span>.</p>
+      <p>O reboque precisa estar a menos de <b>meia tela</b> de distância. Se a mensagem não aparecer,
+        chegue mais perto.</p>
+    </div>
+  </div>
+
+  <div class="passo">
+    <div class="num">9</div>
+    <div class="txt">
+      <h4>Venda</h4>
+      <p>Engate o reboque no trator e leve até a <b>Cooperativa de Grãos</b> (o galpão marcado no
+        mapa). Pare na frente dela: aparece <i>"Vender 8.000 L (+$4.856)"</i> com o valor exato.
+        Aperte <span class="tecla verde">T</span>.</p>
+      <p><b>Pronto — o ciclo fechou.</b> Agora repita, mas melhor: com adubo, com calcário e num
+        campo maior.</p>
+    </div>
+  </div>
+
+  <div class="caixa alerta">
+    <span class="rot">Erro clássico</span>
+    <p>Chegar no posto e não aparecer nada. Quase sempre é um destes três motivos:
+      o reboque está <b>vazio</b>; ele não está <b>engatado</b> no trator; ou aquele posto
+      <b>não compra</b> o que você está levando (o moinho não compra soja, por exemplo).</p>
+  </div>
+
+  <h3>O que fazer com o primeiro dinheiro</h3>
+  <table>
+    <tr><th class="n">Ordem</th><th>Compra</th><th class="n">Preço</th><th>Por quê</th></tr>
+    <tr><td class="n">1ª</td><td>Distribuidor de Adubo 3T</td><td class="n">$ 3.900</td>
+      <td>Duas passadas de adubo somam 45% de rendimento. É o item que mais se paga.</td></tr>
+    <tr><td class="n">2ª</td><td>Arado 2 Sulcos</td><td class="n">$ 6.500</td>
+      <td>+15% de rendimento e acaba com a erva daninha.</td></tr>
+    <tr><td class="n">3ª</td><td>Trator T-160</td><td class="n">$ 22.000</td>
+      <td>Puxa implementos de 4 quadras: você trabalha o dobro no mesmo tempo.</td></tr>
+    <tr><td class="n">4ª</td><td>Semeadora 4T</td><td class="n">$ 19.500</td>
+      <td>Dobra a velocidade do plantio.</td></tr>
+  </table>
+</div>
+
+<!-- ================= SOLO E QUALIDADE ================= -->
+<div class="pagina">
+  <div class="olho">A lavoura</div>
+  <h2>Lendo o campo</h2>
+
+  <p>O solo mostra em que pé está o trabalho. Estes são os sete estados, na ordem:</p>
+
+  <div class="fig larga">
+    <img src="assets/tira_solo.png" alt="Sete faixas de solo mostrando cada estágio">
+    <div class="tira-leg">
+      <span>restolho</span><span>arado</span><span>cultivado</span><span>semeado</span>
+      <span>brotando</span><span>crescendo</span><span>maduro</span>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Estado</th><th>Como aparece</th><th>O que fazer</th></tr>
+    <tr><td><b>Restolho</b></td><td>Palha clara com restos secos</td><td>Cultivar ou arar</td></tr>
+    <tr><td><b>Arado</b></td><td>Terra escura com leivas grossas</td><td>Semear (rende +15%)</td></tr>
+    <tr><td><b>Cultivado</b></td><td>Terra marrom fina e solta</td><td>Semear</td></tr>
+    <tr><td><b>Semeado</b></td><td>Terra com linhas de plantio</td><td>Adubar e esperar</td></tr>
+    <tr><td><b>Crescendo</b></td><td>Verde, cada vez mais fechado</td><td>Adubar, capinar, esperar</td></tr>
+    <tr><td><b>Maduro</b></td><td>Dourado (ou verde escuro, na raiz)</td><td><b>Colher agora</b></td></tr>
+    <tr><td><b>Murcho</b></td><td>Bege apagado, sem brilho</td><td>Perdeu. Cultive de novo.</td></tr>
+  </table>
+
+  <div class="caixa alerta">
+    <span class="rot">Prazo de validade</span>
+    <p>Uma lavoura madura aguenta <b>3 meses</b> parada. Passou disso, murcha e você perde a colheita
+      inteira daquele pedaço. Colher é sempre mais urgente do que parece.</p>
+  </div>
+
+</div>
+
+<div class="pagina">
+  <div class="olho">A lavoura</div>
+  <h2>Qualidade: como dobrar sua colheita</h2>
+  <p>Cada coisa que você faz direito soma um bônus. Eles se <b>somam</b> (não se multiplicam) e o
+    total para em <b>2×</b>:</p>
+
+  <table>
+    <tr><th>O que você fez</th><th class="n">Bônus</th><th>Como conseguir</th></tr>
+    <tr><td>Arou o solo</td><td class="n">+15%</td><td>Arado, antes de plantar</td></tr>
+    <tr><td>Passou calcário</td><td class="n">+15%</td><td>Distribuidor no modo calcário (<span class="tecla">F</span>). Dura 3 colheitas.</td></tr>
+    <tr><td>Adubou uma vez</td><td class="n">+22,5%</td><td>Distribuidor no modo adubo</td></tr>
+    <tr><td>Adubou duas vezes</td><td class="n">+45%</td><td>Passe de novo depois que a planta nasceu</td></tr>
+    <tr><td>Matou a erva cedo</td><td class="n">+20%</td><td>Pulverizador enquanto a erva ainda é pouca</td></tr>
+    <tr><td>Matou a erva tarde</td><td class="n">+5% a +10%</td><td>Quanto mais tarde, menos recupera</td></tr>
+  </table>
+
+  <p><b>Na prática:</b> arado + calcário + duas adubadas + capina = <b>95% de qualidade</b>, ou seja,
+    quase o dobro de produção no mesmo pedaço de terra e no mesmo tempo.</p>
+
+  <div class="fig">
+    <img src="assets/tela_overlay.png" alt="Campo com a camada de adubo ligada">
+    <figcaption>Aperte <span class="tecla">Tab</span> para ver o campo por camadas. Aqui, a camada de
+      adubo: azul claro é uma passada, azul escuro são duas. Também há camadas de calcário,
+      erva daninha e do que ainda falta arar.</figcaption>
+  </div>
+</div>
+
+<!-- ================= CULTURAS E VENDA ================= -->
+<div class="pagina">
+  <div class="olho">O que plantar</div>
+  <h2>As nove culturas</h2>
+
+  <table>
+    <tr><th>Cultura</th><th class="n">Rende</th><th class="n">Preço base</th><th class="n">Meses</th>
+      <th class="n">Semente</th><th>Precisa de</th></tr>
+    <tr><td><span class="pastilha" style="background:#C9A227"></span>Trigo</td><td class="n">90 L</td><td class="n">$0,607</td><td class="n">4</td><td class="n">5,0 L</td><td>—</td></tr>
+    <tr><td><span class="pastilha" style="background:#D2B14A"></span>Cevada</td><td class="n">96 L</td><td class="n">$0,563</td><td class="n">4</td><td class="n">5,0 L</td><td>—</td></tr>
+    <tr><td><span class="pastilha" style="background:#CBAE55"></span>Aveia</td><td class="n">57 L</td><td class="n">$0,958</td><td class="n">3</td><td class="n">5,0 L</td><td>—</td></tr>
+    <tr><td><span class="pastilha" style="background:#E0C21E"></span>Canola</td><td class="n">58 L</td><td class="n">$1,085</td><td class="n">4</td><td class="n">2,0 L</td><td>—</td></tr>
+    <tr><td><span class="pastilha" style="background:#6E7A2E"></span>Soja</td><td class="n">45 L</td><td class="n">$1,400</td><td class="n">4</td><td class="n">3,0 L</td><td>—</td></tr>
+    <tr><td><span class="pastilha" style="background:#A8901F"></span>Milho</td><td class="n">92 L</td><td class="n">$0,684</td><td class="n">4</td><td class="n">4,0 L</td><td>colheitadeira C-900</td></tr>
+    <tr><td><span class="pastilha" style="background:#C8A415"></span>Girassol</td><td class="n">52 L</td><td class="n">$1,211</td><td class="n">4</td><td class="n">3,0 L</td><td>colheitadeira C-900</td></tr>
+    <tr><td><span class="pastilha" style="background:#3E6B2B"></span>Batata</td><td class="n">413 L</td><td class="n">$0,400</td><td class="n">4</td><td class="n">37,3 L</td><td>colhedora de raízes + <b>solo arado</b></td></tr>
+    <tr><td><span class="pastilha" style="background:#4C7A33"></span>Beterraba</td><td class="n">578 L</td><td class="n">$0,310</td><td class="n">5</td><td class="n">4,0 L</td><td>colhedora de raízes + <b>solo arado</b></td></tr>
+  </table>
+  <p class="rodape-secao">Rendimento por quadra de terra, sem bônus. "Semente" é o quanto a semeadora
+    gasta por quadra — repare que batata gasta 37 L e esvazia o tanque rapidinho.</p>
+
+  <div class="caixa">
+    <span class="rot">Qual escolher</span>
+    <p><b>Começando:</b> trigo ou cevada. Baratos, rápidos, vendem em qualquer lugar.<br>
+      <b>Com dinheiro sobrando:</b> soja e canola valem 2× mais por litro.<br>
+      <b>No fim do jogo:</b> batata e beterraba rendem 5× mais volume — mas exigem a colhedora de
+      raízes ($52.000) e o solo <b>arado</b>, senão a semeadora recusa.</p>
+  </div>
+
+  <h2 style="margin-top:8mm">Onde vender</h2>
+  <table>
+    <tr><th>Posto</th><th>Compra</th><th class="n">Paga</th><th>Satura em</th></tr>
+    <tr><td><b>Cooperativa de Grãos</b></td><td>todos os grãos e oleaginosas</td><td class="n">normal</td><td>40.000 L</td></tr>
+    <tr><td><b>Moinho</b></td><td>só trigo, cevada e aveia</td><td class="n"><b>+15%</b></td><td>12.000 L</td></tr>
+    <tr><td><b>Central de Hortifrúti</b></td><td>batata e beterraba</td><td class="n">+10%</td><td>30.000 L</td></tr>
+    <tr><td><b>Usina de Açúcar</b></td><td>só beterraba</td><td class="n">+5%</td><td>90.000 L</td></tr>
+  </table>
+
+  <div class="caixa alerta">
+    <span class="rot">Não despeje tudo no mesmo lugar</span>
+    <p>Cada posto tem um limite. Passando dele, o preço <b>despenca até 60%</b> e demora horas do jogo
+      para se recuperar. O moinho paga mais, mas satura três vezes mais rápido que a cooperativa —
+      venda uma parte lá e o resto na cooperativa.</p>
+  </div>
+</div>
+
+<!-- ================= ECONOMIA ================= -->
+<div class="pagina">
+  <div class="olho">Economia</div>
+  <h2>Quando vender</h2>
+
+  <p class="lead">O preço muda todo mês. A mesma carga de trigo pode valer 30% a mais só por você ter
+    esperado a virada do ano.</p>
+
+  <table>
+    <tr><th>Cultura</th><th class="n">Melhor mês</th><th class="n">Pior mês</th><th class="n">Diferença</th></tr>
+    <tr><td>Trigo, cevada, aveia, canola</td><td class="n">Janeiro (1,21×)</td><td class="n">Agosto (0,81×)</td><td class="n">49%</td></tr>
+    <tr><td>Soja</td><td class="n">Julho (1,59×)</td><td class="n">Fevereiro (0,64×)</td><td class="n"><b>148%</b></td></tr>
+    <tr><td>Milho</td><td class="n">Janeiro (1,33×)</td><td class="n">Novembro (0,61×)</td><td class="n">118%</td></tr>
+    <tr><td>Girassol</td><td class="n">Julho (1,20×)</td><td class="n">Novembro (0,65×)</td><td class="n">85%</td></tr>
+    <tr><td>Batata e beterraba</td><td class="n">Novembro (1,15×)</td><td class="n">Abril (0,90×)</td><td class="n">28%</td></tr>
+  </table>
+
+  <div class="caixa dica">
+    <span class="rot">A jogada da soja</span>
+    <p>Soja colhida em fevereiro e vendida na hora rende $0,90 por litro. A mesma soja guardada até
+      julho rende $1,66 — <b>84% a mais</b>, sem plantar um grão a mais. Só cuidado: guardar no silo
+      custa por mês, então segurar demais come o lucro.</p>
+  </div>
+
+  <p>Você vê o preço do dia dentro da <b>loja</b> (<span class="tecla">P</span>), no quadro
+    "Preços hoje": a seta ↑ verde quer dizer que está acima da média, ↓ vermelha abaixo.</p>
+
+  <div class="fig">
+    <img src="assets/tela_loja.png" alt="Loja mostrando máquinas e o quadro de preços do dia">
+    <figcaption>Na loja: <span class="tecla">←</span> <span class="tecla">→</span> trocam a aba,
+      <span class="tecla">↑</span> <span class="tecla">↓</span> escolhem e
+      <span class="tecla">Enter</span> compra. No celular, toque uma vez para escolher e outra para comprar.</figcaption>
+  </div>
+
+</div>
+
+<div class="pagina">
+  <div class="olho">Economia</div>
+  <h2>Contratos e custos</h2>
+  <h3>Contratos: dinheiro antes da primeira colheita</h3>
+  <p>Aparecem sozinhos no painel do alto, até três por vez. Você aceita com
+    <span class="tecla">1</span>–<span class="tecla">3</span> e cumpre fazendo o serviço em qualquer
+    campo seu — o contador anda sozinho enquanto você trabalha.</p>
+  <table>
+    <tr><th>Tipo</th><th class="n">Paga por quadra</th><th>Comentário</th></tr>
+    <tr><td>Arar</td><td class="n">$ 28</td><td>O que mais paga</td></tr>
+    <tr><td>Colher</td><td class="n">$ 25</td><td>Você ainda fica com o produto</td></tr>
+    <tr><td>Cultivar</td><td class="n">$ 23</td><td>O mais fácil de cumprir cedo</td></tr>
+    <tr><td>Semear</td><td class="n">$ 20</td><td>Some com o custo da semente</td></tr>
+    <tr><td>Adubar</td><td class="n">$ 15</td><td>Melhora o campo e ainda paga</td></tr>
+  </table>
+
+  <h3>O que consome seu dinheiro</h3>
+  <table>
+    <tr><th>Custo</th><th>Quando</th><th>Como resolver</th></tr>
+    <tr><td><b>Diesel</b></td><td>o tempo todo, mais rápido trabalhando</td>
+      <td>Pare na bomba do pátio e aperte <span class="tecla verde">T</span></td></tr>
+    <tr><td><b>Desgaste</b></td><td>sobe trabalhando no campo</td>
+      <td>Oficina do pátio, <span class="tecla verde">T</span>. Acima de 80%, a máquina perde velocidade</td></tr>
+    <tr><td><b>Manutenção</b></td><td>na virada de cada mês</td>
+      <td>Proporcional ao tamanho da frota — não compre máquina que não vai usar</td></tr>
+    <tr><td><b>Semente e adubo</b></td><td>na hora de encher</td>
+      <td>Normal. Adubo se paga com folga</td></tr>
+    <tr><td><b>Silo</b></td><td>por mês, se tiver algo guardado</td>
+      <td>Só guarde se estiver esperando o preço subir</td></tr>
+  </table>
+</div>
+
+<!-- ================= CLIMA + PROBLEMAS ================= -->
+<div class="pagina">
+  <div class="olho">Clima e estações</div>
+  <h2>O tempo interfere</h2>
+
+  <table>
+    <tr><th>Clima</th><th>Efeito</th></tr>
+    <tr><td><b>Sol</b> / <b>Nublado</b></td><td>Nada. Dia normal de trabalho.</td></tr>
+    <tr><td><b>Chuva</b></td><td><b>Colheita rende metade.</b> Arar, cultivar, semear e adubar
+      continuam normais.</td></tr>
+    <tr><td><b>Tempestade</b></td><td>Colheita pela metade <b>e</b> pode destruir parte da lavoura em pé.</td></tr>
+    <tr><td><b>Neblina</b></td><td>Atrapalha a visão de manhã cedo. Ligue os faróis (<span class="tecla">L</span>).</td></tr>
+    <tr><td><b>Neve</b></td><td>Só no inverno. Colheita pela metade, e o campo fica branco.</td></tr>
+  </table>
+
+  <div class="caixa">
+    <span class="rot">A decisão mais interessante do jogo</span>
+    <p>Sua lavoura está madura e começou a chover. Colher agora significa perder metade.
+      Esperar significa arriscar os 3 meses de validade — e a previsão do próximo tempo está lá
+      no alto da tela, do lado do relógio, esperando você olhar.</p>
+  </div>
+
+  <h3>O ano</h3>
+  <p>O ano tem 12 meses e começa em <b>março</b>. Cada mês dura 30 segundos e avança a lavoura um
+    estágio. As estações mudam a cor do mato e o inverno traz neve, mas <b>você pode plantar o ano
+    inteiro</b>.</p>
+
+  <h2 style="margin-top:7mm">Deu errado?</h2>
+
+  <table>
+    <tr><th>O que aconteceu</th><th>Por quê</th><th>Solução</th></tr>
+    <tr><td>Ando pelo campo e nada acontece</td><td>Implemento desligado</td>
+      <td>Aperte <span class="tecla verde">R</span>.</td></tr>
+    <tr><td>"Solo precisa estar arado ou cultivado"</td><td>Tentando plantar no mato</td>
+      <td>Passe o cultivador ali primeiro.</td></tr>
+    <tr><td>"Semeadora vazia"</td><td>Acabou a semente</td>
+      <td>Volte ao silo do pátio e aperte <span class="tecla verde">T</span>.</td></tr>
+    <tr><td>"Terreno não é seu"</td><td>Campo não comprado</td>
+      <td>Compre na loja (<span class="tecla">P</span>), aba Terrenos.</td></tr>
+    <tr><td>"Esta colheitadeira não colhe Milho"</td><td>Máquina errada para a cultura</td>
+      <td>Milho e girassol exigem a C-900; batata e beterraba, a colhedora de raízes.</td></tr>
+    <tr><td>Colheitadeira parou de colher</td><td>Tanque cheio</td>
+      <td>Transborde no reboque (<span class="tecla verde">T</span>) ou descarregue no silo.</td></tr>
+    <tr><td>Não aparece "Vender"</td><td>Reboque vazio, solto, ou posto errado</td>
+      <td>Confira se está engatado, com carga, e se o posto compra aquele produto.</td></tr>
+    <tr><td>O trator não anda</td><td>Sem diesel</td>
+      <td>Barra <b>D</b> zerada. Vá até a bomba do pátio.</td></tr>
+    <tr><td>Máquina lenta demais</td><td>Implemento pesado ou desgaste alto</td>
+      <td>Implemento de 4 quadras exige trator de 180 cv+. Repare na oficina.</td></tr>
+    <tr><td>A lavoura virou bege</td><td>Passou de 3 meses madura</td>
+      <td>Não tem volta. Cultive de novo e colha mais cedo da próxima vez.</td></tr>
+  </table>
+
+  <div class="caixa alerta">
+    <span class="rot">O jogo não salva</span>
+    <p>Ainda não existe salvamento: se você fechar a aba, a partida recomeça do zero. Uma partida
+      completa leva cerca de 15 minutos, então jogue de uma sentada só.</p>
+  </div>
+</div>
+
+<!-- ================= REFERÊNCIA RÁPIDA ================= -->
+<div class="pagina">
+  <div class="olho">Cola</div>
+  <h2>Referência rápida</h2>
+
+  <div class="duas">
+    <div>
+      <h4>Teclado</h4>
+      <table style="font-size:8.4pt">
+        <tr><td><span class="tecla">W</span><span class="tecla">A</span><span class="tecla">S</span><span class="tecla">D</span></td><td>dirigir</td></tr>
+        <tr><td><span class="tecla verde">Q</span></td><td>engatar / desengatar</td></tr>
+        <tr><td><span class="tecla verde">R</span></td><td>ligar / desligar implemento</td></tr>
+        <tr><td><span class="tecla verde">T</span></td><td>ação (encher / vender / reparar)</td></tr>
+        <tr><td><span class="tecla">E</span></td><td>trocar de veículo</td></tr>
+        <tr><td><span class="tecla">[</span> <span class="tecla">]</span></td><td>trocar semente</td></tr>
+        <tr><td><span class="tecla">F</span></td><td>adubo ↔ calcário</td></tr>
+        <tr><td><span class="tecla">P</span></td><td>loja</td></tr>
+        <tr><td><span class="tecla">Tab</span></td><td>camadas do mapa</td></tr>
+        <tr><td><span class="tecla">7</span> <span class="tecla">8</span></td><td>velocidade do tempo</td></tr>
+        <tr><td><span class="tecla">L</span></td><td>faróis</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>Celular</h4>
+      <table style="font-size:8.4pt">
+        <tr><td><b>Círculo esquerdo</b></td><td>volante (arraste)</td></tr>
+        <tr><td><b>▲ ▼ direita</b></td><td>acelerar / frear</td></tr>
+        <tr><td><b>ENGATA</b></td><td>engatar implemento</td></tr>
+        <tr><td><b>LIGA</b></td><td>ligar implemento</td></tr>
+        <tr><td><b>AÇÃO</b></td><td>encher / vender / reparar</td></tr>
+        <tr><td><b>TROCA</b></td><td>trocar de veículo</td></tr>
+        <tr><td><b>LOJA</b></td><td>abrir a loja</td></tr>
+        <tr><td><b>MAPA</b></td><td>tamanho do minimapa</td></tr>
+        <tr><td colspan="2" style="color:#5F6660">Na loja: um toque escolhe, outro compra.</td></tr>
+        <tr><td colspan="2" style="color:#5F6660">Jogue na horizontal.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h4 style="margin-top:5mm">A rotina de um campo bem feito</h4>
+  <table>
+    <tr><th class="n">1</th><td>Arar (ou cultivar, se ainda não tiver arado)</td><td class="n">+15%</td></tr>
+    <tr><th class="n">2</th><td>Passar calcário</td><td class="n">+15%</td></tr>
+    <tr><th class="n">3</th><td>Semear</td><td class="n">—</td></tr>
+    <tr><th class="n">4</th><td>Adubar assim que nascer</td><td class="n">+22,5%</td></tr>
+    <tr><th class="n">5</th><td>Adubar de novo no mês seguinte</td><td class="n">+22,5%</td></tr>
+    <tr><th class="n">6</th><td>Pulverizar quando aparecer erva</td><td class="n">+20%</td></tr>
+    <tr><th class="n">7</th><td>Colher no seco, assim que ficar maduro</td><td class="n">—</td></tr>
+    <tr><th class="n">8</th><td>Vender no posto certo, no mês certo</td><td class="n">até +49%</td></tr>
+  </table>
+
+  <div class="caixa">
+    <span class="rot">Resumo em uma linha</span>
+    <p>Campo largado rende <b>1×</b>. Campo bem tratado rende <b>2×</b> — no mesmo tempo, no mesmo
+      pedaço de terra, com a mesma máquina. É aí que está o jogo.</p>
+  </div>
+
+  <div style="margin-top:14mm;text-align:center;color:#8A918B;font-size:8.4pt">
+    <img src="assets/icone-128.png" alt="" style="width:14mm;height:14mm;margin:0 auto 3mm">
+    Fazenda 25 — Manual do Jogador<br>
+    Jogo independente. Não afiliado a nenhuma outra franquia de simulação agrícola.
+  </div>
+</div>
+
+</body>
+</html>
