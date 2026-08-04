@@ -20,8 +20,66 @@
     text-transform: uppercase; color: #9CC406;
   }
   h1 span { color: #7B7B7B; letter-spacing: 1px; font-weight: 400; }
-  #wrap { position: relative; line-height: 0; }
-  canvas { display: block; background: #4F7A34; border-radius: 4px; }
+  #wrap { position: relative; line-height: 0; touch-action: none; }
+  canvas { display: block; background: #4F7A34; border-radius: 4px; touch-action: none; }
+
+  /* ---------- controles de toque (só aparecem em dispositivo com toque) ---------- */
+  /* --k = escala do canvas (largura exibida / 800). Tudo aqui é medido em
+     unidades lógicas do jogo e multiplicado por --k, então os controles
+     mantêm a proporção em qualquer tela. */
+  #touch { position: absolute; inset: 0; display: none; touch-action: none; user-select: none; -webkit-user-select: none; --k: 1; }
+  body.toque #touch { display: block; }
+  body.toque #tip, body.toque h1 { display: none; }
+  body.toque { padding: 0; overflow: hidden; }
+  body.toque #shell { gap: 0; }
+  .tbtn {
+    position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.55); color: #F3F6E8; border: 1.5px solid rgba(255,255,255,0.22);
+    border-radius: calc(7px * var(--k));
+    font-family: "Nunito Sans", -apple-system, "Segoe UI", sans-serif; font-weight: 700;
+    font-size: calc(11px * var(--k)); line-height: 1;
+    text-align: center; pointer-events: auto; -webkit-tap-highlight-color: transparent;
+  }
+  .tbtn.press { background: rgba(156,196,6,0.78); color: #14171a; border-color: #9CC406; }
+  .tbtn small { font-size: calc(7px * var(--k)); font-weight: 400; opacity: 0.72; margin-top: calc(2px * var(--k)); }
+  #tsteer {
+    position: absolute; left: calc(16px * var(--k)); top: 50%; transform: translateY(-50%);
+    width: calc(118px * var(--k)); height: calc(118px * var(--k)); border-radius: 50%;
+    background: rgba(0,0,0,0.40); border: 2px solid rgba(255,255,255,0.16);
+    pointer-events: auto; -webkit-tap-highlight-color: transparent;
+  }
+  #tknob {
+    position: absolute; left: 50%; top: 50%;
+    width: calc(48px * var(--k)); height: calc(48px * var(--k));
+    margin: calc(-24px * var(--k)) 0 0 calc(-24px * var(--k));
+    border-radius: 50%; background: rgba(156,196,6,0.55); border: 2px solid #9CC406;
+    transition: background 0.1s;
+  }
+  #tsteer::after {
+    content: "DIREÇÃO"; position: absolute; left: 0; right: 0; bottom: calc(-14px * var(--k));
+    text-align: center; font: 400 calc(8px * var(--k)) "Nunito Sans", sans-serif;
+    color: rgba(243,246,232,0.45); letter-spacing: 1px;
+  }
+  #tacel, #tfreio {
+    right: calc(16px * var(--k)); width: calc(62px * var(--k)); height: calc(62px * var(--k));
+    border-radius: 50%; font-size: calc(20px * var(--k));
+  }
+  #tacel { top: 28%; } #tfreio { top: 60%; }
+  .tact { width: calc(54px * var(--k)); height: calc(34px * var(--k)); right: calc(88px * var(--k)); }
+  #tR { top: 24%; } #tQ { top: 38%; } #tT { top: 52%; } #tE { top: 66%; }
+  .tmini {
+    width: calc(40px * var(--k)); height: calc(24px * var(--k));
+    font-size: calc(9px * var(--k)); left: calc(10px * var(--k));
+  }
+  #tP { top: calc(34px * var(--k)); } #tM { top: calc(64px * var(--k)); } #tH { top: calc(94px * var(--k)); }
+  #girar {
+    position: fixed; inset: 0; background: #14171a; color: #F3F6E8; z-index: 99;
+    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    font: 700 15px "Nunito Sans", sans-serif; text-align: center; padding: 24px;
+  }
+  body.retrato #girar { display: flex; }
+  #girar .ph { width: 54px; height: 88px; border: 3px solid #9CC406; border-radius: 8px; animation: gira 1.8s ease-in-out infinite; }
+  @keyframes gira { 0%, 40% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
   #tip { font-size: 11px; color: #7B7B7B; max-width: 800px; text-align: center; line-height: 1.7; }
   #tip b { color: #F3F6E8; font-weight: 700; }
   kbd {
@@ -33,7 +91,22 @@
 <body>
 <div id="shell">
   <h1>Fazenda 25 <span>— simulador agrícola</span></h1>
-  <div id="wrap"><canvas id="c" width="800" height="560"></canvas></div>
+  <div id="wrap">
+    <canvas id="c" width="800" height="560"></canvas>
+    <div id="touch">
+      <div id="tsteer"><div id="tknob"></div></div>
+      <div class="tbtn" id="tacel">▲</div>
+      <div class="tbtn" id="tfreio">▼</div>
+      <div class="tbtn tact" id="tR" data-k="r">LIGA<small>implem.</small></div>
+      <div class="tbtn tact" id="tQ" data-k="q">ENGATA</div>
+      <div class="tbtn tact" id="tT" data-k="t">AÇÃO</div>
+      <div class="tbtn tact" id="tE" data-k="e">TROCA<small>veículo</small></div>
+      <div class="tbtn tmini" id="tP" data-k="p">LOJA</div>
+      <div class="tbtn tmini" id="tM" data-k="m">MAPA</div>
+      <div class="tbtn tmini" id="tH" data-k="h">?</div>
+    </div>
+  </div>
+  <div id="girar"><div class="ph"></div>Gire o aparelho<br><span style="font-weight:400;font-size:12px;opacity:.7">Fazenda 25 é jogado na horizontal</span></div>
   <div id="tip">
     <kbd>W</kbd><kbd>S</kbd> acelerar/frear · <kbd>A</kbd><kbd>D</kbd> esterçar · <kbd>R</kbd> ligar implemento ·
     <kbd>Q</kbd> engatar · <kbd>T</kbd> ação (encher/descarregar/vender) · <kbd>E</kbd> trocar de veículo ·
@@ -53,8 +126,39 @@ const VIEW_W = 800, VIEW_H = 560;
 
 const dpr = Math.min(2, window.devicePixelRatio || 1);
 cv.width = VIEW_W * dpr; cv.height = VIEW_H * dpr;
-cv.style.width = VIEW_W + 'px'; cv.style.height = VIEW_H + 'px';
 ctx.scale(dpr, dpr);
+
+const TOQUE = ('ontouchstart' in window) || navigator.maxTouchPoints > 0
+              || matchMedia('(pointer: coarse)').matches;
+if (TOQUE) document.body.classList.add('toque');
+
+// o buffer é sempre 800x560; o CSS escala pra caber na tela
+function ajustarEscala() {
+  const wrapEl = document.getElementById('wrap');
+  // no celular o visualViewport é menor que innerHeight (barra de endereço)
+  const vv = window.visualViewport;
+  const vw = vv ? vv.width : window.innerWidth;
+  const vh = vv ? vv.height : window.innerHeight;
+  const dispW = Math.max(280, vw - (TOQUE ? 2 : 24));
+  const dispH = Math.max(200, vh - (TOQUE ? 4 : 120));
+  const esc = Math.min(dispW / VIEW_W, dispH / VIEW_H, TOQUE ? 4 : 1);
+  const w = Math.round(VIEW_W * esc), h = Math.round(VIEW_H * esc);
+  cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  wrapEl.style.width = w + 'px'; wrapEl.style.height = h + 'px';
+  // os controles de toque são medidos em unidades lógicas × esta escala
+  document.getElementById('touch').style.setProperty('--k', esc.toFixed(3));
+  document.body.classList.toggle('retrato', TOQUE && window.innerHeight > window.innerWidth);
+}
+addEventListener('resize', ajustarEscala);
+addEventListener('orientationchange', () => setTimeout(ajustarEscala, 120));
+addEventListener('load', () => { ajustarEscala(); setTimeout(ajustarEscala, 200); });
+ajustarEscala();
+
+// converte ponto da tela para coordenadas do canvas lógico (800x560)
+function paraCanvas(clientX, clientY) {
+  const r = cv.getBoundingClientRect();
+  return { x: (clientX - r.left) / r.width * VIEW_W, y: (clientY - r.top) / r.height * VIEW_H };
+}
 
 const TILE = 20, WC = 120, WR = 90, N = WC * WR;
 const WORLD_W = WC * TILE, WORLD_H = WR * TILE;
@@ -1102,6 +1206,95 @@ function onPress(k) {
   }
 }
 
+/* ============================================================
+   §10b  CONTROLES DE TOQUE
+   ============================================================ */
+const TOQ = { steer: 0, acel: 0, freio: 0 };
+
+function ligarToque() {
+  const steer = document.getElementById('tsteer');
+  const knob = document.getElementById('tknob');
+  let steerId = null;
+
+  const moverKnob = (clientX) => {
+    const r = steer.getBoundingClientRect();
+    const rel = (clientX - (r.left + r.width / 2)) / (r.width / 2);
+    TOQ.steer = clamp(rel, -1, 1);
+    knob.style.left = (50 + TOQ.steer * 32) + '%';
+    knob.style.background = Math.abs(TOQ.steer) > 0.15 ? 'rgba(156,196,6,0.85)' : 'rgba(156,196,6,0.55)';
+  };
+  const soltarKnob = () => {
+    steerId = null; TOQ.steer = 0;
+    knob.style.left = '50%'; knob.style.background = 'rgba(156,196,6,0.55)';
+  };
+  const capturar = (el, id) => { try { el.setPointerCapture(id); } catch (_) { /* nem todo pointer é capturável */ } };
+  steer.addEventListener('pointerdown', e => {
+    e.preventDefault(); steerId = e.pointerId; capturar(steer, e.pointerId); moverKnob(e.clientX);
+  });
+  steer.addEventListener('pointermove', e => { if (e.pointerId === steerId) moverKnob(e.clientX); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev =>
+    steer.addEventListener(ev, e => { if (e.pointerId === steerId) soltarKnob(); }));
+
+  // pedais: mantêm pressionado
+  const pedal = (id, campo) => {
+    const el = document.getElementById(id);
+    const on = e => { e.preventDefault(); TOQ[campo] = 1; el.classList.add('press'); capturar(el, e.pointerId); };
+    const off = () => { TOQ[campo] = 0; el.classList.remove('press'); };
+    el.addEventListener('pointerdown', on);
+    ['pointerup', 'pointercancel', 'lostpointercapture', 'pointerleave'].forEach(ev => el.addEventListener(ev, off));
+  };
+  pedal('tacel', 'acel');
+  pedal('tfreio', 'freio');
+
+  // botões de ação: disparam uma vez
+  document.querySelectorAll('.tbtn[data-k]').forEach(el => {
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      el.classList.add('press');
+      onPress(el.dataset.k);
+      if (el.dataset.k === 'r') el.classList.toggle('press', !!(veiculos[atual] && veiculos[atual].on));
+      else setTimeout(() => el.classList.remove('press'), 130);
+    });
+  });
+
+  // no celular a caixa de ajuda ocupa meia tela: começa recolhida
+  S.ajuda = false;
+}
+
+/* toque no canvas: abre/opera a loja e aceita contratos sem teclado */
+cv.addEventListener('pointerdown', e => {
+  const p = paraCanvas(e.clientX, e.clientY);
+  if (S.loja) {
+    const bx = 80, by = 50, bw = 640, bh = 460;
+    if (p.x < bx || p.x > bx + bw || p.y < by || p.y > by + bh) { S.loja = false; return; }
+    // abas
+    for (let i = 0; i < 3; i++) {
+      const ax = bx + 20 + i * 110;
+      if (p.x >= ax && p.x <= ax + 100 && p.y >= by + 42 && p.y <= by + 64) {
+        S.lojaAba = i; S.lojaSel = 0; return;
+      }
+    }
+    // itens (mesma matemática do drawLoja)
+    const itens = itensLoja();
+    const start = clamp(S.lojaSel - 6, 0, Math.max(0, itens.length - 14));
+    for (let k = 0; k < Math.min(14, itens.length - start); k++) {
+      const ry = by + 78 + k * 25;
+      if (p.x >= bx + 16 && p.x <= bx + bw - 16 && p.y >= ry - 2 && p.y <= ry + 21) {
+        const i = start + k;
+        if (S.lojaSel === i) comprarSel(); else S.lojaSel = i;   // 1º toque seleciona, 2º compra
+        return;
+      }
+    }
+    return;
+  }
+  // fora da loja: tocar no painel de contratos aceita o contrato
+  if (S.contratos.length && p.x >= 196 && p.x <= 370 && p.y >= 26 && p.y <= 26 + S.contratos.length * 16 + 8) {
+    const k = Math.floor((p.y - 26) / 16);
+    const c = S.contratos[k];
+    if (c && !c.aceito) { c.aceito = true; toast(`Contrato aceito: ${c.tipo} · ${c.meta} tiles`); }
+  }
+});
+
 function trocarVeiculo() {
   const cands = veiculos.map((v, i) => i).filter(i => autoPropelido(veiculos[i]));
   if (cands.length < 2) return;
@@ -1925,9 +2118,9 @@ function simular(dt) {
   const v = veiculos[atual];
   if (v) {
     const inp = {
-      acel: (keys['w'] || keys['arrowup'] ? 1 : 0) - 0,
-      freio: (keys['s'] || keys['arrowdown'] ? 1 : 0),
-      dir: (keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0),
+      acel: Math.max(keys['w'] || keys['arrowup'] ? 1 : 0, TOQ.acel),
+      freio: Math.max(keys['s'] || keys['arrowdown'] ? 1 : 0, TOQ.freio),
+      dir: clamp((keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0) + TOQ.steer, -1, 1),
       mao: keys[' ']
     };
     if (inp.freio && v.v <= 0.5) { inp.acel = -0.6; inp.freio = 0; }
@@ -1991,7 +2184,9 @@ cam.y = clamp(t0.y - VIEW_H / 2, 0, WORLD_H - VIEW_H);
 
 gerarContrato(); gerarContrato();
 notif("Bem-vindo à Fazenda 25", UI.green);
-toast("Engate o cultivador (Q), ligue com R e trabalhe o Campo 1");
+toast(TOQUE ? "ENGATA no cultivador, LIGA e acelere ▲"
+            : "Engate o cultivador (Q), ligue com R e trabalhe o Campo 1");
+if (TOQUE) ligarToque();
 
 requestAnimationFrame(frame);
 </script>
