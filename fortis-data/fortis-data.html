@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Fortis Data — Remoção de Dados Pessoais da Internet</title>
+<style>
+  @page { size: A4; margin: 0; }
+
+  :root{
+    --ink:      #0A1226;
+    --ink-2:    #101B36;
+    --ink-3:    #16233F;
+    --gold:     #C8A45C;
+    --gold-dim: #9A7C3E;
+    --paper:    #FFFFFF;
+    --off:      #F5F6F8;
+    --slate:    #5A6478;
+    --slate-2:  #8A93A5;
+    --line:     #E3E6EC;
+    --risk:     #B4472F;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background:#fff;
+    font-family:'Inter', 'Liberation Sans', sans-serif;
+    color:var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page{
+    position:relative;
+    width:210mm; height:297mm;
+    padding:17mm 16mm 15mm;
+    overflow:hidden;
+    page-break-after:always;
+    break-after:page;
+  }
+  .page:last-child{ page-break-after:auto; break-after:auto; }
+
+  .dark{ background:var(--ink); color:#fff; }
+
+  /* ---------- shared type ---------- */
+  .eyebrow{
+    font-size:7.6pt; font-weight:700; letter-spacing:.20em;
+    text-transform:uppercase; color:var(--gold);
+  }
+  .eyebrow.muted{ color:var(--slate-2); }
+
+  h1{ font-family:'Manrope','Liberation Sans',sans-serif; font-weight:800; margin:0; }
+  h2{
+    font-family:'Manrope','Liberation Sans',sans-serif;
+    font-weight:800; font-size:23pt; line-height:1.12;
+    margin:7px 0 0; letter-spacing:-.018em;
+  }
+  h3{ font-family:'Manrope',sans-serif; font-weight:800; font-size:11pt; margin:0; letter-spacing:-.01em; }
+  p{ margin:0; font-size:9.6pt; line-height:1.58; color:var(--slate); }
+  .lead{ font-size:11.2pt; line-height:1.55; color:var(--ink-3); }
+  strong{ color:var(--ink); font-weight:700; }
+  .dark strong{ color:#fff; }
+
+  .rule{ height:2.5px; width:44px; background:var(--gold); margin:13px 0 15px; }
+
+  /* ---------- header / footer ---------- */
+  .phead{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-bottom:8px; border-bottom:1px solid var(--line);
+    margin-bottom:20px;
+  }
+  .phead .brand{ font-family:'Manrope',sans-serif; font-weight:800; font-size:8.6pt; letter-spacing:.03em; }
+  .phead .brand span{ color:var(--gold); }
+  .phead .sec{ font-size:7.4pt; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--slate-2); }
+
+  .pfoot{
+    position:absolute; left:16mm; right:16mm; bottom:9mm;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:7.4pt; color:var(--slate-2);
+    border-top:1px solid var(--line); padding-top:6px;
+  }
+  .pfoot b{ color:var(--ink); font-weight:700; }
+  .dark .pfoot{ border-top-color:rgba(255,255,255,.14); color:rgba(255,255,255,.55); }
+  .dark .pfoot b{ color:#fff; }
+
+  /* ---------- cover ---------- */
+  .cover{ display:flex; flex-direction:column; justify-content:space-between; padding:20mm 16mm 15mm; }
+  .cover-glow{
+    position:absolute; width:420px; height:420px; border-radius:50%;
+    background:radial-gradient(circle, rgba(200,164,92,.17) 0%, rgba(200,164,92,0) 68%);
+    top:-130px; right:-120px;
+  }
+  .cover-grid{
+    position:absolute; inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(255,255,255,.032) 1px, transparent 1px);
+    background-size:34px 34px;
+  }
+  .cover-inner{ position:relative; z-index:2; }
+
+  .logo{ display:flex; align-items:center; gap:11px; }
+  .logo-name{ font-family:'Manrope',sans-serif; font-weight:800; font-size:15pt; letter-spacing:.01em; line-height:1; }
+  .logo-name span{ color:var(--gold); }
+  .logo-tag{ font-size:6.7pt; letter-spacing:.20em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-top:4px; }
+
+  .cover h1{ font-size:37pt; line-height:1.06; letter-spacing:-.028em; }
+  .cover h1 em{ font-style:normal; color:var(--gold); }
+  .cover .sub{ font-size:12pt; line-height:1.6; color:rgba(255,255,255,.74); max-width:150mm; }
+
+  .cover-chips{ display:flex; gap:7px; flex-wrap:wrap; }
+  .chip{
+    font-size:7.6pt; font-weight:600; letter-spacing:.04em;
+    padding:6px 12px; border:1px solid rgba(255,255,255,.20);
+    border-radius:100px; color:rgba(255,255,255,.82);
+  }
+
+  .cover-cta{
+    display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(100deg, var(--gold) 0%, #B08D45 100%);
+    border-radius:5px; padding:17px 22px; color:#1A1305;
+  }
+  .cover-cta .l1{ font-size:8pt; font-weight:700; letter-spacing:.16em; text-transform:uppercase; opacity:.72; }
+  .cover-cta .l2{ font-family:'Manrope',sans-serif; font-size:15.5pt; font-weight:800; margin-top:2px; letter-spacing:-.01em; }
+  .cover-cta .phone{ font-family:'Manrope',sans-serif; font-size:21pt; font-weight:800; letter-spacing:-.02em; white-space:nowrap; }
+  .cover-cta .phone-l{ font-size:7.2pt; font-weight:700; letter-spacing:.16em; text-transform:uppercase; opacity:.72; text-align:right; }
+
+  /* ---------- grids ---------- */
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
+
+  .card{ border:1px solid var(--line); border-radius:4px; padding:13px 14px; background:#fff; }
+  .card .k{ font-family:'Manrope',sans-serif; font-weight:800; font-size:9.6pt; margin-bottom:4px; }
+  .card .v{ font-size:8.5pt; line-height:1.5; color:var(--slate); }
+
+  .exposed{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+    border:1px solid var(--line); border-radius:4px; overflow:hidden;
+  }
+  .exposed div{
+    padding:10.5px 12px; font-size:8.9pt; font-weight:600; color:var(--ink-3);
+    border-right:1px solid var(--line); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:8px; background:#fff;
+  }
+  .exposed div:nth-child(3n){ border-right:none; }
+  .exposed div:nth-last-child(-n+3){ border-bottom:none; }
+  .dot{ width:5px; height:5px; border-radius:50%; background:var(--gold); flex:none; }
+
+  /* ---------- risk columns ---------- */
+  .riskcol{ border:1px solid var(--line); border-radius:4px; overflow:hidden; }
+  .riskcol .rh{ padding:11px 14px; background:var(--ink); color:#fff; }
+  .riskcol .rh .t{ font-family:'Manrope',sans-serif; font-weight:800; font-size:10.5pt; }
+  .riskcol .rh .s{ font-size:7.5pt; color:rgba(255,255,255,.6); margin-top:2px; letter-spacing:.03em; }
+  .riskcol ul{ margin:0; padding:5px 14px 12px; list-style:none; }
+  .riskcol li{ padding:8px 0 8px 15px; border-bottom:1px dashed var(--line); position:relative; font-size:8.7pt; line-height:1.48; color:var(--slate); }
+  .riskcol li:last-child{ border-bottom:none; }
+  .riskcol li:before{ content:""; position:absolute; left:0; top:13px; width:5px; height:5px; background:var(--risk); border-radius:1px; }
+  .riskcol li b{ color:var(--ink); font-weight:700; display:block; margin-bottom:1px; font-size:9pt; }
+
+  /* ---------- law ---------- */
+  .law{ display:flex; gap:13px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .law:last-of-type{ border-bottom:none; }
+  .law .art{
+    flex:none; width:112px; font-family:'Manrope',sans-serif;
+    font-weight:800; font-size:9.4pt; color:var(--ink); line-height:1.25;
+  }
+  .law .art small{ display:block; font-family:'Inter',sans-serif; font-weight:600; font-size:7.2pt; letter-spacing:.10em; text-transform:uppercase; color:var(--gold); margin-bottom:3px; }
+  .law .txt{ font-size:8.9pt; line-height:1.55; color:var(--slate); }
+  .law .txt b{ color:var(--ink); }
+
+  .quote{
+    background:var(--ink); color:#fff; border-radius:4px; padding:20px 22px;
+    position:relative; overflow:hidden;
+  }
+  .quote .qt{ font-family:'Manrope',sans-serif; font-weight:800; font-size:13pt; line-height:1.38; letter-spacing:-.012em; position:relative; z-index:2; }
+  .quote .qt em{ font-style:normal; color:var(--gold); }
+  .quote .qs{ font-size:8.6pt; color:rgba(255,255,255,.62); margin-top:9px; line-height:1.55; position:relative; z-index:2; }
+  .quote:after{
+    content:""; position:absolute; right:-60px; bottom:-90px; width:230px; height:230px; border-radius:50%;
+    background:radial-gradient(circle, rgba(200,164,92,.20) 0%, rgba(200,164,92,0) 70%);
+  }
+
+  /* ---------- method ---------- */
+  .step{ display:flex; gap:14px; padding:12.5px 0; border-bottom:1px solid var(--line); }
+  .step:last-of-type{ border-bottom:none; }
+  .step .n{
+    flex:none; width:34px; height:34px; border-radius:50%;
+    border:1.5px solid var(--gold); color:var(--gold);
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:11pt;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step .b h3{ margin-bottom:3px; }
+  .step .b p{ font-size:8.9pt; line-height:1.55; }
+  .badge-free{
+    display:inline-block; background:var(--gold); color:#1A1305;
+    font-size:6.9pt; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+    padding:2.5px 7px; border-radius:3px; margin-left:7px; vertical-align:2px;
+  }
+
+  .honest{ border:1px solid var(--gold); border-radius:4px; padding:14px 16px; background:#FDFAF3; }
+  .honest .k{ font-family:'Manrope',sans-serif; font-weight:800; font-size:9.8pt; margin-bottom:5px; }
+  .honest p{ font-size:8.6pt; line-height:1.55; }
+
+  /* ---------- faq ---------- */
+  .faq{ padding:11px 0; border-bottom:1px solid var(--line); }
+  .faq:last-of-type{ border-bottom:none; }
+  .faq .q{ font-family:'Manrope',sans-serif; font-weight:800; font-size:9.5pt; margin-bottom:4px; }
+  .faq .q:before{ content:"— "; color:var(--gold); }
+  .faq .a{ font-size:8.8pt; line-height:1.55; color:var(--slate); }
+
+  /* ---------- final cta ---------- */
+  .final{ display:flex; flex-direction:column; justify-content:space-between; }
+  .final h2{ font-size:29pt; line-height:1.1; }
+  .final h2 em{ font-style:normal; color:var(--gold); }
+  .callbox{
+    border:1.5px solid rgba(255,255,255,.16); border-radius:6px; padding:24px 26px;
+    background:linear-gradient(160deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,0) 100%);
+  }
+  .callbox .lbl{ font-size:7.6pt; font-weight:700; letter-spacing:.20em; text-transform:uppercase; color:var(--gold); }
+  .callbox .num{
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:38pt;
+    letter-spacing:-.03em; line-height:1.05; margin:6px 0 4px; color:#fff;
+  }
+  .callbox .note{ font-size:8.8pt; color:rgba(255,255,255,.62); line-height:1.5; }
+
+  .deliver{ display:grid; grid-template-columns:1fr 1fr; gap:0 26px; }
+  .deliver > div{
+    display:flex; gap:10px; align-items:flex-start;
+    font-size:9.4pt; line-height:1.45; color:rgba(255,255,255,.84);
+    border-bottom:1px solid rgba(255,255,255,.11); padding:10px 0;
+  }
+  .deliver > div:nth-last-child(-n+2){ border-bottom:none; }
+  .deliver svg{ flex:none; margin-top:2px; }
+
+  .steps-call{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .steps-call > div{ border-top:2px solid var(--gold); padding-top:9px; }
+  .steps-call .sn{ font-size:7pt; font-weight:800; letter-spacing:.16em; color:var(--gold); text-transform:uppercase; }
+  .steps-call .st{ font-size:8.6pt; line-height:1.45; color:rgba(255,255,255,.80); margin-top:4px; }
+
+  .mt6{ margin-top:6px; } .mt10{ margin-top:10px; } .mt14{ margin-top:14px; }
+  .mt18{ margin-top:18px; } .mt22{ margin-top:22px; } .mt28{ margin-top:28px; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1. CAPA ============ -->
+<section class="page dark cover">
+  <div class="cover-grid"></div>
+  <div class="cover-glow"></div>
+
+  <div class="cover-inner logo">
+    <svg width="40" height="46" viewBox="0 0 40 46" fill="none">
+      <path d="M20 1.6 L37.6 8.4 V22.5 C37.6 33.4 30.2 41.2 20 44.4 C9.8 41.2 2.4 33.4 2.4 22.5 V8.4 Z"
+            stroke="#C8A45C" stroke-width="1.9" fill="rgba(200,164,92,0.07)"/>
+      <path d="M15.4 13.6 H27.4 M15.4 22.4 H23.8 M15.4 13.6 V32.2"
+            stroke="#C8A45C" stroke-width="2.5" stroke-linecap="square"/>
+    </svg>
+    <div>
+      <div class="logo-name">FORTIS <span>DATA</span></div>
+      <div class="logo-tag">Privacidade &middot; Remoção de Dados</div>
+    </div>
+  </div>
+
+  <div class="cover-inner">
+    <div class="eyebrow">Dossiê de exposição digital &middot; 2026</div>
+    <h1 class="mt14">Seus dados estão<br>na internet.<br><em>E alguém está<br>lucrando com eles.</em></h1>
+    <div class="rule" style="width:64px; margin:22px 0 18px;"></div>
+    <p class="sub">
+      CPF, endereço, telefone, renda, parentes, sócios, rotina. Tudo isso já está
+      público — e foi vendido sem que você autorizasse. A Fortis Data localiza,
+      remove e mantém fora do ar as informações que expõem você, sua família e
+      sua empresa, com fundamento na <strong>LGPD</strong>.
+    </p>
+    <div class="cover-chips mt22">
+      <div class="chip">Pessoa Física</div>
+      <div class="chip">Pessoa Jurídica</div>
+      <div class="chip">Executivos &amp; Famílias</div>
+      <div class="chip">Monitoramento contínuo</div>
+    </div>
+  </div>
+
+  <div class="cover-inner">
+    <div class="cover-cta">
+      <div>
+        <div class="l1">Primeiro passo — sem custo</div>
+        <div class="l2">Diagnóstico de exposição gratuito</div>
+      </div>
+      <div>
+        <div class="phone-l">Ligue agora</div>
+        <div class="phone">(11) 92157-1498</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:11px; font-size:7.4pt; color:rgba(255,255,255,.45);">
+      <span>Fortis Data — Remoção de Dados e Privacidade Digital</span>
+      <span>Atuação fundamentada na Lei nº 13.709/2018 (LGPD)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. O QUE EXISTE SOBRE VOCÊ ============ -->
+<section class="page">
+  <div class="phead">
+    <div class="brand">FORTIS <span>DATA</span></div>
+    <div class="sec">01 — O tamanho da exposição</div>
+  </div>
+
+  <div class="eyebrow">Faça o teste agora</div>
+  <h2>Digite seu nome completo<br>no Google. Depois, seu CPF.</h2>
+  <div class="rule"></div>
+  <p class="lead">
+    O que aparece na primeira página é apenas a superfície. Abaixo dela existe um
+    mercado inteiro de sites de consulta, corretores de dados e bases vazadas que
+    montam, peça por peça, um retrato completo da sua vida — e o vendem por
+    poucos reais a quem quiser comprar.
+  </p>
+
+  <div class="eyebrow muted mt28" style="margin-bottom:9px;">O que costuma estar público sobre uma pessoa ou empresa</div>
+  <div class="exposed">
+    <div><i class="dot"></i>CPF e RG</div>
+    <div><i class="dot"></i>Endereço residencial</div>
+    <div><i class="dot"></i>Telefone e WhatsApp</div>
+    <div><i class="dot"></i>E-mails pessoais</div>
+    <div><i class="dot"></i>Renda estimada</div>
+    <div><i class="dot"></i>Score e situação de crédito</div>
+    <div><i class="dot"></i>Veículos e placas</div>
+    <div><i class="dot"></i>Parentes e vínculos</div>
+    <div><i class="dot"></i>Sócios e participações</div>
+    <div><i class="dot"></i>Imóveis e patrimônio</div>
+    <div><i class="dot"></i>Processos judiciais</div>
+    <div><i class="dot"></i>Senhas já vazadas</div>
+    <div><i class="dot"></i>Rotina em redes sociais</div>
+    <div><i class="dot"></i>Local de trabalho</div>
+    <div><i class="dot"></i>Fotos suas e da família</div>
+  </div>
+
+  <div class="eyebrow muted mt28" style="margin-bottom:9px;">Como esses dados foram parar lá</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="k">Vazamentos</div>
+      <div class="v">Bases de empresas em que você comprou, contratou ou apenas se cadastrou acabam expostas — e circulam para sempre em fóruns e na dark web.</div>
+    </div>
+    <div class="card">
+      <div class="k">Corretores de dados</div>
+      <div class="v">Empresas que compram, cruzam e revendem cadastros em massa. Você nunca ouviu falar delas, mas elas têm um perfil seu.</div>
+    </div>
+    <div class="card">
+      <div class="k">Sites de consulta</div>
+      <div class="v">Portais que entregam CPF, endereço e parentes de qualquer pessoa mediante busca simples ou assinatura barata.</div>
+    </div>
+    <div class="card">
+      <div class="k">Registros públicos</div>
+      <div class="v">Diários oficiais, juntas comerciais, processos e cartórios são replicados e indexados por agregadores privados.</div>
+    </div>
+    <div class="card">
+      <div class="k">Cadastros do dia a dia</div>
+      <div class="v">Lojas, farmácias, apps, promoções e Wi-Fi gratuito. Cada "seu CPF na nota?" alimenta uma base que você não controla.</div>
+    </div>
+    <div class="card">
+      <div class="k">Suas próprias redes</div>
+      <div class="v">Fotos, marcações, check-ins e stories revelam endereço, rotina, escola dos filhos e padrão de vida sem que você perceba.</div>
+    </div>
+  </div>
+
+  <div class="quote mt28">
+    <div class="qt">Você não precisa ter feito nada errado.<br><em>Basta existir no Brasil digital.</em></div>
+    <div class="qs">
+      O vazamento de dados de mais de 200 milhões de brasileiros, revelado em 2021,
+      colocou praticamente toda a população adulta do país dentro de bases criminosas.
+      Desde então, esses registros nunca foram recolhidos — apenas revendidos.
+    </div>
+  </div>
+
+  <div class="pfoot">
+    <span><b>Fortis Data</b> — Diagnóstico gratuito</span>
+    <span><b>(11) 92157-1498</b></span>
+  </div>
+</section>
+
+<!-- ============ 3. O RISCO ============ -->
+<section class="page">
+  <div class="phead">
+    <div class="brand">FORTIS <span>DATA</span></div>
+    <div class="sec">02 — O que fazem com isso</div>
+  </div>
+
+  <div class="eyebrow">Do dado exposto ao prejuízo</div>
+  <h2>Nenhum golpe começa no golpe.<br>Começa na informação.</h2>
+  <div class="rule"></div>
+  <p class="lead">
+    Um criminoso não escolhe alvos ao acaso: ele escolhe o alvo mais bem documentado.
+    Quanto mais a internet sabe sobre você, mais convincente fica a abordagem — e menos
+    tempo você tem para desconfiar.
+  </p>
+
+  <div class="grid-2 mt28">
+    <div class="riskcol">
+      <div class="rh">
+        <div class="t">Pessoa Física</div>
+        <div class="s">Você, sua casa, sua família</div>
+      </div>
+      <ul>
+        <li><b>Falso sequestro</b>Sabem o nome da sua filha, a escola e o endereço. O pânico faz o resto.</li>
+        <li><b>Fraude e conta aberta em seu nome</b>Com CPF, endereço e data de nascimento se contrata crédito e se abre conta.</li>
+        <li><b>Clonagem de WhatsApp</b>Telefone público + dados pessoais = confirmação de identidade na operadora.</li>
+        <li><b>Planejamento de roubo</b>Endereço, veículos, patrimônio e rotina publicada compõem um mapa da sua casa.</li>
+        <li><b>Perseguição e stalking</b>Ex-parceiros, obsessivos e desafetos localizam alguém em minutos.</li>
+        <li><b>Extorsão e exposição de imagem</b>Fotos íntimas ou constrangedoras usadas como moeda de chantagem.</li>
+      </ul>
+    </div>
+
+    <div class="riskcol">
+      <div class="rh">
+        <div class="t">Pessoa Jurídica</div>
+        <div class="s">Sua empresa, seus sócios, seu time</div>
+      </div>
+      <ul>
+        <li><b>Fraude do CEO</b>Com organograma e e-mails expostos, o "diretor" pede a transferência urgente ao financeiro.</li>
+        <li><b>Engenharia social contra o time</b>Quanto mais dados do colaborador circulam, mais fácil convencê-lo a abrir a porta.</li>
+        <li><b>Risco patrimonial dos executivos</b>Sócios e diretores expostos viram alvo preferencial de sequestro e extorsão.</li>
+        <li><b>Inteligência da concorrência</b>Carteira de clientes, fornecedores e estrutura societária mapeados livremente.</li>
+        <li><b>Passivo LGPD</b>Dado de cliente ou colaborador exposto é responsabilidade da empresa perante a ANPD.</li>
+        <li><b>Dano reputacional</b>Conteúdo negativo indexado no seu nome define a primeira impressão de todo cliente.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-3 mt28">
+    <div class="card" style="border-color:var(--risk);">
+      <div class="k" style="color:var(--risk);">Até 2% do faturamento</div>
+      <div class="v">Sanção que a ANPD pode aplicar à empresa por infração à LGPD, limitada a R$ 50 milhões por infração (art. 52).</div>
+    </div>
+    <div class="card">
+      <div class="k">Sem prazo de validade</div>
+      <div class="v">Dado vazado não expira. Ele é copiado, revendido e reaparece anos depois em uma base nova.</div>
+    </div>
+    <div class="card">
+      <div class="k">O alvo é a família</div>
+      <div class="v">Na maioria dos casos graves, a porta de entrada não é o titular — é o filho, o cônjuge ou o assistente.</div>
+    </div>
+  </div>
+
+  <div class="pfoot">
+    <span><b>Fortis Data</b> — Diagnóstico gratuito</span>
+    <span><b>(11) 92157-1498</b></span>
+  </div>
+</section>
+
+<!-- ============ 4. A LEI ============ -->
+<section class="page">
+  <div class="phead">
+    <div class="brand">FORTIS <span>DATA</span></div>
+    <div class="sec">03 — A lei está do seu lado</div>
+  </div>
+
+  <div class="eyebrow">Seu direito já existe</div>
+  <h2>Você pode exigir a exclusão.<br>Eles são obrigados a responder.</h2>
+  <div class="rule"></div>
+  <p class="lead">
+    A maior parte das pessoas convive com os próprios dados expostos acreditando que
+    "internet é assim mesmo". Não é. A legislação brasileira dá ao titular o direito de
+    exigir a eliminação — e cria consequências reais para quem se recusa.
+  </p>
+
+  <div class="mt22">
+    <div class="law">
+      <div class="art"><small>LGPD</small>Art. 18, IV e VI</div>
+      <div class="txt">
+        Garante ao titular o direito de exigir a <b>anonimização, bloqueio ou eliminação</b> de
+        dados desnecessários, excessivos ou tratados em desconformidade com a lei — e a
+        <b>eliminação</b> dos dados tratados com base no seu consentimento.
+      </div>
+    </div>
+    <div class="law">
+      <div class="art"><small>LGPD</small>Art. 19</div>
+      <div class="txt">
+        O controlador deve responder à solicitação do titular <b>imediatamente</b>, em formato
+        simplificado, ou por <b>declaração clara e completa em até 15 dias</b>. Silêncio não é
+        opção prevista em lei.
+      </div>
+    </div>
+    <div class="law">
+      <div class="art"><small>LGPD</small>Art. 18, § 3º</div>
+      <div class="txt">
+        Se o pedido for ignorado ou negado, o titular pode <b>peticionar contra o controlador
+        perante a ANPD</b> — a Autoridade Nacional de Proteção de Dados.
+      </div>
+    </div>
+    <div class="law">
+      <div class="art"><small>LGPD</small>Art. 52</div>
+      <div class="txt">
+        Prevê <b>advertência, multa de até 2% do faturamento</b> (limitada a R$ 50 milhões por
+        infração), bloqueio e eliminação dos dados, além de suspensão da atividade de tratamento.
+      </div>
+    </div>
+    <div class="law">
+      <div class="art"><small>Constituição</small>Art. 5º, X</div>
+      <div class="txt">
+        São <b>invioláveis a intimidade, a vida privada, a honra e a imagem</b> das pessoas,
+        assegurado o direito a indenização pelo dano decorrente de sua violação.
+      </div>
+    </div>
+    <div class="law">
+      <div class="art"><small>Marco Civil</small>Art. 21</div>
+      <div class="txt">
+        Determina a <b>remoção de conteúdo de nudez ou de ato sexual de caráter privado</b>
+        divulgado sem autorização, mediante simples notificação do participante.
+      </div>
+    </div>
+  </div>
+
+  <div class="eyebrow muted mt18" style="margin-bottom:9px;">Na prática, é isto que exigimos — e de quem</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="k">Dos sites de consulta</div>
+      <div class="v">Eliminação do seu CPF, endereço, telefone e vínculos familiares das páginas e das bases que os alimentam.</div>
+    </div>
+    <div class="card">
+      <div class="k">Dos buscadores</div>
+      <div class="v">Desindexação das URLs que expõem seus dados, para que deixem de aparecer na busca pelo seu nome.</div>
+    </div>
+    <div class="card">
+      <div class="k">Dos corretores de dados</div>
+      <div class="v">Exclusão do seu perfil das listas comercializadas e a proibição de recadastramento em novas bases.</div>
+    </div>
+  </div>
+
+  <div class="quote mt18">
+    <div class="qt">O problema nunca foi a lei.<br><em>É saber onde o dado está — e como cobrar.</em></div>
+    <div class="qs">
+      A maioria dos sites e corretores de dados remove a informação assim que recebe uma
+      notificação juridicamente correta, dirigida ao encarregado certo, com o fundamento
+      certo e o prazo certo. O que trava o processo é o titular não saber quantos
+      controladores existem, quem são, onde estão e o que exigir de cada um.
+      É exatamente esse trabalho que a Fortis Data executa.
+    </div>
+  </div>
+
+  <div class="pfoot">
+    <span><b>Fortis Data</b> — Diagnóstico gratuito</span>
+    <span><b>(11) 92157-1498</b></span>
+  </div>
+</section>
+
+<!-- ============ 5. MÉTODO ============ -->
+<section class="page">
+  <div class="phead">
+    <div class="brand">FORTIS <span>DATA</span></div>
+    <div class="sec">04 — Como trabalhamos</div>
+  </div>
+
+  <div class="eyebrow">O método Fortis</div>
+  <h2>Encontrar. Fundamentar.<br>Remover. Vigiar.</h2>
+  <div class="rule"></div>
+  <p class="lead">
+    Remoção de dados não é enviar um e-mail pedindo gentileza. É um processo técnico e
+    jurídico, executado controlador por controlador, com prazo, protocolo e prova de cada etapa.
+  </p>
+
+  <div class="mt18">
+    <div class="step">
+      <div class="n">01</div>
+      <div class="b">
+        <h3>Diagnóstico de exposição<span class="badge-free">Gratuito</span></h3>
+        <p>Varredura do seu nome, CPF/CNPJ, telefone e e-mails em buscadores, sites de consulta,
+        corretores de dados, bases de vazamento conhecidas e redes sociais. Você recebe o
+        panorama do que está público hoje — antes de decidir qualquer coisa.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="n">02</div>
+      <div class="b">
+        <h3>Mapeamento e priorização de risco</h3>
+        <p>Nem todo dado exposto tem o mesmo peso. Classificamos cada ocorrência pelo risco real
+        que ela cria — segurança física, fraude financeira, reputação ou passivo legal — e
+        atacamos primeiro o que pode te machucar mais rápido.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="n">03</div>
+      <div class="b">
+        <h3>Notificação jurídica a cada controlador</h3>
+        <p>Elaboramos e enviamos os pedidos de eliminação fundamentados na LGPD, dirigidos ao
+        encarregado de cada site, plataforma ou corretor de dados, com prazo legal expresso —
+        além dos pedidos de desindexação junto aos buscadores.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="n">04</div>
+      <div class="b">
+        <h3>Remoção, cobrança e escalonamento</h3>
+        <p>Acompanhamos cada protocolo, reiteramos os que não respondem no prazo e escalamos à
+        ANPD ou ao Judiciário quando há recusa. Você recebe o registro do que saiu do ar,
+        onde estava e quando foi removido.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="n">05</div>
+      <div class="b">
+        <h3>Monitoramento contínuo</h3>
+        <p>Dado removido pode voltar: a base é revendida e republicada por outro site. Mantemos
+        vigilância permanente sobre suas informações e removemos novamente cada reincidência,
+        sem que você precise procurar.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="honest mt18">
+    <div class="k">O que prometemos — e o que não prometemos</div>
+    <p>
+      Nenhuma empresa honesta pode garantir que cada cópia de um dado desapareça de toda a
+      internet: parte do material já vazado circula fora do alcance da lei. O que a Fortis Data
+      garante é o que de fato está sob nosso controle — <strong>método, fundamento legal em cada
+      pedido, insistência até o fim do prazo, escalonamento quando há recusa, monitoramento das
+      reincidências e relatório transparente de cada remoção</strong>. Na prática, é a diferença entre
+      estar exposto a qualquer um que faça uma busca e ser um alvo difícil.
+    </p>
+  </div>
+
+  <div class="pfoot">
+    <span><b>Fortis Data</b> — Diagnóstico gratuito</span>
+    <span><b>(11) 92157-1498</b></span>
+  </div>
+</section>
+
+<!-- ============ 6. FAQ ============ -->
+<section class="page">
+  <div class="phead">
+    <div class="brand">FORTIS <span>DATA</span></div>
+    <div class="sec">05 — Perguntas frequentes</div>
+  </div>
+
+  <div class="eyebrow">Antes de você ligar</div>
+  <h2>As dúvidas que todo mundo<br>tem na primeira conversa.</h2>
+  <div class="rule"></div>
+
+  <div class="mt10">
+    <div class="faq">
+      <div class="q">Isso é legal?</div>
+      <div class="a">Totalmente. Não invadimos nem apagamos nada por conta própria: exercemos, em nome do titular,
+      direitos que a própria LGPD assegura, notificando formalmente quem trata seus dados.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Em quanto tempo eu vejo resultado?</div>
+      <div class="a">O diagnóstico sai em poucos dias. As primeiras remoções costumam ocorrer dentro do prazo legal
+      de resposta; controladores resistentes exigem reiteração, ANPD ou via judicial, e nesses casos o
+      processo se estende — sempre com acompanhamento e retorno a você.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Vocês removem também o que eu mesmo publiquei?</div>
+      <div class="a">Sim. Mapeamos o que suas próprias redes revelam sobre endereço, rotina e família, orientamos o
+      que deve sair e cuidamos das remoções e da desindexação do conteúdo antigo ainda cacheado.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Preciso entregar documentos meus?</div>
+      <div class="a">Apenas o mínimo para comprovar que você é o titular — exigência da própria lei, já que nenhum
+      controlador pode excluir dados a pedido de um terceiro não identificado. Tratamos esse material
+      com sigilo e sob os mesmos princípios da LGPD que defendemos.</div>
+    </div>
+    <div class="faq">
+      <div class="q">E se o dado voltar depois?</div>
+      <div class="a">Volta mesmo, com frequência — por isso remoção sem monitoramento é dinheiro perdido. Nossos
+      planos mantêm vigilância contínua e reabrem o processo a cada reaparecimento.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Atendem empresas, ou só pessoas físicas?</div>
+      <div class="a">Os dois. Para empresas, trabalhamos a exposição da companhia, dos sócios, dos executivos e
+      das famílias, e o passivo de dados de clientes e colaboradores que circulam indevidamente.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Quanto custa?</div>
+      <div class="a">Depende do volume de exposição encontrado — não faz sentido cobrar antes de saber o tamanho do
+      problema. Por isso o diagnóstico é gratuito: primeiro medimos, depois apresentamos o escopo e o
+      valor. Você decide com o número na mão.</div>
+    </div>
+  </div>
+
+  <div class="quote mt18">
+    <div class="qt">Toda semana que passa, seus dados são<br>copiados para <em>mais uma base.</em></div>
+    <div class="qs">
+      Exposição não é um estado estável: é um processo que piora sozinho. Quanto antes começa a
+      remoção, menos cópias existem para perseguir depois.
+    </div>
+  </div>
+
+  <div class="pfoot">
+    <span><b>Fortis Data</b> — Diagnóstico gratuito</span>
+    <span><b>(11) 92157-1498</b></span>
+  </div>
+</section>
+
+<!-- ============ 7. CTA FINAL ============ -->
+<section class="page dark final">
+  <div class="cover-grid"></div>
+  <div class="cover-glow" style="top:auto; bottom:-160px; left:-140px; right:auto;"></div>
+
+  <div class="cover-inner">
+    <div class="phead" style="border-bottom-color:rgba(255,255,255,.14);">
+      <div class="brand">FORTIS <span>DATA</span></div>
+      <div class="sec" style="color:rgba(255,255,255,.5);">06 — Comece agora</div>
+    </div>
+    <div class="eyebrow">Ligue e descubra em 15 minutos</div>
+    <h2 class="mt6">O primeiro passo é<br>saber o tamanho do<br>problema. <em>E ele é grátis.</em></h2>
+    <div class="rule" style="width:64px;"></div>
+    <p style="color:rgba(255,255,255,.72); font-size:11pt; line-height:1.6; max-width:150mm;">
+      Uma ligação rápida com um especialista da Fortis Data. Sem formulário interminável,
+      sem compromisso, sem cartão. Você fala, a gente procura — e você descobre exatamente
+      o que a internet entrega sobre você para qualquer pessoa que resolver olhar.
+    </p>
+  </div>
+
+  <div class="cover-inner">
+    <div class="eyebrow" style="margin-bottom:4px;">O que você recebe no diagnóstico — sem pagar nada</div>
+    <div class="deliver">
+      <div>
+        <svg width="15" height="15" viewBox="0 0 16 16"><path d="M3 8.4 L6.4 11.8 L13 5.2" stroke="#C8A45C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>O retrato do que a internet entrega sobre você</span>
+      </div>
+      <div>
+        <svg width="15" height="15" viewBox="0 0 16 16"><path d="M3 8.4 L6.4 11.8 L13 5.2" stroke="#C8A45C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Onde cada dado está exposto, site por site</span>
+      </div>
+      <div>
+        <svg width="15" height="15" viewBox="0 0 16 16"><path d="M3 8.4 L6.4 11.8 L13 5.2" stroke="#C8A45C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>O nível de risco real que cada exposição cria</span>
+      </div>
+      <div>
+        <svg width="15" height="15" viewBox="0 0 16 16"><path d="M3 8.4 L6.4 11.8 L13 5.2" stroke="#C8A45C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>O que dá para remover — e em quanto tempo</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-inner">
+    <div class="eyebrow" style="margin-bottom:11px;">Como funciona a ligação</div>
+    <div class="steps-call">
+      <div>
+        <div class="sn">Passo 01</div>
+        <div class="st">Você liga e conta, em poucos minutos, seu contexto: pessoa física, empresa ou ambos.</div>
+      </div>
+      <div>
+        <div class="sn">Passo 02</div>
+        <div class="st">Fazemos a varredura inicial do seu nome, CPF ou CNPJ nas principais fontes públicas.</div>
+      </div>
+      <div>
+        <div class="sn">Passo 03</div>
+        <div class="st">Apresentamos o que encontramos e o nível de risco que cada exposição representa.</div>
+      </div>
+      <div>
+        <div class="sn">Passo 04</div>
+        <div class="st">Você decide se quer avançar para a remoção. Se não quiser, o diagnóstico é seu de graça.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-inner">
+    <div class="callbox">
+      <div class="lbl">Fale agora com um especialista</div>
+      <div class="num">(11) 92157-1498</div>
+      <div class="note">
+        Atendimento por telefone e WhatsApp &middot; Segunda a sexta, 9h às 18h<br>
+        Diagnóstico de exposição <strong>gratuito e sem compromisso</strong> — para pessoa física e jurídica.
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:7.4pt; color:rgba(255,255,255,.45);">
+      <span><b style="color:#fff;">FORTIS DATA</b> — Remoção de Dados e Privacidade Digital</span>
+      <span>Atuação fundamentada na Lei nº 13.709/2018 (LGPD) e no Marco Civil da Internet</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
