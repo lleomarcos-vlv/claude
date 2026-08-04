@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Central de Contas — Instagram, TikTok, YouTube, Facebook, Meta Business e Google Ads</title>
+<style>
+/* ---------------------------------------------------------------
+   Tokens
+   A página é cromaticamente contida de propósito: a cor forte fica
+   reservada para as plataformas (o dado que precisa ser lido de
+   relance) e para os estados semânticos. O resto é neutro com um
+   leve viés violeta, na mesma família do acento amora.
+----------------------------------------------------------------*/
+:root {
+  --ground:      #ECEDF0;
+  --surface:     #FBFAFC;
+  --surface-2:   #F2F1F5;
+  --ink:         #1D1B22;
+  --ink-2:       #4C4956;
+  --ink-3:       #77717F;
+  --line:        #DAD7E0;
+  --line-2:      #C3BFCD;
+  --accent:      #7A2E52;
+  --accent-ink:  #FFFFFF;
+  --accent-soft: #F2E4EB;
+
+  --ok:      #0E7050;   --ok-soft:   #E0F0E9;
+  --warn:    #8A5E0E;   --warn-soft: #F6EBD8;
+  --crit:    #A32A22;   --crit-soft: #F7E4E2;
+  --idle:    #55606D;   --idle-soft: #E6E9ED;
+
+  --p-instagram:  #D6336C;
+  --p-tiktok:     #0DA6A0;
+  --p-youtube:    #DC2F2F;
+  --p-facebook:   #1877F2;
+  --p-meta:       #7A5AF8;
+  --p-ads:        #C7870F;
+  --p-outra:      #6B7280;
+
+  --shadow: 0 1px 2px rgba(29,27,34,.06), 0 8px 24px -12px rgba(29,27,34,.18);
+  --radius: 10px;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground:      #15141A;
+    --surface:     #1D1C23;
+    --surface-2:   #26242E;
+    --ink:         #EEEBF3;
+    --ink-2:       #B6B1C1;
+    --ink-3:       #8B8496;
+    --line:        #322F3C;
+    --line-2:      #474354;
+    --accent:      #E68CB2;
+    --accent-ink:  #2B0F1D;
+    --accent-soft: #3A2130;
+
+    --ok:   #4FC496;  --ok-soft:   #12302A;
+    --warn: #DDAB5C;  --warn-soft: #33280F;
+    --crit: #F08C82;  --crit-soft: #3A1E1D;
+    --idle: #9AA5B2;  --idle-soft: #262A31;
+
+    --p-instagram: #F2699A;
+    --p-tiktok:    #2FD2CA;
+    --p-youtube:   #FF6B6B;
+    --p-facebook:  #61A5FF;
+    --p-meta:      #A992FF;
+    --p-ads:       #EDB24A;
+    --p-outra:     #9AA1AD;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.7);
+  }
+}
+
+:root[data-theme="light"] {
+  --ground:#ECEDF0; --surface:#FBFAFC; --surface-2:#F2F1F5;
+  --ink:#1D1B22; --ink-2:#4C4956; --ink-3:#77717F;
+  --line:#DAD7E0; --line-2:#C3BFCD;
+  --accent:#7A2E52; --accent-ink:#FFFFFF; --accent-soft:#F2E4EB;
+  --ok:#0E7050; --ok-soft:#E0F0E9; --warn:#8A5E0E; --warn-soft:#F6EBD8;
+  --crit:#A32A22; --crit-soft:#F7E4E2; --idle:#55606D; --idle-soft:#E6E9ED;
+  --p-instagram:#D6336C; --p-tiktok:#0DA6A0; --p-youtube:#DC2F2F;
+  --p-facebook:#1877F2; --p-meta:#7A5AF8; --p-ads:#C7870F; --p-outra:#6B7280;
+  --shadow: 0 1px 2px rgba(29,27,34,.06), 0 8px 24px -12px rgba(29,27,34,.18);
+}
+:root[data-theme="dark"] {
+  --ground:#15141A; --surface:#1D1C23; --surface-2:#26242E;
+  --ink:#EEEBF3; --ink-2:#B6B1C1; --ink-3:#8B8496;
+  --line:#322F3C; --line-2:#474354;
+  --accent:#E68CB2; --accent-ink:#2B0F1D; --accent-soft:#3A2130;
+  --ok:#4FC496; --ok-soft:#12302A; --warn:#DDAB5C; --warn-soft:#33280F;
+  --crit:#F08C82; --crit-soft:#3A1E1D; --idle:#9AA5B2; --idle-soft:#262A31;
+  --p-instagram:#F2699A; --p-tiktok:#2FD2CA; --p-youtube:#FF6B6B;
+  --p-facebook:#61A5FF; --p-meta:#A992FF; --p-ads:#EDB24A; --p-outra:#9AA1AD;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.7);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 28px 20px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ---------------- Masthead ---------------- */
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.brand .eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.brand h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+.brand h1 em { font-style: italic; color: var(--accent); }
+.brand p { margin: 4px 0 0; color: var(--ink-2); max-width: 56ch; font-size: 14px; }
+
+.masthead-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* ---------------- Buttons ---------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, transform .1s ease;
+}
+.btn:hover { background: var(--surface-2); border-color: var(--ink-3); }
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.btn-primary:hover { background: var(--accent); border-color: var(--accent); filter: brightness(1.08); }
+.btn-danger { color: var(--crit); border-color: var(--crit); background: transparent; }
+.btn-danger:hover { background: var(--crit-soft); border-color: var(--crit); }
+.btn-quiet { border-color: transparent; background: transparent; padding: 6px 8px; color: var(--ink-2); }
+.btn-quiet:hover { background: var(--surface-2); border-color: var(--line); color: var(--ink); }
+.btn .ic { width: 15px; height: 15px; flex: none; }
+
+/* ---------------- Ledger (indicadores) ---------------- */
+.ledger {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow);
+}
+.tile .label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.tile .value {
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+.tile .foot { font-size: 12.5px; color: var(--ink-2); }
+.tile.is-warn .value { color: var(--warn); }
+.tile.is-crit .value { color: var(--crit); }
+.tile.is-ok .value { color: var(--ok); }
+
+.mixbar {
+  display: flex;
+  height: 7px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-2);
+  margin-top: 3px;
+}
+.mixbar span { display: block; min-width: 3px; }
+
+/* ---------------- Workbench ---------------- */
+.workbench {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.rail {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px;
+  position: sticky;
+  top: 18px;
+  box-shadow: var(--shadow);
+}
+.rail h2 {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 6px 6px 10px;
+  font-weight: 500;
+}
+.rail-list { display: flex; flex-direction: column; gap: 2px; }
+.rail-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 7px 9px;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13.5px;
+}
+.rail-item:hover { background: var(--surface-2); }
+.rail-item[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  font-weight: 600;
+}
+.rail-item .dot {
+  width: 9px; height: 9px; border-radius: 3px; flex: none;
+  background: var(--tone, var(--ink-3));
+}
+.rail-item .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rail-item .count {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+.rail-item[aria-pressed="true"] .count { color: var(--ink-2); }
+
+.board {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ---------------- Toolbar ---------------- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.search {
+  flex: 1 1 220px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  padding: 0 10px;
+  min-width: 0;
+}
+.search input {
+  border: 0;
+  background: transparent;
+  padding: 8px 0;
+  width: 100%;
+  min-width: 0;
+  outline: none;
+}
+.search .ic { width: 15px; height: 15px; color: var(--ink-3); flex: none; }
+.search kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex: none;
+}
+.field-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.field-inline select {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  padding: 8px 9px;
+  cursor: pointer;
+}
+.result-count {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+/* ---------------- Tabela ---------------- */
+.table-wrap { overflow-x: auto; }
+table.grid { width: 100%; min-width: 900px; border-collapse: collapse; }
+.col-account { min-width: 168px; }
+.col-access  { min-width: 150px; }
+.col-owner   { min-width: 104px; }
+table.grid th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+table.grid td {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+table.grid tbody tr:last-child td { border-bottom: 0; }
+table.grid tbody tr:hover { background: var(--surface-2); }
+/* A coluna de ações fica ancorada à direita: os controles continuam
+   alcançáveis mesmo quando a tabela precisa rolar na horizontal. */
+table.grid th:last-child,
+table.grid td:last-child {
+  position: sticky;
+  right: 0;
+  background: var(--surface);
+  box-shadow: -10px 0 12px -12px rgba(0, 0, 0, .45);
+}
+table.grid tbody tr:hover td:last-child { background: var(--surface-2); }
+table.grid tbody tr.needs-eye td:first-child { box-shadow: inset 3px 0 0 var(--warn); }
+
+.cell-platform { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.cell-platform .dot { width: 9px; height: 9px; border-radius: 3px; background: var(--tone); flex: none; }
+.cell-platform .txt { font-size: 13px; }
+
+.acct-name { font-family: var(--mono); font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.acct-client { font-size: 12.5px; color: var(--ink-2); }
+.acct-meta { display: none; font-size: 12px; color: var(--ink-3); margin-top: 3px; overflow-wrap: anywhere; }
+
+.mono-cell {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  max-width: 138px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.chip .bullet { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+.chip-ok   { color: var(--ok);   background: var(--ok-soft);   border-color: color-mix(in srgb, var(--ok) 28%, transparent); }
+.chip-warn { color: var(--warn); background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+.chip-crit { color: var(--crit); background: var(--crit-soft); border-color: color-mix(in srgb, var(--crit) 28%, transparent); }
+.chip-idle { color: var(--idle); background: var(--idle-soft); border-color: color-mix(in srgb, var(--idle) 26%, transparent); }
+
+.role-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.date-cell { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.date-cell small { display: block; font-size: 11px; color: var(--ink-3); letter-spacing: .02em; }
+.date-cell.is-late { color: var(--crit); }
+.date-cell.is-late small { color: var(--crit); }
+.date-cell.is-soon { color: var(--warn); }
+.date-cell.is-soon small { color: var(--warn); }
+
+.row-actions { display: flex; gap: 0; justify-content: flex-end; }
+.icon-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 7px;
+  padding: 5px;
+  cursor: pointer;
+  color: var(--ink-3);
+  line-height: 0;
+}
+.icon-btn:hover { background: var(--surface); border-color: var(--line-2); color: var(--ink); }
+.icon-btn.danger:hover { color: var(--crit); border-color: var(--crit); background: var(--crit-soft); }
+.icon-btn svg { width: 16px; height: 16px; }
+.icon-btn[aria-disabled="true"] { opacity: .35; cursor: not-allowed; }
+
+/* ---------------- Vazio ---------------- */
+.empty {
+  padding: 56px 24px 64px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.empty h3 { font-family: var(--serif); font-size: 21px; margin: 0; font-weight: 600; }
+.empty p { margin: 0; color: var(--ink-2); max-width: 42ch; font-size: 14px; }
+.empty .btn { margin-top: 10px; }
+
+/* ---------------- Drawer / formulário ---------------- */
+dialog {
+  border: 0;
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface);
+  max-width: none;
+  max-height: none;
+}
+dialog::backdrop { background: rgba(18,16,22,.5); backdrop-filter: blur(2px); }
+
+#drawer {
+  margin: 0 0 0 auto;
+  height: 100%;
+  width: min(520px, 100%);
+  border-left: 1px solid var(--line);
+}
+#drawer[open] {
+  display: flex;
+  flex-direction: column;
+  animation: slide-in .22s cubic-bezier(.2,.7,.3,1);
+}
+@keyframes slide-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.drawer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.drawer-head h2 { font-family: var(--serif); font-size: 22px; margin: 0; font-weight: 600; }
+.drawer-head p { margin: 3px 0 0; font-size: 13px; color: var(--ink-2); }
+
+form.drawer-body {
+  padding: 18px 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field > label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.field input, .field select, .field textarea {
+  background: var(--ground);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  padding: 9px 11px;
+  width: 100%;
+  outline: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.field textarea { resize: vertical; min-height: 72px; }
+.field .hint { font-size: 12px; color: var(--ink-3); }
+.field .err { font-size: 12px; color: var(--crit); display: none; }
+.field.invalid input, .field.invalid select { border-color: var(--crit); }
+.field.invalid .err { display: block; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--ground);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.switch-row .txt { font-size: 13.5px; }
+.switch-row .txt small { display: block; color: var(--ink-3); font-size: 12px; }
+.switch-row input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+
+.note {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.note svg { width: 15px; height: 15px; flex: none; margin-top: 2px; color: var(--accent); }
+
+.drawer-foot {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.drawer-foot .btn { flex: 0 0 auto; }
+.drawer-foot .spacer { flex: 1; }
+
+/* Confirmação */
+#confirm {
+  margin: auto;
+  width: min(400px, calc(100% - 32px));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+#confirm h2 { font-family: var(--serif); font-size: 20px; margin: 0 0 6px; font-weight: 600; }
+#confirm p { margin: 0 0 16px; color: var(--ink-2); font-size: 14px; }
+#confirm .actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ---------------- Toasts ---------------- */
+.toasts {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(360px, calc(100vw - 40px));
+}
+.toast {
+  background: var(--ink);
+  color: var(--ground);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  box-shadow: var(--shadow);
+  animation: toast-in .18s ease;
+}
+@keyframes toast-in { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------------- Rodapé ---------------- */
+.footnote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  align-items: center;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.footnote kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--ink-2);
+}
+
+/* ---------------- Responsivo ---------------- */
+@media (max-width: 980px) {
+  .workbench { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; }
+  .rail-list { flex-direction: row; overflow-x: auto; padding-bottom: 2px; }
+  .rail-item { white-space: nowrap; }
+  .rail-item .count { margin-left: 2px; }
+}
+@media (max-width: 760px) {
+  .page { padding: 20px 14px 64px; }
+  .tile .value { font-size: 28px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .toasts { left: 14px; right: 14px; bottom: 14px; }
+
+  /* Sem espaço para 8 colunas: cada conta vira uma linha empilhada,
+     com e-mail, responsável e revisão reunidos na linha de apoio. */
+  .table-wrap { overflow: visible; }
+  table.grid { min-width: 0; display: block; }
+  table.grid thead { display: none; }
+  table.grid tbody { display: block; }
+  table.grid tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  table.grid tr:last-child { border-bottom: 0; }
+  table.grid td { display: block; border: 0; padding: 0; }
+  table.grid td.col-platform, table.grid td.col-account { grid-column: 1 / -1; }
+  table.grid td:last-child { position: static; box-shadow: none; background: transparent; }
+  table.grid tbody tr:hover td:last-child { background: transparent; }
+  table.grid tbody tr.needs-eye td:first-child { box-shadow: none; }
+  table.grid tbody tr.needs-eye { box-shadow: inset 3px 0 0 var(--warn); }
+  table.grid td.col-access,
+  table.grid td.col-owner,
+  table.grid td.col-2fa,
+  table.grid td.col-review { display: none; }
+  .col-account { min-width: 0; }
+  .acct-name { font-size: 14px; }
+  .acct-meta { display: block; }
+  .cell-platform .txt { font-size: 12px; color: var(--ink-2); letter-spacing: .02em; }
+  .row-actions { gap: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="brand">
+      <span class="eyebrow">Operação de contas</span>
+      <h1>Central de <em>Contas</em></h1>
+      <p>Um só lugar para saber quem tem acesso ao quê no Instagram, TikTok, YouTube, Facebook, Meta Business e Google Ads — e o que está prestes a vencer.</p>
+    </div>
+    <div class="masthead-actions">
+      <button class="btn" id="btn-theme" type="button" title="Alternar tema claro/escuro">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        Tema
+      </button>
+      <button class="btn" id="btn-import" type="button">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        Importar
+      </button>
+      <button class="btn" id="btn-export" type="button">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
+        Exportar
+      </button>
+      <button class="btn btn-primary" id="btn-new" type="button">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nova conta
+      </button>
+    </div>
+  </header>
+
+  <section class="ledger" aria-label="Resumo da carteira">
+    <div class="tile">
+      <span class="label">Contas cadastradas</span>
+      <span class="value" id="stat-total">0</span>
+      <span class="foot" id="stat-total-foot">—</span>
+      <div class="mixbar" id="stat-mix" aria-hidden="true"></div>
+    </div>
+    <div class="tile is-ok">
+      <span class="label">Ativas</span>
+      <span class="value" id="stat-active">0</span>
+      <span class="foot" id="stat-active-foot">—</span>
+    </div>
+    <div class="tile is-warn">
+      <span class="label">Revisão vencendo</span>
+      <span class="value" id="stat-review">0</span>
+      <span class="foot">Vencidas ou nos próximos 14 dias</span>
+    </div>
+    <div class="tile is-crit">
+      <span class="label">Sem verificação em 2 etapas</span>
+      <span class="value" id="stat-2fa">0</span>
+      <span class="foot">Contas ativas expostas</span>
+    </div>
+  </section>
+
+  <div class="workbench">
+    <aside class="rail" aria-label="Filtro por plataforma">
+      <h2>Plataformas</h2>
+      <div class="rail-list" id="rail"></div>
+    </aside>
+
+    <main class="board">
+      <div class="toolbar">
+        <div class="search">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="search" type="search" placeholder="Buscar por conta, cliente, e-mail ou responsável" aria-label="Buscar contas">
+          <kbd>/</kbd>
+        </div>
+        <label class="field-inline">
+          Status
+          <select id="filter-status" aria-label="Filtrar por status">
+            <option value="todos">Todos</option>
+            <option value="ativa">Ativa</option>
+            <option value="pendente">Pendente</option>
+            <option value="pausada">Pausada</option>
+            <option value="encerrada">Encerrada</option>
+          </select>
+        </label>
+        <label class="field-inline">
+          Ordenar
+          <select id="sort" aria-label="Ordenar lista">
+            <option value="revisao">Revisão mais próxima</option>
+            <option value="plataforma">Plataforma</option>
+            <option value="nome">Nome da conta</option>
+            <option value="cliente">Cliente</option>
+            <option value="recente">Cadastro mais recente</option>
+          </select>
+        </label>
+        <span class="result-count" id="result-count"></span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th scope="col" class="col-platform">Plataforma</th>
+              <th scope="col" class="col-account">Conta</th>
+              <th scope="col" class="col-access">Acesso</th>
+              <th scope="col" class="col-owner">Responsável</th>
+              <th scope="col" class="col-2fa">2 etapas</th>
+              <th scope="col" class="col-review">Revisão</th>
+              <th scope="col" class="col-status">Status</th>
+              <th scope="col"><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <div class="empty" id="empty" hidden>
+        <h3>Nenhuma conta por aqui</h3>
+        <p id="empty-msg">Cadastre a primeira conta para começar a acompanhar acessos, responsáveis e revisões.</p>
+        <button class="btn btn-primary" type="button" id="empty-action">Cadastrar conta</button>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footnote">
+    <span>Os dados ficam salvos apenas neste navegador (localStorage).</span>
+    <span><kbd>/</kbd> busca · <kbd>Esc</kbd> fecha o formulário</span>
+    <span>Exporte um JSON para levar sua lista para outro dispositivo.</span>
+  </footer>
+</div>
+
+<!-- Formulário -->
+<dialog id="drawer" aria-labelledby="drawer-title">
+  <div class="drawer-head">
+    <div>
+      <h2 id="drawer-title">Nova conta</h2>
+      <p id="drawer-sub">Registre um acesso da equipe a uma plataforma.</p>
+    </div>
+    <button class="icon-btn" type="button" id="drawer-close" title="Fechar" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <form class="drawer-body" id="form" novalidate>
+    <div class="field" id="f-platform">
+      <label for="in-platform">Plataforma</label>
+      <select id="in-platform" required></select>
+      <span class="err">Escolha a plataforma.</span>
+    </div>
+
+    <div class="field" id="f-name">
+      <label for="in-name">Nome da conta ou perfil</label>
+      <input id="in-name" type="text" placeholder="@minhaconta, ID 123-456-7890, Canal X" required>
+      <span class="err">Informe como essa conta é identificada.</span>
+    </div>
+
+    <div class="field">
+      <label for="in-client">Cliente ou marca</label>
+      <input id="in-client" type="text" placeholder="Escola Remington">
+    </div>
+
+    <div class="grid-2">
+      <div class="field" id="f-email">
+        <label for="in-email">E-mail de acesso</label>
+        <input id="in-email" type="email" placeholder="social@empresa.com.br">
+        <span class="err">E-mail em formato inválido.</span>
+      </div>
+      <div class="field">
+        <label for="in-owner">Responsável</label>
+        <input id="in-owner" type="text" placeholder="Quem administra">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="in-role">Nível de acesso</label>
+        <select id="in-role">
+          <option>Administrador</option>
+          <option>Editor</option>
+          <option>Analista</option>
+          <option>Somente leitura</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="in-status">Status</label>
+        <select id="in-status">
+          <option value="ativa">Ativa</option>
+          <option value="pendente">Pendente</option>
+          <option value="pausada">Pausada</option>
+          <option value="encerrada">Encerrada</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="in-review">Próxima revisão de acesso</label>
+        <input id="in-review" type="date">
+        <span class="hint">Quando conferir de novo quem tem acesso.</span>
+      </div>
+      <div class="field" id="f-url">
+        <label for="in-url">Link do painel</label>
+        <input id="in-url" type="url" placeholder="https://…">
+        <span class="err">Use um endereço começando com https://</span>
+      </div>
+    </div>
+
+    <div class="switch-row">
+      <span class="txt">
+        Verificação em 2 etapas ativa
+        <small>Marque quando a conta exigir código além da senha.</small>
+      </span>
+      <input id="in-2fa" type="checkbox">
+    </div>
+
+    <div class="field">
+      <label for="in-notes">Observações</label>
+      <textarea id="in-notes" placeholder="Contrato até dezembro, acesso via BM do cliente, etc."></textarea>
+    </div>
+
+    <div class="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <span>Este painel não guarda senhas, e nem deveria: o arquivo fica salvo em texto no navegador. Mantenha as senhas em um gerenciador dedicado e registre aqui só quem tem acesso.</span>
+    </div>
+  </form>
+
+  <div class="drawer-foot">
+    <button class="btn btn-danger" type="button" id="btn-delete" hidden>Excluir</button>
+    <span class="spacer"></span>
+    <button class="btn" type="button" id="btn-cancel">Cancelar</button>
+    <button class="btn btn-primary" type="submit" form="form" id="btn-save">Salvar conta</button>
+  </div>
+</dialog>
+
+<!-- Confirmação -->
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <h2 id="confirm-title">Excluir conta</h2>
+  <p id="confirm-text">Essa conta sai da lista. A ação não pode ser desfeita.</p>
+  <div class="actions">
+    <button class="btn" type="button" id="confirm-no">Manter</button>
+    <button class="btn btn-danger" type="button" id="confirm-yes">Excluir</button>
+  </div>
+</dialog>
+
+<input type="file" id="file-input" accept="application/json,.json" hidden>
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     Plataformas
+  ------------------------------------------------------------------ */
+  const PLATFORMS = [
+    { id: "instagram", nome: "Instagram",          tone: "var(--p-instagram)", console: "https://www.instagram.com/" },
+    { id: "tiktok",    nome: "TikTok",             tone: "var(--p-tiktok)",    console: "https://www.tiktok.com/" },
+    { id: "youtube",   nome: "YouTube",            tone: "var(--p-youtube)",   console: "https://studio.youtube.com/" },
+    { id: "facebook",  nome: "Facebook",           tone: "var(--p-facebook)",  console: "https://www.facebook.com/" },
+    { id: "meta",      nome: "Meta Business",      tone: "var(--p-meta)",      console: "https://business.facebook.com/" },
+    { id: "ads",       nome: "Google Ads",         tone: "var(--p-ads)",       console: "https://ads.google.com/" },
+    { id: "outra",     nome: "Outra plataforma",   tone: "var(--p-outra)",     console: "" }
+  ];
+  const byId = Object.fromEntries(PLATFORMS.map(p => [p.id, p]));
+
+  const STATUS = {
+    ativa:      { rotulo: "Ativa",      chip: "chip-ok" },
+    pendente:   { rotulo: "Pendente",   chip: "chip-warn" },
+    pausada:    { rotulo: "Pausada",    chip: "chip-idle" },
+    encerrada:  { rotulo: "Encerrada",  chip: "chip-crit" }
+  };
+
+  const STORE_KEY = "central-de-contas:v1";
+  const THEME_KEY = "central-de-contas:tema";
+
+  /* ------------------------------------------------------------------
+     Estado
+  ------------------------------------------------------------------ */
+  let contas = [];
+  let filtroPlataforma = "todas";
+  let busca = "";
+  let editandoId = null;
+  let paraExcluir = null;
+
+  const $ = sel => document.querySelector(sel);
+  const el = {
+    rail: $("#rail"), rows: $("#rows"), empty: $("#empty"), emptyMsg: $("#empty-msg"),
+    search: $("#search"), status: $("#filter-status"), sort: $("#sort"), count: $("#result-count"),
+    drawer: $("#drawer"), form: $("#form"), title: $("#drawer-title"), sub: $("#drawer-sub"),
+    del: $("#btn-delete"), confirm: $("#confirm"), confirmText: $("#confirm-text"),
+    toasts: $("#toasts"), file: $("#file-input")
+  };
+  const input = {
+    platform: $("#in-platform"), name: $("#in-name"), client: $("#in-client"),
+    email: $("#in-email"), owner: $("#in-owner"), role: $("#in-role"),
+    status: $("#in-status"), review: $("#in-review"), url: $("#in-url"),
+    twofa: $("#in-2fa"), notes: $("#in-notes")
+  };
+
+  /* ------------------------------------------------------------------
+     Utilidades
+  ------------------------------------------------------------------ */
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const novoId = () => "c_" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
+
+  function hojeISO(offsetDias) {
+    const d = new Date();
+    d.setDate(d.getDate() + (offsetDias || 0));
+    return d.toISOString().slice(0, 10);
+  }
+  function diasAte(iso) {
+    if (!iso) return null;
+    const [a, m, d] = iso.split("-").map(Number);
+    if (!a || !m || !d) return null;
+    const alvo = new Date(a, m - 1, d);
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    return Math.round((alvo - hoje) / 86400000);
+  }
+  function dataBR(iso) {
+    if (!iso) return "";
+    const [a, m, d] = iso.split("-");
+    return `${d}/${m}/${a}`;
+  }
+  function precisaRevisao(c) {
+    const d = diasAte(c.revisao);
+    return d !== null && d <= 14;
+  }
+  function emAlerta(c) {
+    return c.status === "ativa" && (!c.twofa || precisaRevisao(c));
+  }
+
+  function toast(msg) {
+    const node = document.createElement("div");
+    node.className = "toast";
+    node.textContent = msg;
+    el.toasts.appendChild(node);
+    setTimeout(() => node.remove(), 3600);
+  }
+
+  /* ------------------------------------------------------------------
+     Persistência
+  ------------------------------------------------------------------ */
+  function salvar() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(contas));
+    } catch (e) {
+      toast("Não foi possível salvar neste navegador. Exporte um JSON para não perder os dados.");
+    }
+  }
+
+  function carregar() {
+    let bruto = null;
+    try { bruto = localStorage.getItem(STORE_KEY); } catch (e) { bruto = null; }
+    if (!bruto) { contas = exemplos(); salvar(); return; }
+    try {
+      const lido = JSON.parse(bruto);
+      contas = Array.isArray(lido) ? lido.map(normalizar).filter(Boolean) : exemplos();
+    } catch (e) {
+      contas = exemplos();
+    }
+  }
+
+  function normalizar(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    const plataforma = byId[raw.plataforma] ? raw.plataforma : "outra";
+    return {
+      id: typeof raw.id === "string" && raw.id ? raw.id : novoId(),
+      plataforma,
+      nome: String(raw.nome || "").trim() || "(sem nome)",
+      cliente: String(raw.cliente || "").trim(),
+      email: String(raw.email || "").trim(),
+      responsavel: String(raw.responsavel || "").trim(),
+      papel: String(raw.papel || "Administrador").trim(),
+      status: STATUS[raw.status] ? raw.status : "ativa",
+      revisao: /^\d{4}-\d{2}-\d{2}$/.test(raw.revisao || "") ? raw.revisao : "",
+      url: String(raw.url || "").trim(),
+      twofa: Boolean(raw.twofa),
+      notas: String(raw.notas || "").trim(),
+      criadoEm: Number(raw.criadoEm) || Date.now()
+    };
+  }
+
+  function exemplos() {
+    const base = [
+      { plataforma: "instagram", nome: "@escolaremington", cliente: "Escola Remington", email: "social@escolaremington.com.br", responsavel: "Marcos", papel: "Administrador", status: "ativa", revisao: hojeISO(24), twofa: true, url: "https://www.instagram.com/", notas: "Perfil principal, agenda de posts na segunda." },
+      { plataforma: "tiktok", nome: "@escolaremington", cliente: "Escola Remington", email: "social@escolaremington.com.br", responsavel: "Ana", papel: "Editor", status: "ativa", revisao: hojeISO(9), twofa: false, url: "https://www.tiktok.com/", notas: "Ativar 2 etapas — conta ainda só com senha." },
+      { plataforma: "youtube", nome: "Escola Remington", cliente: "Escola Remington", email: "conteudo@escolaremington.com.br", responsavel: "Marcos", papel: "Administrador", status: "ativa", revisao: hojeISO(58), twofa: true, url: "https://studio.youtube.com/", notas: "Acesso via marca (brand account)." },
+      { plataforma: "facebook", nome: "/escolaremington", cliente: "Escola Remington", email: "social@escolaremington.com.br", responsavel: "Ana", papel: "Editor", status: "ativa", revisao: hojeISO(24), twofa: true, url: "https://www.facebook.com/", notas: "" },
+      { plataforma: "meta", nome: "BM Remington", cliente: "Escola Remington", email: "marcos@escolaremington.com.br", responsavel: "Marcos", papel: "Administrador", status: "ativa", revisao: hojeISO(-3), twofa: true, url: "https://business.facebook.com/", notas: "Revisar parceiros com acesso ao pixel." },
+      { plataforma: "ads", nome: "123-456-7890", cliente: "Escola Remington", email: "marcos@escolaremington.com.br", responsavel: "Marcos", papel: "Administrador", status: "ativa", revisao: hojeISO(11), twofa: true, url: "https://ads.google.com/", notas: "Cartão de cobrança vence em outubro." },
+      { plataforma: "instagram", nome: "@remington.cursos", cliente: "Remington Cursos", email: "cursos@escolaremington.com.br", responsavel: "Ana", papel: "Analista", status: "pausada", revisao: "", twofa: false, url: "", notas: "Perfil secundário, parado desde a última campanha." }
+    ];
+    return base.map((b, i) => normalizar(Object.assign({ criadoEm: Date.now() - (base.length - i) * 6e5 }, b)));
+  }
+
+  /* ------------------------------------------------------------------
+     Filtro e ordenação
+  ------------------------------------------------------------------ */
+  function visiveis() {
+    const termo = busca.trim().toLowerCase();
+    const status = el.status.value;
+    let lista = contas.filter(c => {
+      if (filtroPlataforma !== "todas" && c.plataforma !== filtroPlataforma) return false;
+      if (status !== "todos" && c.status !== status) return false;
+      if (!termo) return true;
+      return [c.nome, c.cliente, c.email, c.responsavel, c.papel, c.notas, byId[c.plataforma].nome]
+        .join(" ").toLowerCase().includes(termo);
+    });
+
+    const ordem = el.sort.value;
+    const cmpTexto = (a, b) => a.localeCompare(b, "pt-BR", { sensitivity: "base" });
+    lista.sort((a, b) => {
+      if (ordem === "nome") return cmpTexto(a.nome, b.nome);
+      if (ordem === "cliente") return cmpTexto(a.cliente || "zzz", b.cliente || "zzz");
+      if (ordem === "recente") return b.criadoEm - a.criadoEm;
+      if (ordem === "plataforma") {
+        const pa = PLATFORMS.findIndex(p => p.id === a.plataforma);
+        const pb = PLATFORMS.findIndex(p => p.id === b.plataforma);
+        return pa - pb || cmpTexto(a.nome, b.nome);
+      }
+      const da = diasAte(a.revisao), db = diasAte(b.revisao);
+      if (da === null && db === null) return cmpTexto(a.nome, b.nome);
+      if (da === null) return 1;
+      if (db === null) return -1;
+      return da - db;
+    });
+    return lista;
+  }
+
+  /* ------------------------------------------------------------------
+     Render
+  ------------------------------------------------------------------ */
+  function renderIndicadores() {
+    const total = contas.length;
+    const ativas = contas.filter(c => c.status === "ativa").length;
+    const revisao = contas.filter(c => c.status !== "encerrada" && precisaRevisao(c)).length;
+    const sem2fa = contas.filter(c => c.status === "ativa" && !c.twofa).length;
+    const plataformasUsadas = new Set(contas.map(c => c.plataforma)).size;
+
+    $("#stat-total").textContent = total;
+    $("#stat-total-foot").textContent = plataformasUsadas === 1
+      ? "em 1 plataforma"
+      : `distribuídas em ${plataformasUsadas} plataformas`;
+    $("#stat-active").textContent = ativas;
+    $("#stat-active-foot").textContent = total
+      ? `${Math.round((ativas / total) * 100)}% da carteira`
+      : "nenhuma conta cadastrada";
+    $("#stat-review").textContent = revisao;
+    $("#stat-2fa").textContent = sem2fa;
+
+    const mix = $("#stat-mix");
+    mix.innerHTML = "";
+    PLATFORMS.forEach(p => {
+      const n = contas.filter(c => c.plataforma === p.id).length;
+      if (!n) return;
+      const seg = document.createElement("span");
+      seg.style.flex = String(n);
+      seg.style.background = p.tone;
+      seg.title = `${p.nome}: ${n}`;
+      mix.appendChild(seg);
+    });
+  }
+
+  function renderRail() {
+    const itens = [{ id: "todas", nome: "Todas as contas", tone: "var(--ink-3)", n: contas.length }]
+      .concat(PLATFORMS.map(p => ({
+        id: p.id, nome: p.nome, tone: p.tone,
+        n: contas.filter(c => c.plataforma === p.id).length
+      })));
+
+    el.rail.innerHTML = itens.map(i => `
+      <button class="rail-item" type="button" data-plat="${esc(i.id)}"
+              aria-pressed="${i.id === filtroPlataforma}" style="--tone:${i.tone}">
+        <span class="dot"></span>
+        <span class="name">${esc(i.nome)}</span>
+        <span class="count">${i.n}</span>
+      </button>`).join("");
+  }
+
+  function notaRevisao(iso) {
+    const d = diasAte(iso);
+    if (d === null) return { cls: "", nota: "" };
+    if (d < 0) return { cls: "is-late", nota: `${Math.abs(d)} dia${Math.abs(d) === 1 ? "" : "s"} em atraso` };
+    if (d === 0) return { cls: "is-late", nota: "é hoje" };
+    if (d <= 14) return { cls: "is-soon", nota: `em ${d} dia${d === 1 ? "" : "s"}` };
+    return { cls: "", nota: `em ${d} dias` };
+  }
+
+  function celulaRevisao(c) {
+    if (!c.revisao) return '<span class="date-cell" style="color:var(--ink-3)">—</span>';
+    const { cls, nota } = notaRevisao(c.revisao);
+    return `<span class="date-cell ${cls}">${dataBR(c.revisao)}<small>${esc(nota)}</small></span>`;
+  }
+
+  function renderLinhas() {
+    const lista = visiveis();
+    el.count.textContent = lista.length === contas.length
+      ? `${contas.length} conta${contas.length === 1 ? "" : "s"}`
+      : `${lista.length} de ${contas.length}`;
+
+    if (!lista.length) {
+      el.rows.innerHTML = "";
+      el.empty.hidden = false;
+      el.emptyMsg.textContent = contas.length
+        ? "Nenhuma conta corresponde a esse filtro. Ajuste a busca ou volte para “Todas as contas”."
+        : "Cadastre a primeira conta para começar a acompanhar acessos, responsáveis e revisões.";
+      return;
+    }
+    el.empty.hidden = true;
+
+    el.rows.innerHTML = lista.map(c => {
+      const p = byId[c.plataforma];
+      const st = STATUS[c.status];
+      const rev = notaRevisao(c.revisao);
+      const metaMovel = [
+        c.email, c.responsavel,
+        c.revisao ? `revisão ${dataBR(c.revisao)} (${rev.nota})` : "",
+        c.twofa ? "2 etapas ativa" : "sem 2 etapas"
+      ].filter(Boolean).join(" · ");
+
+      return `
+      <tr data-id="${esc(c.id)}" class="${emAlerta(c) ? "needs-eye" : ""}">
+        <td class="col-platform">
+          <span class="cell-platform" style="--tone:${p.tone}">
+            <span class="dot"></span><span class="txt">${esc(p.nome)}</span>
+          </span>
+        </td>
+        <td class="col-account">
+          <div class="acct-name">${esc(c.nome)}</div>
+          ${c.cliente ? `<div class="acct-client">${esc(c.cliente)}</div>` : ""}
+          <div class="acct-meta">${esc(metaMovel)}</div>
+        </td>
+        <td class="col-access"><span class="mono-cell" title="${esc(c.email)}">${esc(c.email || "—")}</span></td>
+        <td class="col-owner">
+          <div>${esc(c.responsavel || "—")}</div>
+          <div class="role-tag">${esc(c.papel)}</div>
+        </td>
+        <td class="col-2fa">
+          ${c.twofa
+            ? '<span class="chip chip-ok"><span class="bullet"></span>Ativa</span>'
+            : '<span class="chip chip-crit"><span class="bullet"></span>Sem</span>'}
+        </td>
+        <td class="col-review">${celulaRevisao(c)}</td>
+        <td class="col-status"><span class="chip ${st.chip}"><span class="bullet"></span>${esc(st.rotulo)}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" type="button" data-act="abrir" title="Abrir plataforma" aria-label="Abrir ${esc(p.nome)}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+            </button>
+            <button class="icon-btn" type="button" data-act="copiar" title="Copiar e-mail de acesso" aria-label="Copiar e-mail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></svg>
+            </button>
+            <button class="icon-btn" type="button" data-act="editar" title="Editar" aria-label="Editar conta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="M14.5 6.5 17.5 9.5"/></svg>
+            </button>
+            <button class="icon-btn danger" type="button" data-act="excluir" title="Excluir" aria-label="Excluir conta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    }).join("");
+  }
+
+  function render() {
+    renderIndicadores();
+    renderRail();
+    renderLinhas();
+  }
+
+  /* ------------------------------------------------------------------
+     Formulário
+  ------------------------------------------------------------------ */
+  input.platform.innerHTML = PLATFORMS.map(p => `<option value="${p.id}">${esc(p.nome)}</option>`).join("");
+
+  function abrirDrawer(conta) {
+    editandoId = conta ? conta.id : null;
+    el.title.textContent = conta ? "Editar conta" : "Nova conta";
+    el.sub.textContent = conta
+      ? `${byId[conta.plataforma].nome} · ${conta.nome}`
+      : "Registre um acesso da equipe a uma plataforma.";
+    el.del.hidden = !conta;
+
+    input.platform.value = conta ? conta.plataforma : (filtroPlataforma !== "todas" ? filtroPlataforma : "instagram");
+    input.name.value = conta ? conta.nome : "";
+    input.client.value = conta ? conta.cliente : "";
+    input.email.value = conta ? conta.email : "";
+    input.owner.value = conta ? conta.responsavel : "";
+    input.role.value = conta ? conta.papel : "Administrador";
+    input.status.value = conta ? conta.status : "ativa";
+    input.review.value = conta ? conta.revisao : "";
+    input.url.value = conta ? conta.url : "";
+    input.twofa.checked = conta ? conta.twofa : true;
+    input.notes.value = conta ? conta.notas : "";
+
+    el.form.querySelectorAll(".field.invalid").forEach(f => f.classList.remove("invalid"));
+    el.drawer.showModal();
+    setTimeout(() => input.name.focus(), 40);
+  }
+
+  function validar() {
+    let ok = true;
+    const marca = (campo, valido) => {
+      const f = document.querySelector(campo);
+      f.classList.toggle("invalid", !valido);
+      if (!valido) ok = false;
+    };
+    marca("#f-name", input.name.value.trim().length > 0);
+    marca("#f-platform", Boolean(byId[input.platform.value]));
+    const email = input.email.value.trim();
+    marca("#f-email", !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    const url = input.url.value.trim();
+    marca("#f-url", !url || /^https?:\/\/.+/i.test(url));
+    return ok;
+  }
+
+  el.form.addEventListener("submit", ev => {
+    ev.preventDefault();
+    if (!validar()) {
+      el.form.querySelector(".field.invalid input, .field.invalid select")?.focus();
+      return;
+    }
+    const dados = {
+      plataforma: input.platform.value,
+      nome: input.name.value.trim(),
+      cliente: input.client.value.trim(),
+      email: input.email.value.trim(),
+      responsavel: input.owner.value.trim(),
+      papel: input.role.value,
+      status: input.status.value,
+      revisao: input.review.value,
+      url: input.url.value.trim(),
+      twofa: input.twofa.checked,
+      notas: input.notes.value.trim()
+    };
+
+    if (editandoId) {
+      const i = contas.findIndex(c => c.id === editandoId);
+      if (i > -1) contas[i] = normalizar(Object.assign({}, contas[i], dados));
+      toast("Conta atualizada.");
+    } else {
+      contas.push(normalizar(Object.assign({ id: novoId(), criadoEm: Date.now() }, dados)));
+      toast("Conta cadastrada.");
+    }
+    salvar();
+    render();
+    el.drawer.close();
+  });
+
+  /* ------------------------------------------------------------------
+     Ações
+  ------------------------------------------------------------------ */
+  $("#btn-new").addEventListener("click", () => abrirDrawer(null));
+  $("#empty-action").addEventListener("click", () => abrirDrawer(null));
+  $("#btn-cancel").addEventListener("click", () => el.drawer.close());
+  $("#drawer-close").addEventListener("click", () => el.drawer.close());
+
+  el.del.addEventListener("click", () => {
+    const c = contas.find(x => x.id === editandoId);
+    if (c) pedirExclusao(c);
+  });
+
+  function pedirExclusao(conta) {
+    paraExcluir = conta.id;
+    el.confirmText.textContent = `“${conta.nome}” (${byId[conta.plataforma].nome}) sai da lista. A ação não pode ser desfeita.`;
+    el.confirm.showModal();
+  }
+
+  $("#confirm-no").addEventListener("click", () => { paraExcluir = null; el.confirm.close(); });
+  $("#confirm-yes").addEventListener("click", () => {
+    contas = contas.filter(c => c.id !== paraExcluir);
+    paraExcluir = null;
+    salvar();
+    render();
+    el.confirm.close();
+    if (el.drawer.open) el.drawer.close();
+    toast("Conta excluída.");
+  });
+
+  el.rows.addEventListener("click", ev => {
+    const botao = ev.target.closest("button[data-act]");
+    const linha = ev.target.closest("tr[data-id]");
+    if (!linha) return;
+    const conta = contas.find(c => c.id === linha.dataset.id);
+    if (!conta) return;
+
+    if (!botao) { abrirDrawer(conta); return; }
+
+    const acao = botao.dataset.act;
+    if (acao === "editar") abrirDrawer(conta);
+    if (acao === "excluir") pedirExclusao(conta);
+    if (acao === "abrir") {
+      const destino = conta.url || byId[conta.plataforma].console;
+      if (!destino) { toast("Essa conta não tem link cadastrado."); return; }
+      window.open(destino, "_blank", "noopener");
+    }
+    if (acao === "copiar") {
+      if (!conta.email) { toast("Essa conta não tem e-mail cadastrado."); return; }
+      navigator.clipboard?.writeText(conta.email)
+        .then(() => toast("E-mail copiado: " + conta.email))
+        .catch(() => toast("O navegador bloqueou a cópia."));
+    }
+  });
+
+  el.rail.addEventListener("click", ev => {
+    const item = ev.target.closest("button[data-plat]");
+    if (!item) return;
+    filtroPlataforma = item.dataset.plat;
+    render();
+  });
+
+  el.search.addEventListener("input", () => { busca = el.search.value; renderLinhas(); });
+  el.status.addEventListener("change", renderLinhas);
+  el.sort.addEventListener("change", renderLinhas);
+
+  /* ------------------------------------------------------------------
+     Exportar / importar
+  ------------------------------------------------------------------ */
+  function baixar(nome, conteudo, tipo) {
+    const blob = new Blob([conteudo], { type: tipo });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  $("#btn-export").addEventListener("click", () => {
+    if (!contas.length) { toast("Não há contas para exportar."); return; }
+    const carimbo = hojeISO();
+    baixar(`contas-${carimbo}.json`, JSON.stringify(contas, null, 2), "application/json");
+
+    const cel = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const cabecalho = ["Plataforma", "Conta", "Cliente", "E-mail", "Responsável", "Nível de acesso", "Status", "2 etapas", "Próxima revisão", "Link", "Observações"];
+    const linhas = contas.map(c => [
+      byId[c.plataforma].nome, c.nome, c.cliente, c.email, c.responsavel,
+      c.papel, STATUS[c.status].rotulo, c.twofa ? "Sim" : "Não",
+      dataBR(c.revisao), c.url, c.notas
+    ].map(cel).join(","));
+    baixar(`contas-${carimbo}.csv`, "﻿" + [cabecalho.map(cel).join(","), ...linhas].join("\r\n"), "text/csv");
+    toast("Exportado em JSON e CSV.");
+  });
+
+  $("#btn-import").addEventListener("click", () => el.file.click());
+  el.file.addEventListener("change", () => {
+    const arquivo = el.file.files && el.file.files[0];
+    if (!arquivo) return;
+    const leitor = new FileReader();
+    leitor.onload = () => {
+      try {
+        const lido = JSON.parse(String(leitor.result));
+        if (!Array.isArray(lido)) throw new Error("formato");
+        let novas = 0, atualizadas = 0;
+        lido.map(normalizar).filter(Boolean).forEach(c => {
+          const i = contas.findIndex(x => x.id === c.id);
+          if (i > -1) { contas[i] = c; atualizadas++; } else { contas.push(c); novas++; }
+        });
+        salvar();
+        render();
+        toast(`Importação concluída: ${novas} nova(s), ${atualizadas} atualizada(s).`);
+      } catch (e) {
+        toast("Arquivo inválido. Use um JSON exportado por este painel.");
+      }
+      el.file.value = "";
+    };
+    leitor.readAsText(arquivo);
+  });
+
+  /* ------------------------------------------------------------------
+     Tema e atalhos
+  ------------------------------------------------------------------ */
+  function aplicarTema(t) {
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    else document.documentElement.removeAttribute("data-theme");
+  }
+  try { aplicarTema(localStorage.getItem(THEME_KEY)); } catch (e) {}
+
+  $("#btn-theme").addEventListener("click", () => {
+    const atual = document.documentElement.getAttribute("data-theme");
+    const escuroDoSistema = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const proximo = atual ? (atual === "dark" ? "light" : "dark") : (escuroDoSistema ? "light" : "dark");
+    aplicarTema(proximo);
+    try { localStorage.setItem(THEME_KEY, proximo); } catch (e) {}
+  });
+
+  document.addEventListener("keydown", ev => {
+    if (ev.key !== "/" || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    const alvo = ev.target;
+    const digitando = alvo && (alvo.tagName === "INPUT" || alvo.tagName === "TEXTAREA" || alvo.tagName === "SELECT" || alvo.isContentEditable);
+    if (digitando || el.drawer.open) return;
+    ev.preventDefault();
+    el.search.focus();
+    el.search.select();
+  });
+
+  el.drawer.addEventListener("close", () => { editandoId = null; });
+  el.confirm.addEventListener("close", () => { paraExcluir = null; });
+
+  /* ------------------------------------------------------------------
+     Start
+  ------------------------------------------------------------------ */
+  carregar();
+  render();
+})();
+</script>
+</body>
+</html>
