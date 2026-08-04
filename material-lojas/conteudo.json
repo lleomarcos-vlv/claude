@@ -1,0 +1,82 @@
+{
+  "_comentario": "Todo o texto do folheto. Edite à vontade e rode: python3 gerar_pdf.py",
+
+  "frente": {
+    "kicker": "Consultoria e desenvolvimento\nsob medida para o comércio",
+    "titulo_linha1": "Sua loja tem um",
+    "titulo_linha2": "jeito próprio de trabalhar.",
+    "titulo_destaque": "Por que o sistema dela\né igual ao de todo mundo?",
+    "chamada": "A Kairós MF vai até a sua loja, entende como você realmente trabalha e desenvolve um aplicativo feito para o seu problema — não um pacote genérico que você precisa se adaptar a usar.",
+
+    "checklist_titulo": "Isso acontece na sua loja?",
+    "checklist_apoio": "Marque o que você reconhece no dia a dia:",
+    "checklist": [
+      "O estoque vive no caderno, na cabeça de alguém ou numa planilha que só uma pessoa entende",
+      "Pedido chega pelo WhatsApp e se perde no meio de cem conversas",
+      "Você só descobre quanto vendeu no fim do mês — e ainda assim no chute",
+      "Cliente pergunta “tem esse aqui?” e alguém precisa ir olhar na prateleira",
+      "Fiado, crediário e “deixa anotado” existem, mas ninguém sabe direito quanto",
+      "Tabela de preço, promoção e catálogo sempre desatualizados",
+      "Você paga mensalidade num sistema pronto e usa 20% do que ele faz",
+      "Cada funcionário faz do seu jeito — e quando um falta, a loja trava"
+    ],
+    "faixa_final_forte": "Marcou dois ou mais?",
+    "faixa_final_texto": "Então já existe dinheiro e tempo vazando todo dia. Vire a folha e veja como a gente resolve."
+  },
+
+  "verso": {
+    "passos_titulo": "Como funciona",
+    "passos_apoio": "Quatro etapas, sem enrolação e sem termo técnico.",
+    "passos": [
+      {
+        "titulo": "Diagnóstico na sua loja",
+        "texto": "A gente vai até você e mapeia onde o tempo e o dinheiro estão vazando."
+      },
+      {
+        "titulo": "Projeto sob medida",
+        "texto": "Desenhamos em cima do SEU processo. Você aprova antes de começar."
+      },
+      {
+        "titulo": "Entrega e treinamento",
+        "texto": "Instalamos, treinamos a equipe e acompanhamos as primeiras semanas."
+      },
+      {
+        "titulo": "Suporte com gente",
+        "texto": "Você fala com quem desenvolveu. Sem robô e sem número de protocolo."
+      }
+    ],
+
+    "exemplos_titulo": "O que dá para resolver",
+    "exemplos_apoio": "Exemplos do tipo de aplicativo que desenvolvemos:",
+    "exemplos": [
+      "Estoque com leitura de código de barras pelo próprio celular",
+      "Catálogo digital que o cliente abre por um link e já faz o pedido",
+      "Vendas do dia no seu celular, em tempo real",
+      "Fiado e crediário com lembrete automático de cobrança",
+      "Ordem de serviço com foto, assinatura e histórico",
+      "Comanda, reserva e agendamento sem papel",
+      "Conferência de mercadoria na hora do recebimento",
+      "Relatório do jeito que VOCÊ lê, não do jeito que o sistema mostra"
+    ],
+
+    "comparativo_titulo": "Pronto × Sob medida",
+    "comparativo_col1": "Sistema pronto",
+    "comparativo_col2": "Aplicativo Kairós MF",
+    "comparativo": [
+      ["Você adapta a loja ao sistema", "O aplicativo se adapta à sua loja"],
+      ["Paga por módulos que nunca usa", "Paga pelo que a sua operação precisa"],
+      ["Suporte por ticket e robô", "Fala direto com quem desenvolveu"],
+      ["Relatório no formato deles", "Relatório do jeito que você lê"],
+      ["Novidade só quando entrar na fila deles", "Ajuste é conversado com você"],
+      ["A atualização muda o seu jeito de usar", "Muda quando a sua loja muda"]
+    ],
+
+    "cta_selo": "Sem custo e sem compromisso",
+    "cta_titulo": "Diagnóstico gratuito na sua loja",
+    "cta_texto": "Marque uma visita. A gente entende sua operação e mostra, na prática, o que dá para melhorar — mesmo que você decida não contratar nada.",
+    "cta_qr_label": "Aponte a câmera e fale com a gente",
+
+    "rodape_campos_label": "Entregue por",
+    "rodape_data_label": "Data"
+  }
+}

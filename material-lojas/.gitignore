@@ -1,0 +1,5 @@
+# Artefatos de geração. Os PDFs em dist/ ficam versionados de propósito:
+# são o material pronto para levar na gráfica sem precisar rodar nada.
+__pycache__/
+dist/.chrome-perfil/
+dist/*.html

@@ -1,0 +1,20 @@
+{
+  "_comentario": "Dados de contato e identidade. Troque os valores marcados como PREENCHER pelos dados reais e rode: python3 gerar_pdf.py",
+
+  "marca": "KAIRÓS MF",
+  "marca_linha2": "APLICATIVOS PERSONALIZADOS",
+  "assinatura_rodape": "Kairós MF Aplicativos Personalizados",
+
+  "whatsapp": "PREENCHER (00) 00000-0000",
+  "whatsapp_numero_internacional": "",
+  "whatsapp_mensagem": "Olá! Peguei o folheto da Kairós MF e quero agendar o diagnóstico gratuito na minha loja.",
+
+  "email": "PREENCHER contato@seudominio.com.br",
+  "site": "PREENCHER www.seudominio.com.br",
+  "instagram": "PREENCHER @kairosmf",
+  "cidade": "PREENCHER Cidade e região",
+  "atendimento": "Segunda a sexta, das 8h às 18h",
+
+  "cnpj": "",
+  "consultor": ""
+}
