@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Proposta — Segurança Aérea Autônoma com DJI Dock 2</title>
+<style>
+  @page { size: A4; margin: 0; }
+
+  :root{
+    --navy:#0B2136;
+    --navy-2:#123B52;
+    --navy-deep:#071726;
+    --slate:#3E5266;
+    --muted:#6B7F92;
+    --line:#DCE4EB;
+    --line-2:#E9EEF3;
+    --paper:#FFFFFF;
+    --soft:#F4F7F9;
+    --teal:#0E9F8E;
+    --teal-d:#0A7A6D;
+    --amber:#D9871F;
+    --red:#C0442E;
+  }
+
+  *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  html,body{ margin:0; padding:0; }
+
+  body{
+    font-family:"Liberation Sans","DejaVu Sans",Arial,sans-serif;
+    color:var(--navy);
+    font-size:10.2pt;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{
+    width:210mm; height:297mm;
+    position:relative;
+    overflow:hidden;
+    page-break-after:always;
+    background:var(--paper);
+  }
+  .page:last-child{ page-break-after:auto; }
+
+  .pad{ padding:16mm 16mm 22mm 16mm; height:100%; display:flex; flex-direction:column; }
+
+  /* ---------- running header / footer ---------- */
+  .rh{
+    display:flex; align-items:baseline; justify-content:space-between;
+    border-bottom:1.5px solid var(--navy);
+    padding-bottom:2.5mm; margin-bottom:7mm;
+  }
+  .rh .sec{ font-size:8pt; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color:var(--teal-d); }
+  .rh .brand{ font-size:7.6pt; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+
+  .rf{
+    position:absolute; left:16mm; right:16mm; bottom:8mm;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:7.4pt; color:var(--muted);
+    border-top:.6px solid var(--line); padding-top:2mm;
+  }
+  .rf b{ color:var(--navy); font-weight:700; }
+
+  /* ---------- typography ---------- */
+  h1,h2,h3,h4{ margin:0; font-weight:700; }
+  .h-sec{ font-size:20pt; line-height:1.15; letter-spacing:-.015em; margin-bottom:2.5mm; }
+  .h-sub{ font-size:10.4pt; font-weight:400; color:var(--slate); line-height:1.5; max-width:150mm; }
+  .h3{ font-size:11.2pt; letter-spacing:-.005em; margin-bottom:1.6mm; }
+  .eyebrow{ font-size:7.6pt; letter-spacing:.18em; text-transform:uppercase; font-weight:700; color:var(--teal-d); margin-bottom:2mm; }
+  p{ margin:0 0 2.6mm 0; }
+  .small{ font-size:8.6pt; line-height:1.45; color:var(--slate); }
+  .tiny{ font-size:7.4pt; line-height:1.4; color:var(--muted); }
+  strong{ font-weight:700; }
+  .tnum{ font-variant-numeric:tabular-nums; }
+
+  .rule{ height:1px; background:var(--line); margin:5mm 0; }
+
+  /* ---------- cover ---------- */
+  .cover{ background:var(--navy-deep); color:#fff; }
+  .cover-bg{ position:absolute; inset:0; }
+  .cover-inner{ position:relative; height:100%; padding:18mm 16mm 14mm; display:flex; flex-direction:column; }
+
+  .badge{
+    display:inline-block; font-size:7.4pt; letter-spacing:.2em; text-transform:uppercase;
+    font-weight:700; color:#8FE3D8; border:1px solid rgba(143,227,216,.45);
+    padding:1.6mm 3.2mm; border-radius:1mm;
+  }
+  .cover h1{
+    font-size:37pt; line-height:1.03; letter-spacing:-.025em; color:#fff;
+    margin:0 0 4mm 0;
+  }
+  .cover h1 .accent{ color:#4FD8C4; }
+  .cover .lede{ font-size:11.4pt; line-height:1.55; color:#B9CBDA; max-width:132mm; font-weight:400; }
+
+  .cover-card{
+    background:rgba(255,255,255,.055);
+    border:1px solid rgba(255,255,255,.14);
+    border-left:2.5mm solid var(--teal);
+    border-radius:1.5mm;
+    padding:6mm 7mm;
+  }
+  .cc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:5mm 8mm; }
+  .cc-l{ font-size:7.2pt; letter-spacing:.16em; text-transform:uppercase; color:#7FA3BC; font-weight:700; margin-bottom:1.2mm; }
+  .cc-v{ font-size:10.6pt; color:#fff; font-weight:700; line-height:1.3; }
+  .cc-v.fill{ color:#4FD8C4; }
+
+  .cover-foot{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-top:1px solid rgba(255,255,255,.16); padding-top:4mm;
+    color:#8AA6BC; font-size:8pt;
+  }
+
+  .kpi-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+  .kpi{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:1.5mm; padding:4mm 4.5mm; }
+  .kpi .n{ font-size:17pt; font-weight:700; color:#4FD8C4; line-height:1; letter-spacing:-.02em; }
+  .kpi .t{ font-size:7.8pt; color:#A9C0D2; margin-top:1.6mm; line-height:1.35; }
+
+  /* ---------- generic blocks ---------- */
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+
+  .card{
+    border:1px solid var(--line); border-radius:1.5mm; padding:5mm 5.5mm; background:#fff;
+  }
+  .card.soft{ background:var(--soft); border-color:var(--line-2); }
+  .card .ct{ font-size:10.2pt; font-weight:700; margin-bottom:1.6mm; letter-spacing:-.005em; }
+  .card .cb{ font-size:8.8pt; color:var(--slate); line-height:1.5; }
+
+  .prob{ border-left:2mm solid var(--red); }
+  .prob .num{ font-size:7.4pt; font-weight:700; color:var(--red); letter-spacing:.14em; margin-bottom:1.4mm; }
+
+  .callout{
+    background:var(--soft); border:1px solid var(--line-2);
+    border-left:2.5mm solid var(--teal); border-radius:1.5mm;
+    padding:5mm 6mm;
+  }
+  .callout.amber{ border-left-color:var(--amber); }
+  .callout .ct{ font-weight:700; font-size:10pt; margin-bottom:1.6mm; }
+
+  ul{ margin:0; padding-left:4.6mm; }
+  li{ margin-bottom:1.6mm; font-size:8.9pt; color:var(--slate); line-height:1.45; }
+  li strong{ color:var(--navy); }
+  ul.tight li{ margin-bottom:1.1mm; }
+
+  .chk{ list-style:none; padding-left:0; }
+  .chk li{ position:relative; padding-left:5.6mm; }
+  .chk li:before{
+    content:""; position:absolute; left:0; top:1.5mm;
+    width:3.2mm; height:3.2mm; border-radius:50%;
+    background:var(--teal);
+  }
+  .chk li:after{
+    content:""; position:absolute; left:1.05mm; top:2.5mm;
+    width:1.1mm; height:.55mm; border-left:.6mm solid #fff; border-bottom:.6mm solid #fff;
+    transform:rotate(-45deg);
+  }
+  .nochk li:before{ background:var(--red); }
+  .nochk li:after{
+    left:1.15mm; top:2.5mm; width:1mm; height:1mm;
+    border:0; background:#fff; transform:none;
+    clip-path:polygon(0 0,100% 100%,100% 100%,0 0);
+    box-shadow:none;
+    border-top:.55mm solid #fff; border-bottom:0;
+  }
+
+  /* ---------- tables ---------- */
+  table{ width:100%; border-collapse:collapse; font-size:8.7pt; }
+  th{
+    text-align:left; font-size:7.4pt; letter-spacing:.13em; text-transform:uppercase;
+    font-weight:700; color:#fff; background:var(--navy);
+    padding:2.6mm 3.2mm; border:0;
+  }
+  td{ padding:2.5mm 3.2mm; border-bottom:.6px solid var(--line); vertical-align:top; color:var(--slate); }
+  td.k{ color:var(--navy); font-weight:700; width:38%; }
+  tbody tr:nth-child(even) td{ background:#F8FAFB; }
+  table.spec td.k{ width:42%; }
+  .t-note{ font-size:7.2pt; color:var(--muted); margin-top:2mm; line-height:1.4; }
+
+  th.c, td.c{ text-align:center; }
+  .dot{ display:inline-block; width:3mm; height:3mm; border-radius:50%; }
+  .d-hi{ background:var(--teal); }
+  .d-md{ background:var(--amber); }
+  .d-lo{ background:#C9D4DD; }
+  td.best{ background:#EAF7F5 !important; }
+  th.best{ background:var(--teal-d); }
+
+  /* schedule */
+  table.sched td{ font-size:8.4pt; padding:1.85mm 3.2mm; }
+  table.sched td.h{ font-weight:700; color:var(--navy); width:26mm; }
+  .tag{
+    display:inline-block; font-size:7pt; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; padding:.8mm 2mm; border-radius:.8mm; color:#fff;
+  }
+  .tag.n{ background:var(--navy); }
+  .tag.d{ background:var(--teal-d); }
+  .tag.a{ background:var(--amber); }
+
+  /* ---------- steps / timeline ---------- */
+  .steps{ display:flex; flex-direction:column; gap:0; }
+  .step{ display:grid; grid-template-columns:11mm 1fr; gap:4mm; position:relative; padding-bottom:5mm; }
+  .step:last-child{ padding-bottom:0; }
+  .step .sn{
+    width:9mm; height:9mm; border-radius:50%; background:var(--navy); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10pt; font-weight:700; z-index:2; position:relative;
+  }
+  .step:not(:last-child):before{
+    content:""; position:absolute; left:4.5mm; top:9mm; bottom:0;
+    width:.6mm; background:var(--line); z-index:1;
+  }
+  .step .st{ font-size:10.2pt; font-weight:700; margin-bottom:1mm; padding-top:.8mm; }
+  .step .sd{ font-size:8.8pt; color:var(--slate); line-height:1.48; }
+  .step .sm{ font-size:7.4pt; color:var(--teal-d); font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-top:1.2mm; }
+
+  .tl{ display:grid; grid-template-columns:repeat(5,1fr); gap:0; margin-top:2mm; }
+  .tl-i{ position:relative; padding:0 2.5mm; }
+  .tl-i:first-child{ padding-left:0; }
+  .tl-i:last-child{ padding-right:0; }
+  .tl-bar{ height:2.2mm; background:var(--teal); border-radius:1mm; margin-bottom:3mm; opacity:.35; }
+  .tl-i:nth-child(1) .tl-bar{ opacity:1; }
+  .tl-i:nth-child(2) .tl-bar{ opacity:.85; }
+  .tl-i:nth-child(3) .tl-bar{ opacity:.7; }
+  .tl-i:nth-child(4) .tl-bar{ opacity:.55; }
+  .tl-i:nth-child(5) .tl-bar{ opacity:.4; }
+  .tl-w{ font-size:7pt; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--teal-d); margin-bottom:1.2mm; }
+  .tl-t{ font-size:9.2pt; font-weight:700; margin-bottom:1.2mm; line-height:1.25; }
+  .tl-d{ font-size:7.6pt; color:var(--slate); line-height:1.4; }
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:var(--navy-deep); color:#fff; border-radius:2mm;
+    padding:7mm 8mm; position:relative; overflow:hidden;
+  }
+  .cta h3{ font-size:16pt; color:#fff; letter-spacing:-.02em; margin-bottom:2mm; }
+  .cta p{ color:#B9CBDA; font-size:9.2pt; max-width:120mm; }
+  .fields{ display:grid; grid-template-columns:1fr 1fr; gap:4mm 6mm; margin-top:5mm; }
+  .fld .fl{ font-size:7pt; letter-spacing:.16em; text-transform:uppercase; color:#7FA3BC; font-weight:700; margin-bottom:1.4mm; }
+  .fld .fv{
+    font-size:11pt; font-weight:700; color:#4FD8C4;
+    border-bottom:.5mm solid rgba(79,216,196,.35); padding-bottom:1.6mm;
+  }
+
+  .next{ display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+  .next .n-i{ border:1px solid var(--line); border-top:2mm solid var(--navy); border-radius:1.5mm; padding:4.5mm; }
+  .next .n-n{ font-size:7.2pt; font-weight:700; letter-spacing:.14em; color:var(--teal-d); margin-bottom:1.5mm; }
+  .next .n-t{ font-size:9.6pt; font-weight:700; margin-bottom:1.2mm; line-height:1.25; }
+  .next .n-d{ font-size:7.8pt; color:var(--slate); line-height:1.4; }
+
+  .spacer{ flex:1; }
+  .mt2{ margin-top:2mm; } .mt3{ margin-top:3mm; } .mt4{ margin-top:4mm; }
+  .mt5{ margin-top:5mm; } .mt6{ margin-top:6mm; } .mt8{ margin-top:8mm; }
+  .mb2{ margin-bottom:2mm; } .mb3{ margin-bottom:3mm; } .mb4{ margin-bottom:4mm; } .mb5{ margin-bottom:5mm; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · CAPA ============ -->
+<section class="page cover">
+  <svg class="cover-bg" viewBox="0 0 210 297" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <radialGradient id="gl" cx="76%" cy="20%" r="62%">
+        <stop offset="0%" stop-color="#123B52" stop-opacity=".85"/>
+        <stop offset="100%" stop-color="#071726" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="gb" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#071726" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#04101B"/>
+      </linearGradient>
+    </defs>
+    <rect width="210" height="297" fill="#071726"/>
+    <rect width="210" height="297" fill="url(#gl)"/>
+    <!-- radar rings -->
+    <g fill="none" stroke="#4FD8C4" stroke-opacity=".16">
+      <circle cx="160" cy="62" r="26"/><circle cx="160" cy="62" r="42"/>
+      <circle cx="160" cy="62" r="58"/><circle cx="160" cy="62" r="76"/>
+      <circle cx="160" cy="62" r="96"/>
+    </g>
+    <g stroke="#4FD8C4" stroke-opacity=".1">
+      <line x1="64" y1="62" x2="256" y2="62"/><line x1="160" y1="-34" x2="160" y2="158"/>
+    </g>
+    <path d="M160 62 L160 -14 A76 76 0 0 1 227 34 Z" fill="#4FD8C4" fill-opacity=".07"/>
+    <!-- perimeter path -->
+    <path d="M22 214 L188 214 L188 268 L22 268 Z" fill="none" stroke="#4FD8C4" stroke-opacity=".14" stroke-dasharray="2 2.4"/>
+    <g fill="#4FD8C4" fill-opacity=".5">
+      <circle cx="22" cy="214" r="1.5"/><circle cx="188" cy="214" r="1.5"/>
+      <circle cx="188" cy="268" r="1.5"/><circle cx="22" cy="268" r="1.5"/>
+    </g>
+    <!-- drone glyph -->
+    <g transform="translate(160,62)" stroke="#4FD8C4" stroke-opacity=".85" fill="none" stroke-width="1.1">
+      <line x1="-11" y1="-8" x2="-4.5" y2="-2.5"/><line x1="11" y1="-8" x2="4.5" y2="-2.5"/>
+      <line x1="-11" y1="8" x2="-4.5" y2="2.5"/><line x1="11" y1="8" x2="4.5" y2="2.5"/>
+      <ellipse cx="-11" cy="-8" rx="6.5" ry="1.5"/><ellipse cx="11" cy="-8" rx="6.5" ry="1.5"/>
+      <ellipse cx="-11" cy="8" rx="6.5" ry="1.5"/><ellipse cx="11" cy="8" rx="6.5" ry="1.5"/>
+      <rect x="-5" y="-3.5" width="10" height="7" rx="1.6" fill="#4FD8C4" fill-opacity=".22"/>
+      <circle cx="0" cy="4.6" r="2.1" fill="#4FD8C4" fill-opacity=".45"/>
+    </g>
+    <rect y="200" width="210" height="97" fill="url(#gb)"/>
+  </svg>
+
+  <div class="cover-inner">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <span class="badge">Proposta Comercial</span>
+      <span style="font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:#7FA3BC;">Documento confidencial</span>
+    </div>
+
+    <div style="margin-top:30mm;">
+      <h1>Segurança aérea<br>autônoma <span class="accent">24 / 7</span></h1>
+      <p class="lede">
+        Projeto <strong style="color:#fff;">DJI Dock 2</strong> para condomínios: rondas automáticas em horários
+        programados, visão térmica noturna e transmissão ao vivo das áreas comuns
+        para a portaria e para os moradores.
+      </p>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div style="margin-bottom:8mm;">
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="n">&lt; 60 s</div>
+          <div class="t">da base ao ponto mais distante do perímetro</div>
+        </div>
+        <div class="kpi">
+          <div class="n">24 / 7</div>
+          <div class="t">operação autônoma, sem piloto no local</div>
+        </div>
+        <div class="kpi">
+          <div class="n">100 %</div>
+          <div class="t">das rondas gravadas e auditáveis</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-card">
+      <div class="cc-grid">
+        <div>
+          <div class="cc-l">Preparado para</div>
+          <div class="cc-v fill">[NOME DO CONDOMÍNIO]</div>
+        </div>
+        <div>
+          <div class="cc-l">Aos cuidados de</div>
+          <div class="cc-v">Síndico(a), Conselho e Administração</div>
+        </div>
+        <div>
+          <div class="cc-l">Apresentado por</div>
+          <div class="cc-v fill">[NOME DA EMPRESA]</div>
+        </div>
+        <div>
+          <div class="cc-l">Emissão · Validade</div>
+          <div class="cc-v tnum">Agosto de 2026 · 30 dias</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-foot mt6">
+      <div>
+        <div style="color:#4FD8C4;font-weight:700;font-size:9.4pt;letter-spacing:-.01em;">Fale com nosso especialista</div>
+        <div style="margin-top:1mm;">Visita técnica e demonstração no local, sem compromisso — página 11.</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="letter-spacing:.16em;text-transform:uppercase;font-size:7pt;">Favor entregar à</div>
+        <div style="color:#fff;font-weight:700;font-size:9.4pt;margin-top:.8mm;">Administração / Portaria</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 · SUMÁRIO EXECUTIVO + PROBLEMA ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">01 · Sumário executivo</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">Uma ronda que não falha, não cansa<br>e não avisa que vai passar.</h2>
+    <p class="h-sub">
+      O condomínio passa a contar com um drone autônomo instalado em uma estação-base própria dentro do
+      terreno. Ele decola sozinho nos horários programados, percorre o perímetro e as áreas comuns,
+      transmite ao vivo para a portaria e para o portal do morador, retorna e se recarrega — sem operador
+      no local e sem intervenção humana no ciclo.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="eyebrow">O que muda na prática</div>
+    <div class="grid2 mb5">
+      <div class="card soft">
+        <div class="ct">Cobertura total, não amostral</div>
+        <div class="cb">Muros, telhados, garagens abertas, quadras, piscina, estacionamento de visitantes e
+        áreas de difícil acesso a pé entram na mesma varredura, em minutos.</div>
+      </div>
+      <div class="card soft">
+        <div class="ct">Visão que o olho não tem</div>
+        <div class="cb">Câmera térmica identifica presença humana no escuro, atrás de vegetação e em áreas
+        sem iluminação — onde o CFTV convencional simplesmente não enxerga.</div>
+      </div>
+      <div class="card soft">
+        <div class="ct">Transparência para o morador</div>
+        <div class="cb">Grade de horários publicada, status do drone em tempo real e transmissão ao vivo
+        das áreas comuns no portal — a segurança deixa de ser uma caixa-preta.</div>
+      </div>
+      <div class="card soft">
+        <div class="ct">Prova em vídeo</div>
+        <div class="cb">Toda ronda fica registrada com data, hora e trajeto. Ocorrências deixam de depender
+        de relato verbal e passam a ter imagem, útil inclusive em boletim de ocorrência.</div>
+      </div>
+    </div>
+
+    <div class="eyebrow">Por que o modelo atual deixa brechas</div>
+    <div class="grid2">
+      <div class="card prob">
+        <div class="num">RISCO 01</div>
+        <div class="ct">A ronda a pé é previsível</div>
+        <div class="cb">Um vigilante leva de 15 a 25 minutos para fechar o perímetro de um condomínio médio,
+        sempre no mesmo sentido. Quem observa de fora aprende a janela em poucos dias.</div>
+      </div>
+      <div class="card prob">
+        <div class="num">RISCO 02</div>
+        <div class="ct">Câmera fixa tem ângulo fixo</div>
+        <div class="cb">O CFTV cobre o que foi apontado na instalação. Vegetação que cresceu, um veículo
+        estacionado ou um poste queimado criam pontos cegos que ninguém revisa.</div>
+      </div>
+      <div class="card prob">
+        <div class="num">RISCO 03</div>
+        <div class="ct">Ninguém assiste 40 telas</div>
+        <div class="cb">Gravar não é monitorar. Sem alguém olhando no momento exato, a imagem só serve
+        depois do fato — para constatar o prejuízo, não para evitá-lo.</div>
+      </div>
+      <div class="card prob">
+        <div class="num">RISCO 04</div>
+        <div class="ct">Deslocamento custa minutos</div>
+        <div class="cb">Do acionamento até o vigilante chegar ao fundo do terreno podem se passar vários
+        minutos — tempo suficiente para a ocorrência terminar.</div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 2 de 11</span></div>
+</section>
+
+<!-- ============ 3 · COMO FUNCIONA ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">02 · A solução</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">O ciclo completo, sem ninguém tocar no drone.</h2>
+    <p class="h-sub">
+      A estação DJI Dock 2 é instalada em um ponto elevado e discreto do condomínio — laje técnica,
+      cobertura da guarita ou base concretada em área comum. A partir daí, todo o ciclo é automático.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="sn">1</div>
+        <div>
+          <div class="st">Disparo por agenda ou sob demanda</div>
+          <div class="sd">A missão inicia sozinha no horário programado. A portaria também pode acionar uma
+          ronda extra imediata com um clique, ao receber um chamado ou um alarme de perímetro.</div>
+          <div class="sm">Automático · ou 1 clique da portaria</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div>
+          <div class="st">Abertura e decolagem</div>
+          <div class="sd">A tampa da estação abre, o drone verifica sensores, GPS e vento medido pela própria
+          estação meteorológica embarcada, e decola. Se o vento ou a chuva estiverem fora do limite seguro,
+          a missão é automaticamente adiada e a portaria é avisada.</div>
+          <div class="sm">Cerca de 45 segundos até estar no ar</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div>
+          <div class="st">Ronda autônoma pelo trajeto aprovado</div>
+          <div class="sd">O drone percorre uma rota fixa, desenhada e homologada junto com o condomínio:
+          perímetro, muros, portões, estacionamentos, área de lazer e pontos críticos definidos pelo
+          conselho. Altura, velocidade e ângulo de câmera são travados na programação.</div>
+          <div class="sm">Ronda típica de 8 a 12 minutos</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">4</div>
+        <div>
+          <div class="st">Transmissão ao vivo e gravação</div>
+          <div class="sd">A imagem chega em tempo real ao monitor da portaria e ao portal do morador.
+          Tudo é gravado com trilha de data, hora e coordenada. Se algo for detectado, o operador pode
+          pausar a rota e manter o drone sobre o ponto até a equipe de solo chegar.</div>
+          <div class="sm">Ao vivo · gravado · auditável</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">5</div>
+        <div>
+          <div class="st">Pouso de precisão e recarga</div>
+          <div class="sd">O drone retorna, pousa centralizado na estação e inicia a recarga sozinho. A tampa
+          fecha e o equipamento fica protegido de chuva, sol e poeira até a próxima missão.</div>
+          <div class="sm">Pronto para nova saída em cerca de 32 minutos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout mt5">
+      <div class="ct">E se faltar energia ou internet?</div>
+      <div class="small" style="margin:0;">
+        A estação possui bateria reserva dimensionada para manter o sistema ativo e garantir o retorno e o
+        pouso seguro do drone durante uma queda de energia. A conectividade é redundante: link cabeado
+        principal e modem celular de reserva, de modo que a portaria não perde a transmissão.
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 3 de 11</span></div>
+</section>
+
+<!-- ============ 4 · ESPECIFICAÇÕES ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">03 · Especificações técnicas</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">O equipamento proposto.</h2>
+    <p class="h-sub">
+      Plataforma DJI Dock 2 operando com aeronave DJI Matrice 3TD — a configuração com câmera térmica,
+      indicada para segurança patrimonial noturna.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="eyebrow">Estação-base · DJI Dock 2</div>
+    <table class="spec mb5">
+      <tbody>
+        <tr><td class="k">Grau de proteção</td><td>IP55 — opera exposta a chuva e poeira</td></tr>
+        <tr><td class="k">Faixa de temperatura de operação</td><td>−25 °C a 45 °C</td></tr>
+        <tr><td class="k">Vento máximo para decolagem e pouso</td><td>12 m/s (aprox. 43 km/h)</td></tr>
+        <tr><td class="k">Tempo de recarga</td><td>De 0 % a 90 % em aproximadamente 32 minutos</td></tr>
+        <tr><td class="k">Autonomia em falta de energia</td><td>Bateria reserva para cerca de 5 horas de sistema ativo</td></tr>
+        <tr><td class="k">Alimentação</td><td>100–240 V AC · consumo máximo aproximado de 1.500 W</td></tr>
+        <tr><td class="k">Conectividade</td><td>Ethernet cabeada + modem celular 4G de redundância</td></tr>
+        <tr><td class="k">Sensores embarcados</td><td>Estação meteorológica (vento, chuva, temperatura) e câmera de vigilância da própria base</td></tr>
+        <tr><td class="k">Peso e footprint</td><td>Cerca de 34 kg · base compacta, dispensa obra civil de grande porte</td></tr>
+        <tr><td class="k">Gestão</td><td>DJI FlightHub 2 — missões, gravações, usuários e logs</td></tr>
+      </tbody>
+    </table>
+
+    <div class="eyebrow">Aeronave · DJI Matrice 3TD</div>
+    <table class="spec">
+      <tbody>
+        <tr><td class="k">Autonomia de voo</td><td>Até 50 minutos nominais · rondas planejadas de 8 a 12 minutos, com ampla reserva de segurança</td></tr>
+        <tr><td class="k">Raio operacional a partir da base</td><td>Até 10 km — muito acima da necessidade de um condomínio</td></tr>
+        <tr><td class="k">Câmera térmica</td><td>Resolução 640 × 512 — detecta presença humana no escuro e atrás de vegetação leve</td></tr>
+        <tr><td class="k">Câmera grande-angular</td><td>48 MP — visão geral do perímetro e das áreas comuns</td></tr>
+        <tr><td class="k">Câmera tele com zoom</td><td>12 MP — leitura de detalhe à distância, como placas e portões</td></tr>
+        <tr><td class="k">Desvio de obstáculos</td><td>Sensoriamento omnidirecional, para voo seguro entre torres e árvores</td></tr>
+        <tr><td class="k">Pouso de precisão</td><td>Retorno e pouso centralizado automático na estação</td></tr>
+        <tr><td class="k">Segurança de dados</td><td>Transmissão e armazenamento criptografados</td></tr>
+      </tbody>
+    </table>
+
+    <div class="t-note">
+      Especificações conforme documentação do fabricante (DJI) para as condições de ensaio informadas.
+      Autonomia, alcance e resistência ao vento variam com temperatura, carga e condições reais de voo.
+      O dimensionamento definitivo — número de estações, ponto de instalação e desenho das rotas — é
+      definido na visita técnica.
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 4 de 11</span></div>
+</section>
+
+<!-- ============ 5 · GRADE DE HORÁRIOS ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">04 · Grade de monitoramento</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">Horários de ronda — sugestão inicial.</h2>
+    <p class="h-sub">
+      Grade proposta como ponto de partida, concentrando saídas nas faixas de maior incidência de
+      ocorrências. A grade final é definida com o conselho e pode ser revista a qualquer momento,
+      sem custo adicional e sem visita técnica.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="eyebrow">Segunda a sexta</div>
+    <table class="sched mb5">
+      <thead>
+        <tr><th style="width:26mm;">Horário</th><th>Tipo de ronda</th><th>Foco da varredura</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="h tnum">05h30</td><td><span class="tag d">Diurna</span></td><td>Abertura do dia — perímetro, portões e estacionamentos</td></tr>
+        <tr><td class="h tnum">08h00</td><td><span class="tag d">Diurna</span></td><td>Pico de saída de veículos — portaria social e de serviço</td></tr>
+        <tr><td class="h tnum">12h00</td><td><span class="tag d">Diurna</span></td><td>Perímetro completo, muros e telhados</td></tr>
+        <tr><td class="h tnum">16h00</td><td><span class="tag d">Diurna</span></td><td>Áreas de lazer, quadras e playground</td></tr>
+        <tr><td class="h tnum">19h00</td><td><span class="tag n">Noturna</span></td><td>Transição para o turno da noite — varredura térmica geral</td></tr>
+        <tr><td class="h tnum">22h00</td><td><span class="tag n">Noturna</span></td><td>Perímetro e áreas sem iluminação · térmico</td></tr>
+        <tr><td class="h tnum">00h30</td><td><span class="tag n">Noturna</span></td><td>Muros, fundos do terreno e garagens · térmico</td></tr>
+        <tr><td class="h tnum">03h00</td><td><span class="tag n">Noturna</span></td><td>Varredura completa na faixa de maior risco · térmico</td></tr>
+      </tbody>
+    </table>
+
+    <div class="eyebrow">Sábados, domingos e feriados</div>
+    <table class="sched mb5">
+      <thead>
+        <tr><th style="width:26mm;">Horário</th><th>Tipo de ronda</th><th>Foco da varredura</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="h tnum">07h00</td><td><span class="tag d">Diurna</span></td><td>Perímetro completo</td></tr>
+        <tr><td class="h tnum">11h00</td><td><span class="tag d">Diurna</span></td><td>Áreas de lazer em uso — piscina, churrasqueiras e quadras</td></tr>
+        <tr><td class="h tnum">15h00</td><td><span class="tag d">Diurna</span></td><td>Estacionamento de visitantes e portaria social</td></tr>
+        <tr><td class="h tnum">19h00</td><td><span class="tag n">Noturna</span></td><td>Varredura térmica geral</td></tr>
+        <tr><td class="h tnum">23h00</td><td><span class="tag n">Noturna</span></td><td>Perímetro, muros e fundos · térmico</td></tr>
+        <tr><td class="h tnum">02h30</td><td><span class="tag n">Noturna</span></td><td>Varredura completa · térmico</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid2">
+      <div class="callout amber">
+        <div class="ct">Rondas sob demanda</div>
+        <div class="small" style="margin:0;">
+          Além da grade, a portaria pode disparar uma ronda extra a qualquer momento: barulho no fundo do
+          terreno, alarme de perímetro, chamado de morador ou apoio à entrada de visitante. O drone está
+          sobre o ponto em menos de um minuto.
+        </div>
+      </div>
+      <div class="callout">
+        <div class="ct">Aleatoriedade programada</div>
+        <div class="small" style="margin:0;">
+          Os horários noturnos podem operar com variação automática de até 20 minutos para mais ou para
+          menos. O morador continua vendo a faixa de horário no portal, mas o padrão exato deixa de ser
+          previsível para quem observa de fora.
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 5 de 11</span></div>
+</section>
+
+<!-- ============ 6 · ACESSO DO MORADOR ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">05 · Acesso do morador</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">O morador acompanha ao vivo —<br>com limites claros.</h2>
+    <p class="h-sub">
+      Cada unidade recebe um acesso individual ao portal do morador, pelo navegador ou pelo aplicativo.
+      O acesso é nominal, protegido por senha e registrado em log. O objetivo é transparência sobre a
+      segurança do condomínio — nunca observação de pessoas.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="grid2 mb5">
+      <div class="card" style="border-top:2mm solid var(--teal);">
+        <div class="ct" style="color:var(--teal-d);">O que o morador vê</div>
+        <ul class="chk tight mt3">
+          <li><strong>Agenda de rondas</strong> do dia e da semana, com horário previsto de cada saída.</li>
+          <li><strong>Status em tempo real:</strong> na base, em ronda, recarregando ou missão adiada por clima.</li>
+          <li><strong>Transmissão ao vivo</strong> das áreas comuns enquanto a ronda está acontecendo.</li>
+          <li><strong>Histórico das últimas rondas,</strong> com data, hora e confirmação de execução.</li>
+          <li><strong>Avisos da administração</strong> vinculados à segurança, como ocorrências e manutenções.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:2mm solid var(--red);">
+        <div class="ct" style="color:var(--red);">O que o morador não faz</div>
+        <ul class="chk nochk tight mt3">
+          <li><strong>Não controla o drone</strong> nem altera a rota, a altura ou o ângulo da câmera.</li>
+          <li><strong>Não usa o zoom</strong> nem a câmera térmica — ambos ficam restritos à operação.</li>
+          <li><strong>Não baixa nem grava</strong> as imagens; a exportação é exclusiva da administração.</li>
+          <li><strong>Não vê áreas privativas.</strong> Janelas, sacadas e quintais entram com máscara automática.</li>
+          <li><strong>Não dispara rondas.</strong> O acionamento extra é privativo da portaria.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="eyebrow">Governança do acesso</div>
+    <table>
+      <thead>
+        <tr><th style="width:40mm;">Perfil</th><th>Permissões</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="k">Morador</td>
+          <td>Agenda, status e visualização ao vivo das áreas comuns. Somente leitura, sem exportação.</td>
+        </tr>
+        <tr>
+          <td class="k">Portaria e vigilância</td>
+          <td>Tudo do morador, mais acionamento de ronda extra, pausa sobre um ponto e uso do zoom e do térmico durante a ocorrência.</td>
+        </tr>
+        <tr>
+          <td class="k">Síndico e administração</td>
+          <td>Acesso completo, exportação de trechos gravados, gestão de usuários e leitura da trilha de auditoria.</td>
+        </tr>
+        <tr>
+          <td class="k">Operação técnica</td>
+          <td>Manutenção, atualização das rotas e diagnóstico. Sem acesso a exportação sem autorização formal da administração.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout amber mt5">
+      <div class="ct">Por que o acesso do morador é limitado</div>
+      <div class="small" style="margin:0;">
+        Liberar controle de câmera, zoom ou térmico para todas as unidades transformaria uma ferramenta de
+        segurança em um instrumento de vigilância entre vizinhos — com risco jurídico direto para o
+        condomínio, à luz da LGPD e do direito à intimidade. O desenho proposto entrega a transparência
+        que o morador quer, sem criar esse passivo para o síndico.
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 6 de 11</span></div>
+</section>
+
+<!-- ============ 7 · COMPARATIVO ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">06 · Comparativo</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">Onde o drone soma —<br>e onde ele não substitui.</h2>
+    <p class="h-sub">
+      O drone não elimina a portaria nem o CFTV. Ele cobre exatamente a lacuna que os dois deixam:
+      o espaço entre as câmeras e o tempo entre as rondas.
+    </p>
+
+    <div class="rule"></div>
+
+    <table class="mb4">
+      <thead>
+        <tr>
+          <th style="width:44mm;">Critério</th>
+          <th class="c" style="width:30mm;">Ronda a pé</th>
+          <th class="c" style="width:30mm;">CFTV fixo</th>
+          <th class="c best">Drone autônomo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="k">Cobertura do terreno</td>
+          <td class="c">Alta, porém lenta</td>
+          <td class="c">Só os ângulos instalados</td>
+          <td class="c best">Total, inclusive telhados</td>
+        </tr>
+        <tr>
+          <td class="k">Tempo até um ponto distante</td>
+          <td class="c">3 a 8 minutos</td>
+          <td class="c">Não se desloca</td>
+          <td class="c best">Menos de 1 minuto</td>
+        </tr>
+        <tr>
+          <td class="k">Visão noturna</td>
+          <td class="c">Lanterna</td>
+          <td class="c">Depende de iluminação</td>
+          <td class="c best">Térmica, independe de luz</td>
+        </tr>
+        <tr>
+          <td class="k">Previsibilidade para o invasor</td>
+          <td class="c">Alta</td>
+          <td class="c">Alta — posição fixa e visível</td>
+          <td class="c best">Baixa, com horário variável</td>
+        </tr>
+        <tr>
+          <td class="k">Registro em vídeo da ronda</td>
+          <td class="c">Não há</td>
+          <td class="c">Do ponto fixo apenas</td>
+          <td class="c best">Trajeto inteiro, georreferenciado</td>
+        </tr>
+        <tr>
+          <td class="k">Custo de uma ronda adicional</td>
+          <td class="c">Hora extra ou novo posto</td>
+          <td class="c">Não aplicável</td>
+          <td class="c best">Praticamente nulo</td>
+        </tr>
+        <tr>
+          <td class="k">Risco ao profissional</td>
+          <td class="c">Exposição direta</td>
+          <td class="c">Nenhum</td>
+          <td class="c best">Nenhum — aproximação sem contato</td>
+        </tr>
+        <tr>
+          <td class="k">Efeito dissuasivo visível</td>
+          <td class="c">Moderado</td>
+          <td class="c">Baixo</td>
+          <td class="c best">Alto, com sinalização sonora e luminosa</td>
+        </tr>
+        <tr>
+          <td class="k">Abordagem e contato físico</td>
+          <td class="c best">Sim — insubstituível</td>
+          <td class="c">Não</td>
+          <td class="c">Não realiza</td>
+        </tr>
+        <tr>
+          <td class="k">Controle de acesso na guarita</td>
+          <td class="c best">Sim — insubstituível</td>
+          <td class="c">Apoio</td>
+          <td class="c">Não realiza</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="ct">A leitura correta da tabela</div>
+      <div class="small" style="margin:0;">
+        As duas últimas linhas são propositais. Abordagem, recepção e controle de acesso continuam sendo
+        função humana, e o projeto não propõe reduzir o efetivo da guarita. O ganho está em liberar a
+        equipe de solo das rondas longas e repetitivas — que passam a ser feitas do alto, mais rápido,
+        mais vezes por dia e com registro — para que ela se concentre no que só ela pode fazer.
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 7 de 11</span></div>
+</section>
+
+<!-- ============ 8 · CONFORMIDADE ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">07 · Conformidade legal</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">Regularização é parte do serviço,<br>não problema do síndico.</h2>
+    <p class="h-sub">
+      Operar drone de forma autônoma no Brasil exige autorizações específicas. Toda a documentação é
+      conduzida por nós e entregue ao condomínio em pasta digital, para apresentação em assembleia,
+      à seguradora ou a qualquer fiscalização.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="grid2 mb5">
+      <div class="card">
+        <div class="ct">Aviação civil</div>
+        <ul class="tight mt3">
+          <li><strong>ANAC:</strong> cadastro da aeronave no SISANT e enquadramento da operação conforme o RBAC-E nº 94.</li>
+          <li><strong>DECEA:</strong> solicitação de acesso ao espaço aéreo via SARPAS, com a área de operação delimitada sobre o condomínio.</li>
+          <li><strong>Operação além da linha de visada:</strong> por ser autônoma, a operação em estação-base exige autorização específica — providenciada e mantida vigente por nós.</li>
+          <li><strong>ANATEL:</strong> equipamentos homologados.</li>
+          <li><strong>Seguro RETA:</strong> seguro de responsabilidade civil obrigatório para operação não recreativa, contratado e mantido pela contratada.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="ct">Proteção de dados · LGPD</div>
+        <ul class="tight mt3">
+          <li><strong>Base legal:</strong> legítimo interesse na proteção do patrimônio e da segurança dos condôminos, devidamente documentado.</li>
+          <li><strong>Finalidade restrita:</strong> imagens usadas apenas para segurança, vedado qualquer outro uso.</li>
+          <li><strong>Áreas privativas:</strong> rotas e ângulos configurados para não captar interiores; janelas e sacadas com máscara automática.</li>
+          <li><strong>Retenção definida:</strong> prazo de guarda acordado com o condomínio e descarte automático ao fim do período.</li>
+          <li><strong>Sinalização:</strong> placas informativas nos acessos e comunicado formal aos moradores.</li>
+          <li><strong>Auditoria:</strong> todo acesso a imagem fica registrado, com identificação de quem viu, o quê e quando.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="eyebrow">Aprovação interna do condomínio</div>
+    <table>
+      <tbody>
+        <tr><td class="k">Assembleia</td><td>Recomendamos aprovação em assembleia, com registro em ata da adoção do sistema, da grade de horários e da política de imagens. Apoiamos a redação da pauta e participamos da apresentação, se desejado.</td></tr>
+        <tr><td class="k">Regimento interno</td><td>Sugerimos incluir cláusula sobre uso das imagens, prazo de guarda e procedimento para solicitação de trechos gravados.</td></tr>
+        <tr><td class="k">Comunicação aos moradores</td><td>Fornecemos o comunicado oficial, o material explicativo para os quadros de aviso e a sinalização física exigida.</td></tr>
+        <tr><td class="k">Vizinhança</td><td>As rotas são desenhadas dentro dos limites do terreno, evitando sobrevoo desnecessário de imóveis lindeiros.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="t-note">
+      Este documento tem caráter comercial e informativo e não constitui parecer jurídico. As exigências
+      regulatórias descritas refletem o entendimento vigente na data de emissão e são confirmadas
+      formalmente no contrato e no projeto executivo.
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 8 de 11</span></div>
+</section>
+
+<!-- ============ 9 · IMPLANTAÇÃO ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">08 · Implantação</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">Da assinatura ao primeiro voo.</h2>
+    <p class="h-sub">
+      Cronograma de referência para uma estação. O prazo real é confirmado após a visita técnica e
+      depende principalmente do trâmite das autorizações de espaço aéreo.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="tl mb5">
+      <div class="tl-i">
+        <div class="tl-bar"></div>
+        <div class="tl-w">Semana 1</div>
+        <div class="tl-t">Visita técnica</div>
+        <div class="tl-d">Levantamento do terreno, definição do ponto de instalação, mapeamento dos pontos críticos com o conselho.</div>
+      </div>
+      <div class="tl-i">
+        <div class="tl-bar"></div>
+        <div class="tl-w">Semanas 2–4</div>
+        <div class="tl-t">Regularização</div>
+        <div class="tl-d">Cadastro da aeronave, protocolo de acesso ao espaço aéreo, seguro e documentação para a assembleia.</div>
+      </div>
+      <div class="tl-i">
+        <div class="tl-bar"></div>
+        <div class="tl-w">Semana 5</div>
+        <div class="tl-t">Infraestrutura</div>
+        <div class="tl-d">Preparação da base, ponto de energia, link de dados e instalação física da estação.</div>
+      </div>
+      <div class="tl-i">
+        <div class="tl-bar"></div>
+        <div class="tl-w">Semana 6</div>
+        <div class="tl-t">Rotas e testes</div>
+        <div class="tl-d">Programação das missões, voos de homologação, ajuste de máscaras de privacidade e testes de falha.</div>
+      </div>
+      <div class="tl-i">
+        <div class="tl-bar"></div>
+        <div class="tl-w">Semana 7</div>
+        <div class="tl-t">Entrada em operação</div>
+        <div class="tl-d">Treinamento da portaria, liberação dos acessos dos moradores e início da grade regular.</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card" style="border-top:2mm solid var(--teal);">
+        <div class="ct">Incluso no serviço</div>
+        <ul class="chk tight mt3">
+          <li>Estação DJI Dock 2 e aeronave, instaladas e configuradas.</li>
+          <li>Toda a regularização junto a ANAC, DECEA e ANATEL, mantida vigente.</li>
+          <li>Seguro de responsabilidade civil da operação.</li>
+          <li>Programação e revisão das rotas sempre que o condomínio pedir.</li>
+          <li>Portal do morador e painel da portaria, com hospedagem e suporte.</li>
+          <li>Armazenamento das gravações pelo prazo contratado.</li>
+          <li>Manutenção preventiva, atualizações e substituição de peças de desgaste.</li>
+          <li>Treinamento da equipe de portaria e reciclagem periódica.</li>
+          <li>Monitoramento remoto da saúde do equipamento.</li>
+        </ul>
+      </div>
+      <div class="card soft">
+        <div class="ct">Sob responsabilidade do condomínio</div>
+        <ul class="tight mt3">
+          <li>Disponibilizar o ponto de instalação e o acesso da equipe técnica.</li>
+          <li>Fornecer energia elétrica e ponto de rede no local da estação.</li>
+          <li>Aprovar o projeto e a política de imagens em assembleia.</li>
+          <li>Manter a sinalização informativa instalada nos acessos.</li>
+          <li>Indicar os responsáveis autorizados a solicitar exportação de imagens.</li>
+        </ul>
+        <div class="tiny mt4" style="border-top:.6px solid var(--line);padding-top:2.5mm;">
+          Eventual obra civil de reforço estrutural, extensão de rede elétrica ou de dados até o ponto
+          escolhido é avaliada e orçada à parte, caso a visita técnica identifique necessidade.
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 9 de 11</span></div>
+</section>
+
+<!-- ============ 10 · INVESTIMENTO + CTA ============ -->
+<section class="page">
+  <div class="pad">
+    <div class="rh">
+      <span class="sec">09 · Investimento e próximos passos</span>
+      <span class="brand">Projeto DJI Dock 2 · [NOME DO CONDOMÍNIO]</span>
+    </div>
+
+    <h2 class="h-sec">O valor sai da visita técnica —<br>não de uma tabela genérica.</h2>
+    <p class="h-sub">
+      Cada condomínio tem terreno, perímetro e ponto de instalação diferentes. Apresentar um número antes
+      de olhar o local seria chutar. Por isso a proposta financeira é emitida após a visita, já fechada,
+      sem surpresa depois.
+    </p>
+
+    <div class="rule"></div>
+
+    <div class="grid2 mb4">
+      <div class="card">
+        <div class="ct">Modalidades disponíveis</div>
+        <ul class="tight mt3">
+          <li><strong>Segurança como serviço:</strong> mensalidade única, sem investimento inicial. Equipamento, regularização, seguro, suporte e manutenção inclusos. É o formato adotado pela maioria dos condomínios.</li>
+          <li><strong>Aquisição do equipamento:</strong> o condomínio compra a estação e contrata à parte a operação e a manutenção.</li>
+          <li><strong>Projeto-piloto:</strong> período inicial reduzido para avaliação em campo antes da decisão definitiva em assembleia.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="ct">O que define o valor</div>
+        <ul class="tight mt3">
+          <li>Área total e extensão do perímetro a cobrir.</li>
+          <li>Número de estações necessárias para a cobertura desejada.</li>
+          <li>Quantidade de rondas diárias contratadas.</li>
+          <li>Prazo de guarda das gravações.</li>
+          <li>Necessidade ou não de adequação de infraestrutura no local.</li>
+          <li>Prazo de contrato escolhido.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout mb5">
+      <div class="small" style="margin:0;">
+        <strong>Referência para o rateio:</strong> na modalidade de serviço, o custo é diluído entre as
+        unidades e entra na taxa condominial como uma linha só. Na visita técnica apresentamos o valor
+        fechado e o rateio já calculado por unidade, no formato que o síndico pode levar direto para a
+        assembleia.
+      </div>
+    </div>
+
+    <div class="eyebrow">Próximos passos</div>
+    <div class="next">
+      <div class="n-i">
+        <div class="n-n">PASSO 01</div>
+        <div class="n-t">Agendar a visita</div>
+        <div class="n-d">Um contato pelo WhatsApp da última página já marca. Sugerimos que síndico e conselho participem juntos.</div>
+      </div>
+      <div class="n-i">
+        <div class="n-n">PASSO 02</div>
+        <div class="n-t">Demonstração no local</div>
+        <div class="n-d">Voo real sobre o perímetro do condomínio, com a imagem ao vivo na tela para o conselho ver.</div>
+      </div>
+      <div class="n-i">
+        <div class="n-n">PASSO 03</div>
+        <div class="n-t">Proposta fechada</div>
+        <div class="n-d">Valor definitivo, rateio por unidade e material pronto para a pauta de assembleia.</div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="tiny" style="border-top:.6px solid var(--line);padding-top:3mm;">
+      Documento de caráter comercial, sem valor contratual. Condições, prazos e escopo são formalizados em
+      contrato após a visita técnica. DJI, DJI Dock 2, Matrice e FlightHub são marcas de seus respectivos
+      titulares, citadas aqui apenas para identificar o equipamento proposto.
+    </div>
+  </div>
+  <div class="rf"><span>Proposta Comercial · <b>Segurança Aérea Autônoma</b></span><span class="tnum">Página 10 de 11</span></div>
+</section>
+
+<!-- ============ 11 · CONTATO (ENCERRAMENTO) ============ -->
+<section class="page cover">
+  <svg class="cover-bg" viewBox="0 0 210 297" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <radialGradient id="gl2" cx="72%" cy="16%" r="66%">
+        <stop offset="0%" stop-color="#123B52" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#071726" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="210" height="297" fill="#071726"/>
+    <rect width="210" height="297" fill="url(#gl2)"/>
+    <g fill="none" stroke="#4FD8C4" stroke-opacity=".13">
+      <circle cx="163" cy="48" r="26"/><circle cx="163" cy="48" r="44"/>
+      <circle cx="163" cy="48" r="64"/><circle cx="163" cy="48" r="88"/>
+    </g>
+    <g transform="translate(163,48)" stroke="#4FD8C4" stroke-opacity=".8" fill="none" stroke-width="1.2">
+      <line x1="-12" y1="-9" x2="-5" y2="-3"/><line x1="12" y1="-9" x2="5" y2="-3"/>
+      <line x1="-12" y1="9" x2="-5" y2="3"/><line x1="12" y1="9" x2="5" y2="3"/>
+      <ellipse cx="-12" cy="-9" rx="7" ry="1.6"/><ellipse cx="12" cy="-9" rx="7" ry="1.6"/>
+      <ellipse cx="-12" cy="9" rx="7" ry="1.6"/><ellipse cx="12" cy="9" rx="7" ry="1.6"/>
+      <rect x="-5.5" y="-4" width="11" height="8" rx="1.8" fill="#4FD8C4" fill-opacity=".22"/>
+      <circle cx="0" cy="5.2" r="2.3" fill="#4FD8C4" fill-opacity=".45"/>
+    </g>
+  </svg>
+
+  <div class="cover-inner" style="padding:20mm 16mm 16mm;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <span class="badge">Próximo passo</span>
+      <span style="font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:#7FA3BC;">Página 11 de 11</span>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div>
+      <h1 style="font-size:31pt;">Fale com nosso<br><span class="accent">especialista.</span></h1>
+      <p class="lede" style="max-width:126mm;">
+        Visita técnica e demonstração de voo no próprio condomínio, <strong style="color:#fff;">sem custo e
+        sem compromisso</strong>. Em cerca de 40 minutos o conselho vê o equipamento operando no local
+        e recebe o dimensionamento com valor fechado.
+      </p>
+    </div>
+
+    <div class="mt8" style="margin-top:11mm;">
+      <div class="fields" style="gap:7mm 8mm;">
+        <div class="fld">
+          <div class="fl">Empresa</div>
+          <div class="fv" style="font-size:13pt;">[NOME DA EMPRESA]</div>
+        </div>
+        <div class="fld">
+          <div class="fl">Especialista responsável</div>
+          <div class="fv" style="font-size:13pt;">[NOME DO RESPONSÁVEL]</div>
+        </div>
+        <div class="fld">
+          <div class="fl">WhatsApp · Telefone</div>
+          <div class="fv" style="font-size:13pt;">[WHATSAPP]</div>
+        </div>
+        <div class="fld">
+          <div class="fl">E-mail</div>
+          <div class="fv" style="font-size:13pt;">[E-MAIL]</div>
+        </div>
+        <div class="fld" style="grid-column:1 / -1;">
+          <div class="fl">Site · Instagram</div>
+          <div class="fv" style="font-size:13pt;">[SITE / @INSTAGRAM]</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="cover-card" style="border-left-color:#4FD8C4;">
+      <div class="cc-l" style="margin-bottom:2mm;">Para a portaria</div>
+      <div style="font-size:10.4pt;color:#D6E4EF;line-height:1.5;">
+        Favor encaminhar este material ao <strong style="color:#fff;">síndico(a), ao conselho ou à
+        administradora</strong> do condomínio. Em caso de dúvida sobre o conteúdo, o contato acima
+        atende diretamente e sem custo.
+      </div>
+    </div>
+
+    <div class="cover-foot mt6">
+      <div style="max-width:120mm;">
+        Documento de caráter comercial, sem valor contratual. Condições, prazos e escopo são formalizados
+        em contrato após a visita técnica. DJI, DJI Dock 2, Matrice e FlightHub são marcas de seus
+        respectivos titulares, citadas apenas para identificar o equipamento proposto.
+      </div>
+      <div style="text-align:right;">
+        <div style="color:#4FD8C4;font-weight:700;font-size:9.4pt;">Obrigado.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
