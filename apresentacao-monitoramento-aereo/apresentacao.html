@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Monitoramento Aéreo de Instalações e Infraestrutura</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  @page { size: A4; margin: 0; }
+
+  :root{
+    --ink:      #0A1720;
+    --ink-2:    #122937;
+    --ink-3:    #1D3B4D;
+    --accent:   #00D18C;
+    --accent-d: #00A972;
+    --warn:     #FF6A4A;
+    --warn-soft:#FFF1ED;
+    --acc-soft: #E8FBF3;
+    --paper:    #FFFFFF;
+    --mist:     #F4F7F9;
+    --line:     #DDE5EA;
+    --muted:    #5E7484;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body{
+    font-family:'Inter', 'Liberation Sans', sans-serif;
+    color:var(--ink);
+    background:#8A9AA5;
+    font-feature-settings:"ss01","cv05";
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{
+    width:210mm; height:297mm;
+    background:var(--paper);
+    position:relative; overflow:hidden;
+    page-break-after:always; break-after:page;
+    margin:0 auto;
+  }
+  .page:last-child{ page-break-after:auto; break-after:auto; }
+
+  .cond{ font-family:'Barlow Condensed','Liberation Sans Narrow',sans-serif; }
+
+  /* ============ KICKER / EYEBROW ============ */
+  .eyebrow{
+    font-size:8.4pt; font-weight:700; letter-spacing:.20em;
+    text-transform:uppercase;
+  }
+
+  /* ==================================================================
+     PÁGINA 1 — CAPA
+     ================================================================== */
+  .cover{
+    background:
+      radial-gradient(120% 90% at 88% 8%, rgba(0,209,140,.20) 0%, rgba(0,209,140,0) 55%),
+      radial-gradient(90% 70% at 10% 100%, rgba(0,120,160,.28) 0%, rgba(0,120,160,0) 60%),
+      linear-gradient(165deg, #0D2130 0%, #0A1720 55%, #07131A 100%);
+    color:#fff;
+    display:flex; flex-direction:column;
+  }
+  .grid-lines{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size:14mm 14mm;
+    mask-image:linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.15) 60%, transparent);
+    -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.15) 60%, transparent);
+  }
+
+  .cover-top{
+    position:relative; z-index:2;
+    padding:16mm 18mm 0;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo-slot{
+    border:1px dashed rgba(255,255,255,.30);
+    border-radius:3px;
+    padding:4.5mm 7mm;
+    font-size:7.4pt; font-weight:600; letter-spacing:.16em;
+    color:rgba(255,255,255,.50); text-transform:uppercase;
+  }
+  .cover-top .eyebrow{ color:var(--accent); }
+
+  .cover-body{
+    position:relative; z-index:2;
+    padding:0 18mm;
+    margin-top:14mm;
+    flex:1;
+  }
+  .h1{
+    font-size:37pt; line-height:1.04; font-weight:800;
+    letter-spacing:-.024em; max-width:152mm;
+  }
+  .h1 em{ font-style:normal; color:var(--accent); }
+  .rule{
+    width:26mm; height:3px; background:var(--accent);
+    margin:9mm 0 7mm; border-radius:2px;
+  }
+  .lede{
+    font-size:12.2pt; line-height:1.52; color:rgba(255,255,255,.80);
+    max-width:132mm; font-weight:400;
+  }
+  .lede b{ color:#fff; font-weight:600; }
+
+  .badges{
+    display:flex; gap:4mm; margin-top:12mm; flex-wrap:wrap;
+  }
+  .badge{
+    border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.05);
+    border-radius:5px; padding:5mm 6mm; width:50mm;
+  }
+  .badge-n{
+    font-size:21pt; font-weight:800; letter-spacing:-.03em;
+    color:var(--accent); line-height:1;
+  }
+  .badge-t{
+    font-size:8.6pt; line-height:1.35; color:rgba(255,255,255,.72);
+    margin-top:2.5mm; font-weight:500;
+  }
+
+  /* Hero SVG */
+  .hero-art{
+    position:absolute; right:-7mm; bottom:22mm;
+    width:99mm; opacity:.9; z-index:1;
+  }
+
+  .cover-foot{
+    position:relative; z-index:2;
+    border-top:1px solid rgba(255,255,255,.12);
+    margin:0 18mm; padding:7mm 0 14mm;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:8mm;
+  }
+  .foot-cta{ font-size:10.6pt; font-weight:600; line-height:1.4; max-width:105mm; }
+  .foot-cta span{ color:var(--accent); }
+  .foot-note{
+    font-size:7.6pt; color:rgba(255,255,255,.45); text-align:right;
+    line-height:1.5; white-space:nowrap;
+  }
+
+  /* ==================================================================
+     PÁGINAS INTERNAS
+     ================================================================== */
+  .sheet{ padding:15mm 18mm 16mm; display:flex; flex-direction:column; height:100%; }
+  .sheet > *{ flex:0 0 auto; }
+
+  .sec-head{ display:flex; align-items:baseline; gap:5mm; }
+  .sec-head .eyebrow{ color:var(--accent-d); }
+  .sec-head .num{
+    font-size:8.4pt; font-weight:800; color:var(--line); letter-spacing:.1em;
+    margin-left:auto;
+  }
+  .h2{
+    font-size:25pt; font-weight:800; letter-spacing:-.022em;
+    line-height:1.08; margin-top:4mm; max-width:160mm;
+  }
+  .h2 em{ font-style:normal; color:var(--accent-d); }
+  .sub{
+    font-size:9.8pt; color:var(--muted); line-height:1.5;
+    margin-top:4mm; max-width:152mm;
+  }
+
+  /* --- tabela dor -> solução --- */
+  .ds-head{
+    display:grid; grid-template-columns:1fr 1fr; gap:6mm;
+    margin-top:9mm;
+  }
+  .col-tag{
+    font-size:8.2pt; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+    display:flex; align-items:center; gap:2.5mm;
+    padding-bottom:2.5mm;
+  }
+  .col-tag.pain{ color:var(--warn); border-bottom:2px solid var(--warn); }
+  .col-tag.sol { color:var(--accent-d); border-bottom:2px solid var(--accent); }
+  .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+  .ds-row{
+    display:grid; grid-template-columns:1fr 1fr; gap:6mm;
+    margin-top:3.4mm;
+  }
+  .cell{
+    border-radius:5px; padding:4.4mm 5mm;
+    display:flex; gap:3.6mm; align-items:flex-start;
+  }
+  .cell.pain{ background:var(--warn-soft); }
+  .cell.sol { background:var(--acc-soft); }
+  .cell .ico{ flex:0 0 auto; margin-top:.4mm; }
+  .cell h4{
+    font-size:9.6pt; font-weight:700; line-height:1.25; letter-spacing:-.008em;
+  }
+  .cell.pain h4{ color:#B93A1E; }
+  .cell.sol  h4{ color:#046B4B; }
+  .cell p{
+    font-size:8.5pt; line-height:1.45; color:var(--muted); margin-top:1.6mm;
+  }
+  .cell.sol p{ color:#2E5A4C; }
+
+  .strip{
+    margin-top:auto;
+    background:var(--ink); color:#fff;
+    border-radius:6px; padding:6.5mm 7mm;
+    display:flex; align-items:center; gap:6mm;
+  }
+  .strip .q{
+    font-size:10.6pt; font-weight:700; line-height:1.38; flex:1;
+  }
+  .strip .q span{ color:var(--accent); }
+  .strip .a{
+    font-size:8.4pt; line-height:1.5; color:rgba(255,255,255,.66);
+    width:74mm; border-left:1px solid rgba(255,255,255,.18); padding-left:6mm;
+  }
+
+  /* ==================================================================
+     PÁGINA 3
+     ================================================================== */
+  .apps{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:3mm;
+    margin-top:6mm;
+  }
+  .app{
+    border:1px solid var(--line); border-radius:5px;
+    padding:4mm 3.6mm; text-align:left;
+    background:#fff;
+  }
+  .app .ico{ display:block; margin-bottom:2.8mm; }
+  .app b{ font-size:8.5pt; font-weight:700; display:block; line-height:1.2; }
+  .app span{ font-size:7.4pt; color:var(--muted); display:block; margin-top:1.2mm; line-height:1.35; }
+
+  .tech{
+    margin-top:5mm; display:flex; flex-wrap:wrap; gap:2mm;
+    align-items:center;
+  }
+  .tech .lbl{
+    font-size:7.6pt; font-weight:800; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); margin-right:1.5mm;
+  }
+  .chip{
+    border:1px solid var(--line); border-radius:20px;
+    padding:2mm 4mm; font-size:8pt; font-weight:600; color:var(--ink-3);
+    background:var(--mist);
+  }
+
+  .eco{
+    margin-top:8mm;
+    background:linear-gradient(135deg, #F0FBF6 0%, #EAF7FF 100%);
+    border:1px solid #CFEBE0;
+    border-radius:6px; padding:5.5mm 7mm;
+    margin-bottom:6mm;
+  }
+  .eco-h{
+    display:flex; align-items:center; gap:3mm; margin-bottom:4mm;
+  }
+  .eco-h b{ font-size:11.8pt; font-weight:800; letter-spacing:-.015em; }
+  .eco-h b em{ font-style:normal; color:var(--accent-d); }
+  .eco-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:3.5mm 7mm; }
+  .eco-i{ display:flex; gap:3.2mm; align-items:flex-start; }
+  .eco-i .ico{ flex:0 0 auto; margin-top:.3mm; }
+  .eco-i h5{ font-size:9pt; font-weight:700; line-height:1.25; }
+  .eco-i p{ font-size:8.2pt; color:#3D6357; line-height:1.42; margin-top:1.2mm; }
+
+  /* --- CTA final --- */
+  .cta{
+    margin-top:auto;
+    background:
+      radial-gradient(100% 140% at 92% 0%, rgba(0,209,140,.22) 0%, rgba(0,209,140,0) 60%),
+      linear-gradient(150deg, #0D2130 0%, #0A1720 100%);
+    color:#fff;
+    border-radius:7px; padding:7mm 8.5mm;
+    position:relative; overflow:hidden;
+  }
+  .cta .eyebrow{ color:var(--accent); }
+  .cta h3{
+    font-size:19.5pt; font-weight:800; letter-spacing:-.022em;
+    line-height:1.12; margin-top:3mm; max-width:120mm;
+  }
+  .cta p{
+    font-size:9.4pt; color:rgba(255,255,255,.72); line-height:1.5;
+    margin-top:3.5mm; max-width:118mm;
+  }
+  .contact{
+    display:flex; gap:4mm; margin-top:6mm;
+  }
+  .cbox{
+    flex:1;
+    border:1px dashed rgba(0,209,140,.55);
+    background:rgba(0,209,140,.07);
+    border-radius:5px; padding:4mm 5mm;
+  }
+  .cbox .k{
+    font-size:7.4pt; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--accent); display:flex; align-items:center; gap:2mm;
+  }
+  .cbox .v{
+    font-size:11.5pt; font-weight:700; margin-top:2.6mm;
+    color:rgba(255,255,255,.38); letter-spacing:.01em;
+    border-bottom:1px dotted rgba(255,255,255,.22);
+    padding-bottom:1.4mm; min-height:6mm;
+  }
+
+  .pfoot{
+    position:absolute; left:18mm; right:18mm; bottom:6mm;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:7pt; color:#9DB0BC; letter-spacing:.04em;
+    border-top:1px solid var(--line); padding-top:3mm;
+  }
+  .pfoot b{ color:var(--ink-3); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- ================= SPRITE DE ÍCONES ================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-stop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5h5v5h-5z"/></symbol>
+    <symbol id="i-risk" viewBox="0 0 24 24"><path d="M12 3.5 21 20H3z"/><path d="M12 10v4.2M12 17.2v.1"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-cost" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 16.5h4.5"/></symbol>
+    <symbol id="i-drone" viewBox="0 0 24 24"><path d="M4 5h4M2.8 3.4v3.2M7.2 3.4v3.2M16 5h4M17.2 3.4v3.2M21.6 3.4v3.2M6 5l3.2 4.4M18 5l-3.2 4.4"/><rect x="8.6" y="9.4" width="6.8" height="5.2" rx="1.4"/><path d="M12 14.6v3.2M9.4 20.6 12 17.8l2.6 2.8"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 4.6-3.3 7.7-8 9-4.7-1.3-8-4.4-8-9V6z"/><path d="m8.8 12 2.3 2.3 4.3-4.6"/></symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16M3 12h18"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 3.5-4 3 2.6L20 7"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 2"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-8 5-14 16-15 0 10-4.5 15-11.5 15A6.5 6.5 0 0 1 4 20Z"/><path d="M8 16c2.4-3.4 5.2-5.6 9-7"/></symbol>
+    <symbol id="i-recycle" viewBox="0 0 24 24"><path d="M9.5 4.6 12 9M12 9 9.5 4.6 5.8 11h4.4M18.2 11l-2.4-4.2-3.5 2M14.4 20H19l2.2-3.9M9.6 20H5.2L3 16.1l3.7-2.1"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3s5.5 4.2 5.5 9.2A5.5 5.5 0 0 1 12 21a5.5 5.5 0 0 1-5.5-8.8C7.6 10 9 9.4 9 6.8c1.4.6 3 1.9 3-3.8Z"/></symbol>
+    <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 14.3V5a2 2 0 1 0-4 0v9.3a4.2 4.2 0 1 0 4 0Z"/><path d="M12 9v6"/></symbol>
+    <symbol id="i-tank" viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="7" ry="2.8"/><path d="M5 6.5v11c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8v-11"/><path d="M5 12.5c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8"/></symbol>
+    <symbol id="i-roof" viewBox="0 0 24 24"><path d="M2.5 11 12 4l9.5 7"/><path d="M5 10.2V20h14v-9.8M9.5 20v-5.5h5V20"/></symbol>
+    <symbol id="i-tower" viewBox="0 0 24 24"><path d="M8 21 12 3l4 18M9 15h6M8.2 18.6h7.6"/></symbol>
+    <symbol id="i-pipe" viewBox="0 0 24 24"><path d="M3 7h9a4 4 0 0 1 4 4v2a4 4 0 0 0 4 4h1"/><path d="M3 4.6v4.8M21 14.6v4.8"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2.5 4.5 13.8h6.2L10 21.5l9.2-11.4h-6.3z"/></symbol>
+    <symbol id="i-stock" viewBox="0 0 24 24"><path d="M3 19.5 12 6l9 13.5z"/><path d="M7.4 19.5 12 12.6l4.6 6.9"/></symbol>
+    <symbol id="i-dam" viewBox="0 0 24 24"><path d="M3 20h18M4.5 20V9.5c3.5 0 4.5-4 7.5-4s4 4 7.5 4V20"/><path d="M3 15.5c2.5 1.6 4.5-1 7 0s4.5-1.6 7 0 4-.5 4-.5"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><path d="M12 3.2c-4.6 0-8.4 3.4-9 7.8 0 0 3.4 6.2 9 6.2s9-6.2 9-6.2c-.6-4.4-4.4-7.8-9-7.8Z" opacity=".0"/><rect x="3" y="7" width="18" height="13" rx="2.2"/><path d="M8.6 7 10 4h4l1.4 3"/><circle cx="12" cy="13.5" r="3.4"/></symbol>
+    <symbol id="i-crane" viewBox="0 0 24 24"><path d="M3 21h18M6 21V8.5h5V21M11 21V3.5h7V21"/><path d="M8 12h1M8 16h1M14 8h1M14 12h1M14 16h1"/></symbol>
+    <symbol id="i-fence" viewBox="0 0 24 24"><path d="M6 21V6l3-3 3 3v15M12 21V6l3-3 3 3v15M3 10h18M3 15h18"/></symbol>
+  </defs>
+</svg>
+
+
+<!-- ==================================================================
+     PÁGINA 1 — CAPA
+     ================================================================== -->
+<section class="page cover">
+  <div class="grid-lines"></div>
+
+  <!-- arte aérea -->
+  <svg class="hero-art" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#00D18C" opacity=".22">
+      <circle cx="215" cy="205" r="168" stroke-width="1"/>
+      <circle cx="215" cy="205" r="126" stroke-width="1"/>
+      <circle cx="215" cy="205" r="84"  stroke-width="1"/>
+      <circle cx="215" cy="205" r="42"  stroke-width="1"/>
+    </g>
+    <g stroke="#00D18C" opacity=".45" stroke-width="1.4">
+      <path d="M215 25v40M215 345v40M35 205h40M355 205h40"/>
+    </g>
+    <!-- varredura -->
+    <path d="M215 205 L 383 205 A168 168 0 0 0 330 86 Z" fill="#00D18C" opacity=".08"/>
+    <!-- planta industrial vista de cima (abstrata) -->
+    <g stroke="#7FE9C6" stroke-width="1.6" opacity=".85">
+      <rect x="150" y="150" width="58" height="42" rx="3"/>
+      <rect x="216" y="150" width="34" height="24" rx="3"/>
+      <rect x="216" y="182" width="34" height="34" rx="3"/>
+      <rect x="150" y="200" width="26" height="48" rx="3"/>
+      <circle cx="270" cy="152" r="13"/>
+      <circle cx="270" cy="188" r="9"/>
+      <circle cx="196" cy="270" r="16"/>
+      <path d="M184 224h64M248 224v46M120 205h30M262 250h44M306 250v-46"/>
+      <path d="M150 120h100M250 120v22"/>
+    </g>
+    <!-- alvos de inspeção -->
+    <g opacity=".95">
+      <circle cx="270" cy="152" r="21" stroke="#00D18C" stroke-width="1.6" stroke-dasharray="4 4"/>
+      <circle cx="196" cy="270" r="24" stroke="#00D18C" stroke-width="1.6" stroke-dasharray="4 4"/>
+      <rect x="144" y="144" width="70" height="54" rx="4" stroke="#FF6A4A" stroke-width="1.8" stroke-dasharray="5 4"/>
+    </g>
+    <!-- drone -->
+    <g transform="translate(96,74)" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".92">
+      <path d="M0 6h16M2 0v12M14 0v12M52 6h16M54 0v12M66 0v12M18 6l10 12M50 6l-10 12"/>
+      <rect x="26" y="18" width="16" height="12" rx="3" fill="#0A1720"/>
+      <circle cx="34" cy="24" r="2.6" stroke="#00D18C"/>
+    </g>
+    <path d="M130 104 L 205 196" stroke="#00D18C" stroke-width="1.2" stroke-dasharray="3 5" opacity=".6"/>
+  </svg>
+
+  <div class="cover-top">
+    <div class="logo-slot">[ sua logo aqui ]</div>
+    <div class="eyebrow">Monitoramento Aéreo Industrial</div>
+  </div>
+
+  <div class="cover-body">
+    <h1 class="h1">O que você <em>não inspeciona</em> hoje vira parada de produção amanhã.</h1>
+    <div class="rule"></div>
+    <p class="lede">
+      Monitoramento e inspeção aérea por drone para <b>plantas industriais, infraestrutura e ativos críticos</b> —
+      com a operação rodando, sem andaime, sem ninguém em altura.
+    </p>
+
+    <div class="badges">
+      <div class="badge">
+        <div class="badge-n">0</div>
+        <div class="badge-t">paradas de produção para inspecionar</div>
+      </div>
+      <div class="badge">
+        <div class="badge-n">horas</div>
+        <div class="badge-t">para cobrir o que hoje leva semanas</div>
+      </div>
+      <div class="badge">
+        <div class="badge-n">100%</div>
+        <div class="badge-t">do ativo registrado em imagem e laudo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-foot">
+    <div class="foot-cta">
+      Leve 3 minutos neste material.<br>
+      Depois, <span>fale com o nosso especialista</span> e receba um plano de inspeção do seu ativo.
+    </div>
+    <div class="foot-note">
+      Apresentação comercial<br>
+      Inspeção &middot; Termografia &middot; Mapeamento 3D
+    </div>
+  </div>
+</section>
+
+
+<!-- ==================================================================
+     PÁGINA 2 — DORES x SOLUÇÕES
+     ================================================================== -->
+<section class="page">
+  <div class="sheet">
+    <div class="sec-head">
+      <span class="eyebrow">O problema &amp; a saída</span>
+      <span class="num">02</span>
+    </div>
+    <h2 class="h2">Toda indústria já sabe onde dói.<br>Poucas sabem que dá para <em>resolver voando</em>.</h2>
+    <p class="sub">
+      Inspeção tradicional custa caro porque cobra três vezes: no serviço, na parada e no risco.
+      O monitoramento aéreo ataca os três de uma vez.
+    </p>
+
+    <div class="ds-head">
+      <div class="col-tag pain"><span class="dot"></span>Como é hoje</div>
+      <div class="col-tag sol"><span class="dot"></span>Como fica com drone</div>
+    </div>
+
+    <!-- 1 -->
+    <div class="ds-row">
+      <div class="cell pain">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6A4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-stop"/></svg>
+        <div>
+          <h4>Parar a planta para poder olhar</h4>
+          <p>Andaime, plataforma, alpinismo e janela de shutdown. Cada hora parada é receita que não volta.</p>
+        </div>
+      </div>
+      <div class="cell sol">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-drone"/></svg>
+        <div>
+          <h4>Inspeção com a planta operando</h4>
+          <p>O drone sobe enquanto a linha produz. Sem montagem de estrutura, sem janela de parada, sem retrabalho.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="ds-row">
+      <div class="cell pain">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6A4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-risk"/></svg>
+        <div>
+          <h4>Gente exposta em altura e espaço confinado</h4>
+          <p>Telhado frágil, chaminé, torre, silo e tanque. Um acidente para a obra, o CNPJ e a reputação.</p>
+        </div>
+      </div>
+      <div class="cell sol">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg>
+        <div>
+          <h4>Ninguém sobe. O drone sobe.</h4>
+          <p>Some do escopo o trabalho em altura e o espaço confinado — e com eles, boa parte do seu risco de NR-35 e NR-33.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="ds-row">
+      <div class="cell pain">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6A4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-eye"/></svg>
+        <div>
+          <h4>Inspeção por amostragem</h4>
+          <p>Só se enxerga onde dá para chegar. A trinca, o ponto quente e o vazamento aparecem quando já viraram ocorrência.</p>
+        </div>
+      </div>
+      <div class="cell sol">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-scan"/></svg>
+        <div>
+          <h4>Cobertura total do ativo</h4>
+          <p>Imagem de alta resolução, zoom, termografia e modelo 3D. Falha detectada no início, quando o reparo ainda é barato.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="ds-row">
+      <div class="cell pain">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6A4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cost"/></svg>
+        <div>
+          <h4>Custo alto, imprevisível e recorrente</h4>
+          <p>Andaime, munck, plataforma elevatória, equipe deslocada, diária, hora extra — e tudo de novo no ano seguinte.</p>
+        </div>
+      </div>
+      <div class="cell sol">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chart"/></svg>
+        <div>
+          <h4>Custo por inspeção muito menor</h4>
+          <p>Equipe enxuta, sem estrutura temporária e sem mobilização pesada. Preço fechado por ativo ou plano recorrente.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="ds-row">
+      <div class="cell pain">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6A4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-doc"/></svg>
+        <div>
+          <h4>Laudo solto, sem histórico</h4>
+          <p>Foto no celular do técnico, relatório em papel. Na auditoria, no seguro ou no órgão ambiental, não sustenta.</p>
+        </div>
+      </div>
+      <div class="cell sol">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clock"/></svg>
+        <div>
+          <h4>Relatório digital e comparável no tempo</h4>
+          <p>Cada achado georreferenciado, com data e imagem. Compare voo a voo e prove a evolução do ativo com evidência.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div class="q">Um dia de linha parada costuma custar mais que <span>um ano inteiro</span> de monitoramento aéreo.</div>
+      <div class="a">
+        A conta que interessa não é o preço do voo: é quanto custa descobrir tarde.
+        Manutenção preditiva só existe quando existe dado — e o dado começa no ar.
+      </div>
+    </div>
+  </div>
+
+  <div class="pfoot">
+    <span><b>Monitoramento Aéreo Industrial</b> &nbsp;·&nbsp; Inspeção de instalações e infraestrutura</span>
+    <span>02</span>
+  </div>
+</section>
+
+
+<!-- ==================================================================
+     PÁGINA 3 — APLICAÇÕES, SUSTENTABILIDADE E CTA
+     ================================================================== -->
+<section class="page">
+  <div class="sheet">
+    <div class="sec-head">
+      <span class="eyebrow">Onde entramos</span>
+      <span class="num">03</span>
+    </div>
+    <h2 class="h2">Se está alto, extenso ou perigoso,<br><em>a gente monitora.</em></h2>
+
+    <div class="apps">
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-roof"/></svg>
+        <b>Telhados e coberturas</b><span>Infiltração, corrosão, telha rompida</span>
+      </div>
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tank"/></svg>
+        <b>Tanques e esferas</b><span>Costado, teto, pintura e vazamento</span>
+      </div>
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tower"/></svg>
+        <b>Chaminés e torres</b><span>Estrutura, refratário, solda, escada</span>
+      </div>
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pipe"/></svg>
+        <b>Tubovias e dutos</b><span>Isolamento, suporte, ponto de fuga</span>
+      </div>
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bolt"/></svg>
+        <b>Subestações e linhas</b><span>Ponto quente, isolador, faixa de servidão</span>
+      </div>
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-stock"/></svg>
+        <b>Pátios e estoque</b><span>Volumetria de pilha por drone</span>
+      </div>
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-dam"/></svg>
+        <b>Barragens e taludes</b><span>Erosão, recalque, drenagem</span>
+      </div>
+      <div class="app">
+        <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-crane"/></svg>
+        <b>Obras e ampliações</b><span>Avanço físico e medição mensal</span>
+      </div>
+    </div>
+
+    <div class="tech">
+      <span class="lbl">A bordo</span>
+      <span class="chip">Câmera 4K + zoom</span>
+      <span class="chip">Termografia (IR)</span>
+      <span class="chip">Mapeamento 3D / fotogrametria</span>
+      <span class="chip">Ortomosaico georreferenciado</span>
+      <span class="chip">Detecção de gás</span>
+      <span class="chip">Voo noturno</span>
+      <span class="chip">Multiespectral</span>
+    </div>
+
+    <div class="eco">
+      <div class="eco-h">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-leaf"/></svg>
+        <b>Mais barato porque é <em>mais leve</em> — e sustentável pelo mesmo motivo</b>
+      </div>
+      <div class="eco-grid">
+        <div class="eco-i">
+          <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-recycle"/></svg>
+          <div>
+            <h5>Menos estrutura, menos resíduo</h5>
+            <p>Sem andaime, sem madeira, sem plataforma montada e desmontada a cada inspeção.</p>
+          </div>
+        </div>
+        <div class="eco-i">
+          <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-leaf"/></svg>
+          <div>
+            <h5>Menos máquina, menos emissão</h5>
+            <p>Um voo elétrico substitui munck, guindaste, plataforma e, em muitos casos, o sobrevoo tripulado.</p>
+          </div>
+        </div>
+        <div class="eco-i">
+          <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-thermo"/></svg>
+          <div>
+            <h5>Menos perda de energia e de produto</h5>
+            <p>Termografia acha isolamento ruim e ponto quente; sensor de gás acha fuga antes de virar passivo ambiental.</p>
+          </div>
+        </div>
+        <div class="eco-i">
+          <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A972" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-flame"/></svg>
+          <div>
+            <h5>Evidência pronta para ESG e seguradora</h5>
+            <p>Relatório com data, coordenada e imagem — serve em auditoria, licenciamento e renovação de apólice.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <div class="eyebrow">Próximo passo</div>
+      <h3>Fale com o nosso especialista.</h3>
+      <p>
+        20 minutos de conversa: mapeamos seus ativos críticos, mostramos exemplos de laudo
+        e devolvemos um <b>plano de inspeção com escopo e custo</b> — sem compromisso.
+      </p>
+      <div class="contact">
+        <div class="cbox">
+          <div class="k">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#00D18C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5c0 8.3 6.2 14.5 14.5 14.5v-3.6l-4-1.7-2.1 2.1a12.4 12.4 0 0 1-5.2-5.2l2.1-2.1L7.6 5.5H4Z"/></svg>
+            Telefone / WhatsApp
+          </div>
+          <div class="v">(&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&ndash;</div>
+        </div>
+        <div class="cbox">
+          <div class="k">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#00D18C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.6 6.6 8.4 6 8.4-6"/></svg>
+            E-mail
+          </div>
+          <div class="v">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pfoot">
+    <span><b>Monitoramento Aéreo Industrial</b> &nbsp;·&nbsp; Operação conforme regulamentação ANAC / DECEA</span>
+    <span>03</span>
+  </div>
+</section>
+
+</body>
+</html>
