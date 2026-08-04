@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Fazenda 25">
+  <!-- Variante para 16–48 px: sem sulcos, sem gradiente, silhueta maior e
+       traços mais grossos. Detalhe que some abaixo de 48 px vira ruído. -->
+  <defs>
+    <clipPath id="b2"><rect width="512" height="512" rx="112" ry="112"/></clipPath>
+  </defs>
+  <g clip-path="url(#b2)">
+    <rect width="512" height="512" fill="#171B12"/>
+    <!-- faixa de terra, sem sulcos -->
+    <rect x="0" y="396" width="512" height="116" fill="#4A3527"/>
+    <rect x="0" y="392" width="512" height="9" fill="#9CC406" opacity="0.5"/>
+
+    <g fill="#9CC406" transform="translate(256,286) scale(1.2) translate(-266,-292)">
+      <!-- escapamento -->
+      <rect x="268" y="128" width="30" height="104" rx="12"/>
+      <!-- cabine -->
+      <path d="M130 162 h158 a20 20 0 0 1 20 20 v108 h-198 v-108 a20 20 0 0 1 20 -20 z"/>
+      <!-- capô -->
+      <path d="M308 210 h108 a18 18 0 0 1 18 18 v72 h-126 z"/>
+      <!-- chassi -->
+      <rect x="112" y="288" width="322" height="50" rx="14"/>
+      <!-- vidro (recorte escuro largo, sobrevive ao downscale) -->
+      <rect x="150" y="186" width="140" height="70" rx="8" fill="#171B12"/>
+      <!-- roda traseira -->
+      <circle cx="184" cy="338" r="100"/>
+      <circle cx="184" cy="338" r="52" fill="#171B12"/>
+      <circle cx="184" cy="338" r="22" fill="#9CC406"/>
+      <!-- roda dianteira -->
+      <circle cx="402" cy="368" r="66"/>
+      <circle cx="402" cy="368" r="32" fill="#171B12"/>
+      <circle cx="402" cy="368" r="13" fill="#9CC406"/>
+    </g>
+  </g>
+</svg>

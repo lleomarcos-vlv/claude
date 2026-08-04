@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fazenda 25 — simulador agrícola que roda no navegador</title>
+<meta name="description" content="Dirija o trator, engate o implemento e trabalhe a lavoura de verdade: arar, cultivar, semear, adubar, colher e vender no melhor preço. Roda no navegador, sem instalar nada.">
+<link rel="icon" href="assets/icone-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/icone-180.png">
+<meta property="og:title" content="Fazenda 25 — simulador agrícola no navegador">
+<meta property="og:description" content="O ciclo completo da lavoura, do arado à venda. Sem instalar nada.">
+<meta property="og:image" content="assets/tela_hud.png">
+<style>
+  :root {
+    --verde: #9CC406;
+    --verde-esc: #81AA14;
+    --texto: #F3F6E8;
+    --cinza: #7B7B7B;
+    --fundo: #0F1113;
+    --fundo2: #15181B;
+    --borda: rgba(255,255,255,0.08);
+    --terra: #4A3527;
+    --ambar: #FFAE09;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--fundo); color: var(--texto);
+    font-family: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: var(--verde); }
+  .wrap { width: min(100% - 40px, 1080px); margin-inline: auto; }
+  section { padding: 76px 0; }
+  h1, h2, h3 { line-height: 1.15; margin: 0; }
+  h2 { font-size: clamp(26px, 4vw, 38px); font-weight: 800; letter-spacing: -0.5px; }
+  h3 { font-size: 18px; font-weight: 800; }
+  .olho {
+    color: var(--verde); font-size: 12px; font-weight: 800; letter-spacing: 2.4px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .sub { color: var(--cinza); font-size: 17px; max-width: 62ch; margin-top: 14px; }
+
+  /* ---------- topo ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
+    background: rgba(15,17,19,0.86); border-bottom: 1px solid var(--borda);
+  }
+  .navbar { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+  .navbar img { width: 34px; height: 34px; border-radius: 8px; }
+  .marca { font-weight: 800; font-size: 16px; letter-spacing: 0.4px; }
+  .marca span { color: var(--cinza); font-weight: 400; font-size: 12px; display: block; letter-spacing: 1.6px; text-transform: uppercase; }
+  .navbar nav { margin-left: auto; display: flex; gap: 22px; font-size: 14px; }
+  .navbar nav a { color: var(--cinza); text-decoration: none; font-weight: 600; }
+  .navbar nav a:hover { color: var(--texto); }
+  @media (max-width: 720px) { .navbar nav { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    background: var(--verde); color: #12140E; font-weight: 800; font-size: 15px;
+    padding: 14px 26px; border-radius: 8px; text-decoration: none; border: none;
+    cursor: pointer; transition: transform 0.12s, background 0.12s; white-space: nowrap;
+  }
+  .btn:hover { background: #B0DB08; transform: translateY(-2px); }
+  .btn.ghost { background: transparent; color: var(--texto); border: 1.5px solid var(--borda); }
+  .btn.ghost:hover { background: rgba(255,255,255,0.05); border-color: var(--verde); }
+  .btn.pq { padding: 9px 18px; font-size: 13.5px; }
+
+  /* ---------- herói ---------- */
+  .heroi {
+    padding: 66px 0 40px;
+    background:
+      radial-gradient(900px 420px at 78% -8%, rgba(156,196,6,0.14), transparent 62%),
+      linear-gradient(#12151A, var(--fundo));
+    border-bottom: 1px solid var(--borda);
+  }
+  .heroi-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 46px; align-items: center; }
+  @media (max-width: 900px) { .heroi-grid { grid-template-columns: 1fr; gap: 32px; } }
+  .heroi h1 {
+    font-size: clamp(36px, 6.4vw, 62px); font-weight: 900; letter-spacing: -2px; margin-bottom: 4px;
+  }
+  .heroi h1 em { color: var(--verde); font-style: normal; }
+  .heroi p.lead { font-size: 18.5px; color: #C9CFC0; max-width: 52ch; margin: 18px 0 0; }
+  .cta-linha { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; align-items: center; }
+  .selo { font-size: 13px; color: var(--cinza); margin-top: 16px; }
+  .selo b { color: var(--texto); }
+  .heroi-shot {
+    border-radius: 10px; overflow: hidden; border: 1px solid var(--borda);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.65);
+  }
+
+  /* ---------- números ---------- */
+  .faixa { border-block: 1px solid var(--borda); background: var(--fundo2); padding: 26px 0; }
+  .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
+  @media (max-width: 720px) { .nums { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+  .nums b { display: block; font-size: 27px; font-weight: 900; color: var(--verde); letter-spacing: -0.5px; }
+  .nums span { font-size: 12.5px; color: var(--cinza); }
+
+  /* ---------- blocos de recurso ---------- */
+  .rec { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .rec + .rec { margin-top: 84px; }
+  .rec.inv > div:first-child { order: 2; }
+  @media (max-width: 900px) { .rec, .rec.inv { grid-template-columns: 1fr; gap: 26px; }
+    .rec.inv > div:first-child { order: 0; } }
+  .rec img { border-radius: 9px; border: 1px solid var(--borda); box-shadow: 0 18px 44px rgba(0,0,0,0.5); }
+  .rec ul { list-style: none; padding: 0; margin: 20px 0 0; }
+  .rec li { padding-left: 26px; position: relative; margin-bottom: 10px; color: #C0C6B8; font-size: 15px; }
+  .rec li::before {
+    content: ""; position: absolute; left: 0; top: 9px; width: 11px; height: 11px;
+    background: var(--verde); border-radius: 2px;
+  }
+
+  /* ---------- etapas ---------- */
+  .etapas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 36px; }
+  @media (max-width: 900px) { .etapas { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .etapas { grid-template-columns: 1fr; } }
+  .etapa {
+    background: var(--fundo2); border: 1px solid var(--borda); border-radius: 9px; padding: 18px;
+  }
+  .etapa b { color: var(--verde); font-size: 12px; font-weight: 800; letter-spacing: 1.4px; }
+  .etapa h4 { margin: 6px 0 6px; font-size: 16px; font-weight: 800; }
+  .etapa p { margin: 0; font-size: 13.5px; color: var(--cinza); line-height: 1.55; }
+
+  .tira { border-radius: 8px; overflow: hidden; border: 1px solid var(--borda); margin-top: 26px; }
+  .tira img { width: 100%; image-rendering: auto; }
+  .tira-legenda {
+    display: grid; grid-template-columns: repeat(7, 1fr); font-size: 10.5px; color: var(--cinza);
+    text-align: center; margin-top: 8px; gap: 4px;
+  }
+  @media (max-width: 620px) { .tira-legenda { font-size: 8.5px; } }
+
+  /* ---------- tabela ---------- */
+  .tabela-caixa { overflow-x: auto; margin-top: 28px; border: 1px solid var(--borda); border-radius: 9px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+  th, td { padding: 11px 15px; text-align: left; border-bottom: 1px solid var(--borda); }
+  th { background: var(--fundo2); font-size: 11.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--cinza); font-weight: 800; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(156,196,6,0.05); }
+  .pastilha { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; }
+
+  /* ---------- preço ---------- */
+  .preco-caixa {
+    background: linear-gradient(160deg, #1B2016, var(--fundo2));
+    border: 1px solid rgba(156,196,6,0.30); border-radius: 14px;
+    padding: 40px; text-align: center; max-width: 560px; margin: 36px auto 0;
+  }
+  .preco { font-size: 54px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+  .preco small { font-size: 17px; color: var(--cinza); font-weight: 700; }
+  .preco-nota { color: var(--cinza); font-size: 13.5px; margin-top: 10px; }
+  .inclui { list-style: none; padding: 0; margin: 26px 0 30px; text-align: left; display: inline-block; }
+  .inclui li { padding-left: 27px; position: relative; margin-bottom: 9px; font-size: 14.5px; color: #C9CFC0; }
+  .inclui li::before {
+    content: "✓"; position: absolute; left: 0; color: var(--verde); font-weight: 900;
+  }
+
+  /* ---------- faq ---------- */
+  details {
+    border-bottom: 1px solid var(--borda); padding: 17px 0;
+  }
+  summary {
+    cursor: pointer; font-weight: 700; font-size: 16px; list-style: none;
+    display: flex; justify-content: space-between; gap: 16px; align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--verde); font-size: 21px; font-weight: 400; }
+  details[open] summary::after { content: "−"; }
+  details p { color: var(--cinza); font-size: 15px; margin: 12px 0 0; max-width: 78ch; }
+
+  footer { border-top: 1px solid var(--borda); padding: 34px 0; color: var(--cinza); font-size: 13px; }
+  .footer-linha { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; align-items: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap navbar">
+    <img src="assets/icone-64.png" alt="">
+    <div class="marca">Fazenda 25<span>simulador agrícola</span></div>
+    <nav>
+      <a href="#jogo">O jogo</a>
+      <a href="#lavoura">A lavoura</a>
+      <a href="#celular">No celular</a>
+      <a href="#comprar">Comprar</a>
+    </nav>
+    <a href="#comprar" class="btn pq" style="margin-left:16px">Comprar</a>
+  </div>
+</header>
+
+<!-- ============ HERÓI ============ -->
+<div class="heroi">
+  <div class="wrap heroi-grid">
+    <div>
+      <div class="olho">Roda no navegador · nada pra instalar</div>
+      <h1>O trator é seu.<br>A <em>lavoura</em> responde.</h1>
+      <p class="lead">
+        Engate o implemento, baixe a ferramenta e trabalhe o campo de verdade:
+        arar, cultivar, semear, adubar, colher, transbordar e vender na hora certa.
+        Cada passada fica marcada no solo — no ângulo exato em que você passou.
+      </p>
+      <div class="cta-linha">
+        <a href="#comprar" class="btn">Comprar agora</a>
+        <a href="#lavoura" class="btn ghost">Ver como funciona</a>
+      </div>
+      <p class="selo">
+        Pagamento único, sem assinatura · <b>Funciona offline</b> depois de aberto ·
+        Português do Brasil
+      </p>
+    </div>
+    <div class="heroi-shot">
+      <img src="assets/tela_hud.png" alt="Colheitadeira colhendo trigo maduro, com painel de velocidade, contratos e informações do campo na tela">
+    </div>
+  </div>
+</div>
+
+<!-- ============ NÚMEROS ============ -->
+<div class="faixa">
+  <div class="wrap nums">
+    <div><b>9</b><span>culturas com ciclo e preço próprios</span></div>
+    <div><b>16</b><span>máquinas e implementos</span></div>
+    <div><b>6</b><span>campos para comprar e explorar</span></div>
+    <div><b>12</b><span>meses com preço sazonal real</span></div>
+  </div>
+</div>
+
+<!-- ============ O JOGO ============ -->
+<section id="jogo">
+  <div class="wrap">
+    <div class="olho">O que é</div>
+    <h2>Um simulador agrícola de verdade,<br>que abre num clique.</h2>
+    <p class="sub">
+      Nada de plantar tocando na tela e esperar o cronômetro. Aqui você dirige a máquina,
+      acerta a manobra de cabeceira e vê a faixa de trabalho nascer atrás do implemento.
+      O campo guarda tudo: onde você arou, onde adubou, onde ficou erva daninha.
+    </p>
+
+    <div class="rec" style="margin-top:50px">
+      <div>
+        <h3>Dirigir é o jogo</h3>
+        <ul>
+          <li>Direção de trator com esterço que fecha em alta velocidade</li>
+          <li>Implemento engatado que faz a curva atrás de você, com trava anti-tesoura</li>
+          <li>Faixa de trabalho contínua, sem falhas, mesmo acelerado</li>
+          <li>Rastro de pneu que fica marcado, afunda o terreno, tira velocidade e aumenta o consumo</li>
+        </ul>
+      </div>
+      <img src="assets/tela_cultivando.png" alt="Trator com cultivador engatado abrindo faixas de solo cultivado num campo de restolho">
+    </div>
+
+    <div class="rec inv">
+      <div>
+        <h3>A fazenda inteira à sua volta</h3>
+        <ul>
+          <li>Pátio com silo, bomba de combustível, oficina e concessionária</li>
+          <li>Quatro pontos de venda, cada um com sua tabela e seu multiplicador</li>
+          <li>Ciclo de dia e noite com faróis que abrem cone de luz no escuro</li>
+          <li>Sol, chuva, tempestade, neblina e neve — com previsão do próximo tempo no painel</li>
+        </ul>
+      </div>
+      <img src="assets/tela_noite.png" alt="Trator trabalhando à noite com farol iluminando a frente">
+    </div>
+  </div>
+</section>
+
+<!-- ============ A LAVOURA ============ -->
+<section id="lavoura" style="background:var(--fundo2);border-block:1px solid var(--borda)">
+  <div class="wrap">
+    <div class="olho">O ciclo</div>
+    <h2>Sete etapas, do restolho ao caminhão.</h2>
+    <p class="sub">
+      Só semear e colher são obrigatórios. Todo o resto é decisão sua — e cada decisão
+      aparece na conta no fim da colheita.
+    </p>
+
+    <div class="etapas">
+      <div class="etapa"><b>ETAPA 1</b><h4>Arar ou cultivar</h4>
+        <p>Cultivar é rápido. Arar é lento e caro, mas rende 15% a mais e mata a erva daninha.</p></div>
+      <div class="etapa"><b>ETAPA 2</b><h4>Semear</h4>
+        <p>Escolha a cultura pelo preço do mês. A semeadora recusa solo que você não preparou.</p></div>
+      <div class="etapa"><b>ETAPA 3</b><h4>Adubar</h4>
+        <p>Duas passadas de fertilizante somam 45% de rendimento. Calcário soma outros 15%.</p></div>
+      <div class="etapa"><b>ETAPA 4</b><h4>Capinar</h4>
+        <p>Erva daninha nasce sozinha e come o rendimento. Pulverize cedo e recupere 20%.</p></div>
+      <div class="etapa"><b>ETAPA 5</b><h4>Esperar crescer</h4>
+        <p>A lavoura avança um estágio por mês. Passou três meses madura, murcha e você perde tudo.</p></div>
+      <div class="etapa"><b>ETAPA 6</b><h4>Colher</h4>
+        <p>Colher na chuva rende metade. Colher depois pode custar a janela. Sua escolha.</p></div>
+      <div class="etapa"><b>ETAPA 7</b><h4>Transbordar</h4>
+        <p>O tanque enche no meio do campo. Pare, descarregue no reboque e volte.</p></div>
+      <div class="etapa"><b>ETAPA 8</b><h4>Vender</h4>
+        <p>Cada posto tem preço diferente e satura se você despejar tudo no mesmo lugar.</p></div>
+    </div>
+
+    <div style="margin-top:60px">
+      <h3>O solo conta a história do seu trabalho</h3>
+      <p class="sub" style="margin-top:10px">
+        Cada quadra guarda o ângulo da última passada. Os sulcos do arado, as fileiras de plantio
+        e o restolho seguem o rumo real em que a máquina andou.
+      </p>
+      <div class="tira"><img src="assets/tira_solo.png" alt="Sete faixas de solo lado a lado mostrando cada estágio da lavoura"></div>
+      <div class="tira-legenda">
+        <span>restolho</span><span>arado</span><span>cultivado</span><span>semeado</span>
+        <span>brotando</span><span>crescendo</span><span>maduro</span>
+      </div>
+    </div>
+
+    <div style="margin-top:56px">
+      <h3>Nove culturas, nove decisões diferentes</h3>
+      <div class="tabela-caixa">
+        <table>
+          <thead>
+            <tr>
+              <th>Cultura</th><th class="num">Rendimento</th><th class="num">Preço base</th>
+              <th class="num">Meses</th><th>Colheitadeira</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="pastilha" style="background:#C9A227"></span>Trigo</td><td class="num">90 L</td><td class="num">$ 0,607</td><td class="num">4</td><td>de grão</td></tr>
+            <tr><td><span class="pastilha" style="background:#D2B14A"></span>Cevada</td><td class="num">96 L</td><td class="num">$ 0,563</td><td class="num">4</td><td>de grão</td></tr>
+            <tr><td><span class="pastilha" style="background:#CBAE55"></span>Aveia</td><td class="num">57 L</td><td class="num">$ 0,958</td><td class="num">3</td><td>de grão</td></tr>
+            <tr><td><span class="pastilha" style="background:#E0C21E"></span>Canola</td><td class="num">58 L</td><td class="num">$ 1,085</td><td class="num">4</td><td>de grão</td></tr>
+            <tr><td><span class="pastilha" style="background:#6E7A2E"></span>Soja</td><td class="num">45 L</td><td class="num">$ 1,400</td><td class="num">4</td><td>de grão</td></tr>
+            <tr><td><span class="pastilha" style="background:#A8901F"></span>Milho</td><td class="num">92 L</td><td class="num">$ 0,684</td><td class="num">4</td><td>plataforma de milho</td></tr>
+            <tr><td><span class="pastilha" style="background:#C8A415"></span>Girassol</td><td class="num">52 L</td><td class="num">$ 1,211</td><td class="num">4</td><td>plataforma de milho</td></tr>
+            <tr><td><span class="pastilha" style="background:#3E6B2B"></span>Batata</td><td class="num">413 L</td><td class="num">$ 0,400</td><td class="num">4</td><td>de raízes</td></tr>
+            <tr><td><span class="pastilha" style="background:#4C7A33"></span>Beterraba</td><td class="num">578 L</td><td class="num">$ 0,310</td><td class="num">5</td><td>de raízes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--cinza);font-size:13px;margin-top:12px">
+        Rendimento por quadra de terra, antes dos bônus. Com o campo bem tratado, dobra.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ECONOMIA ============ -->
+<section>
+  <div class="wrap">
+    <div class="olho">Economia</div>
+    <h2>Plantar é fácil.<br>Vender bem é que é o jogo.</h2>
+
+    <div class="rec" style="margin-top:44px">
+      <div>
+        <h3>O preço muda o ano inteiro</h3>
+        <ul>
+          <li>Trigo vale <b>$0,644</b> em março e <b>$0,495</b> em julho — a mesma carga, 30% de diferença</li>
+          <li>Soja oscila de <b>$1,66</b> a <b>$0,91</b> conforme o mês</li>
+          <li>O moinho paga mais que a cooperativa, mas satura três vezes mais rápido</li>
+          <li>Despeje tudo no mesmo posto e o preço cai até o piso de 60%</li>
+          <li>Guardar no silo custa por mês — segurar a colheita é aposta, não jogada garantida</li>
+        </ul>
+      </div>
+      <img src="assets/tela_loja.png" alt="Tela da concessionária mostrando máquinas à venda e os preços do dia por cultura">
+    </div>
+
+    <div class="rec inv">
+      <div>
+        <h3>Você enxerga o que o campo precisa</h3>
+        <ul>
+          <li>Quatro camadas de mapa: fertilizante, calcário, erva daninha e o que falta arar</li>
+          <li>Medidor de qualidade do campo de 0 a 100% somando tudo que você fez direito</li>
+          <li>Contratos de serviço para levantar dinheiro antes da primeira colheita</li>
+          <li>Combustível, desgaste e manutenção correndo o tempo todo</li>
+        </ul>
+      </div>
+      <img src="assets/tela_overlay.png" alt="Campo com camada de fertilizante ligada, mostrando em azul as áreas já adubadas">
+    </div>
+  </div>
+</section>
+
+<!-- ============ CELULAR ============ -->
+<section id="celular" style="background:var(--fundo2);border-block:1px solid var(--borda)">
+  <div class="wrap">
+    <div class="olho">No celular</div>
+    <h2>O mesmo jogo, no seu bolso.</h2>
+    <p class="sub">
+      Não é uma versão reduzida: é o jogo inteiro, com controles feitos para os dois polegares.
+      Abra o link no navegador do celular, vire na horizontal e jogue.
+    </p>
+    <div class="rec" style="margin-top:40px">
+      <img src="assets/tela_mobile.png" alt="O jogo rodando em celular na horizontal, com volante analógico à esquerda e pedais à direita">
+      <div>
+        <h3>Feito para o toque, não adaptado</h3>
+        <ul>
+          <li><b>Polegar esquerdo:</b> volante analógico — quanto mais longe do centro, mais fecha a curva</li>
+          <li><b>Polegar direito:</b> pedal de acelerar e de frear/ré</li>
+          <li>Botões grandes de engatar, ligar implemento, ação e trocar de veículo</li>
+          <li>Loja e contratos funcionam no toque, sem teclado</li>
+          <li>A tela se ajusta ao aparelho e avisa se você estiver na vertical</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPRAR ============ -->
+<section id="comprar">
+  <div class="wrap" style="text-align:center">
+    <div class="olho">Comprar</div>
+    <h2>Pague uma vez. É seu.</h2>
+
+    <div class="preco-caixa">
+      <!-- ===== TROQUE O PREÇO E O LINK AQUI ===== -->
+      <div class="preco">R$ 29,90 <small>à vista</small></div>
+      <div class="preco-nota">Pagamento único · sem assinatura · sem anúncios</div>
+      <ul class="inclui">
+        <li>O jogo completo, num arquivo só</li>
+        <li>Joga no computador e no celular</li>
+        <li>Manual em PDF com o passo a passo</li>
+        <li>Atualizações futuras incluídas</li>
+        <li>Funciona offline depois de aberto</li>
+      </ul>
+      <div>
+        <!-- ===== TROQUE href PELO LINK DO SEU CHECKOUT ===== -->
+        <a href="#" class="btn" style="width:100%;padding:17px" id="btn-comprar">
+          Comprar o Fazenda 25
+        </a>
+      </div>
+      <p style="color:var(--cinza);font-size:12.5px;margin:16px 0 0">
+        Compra processada pelo nosso parceiro de pagamento. Acesso liberado por e-mail.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section style="padding-top:0">
+  <div class="wrap" style="max-width:820px">
+    <h2 style="font-size:26px;margin-bottom:18px">Perguntas frequentes</h2>
+
+    <details open>
+      <summary>Preciso instalar alguma coisa?</summary>
+      <p>Não. O jogo é um arquivo que abre direto no navegador — Chrome, Edge, Firefox ou Safari.
+      Não precisa de loja de aplicativo, conta ou plugin.</p>
+    </details>
+    <details>
+      <summary>Roda no meu computador?</summary>
+      <p>Se o navegador for dos últimos anos, roda. O jogo foi feito para ser leve: o quadro
+      completo custa cerca de meio milissegundo de processamento, então sobra folga até em
+      máquina modesta.</p>
+    </details>
+    <details>
+      <summary>E no celular, funciona mesmo?</summary>
+      <p>Funciona, com controles de toque próprios: volante analógico no polegar esquerdo e
+      pedais no direito. Jogue na horizontal — o jogo avisa se você estiver na vertical.</p>
+    </details>
+    <details>
+      <summary>O jogo salva meu progresso?</summary>
+      <p>Ainda não. Cada partida começa do zero, e uma sessão completa leva cerca de 15 minutos —
+      tempo de sair do restolho e comprar sua segunda máquina. O salvamento está no plano de
+      atualizações, que já vem incluído na sua compra.</p>
+    </details>
+    <details>
+      <summary>Tem multiplayer?</summary>
+      <p>Não. O Fazenda 25 é uma experiência para um jogador.</p>
+    </details>
+    <details>
+      <summary>Preciso de internet para jogar?</summary>
+      <p>Só para baixar. Depois que o arquivo está no seu aparelho, ele roda offline.</p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-linha">
+    <div style="display:flex;align-items:center;gap:11px">
+      <img src="assets/icone-48.png" alt="" style="width:30px;height:30px;border-radius:7px">
+      <div>Fazenda 25 — simulador agrícola</div>
+    </div>
+    <div>Jogo independente. Não afiliado a nenhuma outra franquia de simulação agrícola.</div>
+  </div>
+</footer>
+
+<script>
+  // realce do link do menu conforme a rolagem
+  const secoes = [...document.querySelectorAll('section[id], div.heroi')];
+  const links = [...document.querySelectorAll('.navbar nav a')];
+  const obs = new IntersectionObserver(entradas => {
+    entradas.forEach(e => {
+      if (!e.isIntersecting) return;
+      links.forEach(a => a.style.color = a.getAttribute('href') === '#' + e.target.id ? 'var(--texto)' : '');
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  secoes.forEach(s => s.id && obs.observe(s));
+
+  // aviso enquanto o link de checkout não estiver configurado
+  document.getElementById('btn-comprar').addEventListener('click', e => {
+    const href = e.currentTarget.getAttribute('href');
+    if (!href || href === '#') {
+      e.preventDefault();
+      alert('Configure o link do checkout no arquivo landing.html (procure por "TROQUE href").');
+    }
+  });
+</script>
+</body>
+</html>

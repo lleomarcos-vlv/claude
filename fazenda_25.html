@@ -1857,7 +1857,8 @@ function drawHUD() {
         ["Ervas", ["Nenhuma", "Baixa", "Média", "Alta"][W.weeds[i]]],
         ["Proprietário", f.dono ? "Você" : "$" + fmt(f.preco)]
       ];
-      const h = linhas.length * 14 + 20;
+      // +1 linha reservada para a barra de qualidade, senão ela colide com a última
+      const h = (linhas.length + 1) * 14 + 18;
       painel(642, 444 - h, 150, h, false);
       ctx.font = "400 9px system-ui, sans-serif";
       linhas.forEach((l, k) => {
@@ -1865,7 +1866,7 @@ function drawHUD() {
         ctx.fillStyle = UI.greyLight; ctx.fillText(l[0], 648, y);
         ctx.textAlign = "right"; ctx.fillStyle = UI.text; ctx.fillText(l[1], 786, y); ctx.textAlign = "left";
       });
-      const qy = 444 - 12;
+      const qy = 444 - 15;
       ctx.fillStyle = UI.greyLight; ctx.fillText("Qualidade", 648, qy);
       ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(714, qy - 5, 50, 4);
       ctx.fillStyle = UI.green; ctx.fillRect(714, qy - 5, 50 * (qual / 100), 4);
