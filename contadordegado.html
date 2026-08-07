@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contador de Gado — Fotos Aéreas</title>
+<style>
+  :root{
+    --bg:#10151c; --panel:#181f29; --panel2:#1f2833; --line:#2b3644;
+    --text:#e8edf3; --muted:#93a1b3;
+    --green:#35e08a; --amber:#ffb020; --red:#ff5d5d; --blue:#4da3ff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg); color:var(--text);
+    font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex; flex-direction:column;
+  }
+  header{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding:10px 16px; background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  header h1{font-size:17px; font-weight:700; letter-spacing:.2px;}
+  header h1 span{color:var(--green);}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-left:auto; align-items:center;}
+  .chip{
+    background:var(--panel2); border:1px solid var(--line); border-radius:999px;
+    padding:5px 14px; font-size:13px; white-space:nowrap;
+  }
+  .chip b{font-size:15px;}
+  .chip.adultos b{color:var(--green);} .chip.bezerros b{color:var(--amber);}
+  .chip.total{background:#233042;}
+  button{
+    background:var(--panel2); color:var(--text); border:1px solid var(--line);
+    border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer;
+  }
+  button:hover{border-color:#3d4c5f;}
+  button.primary{background:var(--green); border-color:var(--green); color:#06281a; font-weight:700;}
+  button.active{outline:2px solid var(--blue); outline-offset:-1px;}
+  button:disabled{opacity:.45; cursor:default;}
+  main{flex:1; display:flex; min-height:0;}
+  /* ---------- barra lateral ---------- */
+  aside{
+    width:250px; min-width:250px; background:var(--panel); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; min-height:0;
+  }
+  #dropzone{
+    margin:12px; padding:18px 10px; border:2px dashed #3a4a5e; border-radius:12px;
+    text-align:center; color:var(--muted); cursor:pointer; transition:.15s;
+  }
+  #dropzone.drag{border-color:var(--green); color:var(--green); background:#1b2a22;}
+  #dropzone .big{font-size:26px;}
+  #dropzone b{color:var(--text);}
+  #fotos{flex:1; overflow-y:auto; padding:0 12px 12px;}
+  .foto-item{
+    display:flex; gap:8px; align-items:center; padding:6px; border-radius:10px;
+    border:1px solid transparent; cursor:pointer; margin-bottom:6px; background:var(--panel2);
+  }
+  .foto-item.ativa{border-color:var(--green);}
+  .foto-item img{width:56px; height:42px; object-fit:cover; border-radius:6px; background:#000;}
+  .foto-item .info{flex:1; min-width:0;}
+  .foto-item .nome{font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .foto-item .contagem{font-size:12px; color:var(--muted);}
+  .foto-item .contagem b.a{color:var(--green);} .foto-item .contagem b.b{color:var(--amber);}
+  .foto-item .x{border:none; background:none; color:var(--muted); font-size:15px; padding:2px 6px;}
+  .foto-item .x:hover{color:var(--red);}
+  /* ---------- área principal ---------- */
+  #viewer{flex:1; display:flex; flex-direction:column; min-width:0; min-height:0;}
+  #toolbar{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding:8px 12px; background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  #toolbar .sep{width:1px; height:22px; background:var(--line); margin:0 2px;}
+  #toolbar label{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px;}
+  #toolbar .rotulo{font-size:11px; color:var(--muted);}
+  #modoDica{
+    padding:5px 14px; font-size:12px; color:var(--muted);
+    background:#141b24; border-bottom:1px solid var(--line);
+  }
+  #alerta{
+    display:none; padding:6px 14px; font-size:12px; color:var(--amber);
+    background:#241d10; border-bottom:1px solid var(--line);
+  }
+  #toast{
+    position:fixed; left:50%; bottom:56px; transform:translateX(-50%) translateY(16px);
+    display:flex; gap:10px; align-items:center; background:#0c1117; border:1px solid #3a4a5e;
+    border-radius:10px; padding:8px 14px; font-size:13px; box-shadow:0 6px 24px rgba(0,0,0,.5);
+    opacity:0; pointer-events:none; transition:.2s; z-index:20;
+  }
+  #toast.mostrar{opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto;}
+  #toast button{padding:3px 10px; font-size:12px;}
+  #ajustes{
+    display:none; padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line);
+    gap:22px; flex-wrap:wrap; align-items:flex-end;
+  }
+  #ajustes.aberto{display:flex;}
+  .ajuste{min-width:200px;}
+  .ajuste .titulo{font-size:12px; color:var(--muted); margin-bottom:2px;}
+  .ajuste .titulo b{color:var(--text);}
+  .ajuste input[type=range]{width:100%;}
+  .ajuste .extremos{display:flex; justify-content:space-between; font-size:10px; color:#5c6b7d;}
+  #ajustes .check{font-size:13px; color:var(--text); display:flex; gap:6px; align-items:center; padding-bottom:8px;}
+  #ensino{
+    display:none; padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line);
+    gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  #ensino.aberto{display:flex;}
+  #ensino .rotulo{font-size:12px; color:var(--muted);}
+  #ensino .sep{width:1px; height:22px; background:var(--line); margin:0 4px;}
+  #brainStatus{font-size:12px; color:var(--muted); max-width:420px;}
+  #brainStatus b{color:var(--green);}
+  #canvasWrap{flex:1; overflow:auto; background:#0a0e13; position:relative;}
+  #canvas{display:block; cursor:crosshair;}
+  #vazio{
+    position:absolute; inset:0; display:flex; flex-direction:column; gap:10px;
+    align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:24px;
+  }
+  #vazio .icone{font-size:44px;}
+  #vazio .dica{max-width:560px; font-size:13px;}
+  #legenda{
+    display:flex; gap:16px; flex-wrap:wrap; padding:6px 14px; font-size:12px;
+    color:var(--muted); background:var(--panel); border-top:1px solid var(--line);
+  }
+  .leg{display:flex; align-items:center; gap:6px;}
+  .dot{width:11px; height:11px; border-radius:50%; border:2px solid;}
+  .dot.a{border-color:var(--green);} .dot.b{border-color:var(--amber);}
+  .dot.m{border-color:var(--blue); border-style:dashed;}
+  .dot.r{border-color:var(--red);}
+  footer{
+    padding:6px 14px; font-size:11.5px; color:#5c6b7d; background:var(--panel);
+    border-top:1px solid var(--line); text-align:center;
+  }
+  @media (max-width:760px){
+    main{flex-direction:column;}
+    aside{width:100%; min-width:0; max-height:34vh; border-right:none; border-bottom:1px solid var(--line);}
+    #fotos{display:flex; gap:6px; padding:0 12px 10px;}
+    .foto-item{min-width:180px;}
+    .chips{margin-left:0; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐂 Contador de <span>Gado</span> · fotos aéreas</h1>
+  <div class="chips">
+    <span class="chip adultos">Adultos: <b id="tAdultos">0</b></span>
+    <span class="chip bezerros">Bezerros: <b id="tBezerros">0</b></span>
+    <span class="chip total">Total geral: <b id="tTotal">0</b> <small id="tFotos"></small></span>
+    <button id="btnCsv" title="Baixar planilha com a contagem de cada foto">⬇ Exportar CSV</button>
+    <button id="btnResumo" title="Copiar resumo em texto">📋 Copiar resumo</button>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <div id="dropzone" role="button" tabindex="0" aria-label="Adicionar fotos" title="Clique ou arraste fotos aqui">
+      <div class="big">📷</div>
+      <div><b>Adicionar fotos</b></div>
+      <div style="font-size:12px">arraste aqui, clique ou cole (Ctrl+V)</div>
+    </div>
+    <input type="file" id="inputFotos" accept="image/*" multiple hidden>
+    <div id="fotos"></div>
+  </aside>
+
+  <section id="viewer">
+    <div id="toolbar">
+      <span style="font-size:12px;color:var(--muted)">Corrigir:</span>
+      <button id="mAdulto" data-modo="adulto" title="Clique na foto para marcar um adulto que faltou">➕ Adulto</button>
+      <button id="mBezerro" data-modo="bezerro" title="Clique na foto para marcar um bezerro que faltou">➕ Bezerro</button>
+      <button id="mRemover" data-modo="remover" class="active" title="Clique numa marcação errada para removê-la (ou restaurá-la)">✖ Remover</button>
+      <button id="btnDesfazer" title="Desfazer última correção">↩ Desfazer</button>
+      <div class="sep"></div>
+      <button id="btnEnsinar" title="Ensine o contador tocando nas marcações: ele aprende o tamanho de 1 animal e o que não é animal">🎓 Ensinar</button>
+      <button id="btnAjustes">⚙ Ajustes</button>
+      <label>Zoom <input type="range" id="zoom" min="25" max="300" value="100" style="width:110px"></label>
+      <span class="chips" style="margin-left:auto">
+        <span class="rotulo">nesta foto:</span>
+        <span class="chip adultos" title="Adultos nesta foto">Adultos <b id="fAdultos">0</b></span>
+        <span class="chip bezerros" title="Bezerros nesta foto">Bezerros <b id="fBezerros">0</b></span>
+      </span>
+    </div>
+    <div id="modoDica"></div>
+    <div id="alerta"></div>
+
+    <div id="ensino">
+      <span class="rotulo">Toque numa marcação e diga o que ela é de verdade:</span>
+      <button id="eAdulto" data-modo="ens-adulto" title="A marcação tocada corresponde a exatamente 1 adulto — calibra o tamanho e recalcula os grupos ×N">✔ É 1 adulto</button>
+      <button id="eBezerro" data-modo="ens-bezerro" title="A marcação tocada é exatamente 1 bezerro — ajusta o limite adulto/bezerro">✔ É 1 bezerro</button>
+      <button id="eNada" data-modo="ens-nada" title="A marcação tocada não é um animal (sombra, cocho, mancha) — sai da contagem e vira exemplo negativo">✘ Não é animal</button>
+      <div class="sep"></div>
+      <span id="brainStatus"></span>
+      <div class="sep"></div>
+      <button id="btnBrainExp" title="Salvar o aprendizado num arquivo para usar em outro computador">💾 Exportar aprendizado</button>
+      <button id="btnBrainImp" title="Carregar um aprendizado salvo">📂 Importar</button>
+      <input type="file" id="inputBrain" accept="application/json,.json" hidden>
+      <button id="btnBrainZero" title="Apagar todos os exemplos ensinados">🗑 Zerar</button>
+    </div>
+
+    <div id="ajustes">
+      <div class="ajuste">
+        <label class="titulo" for="sens">Sensibilidade da detecção: <b id="vSens">automática</b></label>
+        <input type="range" id="sens" min="-60" max="60" value="0" step="1">
+        <div class="extremos"><span>detecta menos</span><span>detecta mais</span></div>
+      </div>
+      <div class="ajuste">
+        <label class="titulo" for="minFrac">Ignorar manchas menores que <b id="vMin">18%</b> de um animal</label>
+        <input type="range" id="minFrac" min="5" max="60" value="18" step="1">
+        <div class="extremos"><span>5%</span><span>60%</span></div>
+      </div>
+      <div class="ajuste">
+        <label class="titulo" for="calfFrac">É bezerro se tiver até <b id="vBez">50%</b> do tamanho de um adulto</label>
+        <input type="range" id="calfFrac" min="25" max="80" value="50" step="1">
+        <div class="extremos"><span>25%</span><span>80%</span></div>
+      </div>
+      <label class="check"><input type="checkbox" id="invertido"> Gado escuro em piso claro</label>
+      <label class="check"><input type="checkbox" id="verIgnorados"> Mostrar áreas ignoradas</label>
+      <button id="btnPadrao" title="Voltar aos valores padrão">Restaurar padrão</button>
+    </div>
+
+    <div id="canvasWrap">
+      <canvas id="canvas"></canvas>
+      <div id="vazio">
+        <div class="icone">🛩️</div>
+        <div><b>Solte as fotos do drone aqui</b></div>
+        <div class="dica">
+          A contagem funciona melhor em fotos aéreas (de cima) com o gado claro sobre piso escuro,
+          como em confinamentos. Grupos encostados são estimados pelo tamanho da mancha.
+          Corrija com um clique o que faltar ou sobrar — e use o botão <b>🎓 Ensinar</b> para
+          mostrar ao contador o tamanho de 1 animal e o que não é animal: ele aprende com você
+          e recalcula tudo na hora.
+        </div>
+      </div>
+    </div>
+
+    <div id="legenda">
+      <span class="leg"><span class="dot a"></span> adulto</span>
+      <span class="leg"><span class="dot b"></span> bezerro (B)</span>
+      <span class="leg"><span class="dot a"></span><b>×3</b> grupo encostado (estimado)</span>
+      <span class="leg"><span class="dot m"></span> marcado manualmente (azul tracejado)</span>
+      <span class="leg"><span class="dot r"></span> removido</span>
+      <span class="leg"><span class="dot r"></span><b>≥80</b> aglomerado gigante — confira</span>
+      <span class="leg">🎓 toque nas marcações no modo Ensinar para o motor aprender</span>
+    </div>
+  </section>
+</main>
+
+<div id="toast"><span id="toastMsg"></span><button id="toastUndo">↩ Desfazer</button></div>
+
+<footer>
+  As fotos são processadas somente no seu dispositivo — nada é enviado para a internet.
+  A contagem automática é uma estimativa: confira, corrija e ensine com os botões acima.
+</footer>
+
+<script>
+"use strict";
+/* ============================ CORE START ============================
+   Algoritmo de contagem — funções puras, sem DOM (testáveis fora do navegador).
+   Estratégia: gado claro sobre piso escuro vira "manchas" brilhantes.
+   1. brancura = menor canal RGB (branco tem R,G,B altos; terra vermelha não)
+   2. limiar automático (Otsu) + ajuste do usuário
+   3. limpeza morfológica e componentes conexos
+   4. estima o tamanho de 1 animal (mediana robusta) e divide manchas grandes
+   5. mancha pequena = bezerro; mancha gigante/alongada = estrutura (cocho, pista)
+   6. motor de aprendizado: exemplos ensinados pelo usuário calibram a escala
+      (1 adulto = N px) e treinam um classificador que descarta falsos positivos
+*/
+function otsuThreshold(hist, total){
+  let sum = 0;
+  for (let t = 0; t < 256; t++) sum += t * hist[t];
+  let sumB = 0, wB = 0, best = -1, thr = 127;
+  for (let t = 0; t < 256; t++){
+    wB += hist[t];
+    if (wB === 0) continue;
+    const wF = total - wB;
+    if (wF === 0) break;
+    sumB += t * hist[t];
+    const mB = sumB / wB, mF = (sum - sumB) / wF;
+    const v = wB * wF * (mB - mF) * (mB - mF);
+    if (v > best){ best = v; thr = t; }
+  }
+  // separabilidade (0..1): baixa quando o histograma não tem dois grupos claros
+  const mu = sum / total;
+  let varT = 0;
+  for (let t = 0; t < 256; t++) varT += hist[t] * (t - mu) * (t - mu);
+  const eta = varT > 0 ? best / (varT * total) : 0;
+  return { thr, eta };
+}
+
+function erode(m, W, H){
+  const out = new Uint8Array(W * H);
+  for (let y = 1; y < H - 1; y++){
+    const row = y * W;
+    for (let x = 1; x < W - 1; x++){
+      const i = row + x;
+      if (m[i] && m[i-1] && m[i+1] && m[i-W] && m[i+W]) out[i] = 1;
+    }
+  }
+  return out;
+}
+
+function dilate(m, W, H){
+  const out = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++){
+    const row = y * W;
+    for (let x = 0; x < W; x++){
+      const i = row + x;
+      if (m[i] || (x > 0 && m[i-1]) || (x < W-1 && m[i+1]) || (y > 0 && m[i-W]) || (y < H-1 && m[i+W])) out[i] = 1;
+    }
+  }
+  return out;
+}
+
+// weights (opcional): array com o brilho de cada pixel — cada componente sai
+// com o brilho médio, usado como atributo pelo motor de aprendizado
+function connectedComponents(mask, W, H, weights){
+  const label = new Int32Array(W * H);
+  const stack = new Int32Array(W * H);
+  const comps = [];
+  let cur = 0;
+  for (let start = 0; start < W * H; start++){
+    if (!mask[start] || label[start]) continue;
+    cur++;
+    let sp = 0;
+    stack[sp++] = start;
+    label[start] = cur;
+    let area = 0, sx = 0, sy = 0, sw = 0, minX = W, maxX = 0, minY = H, maxY = 0;
+    while (sp > 0){
+      const p = stack[--sp];
+      const x = p % W, y = (p - x) / W;
+      area++; sx += x; sy += y;
+      if (weights) sw += weights[p];
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+      if (x > 0){ const q = p - 1; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (x < W-1){ const q = p + 1; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (y > 0){ const q = p - W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (y < H-1){ const q = p + W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+    }
+    comps.push({ area, cx: sx / area, cy: sy / area, minX, maxX, minY, maxY, bright: weights ? sw / area : 0 });
+  }
+  return comps;
+}
+
+/*
+  Tamanho típico de 1 animal.
+  Régua principal: manchas com CARA de um animal só — preenchem bem a própria
+  caixa (fill alto) e não são alongadas; grupos encostados falham nisso.
+  A mediana ponderada por área dessas manchas dá a escala mesmo quando a
+  maioria do rebanho está aglomerada (hora do trato) ou quando há muitos
+  bezerros. Se quase nada na foto parecer animal isolado, cai no plano B
+  harmônico (múltiplos inteiros de área).
+*/
+function estimateUnit(comps){
+  if (!comps.length) return 0;
+  const areasAll = comps.map(c => c.area).sort((a, b) => a - b);
+  const medArea = areasAll[Math.floor(areasAll.length / 2)];
+  // área mínima absoluta evita que cisco/sujeira vire a régua e os grupos
+  // sejam divididos em dezenas de "animais" que não existem
+  const singles = comps.filter(c => c.fill >= 0.62 && c.aspect <= 3.5 && c.area >= 20 && c.area <= 3 * medArea);
+  let unit = 0;
+  if (singles.length >= 3){
+    const orden = singles.map(c => c.area).sort((a, b) => a - b);
+    const tot = orden.reduce((s, a) => s + a, 0);
+    let acc = 0;
+    for (const a of orden){ acc += a; if (acc >= tot / 2){ unit = a; break; } }
+  } else {
+    unit = estimateUnitHarmonic(areasAll);
+  }
+  if (!unit) return 0;
+  // refino: divide cada mancha pelo nº estimado de animais e tira a mediana
+  // ponderada por área de todas elas
+  const totalArea = areasAll.reduce((s, a) => s + a, 0);
+  const per = comps
+    .map(c => [c.area / Math.max(1, Math.round(c.area / unit)), c.area])
+    .sort((x, y) => x[0] - y[0]);
+  let acc = 0;
+  for (const [valor, peso] of per){
+    acc += peso;
+    if (acc >= totalArea / 2){ unit = valor; break; }
+  }
+  return unit;
+}
+
+function estimateUnitHarmonic(areas){
+  if (!areas.length) return 0;
+  const sorted = areas.slice().sort((a, b) => a - b);
+  const totalArea = sorted.reduce((s, a) => s + a, 0);
+  const medArea = sorted[Math.floor(sorted.length / 2)];
+  // candidato precisa ter tamanho plausível de 1 animal: até 3× a mancha mediana
+  // (senão um aglomerado gigante vira a própria régua da contagem)
+  const cands = new Set([medArea]);
+  for (const a of sorted){
+    for (let k = 1; k <= 3; k++){
+      const u = a / k;
+      if (u >= sorted[0] * 0.7 && u <= 3 * medArea) cands.add(u);
+    }
+  }
+  let bestScore = Infinity;
+  const scored = [];
+  for (const u of cands){
+    let s = 0;
+    for (const a of sorted){
+      const q = a / u;
+      // desvio do múltiplo inteiro mais próximo, pesado pela área da mancha
+      s += a * (q < 0.4 ? 0.5 : Math.min(Math.abs(q - Math.round(q)), 0.5));
+    }
+    s /= totalArea;
+    scored.push([u, s]);
+    if (s < bestScore) bestScore = s;
+  }
+  let unit = 0;
+  for (const [u, s] of scored) if (s <= bestScore + 0.05 && u > unit) unit = u;
+  // refino: divide cada mancha pelo nº estimado de animais e tira a mediana
+  // ponderada por área (bezerros/ruído, pequenos, não dominam a escala)
+  for (let it = 0; it < 2; it++){
+    const per = sorted
+      .map(a => [a / Math.max(1, Math.round(a / unit)), a])
+      .sort((x, y) => x[0] - y[0]);
+    let acc = 0;
+    for (const [valor, peso] of per){
+      acc += peso;
+      if (acc >= totalArea / 2){ unit = valor; break; }
+    }
+  }
+  return unit;
+}
+
+/* ---------- motor de aprendizado (funções puras) ----------
+   O "cérebro" é uma lista de exemplos ensinados pelo usuário:
+     { k:'animal'|'nada', t:'adulto'|'bezerro'|null, f:{fill,aspect,bright,rel} }
+   Classificação por centroide mais próximo com atributos normalizados (z-score).
+   Só passa a rejeitar manchas quando há exemplos suficientes das duas classes,
+   e com margem conservadora — na dúvida, continua contando como animal. */
+const BRAIN_KEYS = ['fill', 'aspect', 'bright', 'rel'];
+
+function brainFeatures(c, unit){
+  return {
+    fill: c.fill || 0,
+    aspect: Math.min(c.aspect || 1, 6) / 6,
+    bright: (c.bright || 0) / 255,
+    // tamanho relativo ao animal-padrão, em escala log limitada
+    rel: Math.max(-2, Math.min(2, Math.log((c.area || 1) / Math.max(1, unit || c.area || 1)))) / 2
+  };
+}
+
+function brainReady(model){
+  if (!model || !Array.isArray(model.ex)) return false;
+  let pos = 0, neg = 0;
+  for (const e of model.ex) (e.k === 'nada') ? neg++ : pos++;
+  return pos >= 3 && neg >= 3;
+}
+
+function brainClassify(model, f){
+  const ex = model.ex;
+  const mean = {}, sd = {};
+  for (const k of BRAIN_KEYS){
+    let s = 0;
+    for (const e of ex) s += e.f[k] || 0;
+    mean[k] = s / ex.length;
+    let v = 0;
+    for (const e of ex){ const d = (e.f[k] || 0) - mean[k]; v += d * d; }
+    sd[k] = Math.sqrt(v / ex.length) || 1e-6;
+  }
+  const cent = { animal: { n: 0 }, nada: { n: 0 } };
+  for (const e of ex){
+    const c = cent[e.k === 'nada' ? 'nada' : 'animal'];
+    c.n++;
+    for (const k of BRAIN_KEYS) c[k] = (c[k] || 0) + ((e.f[k] || 0) - mean[k]) / sd[k];
+  }
+  let dA = 0, dN = 0;
+  for (const k of BRAIN_KEYS){
+    const z = ((f[k] || 0) - mean[k]) / sd[k];
+    const ca = cent.animal[k] / cent.animal.n, cn = cent.nada[k] / cent.nada.n;
+    dA += (z - ca) * (z - ca);
+    dN += (z - cn) * (z - cn);
+  }
+  // margem: só descarta quando está claramente mais perto dos exemplos "nada"
+  return (Math.sqrt(dN) + 0.35 < Math.sqrt(dA)) ? 'nada' : 'animal';
+}
+
+/*
+  data: Uint8ClampedArray RGBA
+  opts: {offset, minFrac, calfFrac, inverted, unitOverride, calfMedian, model}
+    unitOverride > 0 → tamanho de 1 adulto ensinado pelo usuário (px), vale
+                       mais que a estimativa automática
+    calfMedian  > 0 → área mediana dos bezerros ensinados nesta foto
+    model           → cérebro com os exemplos ensinados (ou null)
+  Retorna {animals, ignored, unit, threshold}
+  animals: [{x, y, count, type:'adulto'|'bezerro', area, fill, aspect, bright, bbox}]
+*/
+function analyzeRGBA(data, W, H, opts){
+  const o = Object.assign({ offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false,
+                            unitOverride: 0, calfMedian: 0, model: null }, opts);
+  const n = W * H;
+  const bright = new Uint8Array(n);
+  const hist = new Float64Array(256);
+  for (let i = 0, j = 0; i < n; i++, j += 4){
+    const r = data[j], g = data[j+1], b = data[j+2];
+    let v;
+    if (o.inverted){
+      const mx = r > g ? (r > b ? r : b) : (g > b ? g : b);
+      v = 255 - mx;              // animais escuros sobre piso claro
+    } else {
+      v = r < g ? (r < b ? r : b) : (g < b ? g : b);  // "brancura"
+    }
+    bright[i] = v;
+    hist[v]++;
+  }
+  const ot = otsuThreshold(hist, n);
+  let thr = ot.thr;
+  // salvaguarda anti-fantasma: se o histograma não separa bem dois grupos, ou o
+  // "primeiro plano" encontrado nem é claro de verdade (Otsu cortou terra ao meio
+  // num curral vazio), exige brancura alta em vez de contar sujeira como boi
+  let fgN = 0, fgSum = 0;
+  for (let t = thr + 1; t < 256; t++){ fgN += hist[t]; fgSum += t * hist[t]; }
+  const fgMean = fgN ? fgSum / fgN : 255;
+  if (ot.eta < 0.5 || fgMean < 140) thr = Math.max(thr, 160);
+  const threshold = Math.max(1, Math.min(254, thr + o.offset));
+  let mask = new Uint8Array(n);
+  for (let i = 0; i < n; i++) mask[i] = bright[i] > threshold ? 1 : 0;
+  mask = dilate(erode(mask, W, H), W, H);   // abertura: tira ruído fino
+
+  const comps = connectedComponents(mask, W, H, bright);
+
+  // separa estruturas (pistas, cochos, faixas de concreto) e ruído grosso;
+  // mancha grande só é estrutura se também for ALONGADA — rebanho denso
+  // ocupando meia foto é parrudo e precisa continuar sendo contado por área
+  const NOISE_PX = 12;
+  const kept = [], ignored = [];
+  for (const c of comps){
+    if (c.area < NOISE_PX) continue;
+    const bw = c.maxX - c.minX + 1, bh = c.maxY - c.minY + 1;
+    c.fill = c.area / (bw * bh);
+    c.aspect = Math.max(bw, bh) / Math.min(bw, bh);
+    if (((bw > 0.5 * W || bh > 0.5 * H) && c.aspect > 5) || c.fill < 0.15){
+      ignored.push(c); continue;
+    }
+    c.naBorda = c.minX <= 1 || c.minY <= 1 || c.maxX >= W - 2 || c.maxY >= H - 2;
+    kept.push(c);
+  }
+  if (kept.length === 0) return { animals: [], ignored, unit: 0, threshold };
+
+  // escala: o que o usuário ensinou vale mais que a estimativa automática
+  let unit;
+  if (o.unitOverride > 0){
+    unit = o.unitOverride;
+  } else {
+    // animais cortados pela margem têm área parcial: fora da estimativa de escala
+    const inteiros = kept.filter(c => !c.naBorda);
+    unit = estimateUnit(inteiros.length >= 3 ? inteiros : kept);
+    // piso absoluto: uma "unidade" de meia dúzia de pixels é cisco, não boi,
+    // e faria cada mancha real virar um grupo de dezenas
+    if (unit) unit = Math.max(unit, 16);
+  }
+
+  const CAP = 80;
+  const minArea = o.minFrac * unit;
+  // limite adulto/bezerro: se o usuário ensinou bezerros, o corte fica no meio
+  // do caminho entre o bezerro típico ensinado e o adulto
+  const calfArea = (o.calfMedian > 0 && unit)
+    ? Math.min((o.calfMedian + unit) / 2, 0.9 * unit)
+    : o.calfFrac * unit;
+  const brainOn = o.model && brainReady(o.model);
+  const animals = [];
+  for (const c of kept){
+    if (c.area < minArea){ ignored.push(c); continue; }
+    if (brainOn && brainClassify(o.model, brainFeatures(c, unit)) === 'nada'){
+      c.aprendido = true;        // descartado pelo motor de aprendizado
+      ignored.push(c); continue;
+    }
+    let count = Math.max(1, Math.round(c.area / unit));
+    const saturado = count > CAP;
+    if (saturado) count = CAP;
+    // mancha na borda é sempre parcial — nunca vira "bezerro" por parecer pequena
+    const type = (count === 1 && c.area < calfArea && !c.naBorda) ? 'bezerro' : 'adulto';
+    animals.push({
+      x: c.cx, y: c.cy, count, type, area: c.area, saturado,
+      fill: c.fill, aspect: c.aspect, bright: c.bright,
+      bbox: [c.minX, c.minY, c.maxX, c.maxY]
+    });
+  }
+  return { animals, ignored, unit, threshold };
+}
+/* ============================ CORE END ============================ */
+
+/* ============================ INTERFACE ============================ */
+const $ = id => document.getElementById(id);
+const MAX_LADO = 1600;          // resolução de processamento
+const BRAIN_LS = 'contadorGadoCerebro-v1';
+
+function loadBrain(){
+  try {
+    const b = JSON.parse(localStorage.getItem(BRAIN_LS));
+    if (b && Array.isArray(b.ex)) return b;
+  } catch {}
+  return { ex: [] };
+}
+function saveBrain(){
+  try { localStorage.setItem(BRAIN_LS, JSON.stringify(state.brain)); } catch {}
+}
+function mediana(arr){
+  if (!arr || !arr.length) return 0;
+  const s = arr.slice().sort((a, b) => a - b);
+  return s[Math.floor(s.length / 2)];
+}
+
+const state = {
+  photos: [],                   // {id,nome,W,H,baseCanvas,thumb,result,adds,removals,history,taughtAdult,taughtCalf}
+  activeId: null,
+  modo: 'remover',
+  settings: { offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false, verIgnorados: false },
+  brain: loadBrain()            // exemplos ensinados — persistem no navegador
+};
+let seq = 0;
+
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d');
+
+/* ---------- entrada de arquivos ---------- */
+$('dropzone').addEventListener('click', () => $('inputFotos').click());
+$('dropzone').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('inputFotos').click(); }
+});
+$('inputFotos').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
+['dragover','dragenter'].forEach(ev => document.addEventListener(ev, e => {
+  e.preventDefault(); $('dropzone').classList.add('drag');
+}));
+document.addEventListener('dragleave', e => {
+  e.preventDefault();
+  // relatedTarget nulo = o arrasto saiu da janela sem soltar
+  if (!e.relatedTarget || e.target === document.documentElement) $('dropzone').classList.remove('drag');
+});
+document.addEventListener('dragend', () => $('dropzone').classList.remove('drag'));
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  $('dropzone').classList.remove('drag');
+  addFiles(e.dataTransfer.files);
+});
+document.addEventListener('paste', e => {
+  if (e.clipboardData && e.clipboardData.files.length) addFiles(e.clipboardData.files);
+});
+
+async function addFiles(fileList){
+  const files = Array.from(fileList || []).filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|bmp)$/i.test(f.name));
+  if (!files.length) return;
+  for (const f of files){
+    try {
+      const foto = await loadPhoto(f);
+      state.photos.push(foto);
+      state.activeId = foto.id;
+      analyzePhoto(foto);
+    } catch (err){
+      console.error(err);
+      alert('Não consegui abrir a imagem "' + f.name + '". Formatos aceitos: JPG, PNG, WEBP.');
+    }
+    renderAll();
+    await new Promise(r => setTimeout(r, 0));   // deixa a tela respirar entre fotos
+  }
+}
+
+function loadPhoto(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const escala = Math.min(1, MAX_LADO / Math.max(img.naturalWidth, img.naturalHeight));
+      const W = Math.max(1, Math.round(img.naturalWidth * escala));
+      const H = Math.max(1, Math.round(img.naturalHeight * escala));
+      const base = document.createElement('canvas');
+      base.width = W; base.height = H;
+      const bctx = base.getContext('2d', { willReadFrequently: true });
+      bctx.drawImage(img, 0, 0, W, H);
+      const th = document.createElement('canvas');
+      const tScale = 90 / Math.max(W, H);
+      th.width = Math.max(1, Math.round(W * tScale));
+      th.height = Math.max(1, Math.round(H * tScale));
+      th.getContext('2d').drawImage(base, 0, 0, th.width, th.height);
+      resolve({
+        id: ++seq, nome: file.name || ('foto ' + seq), W, H,
+        baseCanvas: base, thumb: th.toDataURL('image/jpeg', 0.6),
+        result: null, adds: [], removals: [], history: [],
+        taughtAdult: [], taughtCalf: []     // áreas ensinadas (px) nesta foto
+      });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+    img.src = url;
+  });
+}
+
+/* ---------- análise ---------- */
+function analyzePhoto(foto){
+  const s = state.settings;
+  // pixels lidos do baseCanvas na hora, em vez de reter ~8 MB extras por foto
+  const idata = foto.baseCanvas.getContext('2d').getImageData(0, 0, foto.W, foto.H);
+  foto.result = analyzeRGBA(idata.data, foto.W, foto.H, {
+    offset: s.offset, minFrac: s.minFrac, calfFrac: s.calfFrac, inverted: s.inverted,
+    unitOverride: mediana(foto.taughtAdult),
+    calfMedian: mediana(foto.taughtCalf),
+    model: state.brain
+  });
+  reconcileRemovals(foto);
+}
+
+// reancora cada ponto de remoção na detecção nova mais próxima; órfãos caem —
+// sem isso, mexer nos sliders deixaria remoções invisíveis porém ativas
+function reconcileRemovals(foto){
+  if (!foto.result || !foto.removals.length){ foto.removals = []; return; }
+  const R = Math.max(14, Math.sqrt(((foto.result.unit || 250)) / Math.PI) * 1.8);
+  const novas = [];
+  const usados = new Set();
+  for (const p of foto.removals){
+    let melhor = -1, dist = R;
+    foto.result.animals.forEach((a, i) => {
+      if (usados.has(i)) return;
+      const d = Math.hypot(a.x - p.x, a.y - p.y);
+      if (d < dist){ dist = d; melhor = i; }
+    });
+    if (melhor >= 0){
+      usados.add(melhor);
+      novas.push({ x: foto.result.animals[melhor].x, y: foto.result.animals[melhor].y });
+    }
+  }
+  foto.removals = novas;
+}
+
+let reprocessTimer = null;
+let reprocessGen = 0;
+function reprocessAll(){
+  clearTimeout(reprocessTimer);
+  reprocessTimer = setTimeout(async () => {
+    const gen = ++reprocessGen;
+    for (const foto of [...state.photos]){
+      if (gen !== reprocessGen) return;              // um loop mais novo assumiu
+      if (!state.photos.includes(foto)) continue;    // foto excluída no meio
+      analyzePhoto(foto);
+      renderAll();
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }, 180);
+}
+
+/* ---------- contagem com correções ---------- */
+function raioMarca(foto, area){
+  const unit = (foto.result && foto.result.unit) || 250;
+  return Math.max(6, Math.sqrt((area || unit) / Math.PI) + 4);
+}
+function isRemoved(foto, a){
+  // casamento por identidade: a remoção guarda o centroide exato do alvo
+  // (e é reancorada a cada reprocessamento), então a tolerância é mínima —
+  // um clique nunca apaga um grupo vizinho por tabela
+  return foto.removals.some(p => Math.hypot(p.x - a.x, p.y - a.y) <= 3);
+}
+function contagem(foto){
+  let adultos = 0, bezerros = 0;
+  if (foto.result){
+    for (const a of foto.result.animals){
+      if (isRemoved(foto, a)) continue;
+      if (a.type === 'bezerro') bezerros += a.count; else adultos += a.count;
+    }
+  }
+  for (const m of foto.adds) (m.type === 'bezerro') ? bezerros++ : adultos++;
+  return { adultos, bezerros, total: adultos + bezerros };
+}
+
+/* ---------- correções e ensino por clique ---------- */
+function snapshot(foto){
+  return JSON.stringify({
+    adds: foto.adds, removals: foto.removals,
+    tA: foto.taughtAdult, tB: foto.taughtCalf,
+    exN: state.brain.ex.length
+  });
+}
+
+canvas.addEventListener('click', e => {
+  const foto = fotoAtiva();
+  if (!foto || !foto.result) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+  const antes = snapshot(foto);
+  let aviso = null, reanalisar = false;
+  if (state.modo.startsWith('ens-')){
+    const r = ensinar(foto, x, y);
+    if (!r){
+      toast('Toque em cima de uma marcação detectada (círculo verde/laranja) para ensinar.');
+      return;
+    }
+    aviso = r.aviso; reanalisar = r.reanalisar;
+  } else if (state.modo === 'remover'){
+    aviso = corrigirRemover(foto, x, y);
+  } else {
+    const type = state.modo === 'bezerro' ? 'bezerro' : 'adulto';
+    foto.adds.push({ x, y, type });
+    aviso = type === 'bezerro' ? 'Bezerro marcado' : 'Adulto marcado';
+  }
+  // só entra no histórico o clique que mudou algo — senão o Desfazer "não funciona"
+  if (aviso){
+    foto.history.push(antes);
+    if (foto.history.length > 60) foto.history.shift();
+    toast(aviso);
+    saveBrain();
+  }
+  if (reanalisar){
+    analyzePhoto(foto);   // feedback imediato nesta foto…
+    reprocessAll();       // …e as demais aprendem junto em seguida
+  }
+  renderAll();
+});
+
+// devolve a mensagem do que fez, ou null se o clique não acertou nada
+function corrigirRemover(foto, x, y){
+  const alcance = Math.max(14, raioMarca(foto) * 1.3);
+  // 1º: apaga marcação manual próxima
+  let melhor = -1, dist = alcance;
+  foto.adds.forEach((m, i) => {
+    const d = Math.hypot(m.x - x, m.y - y);
+    if (d < dist){ dist = d; melhor = i; }
+  });
+  if (melhor >= 0){ foto.adds.splice(melhor, 1); return 'Marcação manual apagada'; }
+  // 2º: restaura um ponto removido próximo
+  melhor = -1; dist = alcance;
+  foto.removals.forEach((p, i) => {
+    const d = Math.hypot(p.x - x, p.y - y);
+    if (d < dist){ dist = d; melhor = i; }
+  });
+  if (melhor >= 0){ foto.removals.splice(melhor, 1); return 'Marcação restaurada'; }
+  // 3º: remove a detecção automática mais próxima
+  let alvo = null; dist = alcance * 1.6;
+  for (const a of foto.result.animals){
+    const d = Math.hypot(a.x - x, a.y - y);
+    if (d < dist && !isRemoved(foto, a)){ dist = d; alvo = a; }
+  }
+  if (alvo){
+    foto.removals.push({ x: alvo.x, y: alvo.y });
+    if (alvo.count > 1) return 'Grupo ×' + alvo.count + ' removido';
+    return alvo.type === 'bezerro' ? 'Bezerro removido' : 'Adulto removido';
+  }
+  return null;
+}
+
+// modo ensinar: o clique numa marcação vira exemplo para o motor de aprendizado
+function ensinar(foto, x, y){
+  const alcance = Math.max(16, raioMarca(foto) * 1.6);
+  let alvo = null, dist = alcance;
+  for (const a of foto.result.animals){
+    const d = Math.hypot(a.x - x, a.y - y);
+    if (d < dist && !isRemoved(foto, a)){ dist = d; alvo = a; }
+  }
+  if (!alvo) return null;
+  const unit = foto.result.unit || alvo.area;
+  const f = brainFeatures(alvo, unit);
+  if (state.modo === 'ens-nada'){
+    state.brain.ex.push({ k: 'nada', t: null, f });
+    foto.removals.push({ x: alvo.x, y: alvo.y });
+    const extra = brainReady(state.brain) ? ' — o filtro aprendido está ATIVO' : '';
+    return { aviso: 'Aprendi: isso não é animal (removido da contagem)' + extra, reanalisar: false };
+  }
+  if (state.modo === 'ens-adulto'){
+    state.brain.ex.push({ k: 'animal', t: 'adulto', f });
+    foto.taughtAdult.push(alvo.area);
+    return {
+      aviso: 'Aprendi: 1 adulto ≈ ' + Math.round(mediana(foto.taughtAdult)) +
+             ' px nesta foto — grupos ×N recalculados',
+      reanalisar: true
+    };
+  }
+  state.brain.ex.push({ k: 'animal', t: 'bezerro', f });
+  foto.taughtCalf.push(alvo.area);
+  return { aviso: 'Aprendi: tamanho de bezerro atualizado — contagens recalculadas', reanalisar: true };
+}
+
+function desfazer(){
+  const foto = fotoAtiva();
+  if (!foto || !foto.history.length) return;
+  const s = JSON.parse(foto.history.pop());
+  foto.adds = s.adds; foto.removals = s.removals;
+  const ensinoMudou =
+    JSON.stringify(foto.taughtAdult) !== JSON.stringify(s.tA || []) ||
+    JSON.stringify(foto.taughtCalf) !== JSON.stringify(s.tB || []) ||
+    (typeof s.exN === 'number' && state.brain.ex.length > s.exN);
+  foto.taughtAdult = s.tA || [];
+  foto.taughtCalf = s.tB || [];
+  if (typeof s.exN === 'number' && state.brain.ex.length > s.exN){
+    state.brain.ex.length = s.exN;
+    saveBrain();
+  }
+  if (ensinoMudou) analyzePhoto(foto);
+  esconderToast();
+  renderAll();
+}
+$('btnDesfazer').addEventListener('click', desfazer);
+$('toastUndo').addEventListener('click', desfazer);
+
+let toastTimer = null;
+function toast(msg){
+  $('toastMsg').textContent = msg;
+  $('toast').classList.add('mostrar');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(esconderToast, 2600);
+}
+function esconderToast(){ $('toast').classList.remove('mostrar'); }
+
+/* ---------- modos ---------- */
+const DICAS_MODO = {
+  remover: '✖ Modo remover: toque numa marcação errada para apagá-la (toque de novo no mesmo lugar para restaurar).',
+  adulto: '➕ Modo adulto: toque na foto para marcar um adulto que a detecção não encontrou (ex.: animal escuro).',
+  bezerro: '➕ Modo bezerro: toque na foto para marcar um bezerro que a detecção não encontrou.',
+  'ens-adulto': '🎓 Ensinar: toque numa marcação que corresponde a UM adulto sozinho. O motor aprende o tamanho e recalcula todos os grupos (×N) na hora.',
+  'ens-bezerro': '🎓 Ensinar: toque numa marcação que é UM bezerro sozinho. Ajusta o limite adulto/bezerro desta foto.',
+  'ens-nada': '🎓 Ensinar: toque numa marcação que NÃO é animal (sombra, cocho, mancha). Ela sai da contagem e vira exemplo negativo do filtro.'
+};
+function atualizarDica(){ $('modoDica').textContent = DICAS_MODO[state.modo]; }
+document.querySelectorAll('[data-modo]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.modo = btn.dataset.modo;
+    document.querySelectorAll('[data-modo]').forEach(b => b.classList.toggle('active', b === btn));
+    atualizarDica();
+  });
+});
+atualizarDica();
+
+/* ---------- painel de ensino ---------- */
+$('btnEnsinar').addEventListener('click', () => {
+  const painel = $('ensino');
+  painel.classList.toggle('aberto');
+  $('btnEnsinar').classList.toggle('active', painel.classList.contains('aberto'));
+  // ao abrir, já entra no modo mais usado; ao fechar, volta para remover
+  if (painel.classList.contains('aberto')){
+    $('eAdulto').click();
+  } else if (state.modo.startsWith('ens-')){
+    $('mRemover').click();
+  }
+  renderEnsino();
+});
+
+function renderEnsino(){
+  let ad = 0, bz = 0, na = 0;
+  for (const e of state.brain.ex){
+    if (e.k === 'nada') na++;
+    else if (e.t === 'bezerro') bz++;
+    else ad++;
+  }
+  const foto = fotoAtiva();
+  let descartadas = 0;
+  if (foto && foto.result) descartadas = foto.result.ignored.filter(c => c.aprendido).length;
+  let txt;
+  if (!state.brain.ex.length){
+    txt = 'Nenhum exemplo ainda — o contador usa só a detecção padrão.';
+  } else {
+    txt = 'Exemplos: ' + ad + ' adulto(s), ' + bz + ' bezerro(s), ' + na + ' não-animal. ';
+    txt += brainReady(state.brain)
+      ? 'Filtro aprendido ATIVO' + (descartadas ? ' — descartou ' + descartadas + ' mancha(s) nesta foto.' : '.')
+      : 'O filtro ativa com 3 exemplos de animal e 3 de não-animal.';
+  }
+  $('brainStatus').innerHTML = '';
+  $('brainStatus').textContent = txt;
+}
+
+$('btnBrainExp').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({ versao: 1, ex: state.brain.ex }, null, 1)],
+    { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'aprendizado-contador-gado.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+});
+$('btnBrainImp').addEventListener('click', () => $('inputBrain').click());
+$('inputBrain').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  try {
+    const b = JSON.parse(await f.text());
+    const ex = Array.isArray(b.ex) ? b.ex : null;
+    if (!ex || !ex.every(x => x && (x.k === 'animal' || x.k === 'nada') && x.f)) throw new Error('formato');
+    state.brain = { ex };
+    saveBrain();
+    reprocessAll();
+    toast('Aprendizado importado: ' + ex.length + ' exemplo(s).');
+  } catch {
+    alert('Arquivo de aprendizado inválido. Use um arquivo exportado por este contador.');
+  }
+  renderEnsino();
+});
+$('btnBrainZero').addEventListener('click', () => {
+  if (!state.brain.ex.length) return;
+  if (!confirm('Apagar todos os ' + state.brain.ex.length + ' exemplos ensinados?')) return;
+  state.brain = { ex: [] };
+  saveBrain();
+  reprocessAll();
+  renderEnsino();
+  toast('Aprendizado zerado.');
+});
+
+/* ---------- ajustes ---------- */
+$('btnAjustes').addEventListener('click', () => $('ajustes').classList.toggle('aberto'));
+function bindAjustes(){
+  $('sens').addEventListener('input', () => {
+    const v = parseInt($('sens').value, 10);
+    state.settings.offset = -v;   // mais sensível = limiar menor
+    $('vSens').textContent = v === 0 ? 'automática' : (v > 0 ? '+' + v : String(v));
+    reprocessAll();
+  });
+  $('minFrac').addEventListener('input', () => {
+    state.settings.minFrac = parseInt($('minFrac').value, 10) / 100;
+    $('vMin').textContent = $('minFrac').value + '%';
+    reprocessAll();
+  });
+  $('calfFrac').addEventListener('input', () => {
+    state.settings.calfFrac = parseInt($('calfFrac').value, 10) / 100;
+    $('vBez').textContent = $('calfFrac').value + '%';
+    reprocessAll();
+  });
+  $('invertido').addEventListener('change', () => {
+    state.settings.inverted = $('invertido').checked;
+    reprocessAll();
+  });
+  $('verIgnorados').addEventListener('change', () => {
+    state.settings.verIgnorados = $('verIgnorados').checked;
+    renderAll();
+  });
+  $('btnPadrao').addEventListener('click', () => {
+    $('sens').value = 0; $('minFrac').value = 18; $('calfFrac').value = 50;
+    $('invertido').checked = false;
+    state.settings.offset = 0; state.settings.minFrac = 0.18;
+    state.settings.calfFrac = 0.5; state.settings.inverted = false;
+    $('vSens').textContent = 'automática'; $('vMin').textContent = '18%'; $('vBez').textContent = '50%';
+    reprocessAll();
+  });
+}
+bindAjustes();
+
+$('zoom').addEventListener('input', aplicarZoom);
+function aplicarZoom(){
+  canvas.style.width = $('zoom').value + '%';
+  canvas.style.height = 'auto';
+}
+
+/* ---------- desenho ---------- */
+function fotoAtiva(){
+  return state.photos.find(f => f.id === state.activeId) || null;
+}
+
+function renderCanvas(){
+  const foto = fotoAtiva();
+  $('vazio').style.display = foto ? 'none' : 'flex';
+  if (!foto){ canvas.width = 0; canvas.height = 0; return; }
+  canvas.width = foto.W; canvas.height = foto.H;
+  ctx.drawImage(foto.baseCanvas, 0, 0);
+  if (!foto.result) return;
+  const lw = Math.max(2, foto.W / 700);
+  ctx.font = 'bold ' + Math.max(13, foto.W / 70) + 'px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+
+  if (state.settings.verIgnorados){
+    ctx.setLineDash([6, 5]);
+    ctx.lineWidth = lw * 0.7;
+    for (const c of foto.result.ignored){
+      // vermelho fraco = descartada pelo filtro aprendido; branco = regra fixa
+      ctx.strokeStyle = c.aprendido ? 'rgba(255,93,93,0.55)' : 'rgba(255,255,255,0.35)';
+      ctx.strokeRect(c.minX, c.minY, c.maxX - c.minX + 1, c.maxY - c.minY + 1);
+    }
+    ctx.setLineDash([]);
+  }
+
+  for (const a of foto.result.animals){
+    const removido = isRemoved(foto, a);
+    const r = raioMarca(foto, a.area / a.count) * (a.count > 1 ? 1.25 : 1);
+    ctx.lineWidth = lw;
+    if (removido){
+      ctx.strokeStyle = 'rgba(255,93,93,0.9)';
+      ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(a.x - r * 0.7, a.y - r * 0.7); ctx.lineTo(a.x + r * 0.7, a.y + r * 0.7);
+      ctx.moveTo(a.x + r * 0.7, a.y - r * 0.7); ctx.lineTo(a.x - r * 0.7, a.y + r * 0.7);
+      ctx.stroke();
+      continue;
+    }
+    if (a.saturado){
+      // aglomerado maior que o teto de estimativa: pede conferência humana
+      ctx.strokeStyle = '#ff5d5d';
+      ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
+      texto(a.x, a.y - r - lw * 2, '≥' + a.count, '#ff5d5d');
+      continue;
+    }
+    ctx.strokeStyle = a.type === 'bezerro' ? '#ffb020' : '#35e08a';
+    ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
+    if (a.count > 1){
+      texto(a.x, a.y - r - lw * 2, '×' + a.count, '#35e08a');
+    } else if (a.type === 'bezerro'){
+      texto(a.x, a.y - r - lw * 2, 'B', '#ffb020');
+    }
+  }
+
+  // marcações manuais: sempre azul tracejado (como na legenda); B = bezerro
+  ctx.setLineDash([5, 4]);
+  for (const m of foto.adds){
+    const r = raioMarca(foto);
+    ctx.strokeStyle = '#4da3ff';
+    ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, 7); ctx.stroke();
+    if (m.type === 'bezerro') texto(m.x, m.y - r - lw * 2, 'B', '#ffb020');
+  }
+  ctx.setLineDash([]);
+}
+
+function texto(x, y, s, cor){
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+  ctx.strokeText(s, x, y);
+  ctx.fillStyle = cor;
+  ctx.fillText(s, x, y);
+}
+
+/* ---------- listas e totais ---------- */
+function renderSidebar(){
+  const div = $('fotos');
+  div.innerHTML = '';
+  for (const foto of state.photos){
+    const c = contagem(foto);
+    const el = document.createElement('div');
+    el.className = 'foto-item' + (foto.id === state.activeId ? ' ativa' : '');
+    el.innerHTML =
+      '<img alt="" src="' + foto.thumb + '">' +
+      '<div class="info"><div class="nome"></div>' +
+      '<div class="contagem"><b class="a">' + c.adultos + '</b> ad · <b class="b">' + c.bezerros + '</b> bez</div></div>' +
+      '<button class="x" title="Remover foto">✕</button>';
+    el.querySelector('.nome').textContent = foto.nome;
+    el.addEventListener('click', () => { state.activeId = foto.id; renderAll(); });
+    el.querySelector('.x').addEventListener('click', e => {
+      e.stopPropagation();
+      state.photos = state.photos.filter(f => f.id !== foto.id);
+      if (state.activeId === foto.id) state.activeId = state.photos.length ? state.photos[state.photos.length - 1].id : null;
+      renderAll();
+    });
+    div.appendChild(el);
+  }
+}
+
+function renderTotais(){
+  let A = 0, B = 0;
+  for (const foto of state.photos){
+    const c = contagem(foto);
+    A += c.adultos; B += c.bezerros;
+  }
+  $('tAdultos').textContent = A;
+  $('tBezerros').textContent = B;
+  $('tTotal').textContent = A + B;
+  $('tFotos').textContent = state.photos.length ? '(' + state.photos.length + ' foto' + (state.photos.length > 1 ? 's' : '') + ')' : '';
+  const ativa = fotoAtiva();
+  const cf = ativa ? contagem(ativa) : { adultos: 0, bezerros: 0 };
+  $('fAdultos').textContent = cf.adultos;
+  $('fBezerros').textContent = cf.bezerros;
+  $('btnCsv').disabled = !state.photos.length;
+  $('btnResumo').disabled = !state.photos.length;
+}
+
+// avisa quando a contagem depende demais de grupos estimados grandes —
+// é exatamente o caso em que ensinar o tamanho de 1 animal conserta tudo
+function renderAlerta(){
+  const el = $('alerta');
+  const foto = fotoAtiva();
+  if (!foto || !foto.result || foto.taughtAdult.length){ el.style.display = 'none'; return; }
+  let grandes = 0, total = 0;
+  for (const a of foto.result.animals){
+    if (isRemoved(foto, a)) continue;
+    total += a.count;
+    if (a.count >= 10) grandes += a.count;
+  }
+  if (total > 0 && grandes / total > 0.3){
+    el.style.display = 'block';
+    el.textContent = '⚠ Boa parte desta contagem vem de grupos estimados grandes (×10 ou mais). ' +
+      'Abra 🎓 Ensinar e toque num animal que está sozinho ("É 1 adulto") — os grupos ×N são recalculados na hora com o tamanho certo.';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function renderAll(){
+  renderCanvas();
+  renderSidebar();
+  renderTotais();
+  renderAlerta();
+  renderEnsino();
+}
+
+/* ---------- exportação ---------- */
+function resumoLinhas(){
+  const linhas = [['Foto', 'Adultos', 'Bezerros', 'Total']];
+  let A = 0, B = 0;
+  for (const foto of state.photos){
+    const c = contagem(foto);
+    A += c.adultos; B += c.bezerros;
+    linhas.push([foto.nome, c.adultos, c.bezerros, c.total]);
+  }
+  linhas.push(['TOTAL GERAL', A, B, A + B]);
+  return linhas;
+}
+function csvCampo(v){
+  const s = String(v);
+  return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+$('btnCsv').addEventListener('click', () => {
+  const csv = '﻿' + resumoLinhas()
+    .map(l => l.map(csvCampo).join(';'))
+    .join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const d = new Date();
+  a.download = 'contagem-gado-' + d.toISOString().slice(0, 10) + '.csv';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+});
+$('btnResumo').addEventListener('click', async () => {
+  const linhas = resumoLinhas();
+  const texto = linhas.slice(1).map(l => l[0] + ': ' + l[1] + ' adultos, ' + l[2] + ' bezerros (total ' + l[3] + ')').join('\n');
+  try {
+    await navigator.clipboard.writeText('CONTAGEM DE GADO\n' + texto);
+    $('btnResumo').textContent = '✅ Copiado!';
+  } catch {
+    prompt('Copie o resumo:', texto);
+  }
+  setTimeout(() => { $('btnResumo').textContent = '📋 Copiar resumo'; }, 1600);
+});
+
+// evita perder as fotos e as correções num F5 / gesto de voltar acidental
+window.addEventListener('beforeunload', e => {
+  if (state.photos.length){ e.preventDefault(); e.returnValue = ''; }
+});
+
+renderAll();
+aplicarZoom();
+</script>
+</body>
+</html>
