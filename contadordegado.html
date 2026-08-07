@@ -311,6 +311,7 @@
           <div class="extremos"><span>5</span><span>40</span></div>
         </div>
         <label class="check"><input type="checkbox" id="cfgMostrarAlerta" checked> Alertar quando a contagem depender de grupos grandes</label>
+        <label class="check"><input type="checkbox" id="cfgDividir" checked> Dividir grupos e marcar cada animal individualmente</label>
       </details>
       <details>
         <summary>Marcações na foto</summary>
@@ -459,9 +460,87 @@ function connectedComponents(mask, W, H, weights){
       if (y > 0){ const q = p - W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
       if (y < H-1){ const q = p + W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
     }
-    comps.push({ area, cx: sx / area, cy: sy / area, minX, maxX, minY, maxY, bright: weights ? sw / area : 0 });
+    comps.push({ id: cur, area, cx: sx / area, cy: sy / area, minX, maxX, minY, maxY, bright: weights ? sw / area : 0 });
   }
-  return comps;
+  return { comps, label };
+}
+
+/*
+  Divide uma mancha de animais encostados nos seus "miolos": a transformada de
+  distância mede quão fundo cada pixel está dentro da mancha, e cada animal tem
+  um pico próprio (o lombo); o vinco onde dois corpos se encostam é raso.
+  Devolve os picos em ordem de profundidade. Serve para:
+  1. marcar cada animal do grupo individualmente (em vez de um círculo x7);
+  2. corrigir a contagem quando a sombra comeu parte da área do grupo;
+  3. centrar o círculo no corpo do animal, e não no centroide torto da mancha.
+*/
+function splitPeaks(label, W, H, c, unit){
+  const x0 = Math.max(0, c.minX - 1), y0 = Math.max(0, c.minY - 1);
+  const x1 = Math.min(W - 1, c.maxX + 1), y1 = Math.min(H - 1, c.maxY + 1);
+  const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+  const dt = new Float32Array(bw * bh);
+  for (let y = 0; y < bh; y++){
+    const row = (y0 + y) * W;
+    for (let x = 0; x < bw; x++) dt[y * bw + x] = label[row + x0 + x] === c.id ? 1e9 : 0;
+  }
+  // chamfer 3-4 em duas passadas (aproximação rápida da distância euclidiana)
+  for (let y = 0; y < bh; y++){
+    for (let x = 0; x < bw; x++){
+      const i = y * bw + x;
+      if (!dt[i]) continue;
+      let v = dt[i];
+      if (x > 0) v = Math.min(v, dt[i - 1] + 3);
+      if (y > 0){
+        v = Math.min(v, dt[i - bw] + 3);
+        if (x > 0) v = Math.min(v, dt[i - bw - 1] + 4);
+        if (x < bw - 1) v = Math.min(v, dt[i - bw + 1] + 4);
+      }
+      dt[i] = v;
+    }
+  }
+  for (let y = bh - 1; y >= 0; y--){
+    for (let x = bw - 1; x >= 0; x--){
+      const i = y * bw + x;
+      if (!dt[i]) continue;
+      let v = dt[i];
+      if (x < bw - 1) v = Math.min(v, dt[i + 1] + 3);
+      if (y < bh - 1){
+        v = Math.min(v, dt[i + bw] + 3);
+        if (x < bw - 1) v = Math.min(v, dt[i + bw + 1] + 4);
+        if (x > 0) v = Math.min(v, dt[i + bw - 1] + 4);
+      }
+      dt[i] = v;
+    }
+  }
+  const rAnimal = Math.sqrt(Math.max(unit, 1) / Math.PI);
+  const win = Math.max(2, Math.round(rAnimal * 0.7));
+  const minDepth = Math.max(3, rAnimal * 0.35) * 3;   // ×3: escala do chamfer
+  const cands = [];
+  for (let y = 0; y < bh; y++){
+    for (let x = 0; x < bw; x++){
+      const v = dt[y * bw + x];
+      if (v < minDepth) continue;
+      let ehMax = true;
+      for (let dy = -win; dy <= win && ehMax; dy++){
+        const yy = y + dy;
+        if (yy < 0 || yy >= bh) continue;
+        for (let dx = -win; dx <= win; dx++){
+          const xx = x + dx;
+          if (xx < 0 || xx >= bw) continue;
+          if (dt[yy * bw + xx] > v){ ehMax = false; break; }
+        }
+      }
+      if (ehMax) cands.push({ x: x0 + x, y: y0 + y, v });
+    }
+  }
+  // aglutina platôs e os dois picos (cabeça/traseiro) do mesmo animal
+  cands.sort((a, b) => b.v - a.v);
+  const dmin = rAnimal * 1.6;
+  const peaks = [];
+  for (const p of cands){
+    if (peaks.every(q => Math.hypot(q.x - p.x, q.y - p.y) >= dmin)) peaks.push(p);
+  }
+  return peaks;
 }
 
 /*
@@ -520,27 +599,32 @@ function removeLines(mask, W, H){
 function fenceChain(kept, W, H){
   const cerca = new Set();
   if (kept.length < 8) return cerca;
-  const areas = kept.map(c => c.area).sort((a, b) => a - b);
-  const p90 = areas[Math.min(areas.length - 1, Math.floor(areas.length * 0.9))];
-  const lim = Math.max(12, 0.25 * p90);
-  const peq = kept.filter(c => c.area <= lim);
-  if (peq.length < 6) return cerca;
   const tolY = Math.max(6, H * 0.015);
   const tolX = Math.max(6, W * 0.015);
-  for (const base of peq){
+  const medianaDe = arr => { const s = arr.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
+  // o colar só é cerca se o membro típico dele for MUITO menor que o porte
+  // típico do que está FORA do colar — brilho de arame é uma fração de um
+  // animal; vaca enfileirada no cocho tem o mesmo porte das vacas de fora
+  const ehCerca = (grupo, span, dimSpan) => {
+    if (grupo.size < 6 || span < 0.45 * dimSpan) return false;
+    const fora = kept.filter(c => !grupo.has(c));
+    if (fora.length < 3) return false;
+    const areasFora = fora.map(c => c.area).sort((a, b) => a - b);
+    const p75 = areasFora[Math.floor(areasFora.length * 0.75)];
+    const areasGrupo = [];
+    grupo.forEach(c => areasGrupo.push(c.area));
+    return medianaDe(areasGrupo) <= 0.3 * p75;
+  };
+  for (const base of kept){
     if (!cerca.has(base)){
-      const grupo = peq.filter(c => Math.abs(c.cy - base.cy) <= tolY);
-      if (grupo.length >= 6){
-        const xs = grupo.map(c => c.cx);
-        if (Math.max(...xs) - Math.min(...xs) >= 0.45 * W) grupo.forEach(c => cerca.add(c));
-      }
+      const g = new Set(kept.filter(c => Math.abs(c.cy - base.cy) <= tolY));
+      const xs = []; g.forEach(c => xs.push(c.cx));
+      if (ehCerca(g, Math.max(...xs) - Math.min(...xs), W)) g.forEach(c => cerca.add(c));
     }
     if (!cerca.has(base)){
-      const grupo = peq.filter(c => Math.abs(c.cx - base.cx) <= tolX);
-      if (grupo.length >= 6){
-        const ys = grupo.map(c => c.cy);
-        if (Math.max(...ys) - Math.min(...ys) >= 0.45 * H) grupo.forEach(c => cerca.add(c));
-      }
+      const g = new Set(kept.filter(c => Math.abs(c.cx - base.cx) <= tolX));
+      const ys = []; g.forEach(c => ys.push(c.cy));
+      if (ehCerca(g, Math.max(...ys) - Math.min(...ys), H)) g.forEach(c => cerca.add(c));
     }
   }
   return cerca;
@@ -703,7 +787,7 @@ function analyzeRGBA(data, W, H, opts){
   const o = Object.assign({ offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false,
                             unitOverride: 0, calfMedian: 0, model: null,
                             cap: 80, margem: 0.35, minExemplos: 3,
-                            antiEstrutura: true }, opts);
+                            antiEstrutura: true, dividirGrupos: true }, opts);
   const n = W * H;
   const bright = new Uint8Array(n);
   const hist = new Float64Array(256);
@@ -734,7 +818,8 @@ function analyzeRGBA(data, W, H, opts){
   if (o.antiEstrutura) removeLines(mask, W, H);   // cerca/arame antes de partir
   mask = dilate(erode(mask, W, H), W, H);   // abertura: tira ruído fino
 
-  const comps = connectedComponents(mask, W, H, bright);
+  const cc = connectedComponents(mask, W, H, bright);
+  const comps = cc.comps, label = cc.label;
 
   // separa estruturas (pistas, cochos, faixas de concreto) e ruído grosso;
   // mancha grande só é estrutura se também for ALONGADA — rebanho denso
@@ -809,9 +894,26 @@ function analyzeRGBA(data, W, H, opts){
     if (count === 1 && c.area < calfArea && !c.naBorda && c.fill < 0.4){
       ignored.push(c); continue;   // pequeno E esfarrapado = entulho, não bezerro
     }
+    let cx = c.cx, cy = c.cy, pts = null;
+    if (o.dividirGrupos !== false && !saturado && unit){
+      const peaks = splitPeaks(label, W, H, c, unit);
+      if (count === 1){
+        // recentra o círculo no lombo do animal — o centroide da mancha
+        // escorrega para o lado quando a sombra gruda no corpo
+        if (peaks.length){ cx = peaks[0].x; cy = peaks[0].y; }
+      } else if (peaks.length){
+        // sombra comendo área faz a divisão por área subcontar; os miolos
+        // não mentem — mas com teto, para picos espúrios não estourarem
+        if (peaks.length > count){
+          count = Math.min(peaks.length, count + Math.max(2, Math.round(count * 0.6)));
+        }
+        // com um miolo por animal dá para marcar cada um individualmente
+        if (peaks.length >= count) pts = peaks.slice(0, count).map(p => ({ x: p.x, y: p.y }));
+      }
+    }
     const type = (count === 1 && c.area < calfArea && !c.naBorda) ? 'bezerro' : 'adulto';
     animals.push({
-      x: c.cx, y: c.cy, count, type, area: c.area, saturado,
+      x: cx, y: cy, count, type, area: c.area, saturado, pts,
       fill: c.fill, aspect: c.aspect, bright: c.bright,
       bbox: [c.minX, c.minY, c.maxX, c.maxY]
     });
@@ -844,7 +946,7 @@ function mediana(arr){
 // todos os padrões num lugar só — "Restaurar padrão" volta exatamente para isto
 const CFG_PADRAO = {
   offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false, verIgnorados: false,
-  antiEstrutura: true,
+  antiEstrutura: true, dividirGrupos: true,
   cap: 80, alertaGrupo: 10, mostrarAlerta: true,
   corAdulto: '#35e08a', corBezerro: '#ffb020', corManual: '#4da3ff', corRemovido: '#ff5d5d',
   espessura: 1, tamanhoTexto: 1, mostrarRotulos: true,
@@ -891,6 +993,7 @@ function aplicarCfgNaUI(){
   $('cfgCap').value = String(s.cap); $('vCap').textContent = s.cap;
   $('cfgAlerta').value = String(s.alertaGrupo); $('vAlerta').textContent = s.alertaGrupo;
   $('cfgMostrarAlerta').checked = !!s.mostrarAlerta;
+  $('cfgDividir').checked = !!s.dividirGrupos;
   $('corAdulto').value = s.corAdulto; $('corBezerro').value = s.corBezerro;
   $('corManual').value = s.corManual; $('corRemovido').value = s.corRemovido;
   $('cfgEspessura').value = String(Math.round(s.espessura * 100));
@@ -1139,7 +1242,7 @@ function analyzePhoto(foto){
   foto.result = analyzeRGBA(idata.data, foto.W, foto.H, {
     offset: s.offset, minFrac: s.minFrac, calfFrac: s.calfFrac, inverted: s.inverted,
     cap: s.cap, margem: s.margem, minExemplos: s.minExemplos,
-    antiEstrutura: s.antiEstrutura,
+    antiEstrutura: s.antiEstrutura, dividirGrupos: s.dividirGrupos,
     unitOverride: mediana(foto.taughtAdult),
     calfMedian: mediana(foto.taughtCalf),
     model: s.filtroAtivo ? state.brain : null
@@ -1494,6 +1597,7 @@ function bindCfg(){
   faixa('cfgCap', 'vCap', null, v => { state.settings.cap = v; });
   faixa('cfgAlerta', 'vAlerta', null, v => { state.settings.alertaGrupo = v; }, renderAll);
   caixa('cfgMostrarAlerta', c => { state.settings.mostrarAlerta = c; }, renderAll);
+  caixa('cfgDividir', c => { state.settings.dividirGrupos = c; });
   // marcações
   cor('corAdulto'); cor('corBezerro'); cor('corManual'); cor('corRemovido');
   faixa('cfgEspessura', 'vEspessura', v => v + '%', v => { state.settings.espessura = v / 100; }, renderAll);
@@ -1591,6 +1695,17 @@ function desenharFotoEm(foto, c){
       continue;
     }
     c.strokeStyle = a.type === 'bezerro' ? s.corBezerro : s.corAdulto;
+    if (a.pts && a.pts.length === a.count && a.count > 1){
+      // grupo dividido: um círculo por animal, no miolo de cada um
+      const r1 = raioMarca(foto, a.area / a.count);
+      for (const p of a.pts){
+        c.beginPath(); c.arc(p.x, p.y, r1, 0, 7); c.stroke();
+      }
+      let topo = a.pts[0];
+      for (const p of a.pts) if (p.y < topo.y) topo = p;
+      rotulo(topo.x, topo.y - r1 - lw * 2, '×' + a.count, s.corAdulto);
+      continue;
+    }
     c.beginPath(); c.arc(a.x, a.y, r, 0, 7); c.stroke();
     if (a.count > 1){
       rotulo(a.x, a.y - r - lw * 2, '×' + a.count, s.corAdulto);
