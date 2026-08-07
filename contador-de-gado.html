@@ -73,6 +73,19 @@
   }
   #toolbar .sep{width:1px; height:22px; background:var(--line); margin:0 2px;}
   #toolbar label{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px;}
+  #toolbar .rotulo{font-size:11px; color:var(--muted);}
+  #modoDica{
+    padding:5px 14px; font-size:12px; color:var(--muted);
+    background:#141b24; border-bottom:1px solid var(--line);
+  }
+  #toast{
+    position:fixed; left:50%; bottom:56px; transform:translateX(-50%) translateY(16px);
+    display:flex; gap:10px; align-items:center; background:#0c1117; border:1px solid #3a4a5e;
+    border-radius:10px; padding:8px 14px; font-size:13px; box-shadow:0 6px 24px rgba(0,0,0,.5);
+    opacity:0; pointer-events:none; transition:.2s; z-index:20;
+  }
+  #toast.mostrar{opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto;}
+  #toast button{padding:3px 10px; font-size:12px;}
   #ajustes{
     display:none; padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line);
     gap:22px; flex-wrap:wrap; align-items:flex-end;
@@ -129,7 +142,7 @@
 
 <main>
   <aside>
-    <div id="dropzone" title="Clique ou arraste fotos aqui">
+    <div id="dropzone" role="button" tabindex="0" aria-label="Adicionar fotos" title="Clique ou arraste fotos aqui">
       <div class="big">📷</div>
       <div><b>Adicionar fotos</b></div>
       <div style="font-size:12px">arraste aqui, clique ou cole (Ctrl+V)</div>
@@ -149,24 +162,26 @@
       <button id="btnAjustes">⚙ Ajustes</button>
       <label>Zoom <input type="range" id="zoom" min="25" max="300" value="100" style="width:110px"></label>
       <span class="chips" style="margin-left:auto">
-        <span class="chip adultos" title="Nesta foto">🐂 <b id="fAdultos">0</b></span>
-        <span class="chip bezerros" title="Nesta foto">🐄 <b id="fBezerros">0</b></span>
+        <span class="rotulo">nesta foto:</span>
+        <span class="chip adultos" title="Adultos nesta foto">Adultos <b id="fAdultos">0</b></span>
+        <span class="chip bezerros" title="Bezerros nesta foto">Bezerros <b id="fBezerros">0</b></span>
       </span>
     </div>
+    <div id="modoDica"></div>
 
     <div id="ajustes">
       <div class="ajuste">
-        <div class="titulo">Sensibilidade da detecção: <b id="vSens">automática</b></div>
+        <label class="titulo" for="sens">Sensibilidade da detecção: <b id="vSens">automática</b></label>
         <input type="range" id="sens" min="-60" max="60" value="0" step="1">
         <div class="extremos"><span>detecta menos</span><span>detecta mais</span></div>
       </div>
       <div class="ajuste">
-        <div class="titulo">Ignorar manchas menores que <b id="vMin">18%</b> de um animal</div>
+        <label class="titulo" for="minFrac">Ignorar manchas menores que <b id="vMin">18%</b> de um animal</label>
         <input type="range" id="minFrac" min="5" max="60" value="18" step="1">
         <div class="extremos"><span>5%</span><span>60%</span></div>
       </div>
       <div class="ajuste">
-        <div class="titulo">É bezerro se tiver até <b id="vBez">50%</b> do tamanho de um adulto</div>
+        <label class="titulo" for="calfFrac">É bezerro se tiver até <b id="vBez">50%</b> do tamanho de um adulto</label>
         <input type="range" id="calfFrac" min="25" max="80" value="50" step="1">
         <div class="extremos"><span>25%</span><span>80%</span></div>
       </div>
@@ -191,13 +206,16 @@
 
     <div id="legenda">
       <span class="leg"><span class="dot a"></span> adulto</span>
-      <span class="leg"><span class="dot b"></span> bezerro</span>
+      <span class="leg"><span class="dot b"></span> bezerro (B)</span>
       <span class="leg"><span class="dot a"></span><b>×3</b> grupo encostado (estimado)</span>
-      <span class="leg"><span class="dot m"></span> marcado manualmente</span>
+      <span class="leg"><span class="dot m"></span> marcado manualmente (azul tracejado)</span>
       <span class="leg"><span class="dot r"></span> removido</span>
+      <span class="leg"><span class="dot r"></span><b>≥80</b> aglomerado gigante — confira</span>
     </div>
   </section>
 </main>
+
+<div id="toast"><span id="toastMsg"></span><button id="toastUndo">↩ Desfazer</button></div>
 
 <footer>
   As fotos são processadas somente no seu dispositivo — nada é enviado para a internet.
@@ -229,7 +247,12 @@ function otsuThreshold(hist, total){
     const v = wB * wF * (mB - mF) * (mB - mF);
     if (v > best){ best = v; thr = t; }
   }
-  return thr;
+  // separabilidade (0..1): baixa quando o histograma não tem dois grupos claros
+  const mu = sum / total;
+  let varT = 0;
+  for (let t = 0; t < 256; t++) varT += hist[t] * (t - mu) * (t - mu);
+  const eta = varT > 0 ? best / (varT * total) : 0;
+  return { thr, eta };
 }
 
 function erode(m, W, H){
@@ -284,8 +307,86 @@ function connectedComponents(mask, W, H){
   return comps;
 }
 
-function median(sortedArr){
-  return sortedArr[Math.floor(sortedArr.length / 2)];
+/*
+  Tamanho típico de 1 animal.
+  Régua principal: manchas com CARA de um animal só — preenchem bem a própria
+  caixa (fill alto) e não são alongadas; grupos encostados falham nisso.
+  A mediana ponderada por área dessas manchas dá a escala mesmo quando a
+  maioria do rebanho está aglomerada (hora do trato) ou quando há muitos
+  bezerros. Se quase nada na foto parecer animal isolado, cai no plano B
+  harmônico (múltiplos inteiros de área).
+*/
+function estimateUnit(comps){
+  if (!comps.length) return 0;
+  const areasAll = comps.map(c => c.area).sort((a, b) => a - b);
+  const medArea = areasAll[Math.floor(areasAll.length / 2)];
+  const singles = comps.filter(c => c.fill >= 0.62 && c.aspect <= 3.5 && c.area <= 3 * medArea);
+  let unit = 0;
+  if (singles.length >= 3){
+    const orden = singles.map(c => c.area).sort((a, b) => a - b);
+    const tot = orden.reduce((s, a) => s + a, 0);
+    let acc = 0;
+    for (const a of orden){ acc += a; if (acc >= tot / 2){ unit = a; break; } }
+  } else {
+    unit = estimateUnitHarmonic(areasAll);
+  }
+  if (!unit) return 0;
+  // refino: divide cada mancha pelo nº estimado de animais e tira a mediana
+  // ponderada por área de todas elas
+  const totalArea = areasAll.reduce((s, a) => s + a, 0);
+  const per = comps
+    .map(c => [c.area / Math.max(1, Math.round(c.area / unit)), c.area])
+    .sort((x, y) => x[0] - y[0]);
+  let acc = 0;
+  for (const [valor, peso] of per){
+    acc += peso;
+    if (acc >= totalArea / 2){ unit = valor; break; }
+  }
+  return unit;
+}
+
+function estimateUnitHarmonic(areas){
+  if (!areas.length) return 0;
+  const sorted = areas.slice().sort((a, b) => a - b);
+  const totalArea = sorted.reduce((s, a) => s + a, 0);
+  const medArea = sorted[Math.floor(sorted.length / 2)];
+  // candidato precisa ter tamanho plausível de 1 animal: até 3× a mancha mediana
+  // (senão um aglomerado gigante vira a própria régua da contagem)
+  const cands = new Set([medArea]);
+  for (const a of sorted){
+    for (let k = 1; k <= 3; k++){
+      const u = a / k;
+      if (u >= sorted[0] * 0.7 && u <= 3 * medArea) cands.add(u);
+    }
+  }
+  let bestScore = Infinity;
+  const scored = [];
+  for (const u of cands){
+    let s = 0;
+    for (const a of sorted){
+      const q = a / u;
+      // desvio do múltiplo inteiro mais próximo, pesado pela área da mancha
+      s += a * (q < 0.4 ? 0.5 : Math.min(Math.abs(q - Math.round(q)), 0.5));
+    }
+    s /= totalArea;
+    scored.push([u, s]);
+    if (s < bestScore) bestScore = s;
+  }
+  let unit = 0;
+  for (const [u, s] of scored) if (s <= bestScore + 0.05 && u > unit) unit = u;
+  // refino: divide cada mancha pelo nº estimado de animais e tira a mediana
+  // ponderada por área (bezerros/ruído, pequenos, não dominam a escala)
+  for (let it = 0; it < 2; it++){
+    const per = sorted
+      .map(a => [a / Math.max(1, Math.round(a / unit)), a])
+      .sort((x, y) => x[0] - y[0]);
+    let acc = 0;
+    for (const [valor, peso] of per){
+      acc += peso;
+      if (acc >= totalArea / 2){ unit = valor; break; }
+    }
+  }
+  return unit;
 }
 
 /*
@@ -310,44 +411,57 @@ function analyzeRGBA(data, W, H, opts){
     bright[i] = v;
     hist[v]++;
   }
-  const threshold = Math.max(1, Math.min(254, otsuThreshold(hist, n) + o.offset));
+  const ot = otsuThreshold(hist, n);
+  let thr = ot.thr;
+  // salvaguarda anti-fantasma: se o histograma não separa bem dois grupos, ou o
+  // "primeiro plano" encontrado nem é claro de verdade (Otsu cortou terra ao meio
+  // num curral vazio), exige brancura alta em vez de contar sujeira como boi
+  let fgN = 0, fgSum = 0;
+  for (let t = thr + 1; t < 256; t++){ fgN += hist[t]; fgSum += t * hist[t]; }
+  const fgMean = fgN ? fgSum / fgN : 255;
+  if (ot.eta < 0.5 || fgMean < 140) thr = Math.max(thr, 160);
+  const threshold = Math.max(1, Math.min(254, thr + o.offset));
   let mask = new Uint8Array(n);
   for (let i = 0; i < n; i++) mask[i] = bright[i] > threshold ? 1 : 0;
   mask = dilate(erode(mask, W, H), W, H);   // abertura: tira ruído fino
 
   const comps = connectedComponents(mask, W, H);
 
-  // separa estruturas (pistas, cochos, faixas de concreto) e ruído grosso
+  // separa estruturas (pistas, cochos, faixas de concreto) e ruído grosso;
+  // mancha grande só é estrutura se também for ALONGADA — rebanho denso
+  // ocupando meia foto é parrudo e precisa continuar sendo contado por área
   const NOISE_PX = 12;
   const kept = [], ignored = [];
   for (const c of comps){
     if (c.area < NOISE_PX) continue;
     const bw = c.maxX - c.minX + 1, bh = c.maxY - c.minY + 1;
-    const fill = c.area / (bw * bh);
-    if (bw > 0.5 * W || bh > 0.5 * H || fill < 0.15){ ignored.push(c); continue; }
+    c.fill = c.area / (bw * bh);
+    c.aspect = Math.max(bw, bh) / Math.min(bw, bh);
+    if (((bw > 0.5 * W || bh > 0.5 * H) && c.aspect > 5) || c.fill < 0.15){
+      ignored.push(c); continue;
+    }
+    c.naBorda = c.minX <= 1 || c.minY <= 1 || c.maxX >= W - 2 || c.maxY >= H - 2;
     kept.push(c);
   }
   if (kept.length === 0) return { animals: [], ignored, unit: 0, threshold };
 
-  // tamanho típico de 1 animal: mediana iterada (robusta a grupos encostados)
-  let unit = median(kept.map(c => c.area).sort((a, b) => a - b));
-  for (let it = 0; it < 4; it++){
-    const per = kept
-      .map(c => c.area / Math.max(1, Math.round(c.area / unit)))
-      .sort((a, b) => a - b);
-    unit = median(per);
-  }
+  // animais cortados pela margem têm área parcial: fora da estimativa de escala
+  const inteiros = kept.filter(c => !c.naBorda);
+  const unit = estimateUnit(inteiros.length >= 3 ? inteiros : kept);
 
+  const CAP = 80;
   const minArea = o.minFrac * unit;
   const calfArea = o.calfFrac * unit;
   const animals = [];
   for (const c of kept){
     if (c.area < minArea){ ignored.push(c); continue; }
     let count = Math.max(1, Math.round(c.area / unit));
-    if (count > 30) count = 30;
-    const type = (count === 1 && c.area < calfArea) ? 'bezerro' : 'adulto';
+    const saturado = count > CAP;
+    if (saturado) count = CAP;
+    // mancha na borda é sempre parcial — nunca vira "bezerro" por parecer pequena
+    const type = (count === 1 && c.area < calfArea && !c.naBorda) ? 'bezerro' : 'adulto';
     animals.push({
-      x: c.cx, y: c.cy, count, type, area: c.area,
+      x: c.cx, y: c.cy, count, type, area: c.area, saturado,
       bbox: [c.minX, c.minY, c.maxX, c.maxY]
     });
   }
@@ -371,14 +485,24 @@ const ctx = canvas.getContext('2d');
 
 /* ---------- entrada de arquivos ---------- */
 $('dropzone').addEventListener('click', () => $('inputFotos').click());
+$('dropzone').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('inputFotos').click(); }
+});
 $('inputFotos').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
 ['dragover','dragenter'].forEach(ev => document.addEventListener(ev, e => {
   e.preventDefault(); $('dropzone').classList.add('drag');
 }));
-['dragleave','drop'].forEach(ev => document.addEventListener(ev, e => {
-  e.preventDefault(); if (ev === 'drop' || e.target === document.documentElement) $('dropzone').classList.remove('drag');
-}));
-document.addEventListener('drop', e => { e.preventDefault(); addFiles(e.dataTransfer.files); });
+document.addEventListener('dragleave', e => {
+  e.preventDefault();
+  // relatedTarget nulo = o arrasto saiu da janela sem soltar
+  if (!e.relatedTarget || e.target === document.documentElement) $('dropzone').classList.remove('drag');
+});
+document.addEventListener('dragend', () => $('dropzone').classList.remove('drag'));
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  $('dropzone').classList.remove('drag');
+  addFiles(e.dataTransfer.files);
+});
 document.addEventListener('paste', e => {
   if (e.clipboardData && e.clipboardData.files.length) addFiles(e.clipboardData.files);
 });
@@ -414,7 +538,6 @@ function loadPhoto(file){
       base.width = W; base.height = H;
       const bctx = base.getContext('2d', { willReadFrequently: true });
       bctx.drawImage(img, 0, 0, W, H);
-      const imageData = bctx.getImageData(0, 0, W, H);
       const th = document.createElement('canvas');
       const tScale = 90 / Math.max(W, H);
       th.width = Math.max(1, Math.round(W * tScale));
@@ -422,7 +545,7 @@ function loadPhoto(file){
       th.getContext('2d').drawImage(base, 0, 0, th.width, th.height);
       resolve({
         id: ++seq, nome: file.name || ('foto ' + seq), W, H,
-        imageData, baseCanvas: base, thumb: th.toDataURL('image/jpeg', 0.6),
+        baseCanvas: base, thumb: th.toDataURL('image/jpeg', 0.6),
         result: null, adds: [], removals: [], history: []
       });
     };
@@ -434,16 +557,45 @@ function loadPhoto(file){
 /* ---------- análise ---------- */
 function analyzePhoto(foto){
   const s = state.settings;
-  foto.result = analyzeRGBA(foto.imageData.data, foto.W, foto.H, {
+  // pixels lidos do baseCanvas na hora, em vez de reter ~8 MB extras por foto
+  const idata = foto.baseCanvas.getContext('2d').getImageData(0, 0, foto.W, foto.H);
+  foto.result = analyzeRGBA(idata.data, foto.W, foto.H, {
     offset: s.offset, minFrac: s.minFrac, calfFrac: s.calfFrac, inverted: s.inverted
   });
+  reconcileRemovals(foto);
+}
+
+// reancora cada ponto de remoção na detecção nova mais próxima; órfãos caem —
+// sem isso, mexer nos sliders deixaria remoções invisíveis porém ativas
+function reconcileRemovals(foto){
+  if (!foto.result || !foto.removals.length){ foto.removals = []; return; }
+  const R = Math.max(14, Math.sqrt(((foto.result.unit || 250)) / Math.PI) * 1.8);
+  const novas = [];
+  const usados = new Set();
+  for (const p of foto.removals){
+    let melhor = -1, dist = R;
+    foto.result.animals.forEach((a, i) => {
+      if (usados.has(i)) return;
+      const d = Math.hypot(a.x - p.x, a.y - p.y);
+      if (d < dist){ dist = d; melhor = i; }
+    });
+    if (melhor >= 0){
+      usados.add(melhor);
+      novas.push({ x: foto.result.animals[melhor].x, y: foto.result.animals[melhor].y });
+    }
+  }
+  foto.removals = novas;
 }
 
 let reprocessTimer = null;
+let reprocessGen = 0;
 function reprocessAll(){
   clearTimeout(reprocessTimer);
   reprocessTimer = setTimeout(async () => {
-    for (const foto of state.photos){
+    const gen = ++reprocessGen;
+    for (const foto of [...state.photos]){
+      if (gen !== reprocessGen) return;              // um loop mais novo assumiu
+      if (!state.photos.includes(foto)) continue;    // foto excluída no meio
       analyzePhoto(foto);
       renderAll();
       await new Promise(r => setTimeout(r, 0));
@@ -457,8 +609,10 @@ function raioMarca(foto, area){
   return Math.max(6, Math.sqrt((area || unit) / Math.PI) + 4);
 }
 function isRemoved(foto, a){
-  const r = Math.max(12, raioMarca(foto, a.area));
-  return foto.removals.some(p => Math.hypot(p.x - a.x, p.y - a.y) <= r);
+  // casamento por identidade: a remoção guarda o centroide exato do alvo
+  // (e é reancorada a cada reprocessamento), então a tolerância é mínima —
+  // um clique nunca apaga um grupo vizinho por tabela
+  return foto.removals.some(p => Math.hypot(p.x - a.x, p.y - a.y) <= 3);
 }
 function contagem(foto){
   let adultos = 0, bezerros = 0;
@@ -479,12 +633,25 @@ canvas.addEventListener('click', e => {
   const rect = canvas.getBoundingClientRect();
   const x = (e.clientX - rect.left) * (canvas.width / rect.width);
   const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-  snapshot(foto);
-  if (state.modo === 'remover') corrigirRemover(foto, x, y);
-  else foto.adds.push({ x, y, type: state.modo === 'bezerro' ? 'bezerro' : 'adulto' });
+  const antes = JSON.stringify({ adds: foto.adds, removals: foto.removals });
+  let aviso = null;
+  if (state.modo === 'remover'){
+    aviso = corrigirRemover(foto, x, y);
+  } else {
+    const type = state.modo === 'bezerro' ? 'bezerro' : 'adulto';
+    foto.adds.push({ x, y, type });
+    aviso = type === 'bezerro' ? 'Bezerro marcado' : 'Adulto marcado';
+  }
+  // só entra no histórico o clique que mudou algo — senão o Desfazer "não funciona"
+  if (aviso){
+    foto.history.push(antes);
+    if (foto.history.length > 60) foto.history.shift();
+    toast(aviso);
+  }
   renderAll();
 });
 
+// devolve a mensagem do que fez, ou null se o clique não acertou nada
 function corrigirRemover(foto, x, y){
   const alcance = Math.max(14, raioMarca(foto) * 1.3);
   // 1º: apaga marcação manual próxima
@@ -493,42 +660,63 @@ function corrigirRemover(foto, x, y){
     const d = Math.hypot(m.x - x, m.y - y);
     if (d < dist){ dist = d; melhor = i; }
   });
-  if (melhor >= 0){ foto.adds.splice(melhor, 1); return; }
+  if (melhor >= 0){ foto.adds.splice(melhor, 1); return 'Marcação manual apagada'; }
   // 2º: restaura um ponto removido próximo
   melhor = -1; dist = alcance;
   foto.removals.forEach((p, i) => {
     const d = Math.hypot(p.x - x, p.y - y);
     if (d < dist){ dist = d; melhor = i; }
   });
-  if (melhor >= 0){ foto.removals.splice(melhor, 1); return; }
+  if (melhor >= 0){ foto.removals.splice(melhor, 1); return 'Marcação restaurada'; }
   // 3º: remove a detecção automática mais próxima
   let alvo = null; dist = alcance * 1.6;
   for (const a of foto.result.animals){
     const d = Math.hypot(a.x - x, a.y - y);
     if (d < dist && !isRemoved(foto, a)){ dist = d; alvo = a; }
   }
-  if (alvo) foto.removals.push({ x: alvo.x, y: alvo.y });
+  if (alvo){
+    foto.removals.push({ x: alvo.x, y: alvo.y });
+    if (alvo.count > 1) return 'Grupo ×' + alvo.count + ' removido';
+    return alvo.type === 'bezerro' ? 'Bezerro removido' : 'Adulto removido';
+  }
+  return null;
 }
 
-function snapshot(foto){
-  foto.history.push(JSON.stringify({ adds: foto.adds, removals: foto.removals }));
-  if (foto.history.length > 60) foto.history.shift();
-}
-$('btnDesfazer').addEventListener('click', () => {
+function desfazer(){
   const foto = fotoAtiva();
   if (!foto || !foto.history.length) return;
   const s = JSON.parse(foto.history.pop());
   foto.adds = s.adds; foto.removals = s.removals;
+  esconderToast();
   renderAll();
-});
+}
+$('btnDesfazer').addEventListener('click', desfazer);
+$('toastUndo').addEventListener('click', desfazer);
+
+let toastTimer = null;
+function toast(msg){
+  $('toastMsg').textContent = msg;
+  $('toast').classList.add('mostrar');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(esconderToast, 2600);
+}
+function esconderToast(){ $('toast').classList.remove('mostrar'); }
 
 /* ---------- modos ---------- */
+const DICAS_MODO = {
+  remover: '✖ Modo remover: toque numa marcação errada para apagá-la (toque de novo no mesmo lugar para restaurar).',
+  adulto: '➕ Modo adulto: toque na foto para marcar um adulto que a detecção não encontrou (ex.: animal escuro).',
+  bezerro: '➕ Modo bezerro: toque na foto para marcar um bezerro que a detecção não encontrou.'
+};
+function atualizarDica(){ $('modoDica').textContent = DICAS_MODO[state.modo]; }
 document.querySelectorAll('#toolbar [data-modo]').forEach(btn => {
   btn.addEventListener('click', () => {
     state.modo = btn.dataset.modo;
     document.querySelectorAll('#toolbar [data-modo]').forEach(b => b.classList.toggle('active', b === btn));
+    atualizarDica();
   });
 });
+atualizarDica();
 
 /* ---------- ajustes ---------- */
 $('btnAjustes').addEventListener('click', () => $('ajustes').classList.toggle('aberto'));
@@ -613,6 +801,13 @@ function renderCanvas(){
       ctx.stroke();
       continue;
     }
+    if (a.saturado){
+      // aglomerado maior que o teto de estimativa: pede conferência humana
+      ctx.strokeStyle = '#ff5d5d';
+      ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
+      texto(a.x, a.y - r - lw * 2, '≥' + a.count, '#ff5d5d');
+      continue;
+    }
     ctx.strokeStyle = a.type === 'bezerro' ? '#ffb020' : '#35e08a';
     ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
     if (a.count > 1){
@@ -622,13 +817,14 @@ function renderCanvas(){
     }
   }
 
+  // marcações manuais: sempre azul tracejado (como na legenda); B = bezerro
   ctx.setLineDash([5, 4]);
   for (const m of foto.adds){
     const r = raioMarca(foto);
-    ctx.strokeStyle = m.type === 'bezerro' ? '#ffb020' : '#4da3ff';
+    ctx.strokeStyle = '#4da3ff';
     ctx.lineWidth = lw;
     ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, 7); ctx.stroke();
-    texto(m.x, m.y - r - lw * 2, m.type === 'bezerro' ? 'B✋' : '✋', ctx.strokeStyle);
+    if (m.type === 'bezerro') texto(m.x, m.y - r - lw * 2, 'B', '#ffb020');
   }
   ctx.setLineDash([]);
 }
@@ -724,6 +920,11 @@ $('btnResumo').addEventListener('click', async () => {
     prompt('Copie o resumo:', texto);
   }
   setTimeout(() => { $('btnResumo').textContent = '📋 Copiar resumo'; }, 1600);
+});
+
+// evita perder as fotos e as correções num F5 / gesto de voltar acidental
+window.addEventListener('beforeunload', e => {
+  if (state.photos.length){ e.preventDefault(); e.returnValue = ''; }
 });
 
 renderAll();
