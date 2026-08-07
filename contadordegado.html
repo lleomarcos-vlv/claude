@@ -229,7 +229,8 @@
           como em confinamentos. Grupos encostados são estimados pelo tamanho da mancha.
           Corrija com um clique o que faltar ou sobrar — e use o botão <b>🎓 Ensinar</b> para
           mostrar ao contador o tamanho de 1 animal e o que não é animal: ele aprende com você
-          e recalcula tudo na hora.
+          e recalcula tudo na hora. As fotos, correções e o aprendizado ficam salvos
+          automaticamente neste navegador — pode fechar e continuar depois.
         </div>
       </div>
     </div>
@@ -250,7 +251,7 @@
 
 <footer>
   As fotos são processadas somente no seu dispositivo — nada é enviado para a internet.
-  A contagem automática é uma estimativa: confira, corrija e ensine com os botões acima.
+  A contagem automática é uma estimativa: confira, corrija e ensine com os botões acima.<span id="salvoInfo"></span>
 </footer>
 
 <script>
@@ -615,6 +616,171 @@ const state = {
 };
 let seq = 0;
 
+/* ---------- ajustes persistem no navegador ---------- */
+const AJUSTES_LS = 'contadorGadoAjustes-v1';
+function salvarAjustes(){
+  try { localStorage.setItem(AJUSTES_LS, JSON.stringify(state.settings)); } catch {}
+}
+function carregarAjustes(){
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(AJUSTES_LS)); } catch {}
+  if (!s) return;
+  Object.assign(state.settings, s);
+  $('sens').value = String(-(state.settings.offset || 0));
+  const v = parseInt($('sens').value, 10);
+  $('vSens').textContent = v === 0 ? 'automática' : (v > 0 ? '+' + v : String(v));
+  $('minFrac').value = String(Math.round(state.settings.minFrac * 100));
+  $('vMin').textContent = $('minFrac').value + '%';
+  $('calfFrac').value = String(Math.round(state.settings.calfFrac * 100));
+  $('vBez').textContent = $('calfFrac').value + '%';
+  $('invertido').checked = !!state.settings.inverted;
+  $('verIgnorados').checked = !!state.settings.verIgnorados;
+}
+
+/* ---------- fotos salvas automaticamente (IndexedDB, sem limite fixo) ----------
+   Cada foto é gravada como JPEG na resolução de processamento, junto com as
+   correções (adds/removals) e o ensino de tamanho daquela foto. Ao reabrir a
+   página tudo volta como estava. Quantidade limitada apenas pelo espaço que o
+   navegador conceder — se faltar espaço, avisa em vez de falhar em silêncio. */
+const DB_NOME = 'contadorGadoFotos-v1';
+let db = null, dbFalhou = false, avisouCheio = false;
+const saveQueue = new Set();
+let saveTimer = null;
+
+function abrirDB(){
+  return new Promise(resolve => {
+    if (!('indexedDB' in window)) return resolve(null);
+    let req;
+    try { req = indexedDB.open(DB_NOME, 1); } catch { return resolve(null); }
+    req.onupgradeneeded = () => req.result.createObjectStore('fotos', { keyPath: 'id' });
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => resolve(null);
+  });
+}
+
+// o JPEG é gerado uma vez por foto e reaproveitado nas gravações seguintes
+function blobDaFoto(foto){
+  if (foto.blobSalvo) return Promise.resolve(foto.blobSalvo);
+  return new Promise(resolve => {
+    foto.baseCanvas.toBlob(b => { foto.blobSalvo = b; resolve(b); }, 'image/jpeg', 0.92);
+  });
+}
+
+function agendarSalvar(foto){
+  if (!db || !foto) return;
+  saveQueue.add(foto.id);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(salvarPendentes, 350);
+}
+
+async function salvarPendentes(){
+  if (!db) return;
+  const ids = [...saveQueue];
+  saveQueue.clear();
+  for (const id of ids){
+    const foto = state.photos.find(f => f.id === id);
+    if (!foto) continue;
+    const blob = await blobDaFoto(foto);
+    if (!blob) continue;
+    const rec = {
+      id: foto.id, nome: foto.nome, W: foto.W, H: foto.H, blob, thumb: foto.thumb,
+      adds: foto.adds, removals: foto.removals,
+      taughtAdult: foto.taughtAdult, taughtCalf: foto.taughtCalf
+    };
+    await new Promise(resolve => {
+      let tx;
+      try { tx = db.transaction('fotos', 'readwrite'); } catch { dbFalhou = true; return resolve(); }
+      tx.objectStore('fotos').put(rec);
+      tx.oncomplete = () => { dbFalhou = false; resolve(); };
+      tx.onabort = tx.onerror = () => {
+        dbFalhou = true;
+        if (!avisouCheio){
+          avisouCheio = true;
+          toast('⚠ Não consegui salvar no navegador (armazenamento cheio?). Exporte o CSV para não perder a contagem.');
+        }
+        resolve();
+      };
+    });
+  }
+  renderSalvoInfo();
+}
+
+function apagarFotoDB(id){
+  if (!db) return;
+  try { db.transaction('fotos', 'readwrite').objectStore('fotos').delete(id); } catch {}
+  saveQueue.delete(id);
+  setTimeout(renderSalvoInfo, 300);
+}
+
+async function renderSalvoInfo(){
+  const el = $('salvoInfo');
+  if (!el) return;
+  if (!db){ el.textContent = ''; return; }
+  if (dbFalhou){ el.textContent = ' · ⚠ salvamento automático falhou — exporte o CSV'; return; }
+  let uso = '';
+  try {
+    if (navigator.storage && navigator.storage.estimate){
+      const est = await navigator.storage.estimate();
+      if (est && est.usage) uso = ' (' + (est.usage / 1048576).toFixed(1) + ' MB)';
+    }
+  } catch {}
+  el.textContent = state.photos.length
+    ? ' · 💾 ' + state.photos.length + ' foto(s) e correções salvas automaticamente neste navegador' + uso
+    : '';
+}
+
+function registroParaFoto(rec){
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(rec.blob);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const base = document.createElement('canvas');
+      base.width = rec.W; base.height = rec.H;
+      base.getContext('2d', { willReadFrequently: true }).drawImage(img, 0, 0, rec.W, rec.H);
+      resolve({
+        id: rec.id, nome: rec.nome, W: rec.W, H: rec.H,
+        baseCanvas: base, thumb: rec.thumb, blobSalvo: rec.blob,
+        result: null, adds: rec.adds || [], removals: rec.removals || [], history: [],
+        taughtAdult: rec.taughtAdult || [], taughtCalf: rec.taughtCalf || []
+      });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+async function restaurarFotos(){
+  db = await abrirDB();
+  renderSalvoInfo();
+  if (!db) return;
+  // pede ao navegador para não descartar estes dados quando faltar espaço
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch {}
+  const recs = await new Promise(resolve => {
+    let tx;
+    try { tx = db.transaction('fotos', 'readonly'); } catch { return resolve([]); }
+    const rq = tx.objectStore('fotos').getAll();
+    rq.onsuccess = () => resolve(rq.result || []);
+    rq.onerror = () => resolve([]);
+  });
+  recs.sort((a, b) => a.id - b.id);
+  // reserva os ids restaurados antes de decodificar, para fotos novas não colidirem
+  for (const rec of recs) seq = Math.max(seq, rec.id);
+  let n = 0;
+  for (const rec of recs){
+    const foto = await registroParaFoto(rec);
+    if (!foto) continue;
+    state.photos.push(foto);
+    state.activeId = foto.id;
+    analyzePhoto(foto);
+    n++;
+    renderAll();
+    await new Promise(r => setTimeout(r, 0));
+  }
+  if (n) toast(n + ' foto(s) da última sessão restauradas, com correções e ensino.');
+  renderSalvoInfo();
+}
+
 const canvas = $('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -651,6 +817,7 @@ async function addFiles(fileList){
       state.photos.push(foto);
       state.activeId = foto.id;
       analyzePhoto(foto);
+      agendarSalvar(foto);
     } catch (err){
       console.error(err);
       alert('Não consegui abrir a imagem "' + f.name + '". Formatos aceitos: JPG, PNG, WEBP.');
@@ -802,6 +969,7 @@ canvas.addEventListener('click', e => {
     if (foto.history.length > 60) foto.history.shift();
     toast(aviso);
     saveBrain();
+    agendarSalvar(foto);
   }
   if (reanalisar){
     analyzePhoto(foto);   // feedback imediato nesta foto…
@@ -888,6 +1056,7 @@ function desfazer(){
     saveBrain();
   }
   if (ensinoMudou) analyzePhoto(foto);
+  agendarSalvar(foto);
   esconderToast();
   renderAll();
 }
@@ -1003,24 +1172,29 @@ function bindAjustes(){
     const v = parseInt($('sens').value, 10);
     state.settings.offset = -v;   // mais sensível = limiar menor
     $('vSens').textContent = v === 0 ? 'automática' : (v > 0 ? '+' + v : String(v));
+    salvarAjustes();
     reprocessAll();
   });
   $('minFrac').addEventListener('input', () => {
     state.settings.minFrac = parseInt($('minFrac').value, 10) / 100;
     $('vMin').textContent = $('minFrac').value + '%';
+    salvarAjustes();
     reprocessAll();
   });
   $('calfFrac').addEventListener('input', () => {
     state.settings.calfFrac = parseInt($('calfFrac').value, 10) / 100;
     $('vBez').textContent = $('calfFrac').value + '%';
+    salvarAjustes();
     reprocessAll();
   });
   $('invertido').addEventListener('change', () => {
     state.settings.inverted = $('invertido').checked;
+    salvarAjustes();
     reprocessAll();
   });
   $('verIgnorados').addEventListener('change', () => {
     state.settings.verIgnorados = $('verIgnorados').checked;
+    salvarAjustes();
     renderAll();
   });
   $('btnPadrao').addEventListener('click', () => {
@@ -1029,6 +1203,7 @@ function bindAjustes(){
     state.settings.offset = 0; state.settings.minFrac = 0.18;
     state.settings.calfFrac = 0.5; state.settings.inverted = false;
     $('vSens').textContent = 'automática'; $('vMin').textContent = '18%'; $('vBez').textContent = '50%';
+    salvarAjustes();
     reprocessAll();
   });
 }
@@ -1133,6 +1308,7 @@ function renderSidebar(){
     el.addEventListener('click', () => { state.activeId = foto.id; renderAll(); });
     el.querySelector('.x').addEventListener('click', e => {
       e.stopPropagation();
+      apagarFotoDB(foto.id);
       state.photos = state.photos.filter(f => f.id !== foto.id);
       if (state.activeId === foto.id) state.activeId = state.photos.length ? state.photos[state.photos.length - 1].id : null;
       renderAll();
@@ -1228,13 +1404,17 @@ $('btnResumo').addEventListener('click', async () => {
   setTimeout(() => { $('btnResumo').textContent = '📋 Copiar resumo'; }, 1600);
 });
 
-// evita perder as fotos e as correções num F5 / gesto de voltar acidental
+// com o salvamento automático, só avisa ao sair se ainda houver algo por gravar
 window.addEventListener('beforeunload', e => {
-  if (state.photos.length){ e.preventDefault(); e.returnValue = ''; }
+  if (state.photos.length && (!db || dbFalhou || saveQueue.size)){
+    e.preventDefault(); e.returnValue = '';
+  }
 });
 
+carregarAjustes();
 renderAll();
 aplicarZoom();
+restaurarFotos();
 </script>
 </body>
 </html>
