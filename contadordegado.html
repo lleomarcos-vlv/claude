@@ -90,17 +90,37 @@
   }
   #toast.mostrar{opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto;}
   #toast button{padding:3px 10px; font-size:12px;}
-  #ajustes{
-    display:none; padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line);
-    gap:22px; flex-wrap:wrap; align-items:flex-end;
+  /* ---------- ícones (SVG inline, sem emoji) ---------- */
+  .ic{
+    width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2;
+    stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px; display:inline-block;
   }
-  #ajustes.aberto{display:flex;}
-  .ajuste{min-width:200px;}
-  .ajuste .titulo{font-size:12px; color:var(--muted); margin-bottom:2px;}
+  .ic-g{width:38px; height:38px; stroke-width:1.5;}
+  button .ic{margin-right:2px;}
+  /* ---------- painel de configurações (aba à direita) ---------- */
+  #cfg{
+    width:300px; min-width:300px; background:var(--panel); border-left:1px solid var(--line);
+    display:none; flex-direction:column; min-height:0;
+  }
+  #cfg.aberto{display:flex;}
+  #cfg .cab{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px; border-bottom:1px solid var(--line); font-weight:700;
+  }
+  #cfg .cab button{border:none; background:none; color:var(--muted); padding:2px 6px;}
+  #cfg .cab button:hover{color:var(--red);}
+  #cfg .corpo{flex:1; overflow-y:auto; padding:6px 14px 14px;}
+  #cfg details{border-bottom:1px solid var(--line); padding:6px 0;}
+  #cfg summary{cursor:pointer; font-weight:600; font-size:13px; padding:5px 0; user-select:none; color:var(--text);}
+  #cfg .cor{display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12.5px; margin:6px 0;}
+  #cfg .cor input[type=color]{width:38px; height:24px; border:1px solid var(--line); border-radius:6px; background:var(--panel2); padding:1px; cursor:pointer;}
+  #cfg .rodape-cfg{padding:12px 0 4px;}
+  .ajuste{min-width:200px; margin:8px 0;}
+  .ajuste .titulo{font-size:12px; color:var(--muted); margin-bottom:2px; display:block;}
   .ajuste .titulo b{color:var(--text);}
   .ajuste input[type=range]{width:100%;}
   .ajuste .extremos{display:flex; justify-content:space-between; font-size:10px; color:#5c6b7d;}
-  #ajustes .check{font-size:13px; color:var(--text); display:flex; gap:6px; align-items:center; padding-bottom:8px;}
+  .check{font-size:13px; color:var(--text); display:flex; gap:6px; align-items:center; margin:8px 0;}
   #ensino{
     display:none; padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line);
     gap:8px; flex-wrap:wrap; align-items:center;
@@ -137,26 +157,51 @@
     #fotos{display:flex; gap:6px; padding:0 12px 10px;}
     .foto-item{min-width:180px;}
     .chips{margin-left:0; width:100%;}
+    #cfg{
+      position:fixed; right:0; top:0; bottom:0; z-index:30; max-height:none;
+      width:min(320px, 92vw); min-width:0; box-shadow:-10px 0 30px rgba(0,0,0,.55);
+      border-left:1px solid var(--line);
+    }
   }
 </style>
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-vaca" viewBox="0 0 24 24"><path d="M3 4c1 2.8 2.8 4 5 4h8c2.2 0 4-1.2 5-4"/><path d="M8 8c-1.4 5.5 0 13 4 13s5.4-7.5 4-13"/><path d="M9.6 11.3h.01M14.4 11.3h.01M10.3 17h.01M13.7 17h.01"/></symbol>
+    <symbol id="i-baixar" viewBox="0 0 24 24"><path d="M12 3v11M7 10l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M8 7l1.5-3h5L16 7"/><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+    <symbol id="i-drone" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></symbol>
+    <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-desfazer" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+    <symbol id="i-ensinar" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5L2 9z"/><path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5M22 9v6"/></symbol>
+    <symbol id="i-config" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5V6M12 18v3.5M2.5 12H6M18 12h3.5M5 5l2.5 2.5M16.5 16.5L19 19M19 5l-2.5 2.5M7.5 16.5L5 19"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></symbol>
+    <symbol id="i-pdf" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9.5 13h5M9.5 17h5"/></symbol>
+    <symbol id="i-salvar" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></symbol>
+    <symbol id="i-abrir" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></symbol>
+    <symbol id="i-lixo" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6.5 7l1 14h9l1-14M10 11v6M14 11v6"/></symbol>
+  </defs>
+</svg>
+
 <header>
-  <h1>🐂 Contador de <span>Gado</span> · fotos aéreas</h1>
+  <h1><svg class="ic" style="width:20px;height:20px"><use href="#i-vaca"/></svg> Contador de <span>Gado</span> · fotos aéreas</h1>
   <div class="chips">
     <span class="chip adultos">Adultos: <b id="tAdultos">0</b></span>
     <span class="chip bezerros">Bezerros: <b id="tBezerros">0</b></span>
     <span class="chip total">Total geral: <b id="tTotal">0</b> <small id="tFotos"></small></span>
-    <button id="btnCsv" title="Baixar planilha com a contagem de cada foto">⬇ Exportar CSV</button>
-    <button id="btnResumo" title="Copiar resumo em texto">📋 Copiar resumo</button>
+    <button id="btnCsv" title="Baixar planilha com a contagem de cada foto"><svg class="ic"><use href="#i-baixar"/></svg> Exportar CSV</button>
+    <button id="btnResumo" title="Copiar resumo em texto"><svg class="ic"><use href="#i-copiar"/></svg> <span id="lblResumo">Copiar resumo</span></button>
   </div>
 </header>
 
 <main>
   <aside>
     <div id="dropzone" role="button" tabindex="0" aria-label="Adicionar fotos" title="Clique ou arraste fotos aqui">
-      <div class="big">📷</div>
+      <div class="big"><svg class="ic ic-g"><use href="#i-camera"/></svg></div>
       <div><b>Adicionar fotos</b></div>
       <div style="font-size:12px">arraste aqui, clique ou cole (Ctrl+V)</div>
     </div>
@@ -167,13 +212,13 @@
   <section id="viewer">
     <div id="toolbar">
       <span style="font-size:12px;color:var(--muted)">Corrigir:</span>
-      <button id="mAdulto" data-modo="adulto" title="Clique na foto para marcar um adulto que faltou">➕ Adulto</button>
-      <button id="mBezerro" data-modo="bezerro" title="Clique na foto para marcar um bezerro que faltou">➕ Bezerro</button>
-      <button id="mRemover" data-modo="remover" class="active" title="Clique numa marcação errada para removê-la (ou restaurá-la)">✖ Remover</button>
-      <button id="btnDesfazer" title="Desfazer última correção">↩ Desfazer</button>
+      <button id="mAdulto" data-modo="adulto" title="Clique na foto para marcar um adulto que faltou"><svg class="ic"><use href="#i-mais"/></svg> Adulto</button>
+      <button id="mBezerro" data-modo="bezerro" title="Clique na foto para marcar um bezerro que faltou"><svg class="ic"><use href="#i-mais"/></svg> Bezerro</button>
+      <button id="mRemover" data-modo="remover" class="active" title="Clique numa marcação errada para removê-la (ou restaurá-la)"><svg class="ic"><use href="#i-x"/></svg> Remover</button>
+      <button id="btnDesfazer" title="Desfazer última correção"><svg class="ic"><use href="#i-desfazer"/></svg> Desfazer</button>
       <div class="sep"></div>
-      <button id="btnEnsinar" title="Ensine o contador tocando nas marcações: ele aprende o tamanho de 1 animal e o que não é animal">🎓 Ensinar</button>
-      <button id="btnAjustes">⚙ Ajustes</button>
+      <button id="btnEnsinar" title="Ensine o contador tocando nas marcações: ele aprende o tamanho de 1 animal e o que não é animal"><svg class="ic"><use href="#i-ensinar"/></svg> Ensinar</button>
+      <button id="btnAjustes" title="Abrir o painel de configurações"><svg class="ic"><use href="#i-config"/></svg> Configurações</button>
       <label>Zoom <input type="range" id="zoom" min="25" max="300" value="100" style="width:110px"></label>
       <span class="chips" style="margin-left:auto">
         <span class="rotulo">nesta foto:</span>
@@ -186,48 +231,28 @@
 
     <div id="ensino">
       <span class="rotulo">Toque numa marcação e diga o que ela é de verdade:</span>
-      <button id="eAdulto" data-modo="ens-adulto" title="A marcação tocada corresponde a exatamente 1 adulto — calibra o tamanho e recalcula os grupos ×N">✔ É 1 adulto</button>
-      <button id="eBezerro" data-modo="ens-bezerro" title="A marcação tocada é exatamente 1 bezerro — ajusta o limite adulto/bezerro">✔ É 1 bezerro</button>
-      <button id="eNada" data-modo="ens-nada" title="A marcação tocada não é um animal (sombra, cocho, mancha) — sai da contagem e vira exemplo negativo">✘ Não é animal</button>
+      <button id="eAdulto" data-modo="ens-adulto" title="A marcação tocada corresponde a exatamente 1 adulto — calibra o tamanho e recalcula os grupos ×N"><svg class="ic"><use href="#i-check"/></svg> É 1 adulto</button>
+      <button id="eBezerro" data-modo="ens-bezerro" title="A marcação tocada é exatamente 1 bezerro — ajusta o limite adulto/bezerro"><svg class="ic"><use href="#i-check"/></svg> É 1 bezerro</button>
+      <button id="eNada" data-modo="ens-nada" title="A marcação tocada não é um animal (sombra, cocho, mancha) — sai da contagem e vira exemplo negativo"><svg class="ic"><use href="#i-x"/></svg> Não é animal</button>
       <div class="sep"></div>
       <span id="brainStatus"></span>
       <div class="sep"></div>
-      <button id="btnBrainExp" title="Salvar o aprendizado num arquivo para usar em outro computador">💾 Exportar aprendizado</button>
-      <button id="btnBrainImp" title="Carregar um aprendizado salvo">📂 Importar</button>
+      <button id="btnRelatorio" title="Baixar um PDF com o que foi ensinado e a contagem de cada foto com as marcações"><svg class="ic"><use href="#i-pdf"/></svg> Relatório PDF</button>
+      <button id="btnBrainExp" title="Salvar o aprendizado num arquivo para usar em outro computador"><svg class="ic"><use href="#i-salvar"/></svg> Exportar aprendizado</button>
+      <button id="btnBrainImp" title="Carregar um aprendizado salvo"><svg class="ic"><use href="#i-abrir"/></svg> Importar</button>
       <input type="file" id="inputBrain" accept="application/json,.json" hidden>
-      <button id="btnBrainZero" title="Apagar todos os exemplos ensinados">🗑 Zerar</button>
-    </div>
-
-    <div id="ajustes">
-      <div class="ajuste">
-        <label class="titulo" for="sens">Sensibilidade da detecção: <b id="vSens">automática</b></label>
-        <input type="range" id="sens" min="-60" max="60" value="0" step="1">
-        <div class="extremos"><span>detecta menos</span><span>detecta mais</span></div>
-      </div>
-      <div class="ajuste">
-        <label class="titulo" for="minFrac">Ignorar manchas menores que <b id="vMin">18%</b> de um animal</label>
-        <input type="range" id="minFrac" min="5" max="60" value="18" step="1">
-        <div class="extremos"><span>5%</span><span>60%</span></div>
-      </div>
-      <div class="ajuste">
-        <label class="titulo" for="calfFrac">É bezerro se tiver até <b id="vBez">50%</b> do tamanho de um adulto</label>
-        <input type="range" id="calfFrac" min="25" max="80" value="50" step="1">
-        <div class="extremos"><span>25%</span><span>80%</span></div>
-      </div>
-      <label class="check"><input type="checkbox" id="invertido"> Gado escuro em piso claro</label>
-      <label class="check"><input type="checkbox" id="verIgnorados"> Mostrar áreas ignoradas</label>
-      <button id="btnPadrao" title="Voltar aos valores padrão">Restaurar padrão</button>
+      <button id="btnBrainZero" title="Apagar todos os exemplos ensinados"><svg class="ic"><use href="#i-lixo"/></svg> Zerar</button>
     </div>
 
     <div id="canvasWrap">
       <canvas id="canvas"></canvas>
       <div id="vazio">
-        <div class="icone">🛩️</div>
+        <div class="icone"><svg class="ic ic-g"><use href="#i-drone"/></svg></div>
         <div><b>Solte as fotos do drone aqui</b></div>
         <div class="dica">
           A contagem funciona melhor em fotos aéreas (de cima) com o gado claro sobre piso escuro,
           como em confinamentos. Grupos encostados são estimados pelo tamanho da mancha.
-          Corrija com um clique o que faltar ou sobrar — e use o botão <b>🎓 Ensinar</b> para
+          Corrija com um clique o que faltar ou sobrar — e use o botão <b>Ensinar</b> para
           mostrar ao contador o tamanho de 1 animal e o que não é animal: ele aprende com você
           e recalcula tudo na hora. As fotos, correções e o aprendizado ficam salvos
           automaticamente neste navegador — pode fechar e continuar depois.
@@ -239,15 +264,109 @@
       <span class="leg"><span class="dot a"></span> adulto</span>
       <span class="leg"><span class="dot b"></span> bezerro (B)</span>
       <span class="leg"><span class="dot a"></span><b>×3</b> grupo encostado (estimado)</span>
-      <span class="leg"><span class="dot m"></span> marcado manualmente (azul tracejado)</span>
+      <span class="leg"><span class="dot m"></span> marcado manualmente (tracejado)</span>
       <span class="leg"><span class="dot r"></span> removido</span>
       <span class="leg"><span class="dot r"></span><b>≥80</b> aglomerado gigante — confira</span>
-      <span class="leg">🎓 toque nas marcações no modo Ensinar para o motor aprender</span>
+      <span class="leg">no modo Ensinar, toque nas marcações para o motor aprender</span>
     </div>
   </section>
+
+  <aside id="cfg">
+    <div class="cab">
+      Configurações
+      <button id="btnCfgFechar" title="Fechar configurações"><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="corpo">
+      <details open>
+        <summary>Detecção</summary>
+        <div class="ajuste">
+          <label class="titulo" for="sens">Sensibilidade: <b id="vSens">automática</b></label>
+          <input type="range" id="sens" min="-60" max="60" value="0" step="1">
+          <div class="extremos"><span>detecta menos</span><span>detecta mais</span></div>
+        </div>
+        <div class="ajuste">
+          <label class="titulo" for="minFrac">Ignorar manchas menores que <b id="vMin">18%</b> de um animal</label>
+          <input type="range" id="minFrac" min="5" max="60" value="18" step="1">
+          <div class="extremos"><span>5%</span><span>60%</span></div>
+        </div>
+        <div class="ajuste">
+          <label class="titulo" for="calfFrac">É bezerro se tiver até <b id="vBez">50%</b> do adulto</label>
+          <input type="range" id="calfFrac" min="25" max="80" value="50" step="1">
+          <div class="extremos"><span>25%</span><span>80%</span></div>
+        </div>
+        <label class="check"><input type="checkbox" id="invertido"> Gado escuro em piso claro</label>
+        <label class="check"><input type="checkbox" id="verIgnorados"> Mostrar áreas ignoradas</label>
+      </details>
+      <details>
+        <summary>Contagem e alertas</summary>
+        <div class="ajuste">
+          <label class="titulo" for="cfgCap">Teto de estimativa por aglomerado: <b id="vCap">80</b></label>
+          <input type="range" id="cfgCap" min="20" max="300" value="80" step="5">
+          <div class="extremos"><span>20</span><span>300</span></div>
+        </div>
+        <div class="ajuste">
+          <label class="titulo" for="cfgAlerta">Considerar "grupo grande" a partir de <b id="vAlerta">10</b> animais</label>
+          <input type="range" id="cfgAlerta" min="5" max="40" value="10" step="1">
+          <div class="extremos"><span>5</span><span>40</span></div>
+        </div>
+        <label class="check"><input type="checkbox" id="cfgMostrarAlerta" checked> Alertar quando a contagem depender de grupos grandes</label>
+      </details>
+      <details>
+        <summary>Marcações na foto</summary>
+        <label class="cor">Cor do adulto <input type="color" id="corAdulto" value="#35e08a"></label>
+        <label class="cor">Cor do bezerro <input type="color" id="corBezerro" value="#ffb020"></label>
+        <label class="cor">Cor da marcação manual <input type="color" id="corManual" value="#4da3ff"></label>
+        <label class="cor">Cor de removido / alerta <input type="color" id="corRemovido" value="#ff5d5d"></label>
+        <div class="ajuste">
+          <label class="titulo" for="cfgEspessura">Espessura do traço: <b id="vEspessura">100%</b></label>
+          <input type="range" id="cfgEspessura" min="50" max="250" value="100" step="10">
+          <div class="extremos"><span>fino</span><span>grosso</span></div>
+        </div>
+        <div class="ajuste">
+          <label class="titulo" for="cfgTexto">Tamanho dos rótulos: <b id="vTexto">100%</b></label>
+          <input type="range" id="cfgTexto" min="50" max="250" value="100" step="10">
+          <div class="extremos"><span>menor</span><span>maior</span></div>
+        </div>
+        <label class="check"><input type="checkbox" id="cfgRotulos" checked> Mostrar rótulos (×N, B)</label>
+      </details>
+      <details>
+        <summary>Aprendizado</summary>
+        <label class="check"><input type="checkbox" id="cfgFiltro" checked> Usar o filtro aprendido na detecção</label>
+        <div class="ajuste">
+          <label class="titulo" for="cfgMinEx">Ativar o filtro com <b id="vMinEx">3</b> exemplos de cada tipo</label>
+          <input type="range" id="cfgMinEx" min="2" max="10" value="3" step="1">
+          <div class="extremos"><span>2</span><span>10</span></div>
+        </div>
+        <div class="ajuste">
+          <label class="titulo" for="cfgMargem">Cautela do filtro: <b id="vMargem">35</b></label>
+          <input type="range" id="cfgMargem" min="0" max="100" value="35" step="5">
+          <div class="extremos"><span>descarta mais</span><span>descarta menos</span></div>
+        </div>
+      </details>
+      <details>
+        <summary>Relatório PDF</summary>
+        <label class="check"><input type="checkbox" id="cfgPdfFotos" checked> Incluir as fotos com marcações</label>
+        <div class="ajuste">
+          <label class="titulo" for="cfgPdfEx">Listar até <b id="vPdfEx">30</b> exemplos ensinados</label>
+          <input type="range" id="cfgPdfEx" min="10" max="100" value="30" step="5">
+          <div class="extremos"><span>10</span><span>100</span></div>
+        </div>
+      </details>
+      <details>
+        <summary>Salvamento automático</summary>
+        <label class="check"><input type="checkbox" id="cfgAutosave" checked> Salvar fotos e correções neste navegador</label>
+        <div class="ajuste">
+          <label class="titulo" for="cfgJpeg">Qualidade das fotos salvas: <b id="vJpeg">92%</b></label>
+          <input type="range" id="cfgJpeg" min="50" max="100" value="92" step="1">
+          <div class="extremos"><span>ocupa menos</span><span>melhor</span></div>
+        </div>
+      </details>
+      <div class="rodape-cfg"><button id="btnPadrao" title="Voltar todos os valores ao padrão">Restaurar padrão</button></div>
+    </div>
+  </aside>
 </main>
 
-<div id="toast"><span id="toastMsg"></span><button id="toastUndo">↩ Desfazer</button></div>
+<div id="toast"><span id="toastMsg"></span><button id="toastUndo"><svg class="ic"><use href="#i-desfazer"/></svg> Desfazer</button></div>
 
 <footer>
   As fotos são processadas somente no seu dispositivo — nada é enviado para a internet.
@@ -446,14 +565,15 @@ function brainFeatures(c, unit){
   };
 }
 
-function brainReady(model){
+function brainReady(model, minEx){
   if (!model || !Array.isArray(model.ex)) return false;
+  const m = minEx || 3;
   let pos = 0, neg = 0;
   for (const e of model.ex) (e.k === 'nada') ? neg++ : pos++;
-  return pos >= 3 && neg >= 3;
+  return pos >= m && neg >= m;
 }
 
-function brainClassify(model, f){
+function brainClassify(model, f, margem){
   const ex = model.ex;
   const mean = {}, sd = {};
   for (const k of BRAIN_KEYS){
@@ -478,22 +598,28 @@ function brainClassify(model, f){
     dN += (z - cn) * (z - cn);
   }
   // margem: só descarta quando está claramente mais perto dos exemplos "nada"
-  return (Math.sqrt(dN) + 0.35 < Math.sqrt(dA)) ? 'nada' : 'animal';
+  const mg = (margem === undefined || margem === null) ? 0.35 : margem;
+  return (Math.sqrt(dN) + mg < Math.sqrt(dA)) ? 'nada' : 'animal';
 }
 
 /*
   data: Uint8ClampedArray RGBA
-  opts: {offset, minFrac, calfFrac, inverted, unitOverride, calfMedian, model}
+  opts: {offset, minFrac, calfFrac, inverted, unitOverride, calfMedian, model,
+         cap, margem, minExemplos}
     unitOverride > 0 → tamanho de 1 adulto ensinado pelo usuário (px), vale
                        mais que a estimativa automática
     calfMedian  > 0 → área mediana dos bezerros ensinados nesta foto
     model           → cérebro com os exemplos ensinados (ou null)
+    cap             → teto de animais estimados por aglomerado (padrão 80)
+    margem          → cautela do filtro aprendido (padrão 0.35)
+    minExemplos     → exemplos por classe para o filtro ativar (padrão 3)
   Retorna {animals, ignored, unit, threshold}
   animals: [{x, y, count, type:'adulto'|'bezerro', area, fill, aspect, bright, bbox}]
 */
 function analyzeRGBA(data, W, H, opts){
   const o = Object.assign({ offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false,
-                            unitOverride: 0, calfMedian: 0, model: null }, opts);
+                            unitOverride: 0, calfMedian: 0, model: null,
+                            cap: 80, margem: 0.35, minExemplos: 3 }, opts);
   const n = W * H;
   const bright = new Uint8Array(n);
   const hist = new Float64Array(256);
@@ -556,18 +682,18 @@ function analyzeRGBA(data, W, H, opts){
     if (unit) unit = Math.max(unit, 16);
   }
 
-  const CAP = 80;
+  const CAP = o.cap || 80;
   const minArea = o.minFrac * unit;
   // limite adulto/bezerro: se o usuário ensinou bezerros, o corte fica no meio
   // do caminho entre o bezerro típico ensinado e o adulto
   const calfArea = (o.calfMedian > 0 && unit)
     ? Math.min((o.calfMedian + unit) / 2, 0.9 * unit)
     : o.calfFrac * unit;
-  const brainOn = o.model && brainReady(o.model);
+  const brainOn = o.model && brainReady(o.model, o.minExemplos);
   const animals = [];
   for (const c of kept){
     if (c.area < minArea){ ignored.push(c); continue; }
-    if (brainOn && brainClassify(o.model, brainFeatures(c, unit)) === 'nada'){
+    if (brainOn && brainClassify(o.model, brainFeatures(c, unit), o.margem) === 'nada'){
       c.aprendido = true;        // descartado pelo motor de aprendizado
       ignored.push(c); continue;
     }
@@ -607,11 +733,22 @@ function mediana(arr){
   return s[Math.floor(s.length / 2)];
 }
 
+// todos os padrões num lugar só — "Restaurar padrão" volta exatamente para isto
+const CFG_PADRAO = {
+  offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false, verIgnorados: false,
+  cap: 80, alertaGrupo: 10, mostrarAlerta: true,
+  corAdulto: '#35e08a', corBezerro: '#ffb020', corManual: '#4da3ff', corRemovido: '#ff5d5d',
+  espessura: 1, tamanhoTexto: 1, mostrarRotulos: true,
+  filtroAtivo: true, minExemplos: 3, margem: 0.35,
+  pdfIncluirFotos: true, pdfMaxExemplos: 30,
+  autosave: true, jpegQualidade: 0.92
+};
+
 const state = {
   photos: [],                   // {id,nome,W,H,baseCanvas,thumb,result,adds,removals,history,taughtAdult,taughtCalf}
   activeId: null,
   modo: 'remover',
-  settings: { offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false, verIgnorados: false },
+  settings: Object.assign({}, CFG_PADRAO),
   brain: loadBrain()            // exemplos ensinados — persistem no navegador
 };
 let seq = 0;
@@ -622,19 +759,44 @@ function salvarAjustes(){
   try { localStorage.setItem(AJUSTES_LS, JSON.stringify(state.settings)); } catch {}
 }
 function carregarAjustes(){
-  let s = null;
-  try { s = JSON.parse(localStorage.getItem(AJUSTES_LS)); } catch {}
-  if (!s) return;
-  Object.assign(state.settings, s);
-  $('sens').value = String(-(state.settings.offset || 0));
+  try {
+    const s = JSON.parse(localStorage.getItem(AJUSTES_LS));
+    if (s) Object.assign(state.settings, s);   // chaves novas mantêm o padrão
+  } catch {}
+  aplicarCfgNaUI();
+}
+
+// espelha state.settings em todos os controles do painel de configurações
+function aplicarCfgNaUI(){
+  const s = state.settings;
+  $('sens').value = String(-(s.offset || 0));
   const v = parseInt($('sens').value, 10);
   $('vSens').textContent = v === 0 ? 'automática' : (v > 0 ? '+' + v : String(v));
-  $('minFrac').value = String(Math.round(state.settings.minFrac * 100));
+  $('minFrac').value = String(Math.round(s.minFrac * 100));
   $('vMin').textContent = $('minFrac').value + '%';
-  $('calfFrac').value = String(Math.round(state.settings.calfFrac * 100));
+  $('calfFrac').value = String(Math.round(s.calfFrac * 100));
   $('vBez').textContent = $('calfFrac').value + '%';
-  $('invertido').checked = !!state.settings.inverted;
-  $('verIgnorados').checked = !!state.settings.verIgnorados;
+  $('invertido').checked = !!s.inverted;
+  $('verIgnorados').checked = !!s.verIgnorados;
+  $('cfgCap').value = String(s.cap); $('vCap').textContent = s.cap;
+  $('cfgAlerta').value = String(s.alertaGrupo); $('vAlerta').textContent = s.alertaGrupo;
+  $('cfgMostrarAlerta').checked = !!s.mostrarAlerta;
+  $('corAdulto').value = s.corAdulto; $('corBezerro').value = s.corBezerro;
+  $('corManual').value = s.corManual; $('corRemovido').value = s.corRemovido;
+  $('cfgEspessura').value = String(Math.round(s.espessura * 100));
+  $('vEspessura').textContent = Math.round(s.espessura * 100) + '%';
+  $('cfgTexto').value = String(Math.round(s.tamanhoTexto * 100));
+  $('vTexto').textContent = Math.round(s.tamanhoTexto * 100) + '%';
+  $('cfgRotulos').checked = !!s.mostrarRotulos;
+  $('cfgFiltro').checked = !!s.filtroAtivo;
+  $('cfgMinEx').value = String(s.minExemplos); $('vMinEx').textContent = s.minExemplos;
+  $('cfgMargem').value = String(Math.round(s.margem * 100));
+  $('vMargem').textContent = Math.round(s.margem * 100);
+  $('cfgPdfFotos').checked = !!s.pdfIncluirFotos;
+  $('cfgPdfEx').value = String(s.pdfMaxExemplos); $('vPdfEx').textContent = s.pdfMaxExemplos;
+  $('cfgAutosave').checked = !!s.autosave;
+  $('cfgJpeg').value = String(Math.round(s.jpegQualidade * 100));
+  $('vJpeg').textContent = Math.round(s.jpegQualidade * 100) + '%';
 }
 
 /* ---------- fotos salvas automaticamente (IndexedDB, sem limite fixo) ----------
@@ -662,12 +824,13 @@ function abrirDB(){
 function blobDaFoto(foto){
   if (foto.blobSalvo) return Promise.resolve(foto.blobSalvo);
   return new Promise(resolve => {
-    foto.baseCanvas.toBlob(b => { foto.blobSalvo = b; resolve(b); }, 'image/jpeg', 0.92);
+    foto.baseCanvas.toBlob(b => { foto.blobSalvo = b; resolve(b); },
+      'image/jpeg', state.settings.jpegQualidade || 0.92);
   });
 }
 
 function agendarSalvar(foto){
-  if (!db || !foto) return;
+  if (!db || !foto || !state.settings.autosave) return;
   saveQueue.add(foto.id);
   clearTimeout(saveTimer);
   saveTimer = setTimeout(salvarPendentes, 350);
@@ -696,7 +859,7 @@ async function salvarPendentes(){
         dbFalhou = true;
         if (!avisouCheio){
           avisouCheio = true;
-          toast('⚠ Não consegui salvar no navegador (armazenamento cheio?). Exporte o CSV para não perder a contagem.');
+          toast('Não consegui salvar no navegador (armazenamento cheio?). Exporte o CSV para não perder a contagem.');
         }
         resolve();
       };
@@ -716,7 +879,8 @@ async function renderSalvoInfo(){
   const el = $('salvoInfo');
   if (!el) return;
   if (!db){ el.textContent = ''; return; }
-  if (dbFalhou){ el.textContent = ' · ⚠ salvamento automático falhou — exporte o CSV'; return; }
+  if (!state.settings.autosave){ el.textContent = ' · Salvamento automático desligado nas configurações.'; return; }
+  if (dbFalhou){ el.textContent = ' · Atenção: o salvamento automático falhou — exporte o CSV.'; return; }
   let uso = '';
   try {
     if (navigator.storage && navigator.storage.estimate){
@@ -725,7 +889,7 @@ async function renderSalvoInfo(){
     }
   } catch {}
   el.textContent = state.photos.length
-    ? ' · 💾 ' + state.photos.length + ' foto(s) e correções salvas automaticamente neste navegador' + uso
+    ? ' · ' + state.photos.length + ' foto(s) e correções salvas automaticamente neste navegador' + uso + '.'
     : '';
 }
 
@@ -864,9 +1028,10 @@ function analyzePhoto(foto){
   const idata = foto.baseCanvas.getContext('2d').getImageData(0, 0, foto.W, foto.H);
   foto.result = analyzeRGBA(idata.data, foto.W, foto.H, {
     offset: s.offset, minFrac: s.minFrac, calfFrac: s.calfFrac, inverted: s.inverted,
+    cap: s.cap, margem: s.margem, minExemplos: s.minExemplos,
     unitOverride: mediana(foto.taughtAdult),
     calfMedian: mediana(foto.taughtCalf),
-    model: state.brain
+    model: s.filtroAtivo ? state.brain : null
   });
   reconcileRemovals(foto);
 }
@@ -1020,14 +1185,15 @@ function ensinar(foto, x, y){
   if (!alvo) return null;
   const unit = foto.result.unit || alvo.area;
   const f = brainFeatures(alvo, unit);
+  const marca = { quando: Date.now(), foto: foto.nome };   // para o relatório
   if (state.modo === 'ens-nada'){
-    state.brain.ex.push({ k: 'nada', t: null, f });
+    state.brain.ex.push({ k: 'nada', t: null, f, ...marca });
     foto.removals.push({ x: alvo.x, y: alvo.y });
-    const extra = brainReady(state.brain) ? ' — o filtro aprendido está ATIVO' : '';
+    const extra = brainReady(state.brain, state.settings.minExemplos) ? ' — o filtro aprendido está ATIVO' : '';
     return { aviso: 'Aprendi: isso não é animal (removido da contagem)' + extra, reanalisar: false };
   }
   if (state.modo === 'ens-adulto'){
-    state.brain.ex.push({ k: 'animal', t: 'adulto', f });
+    state.brain.ex.push({ k: 'animal', t: 'adulto', f, ...marca });
     foto.taughtAdult.push(alvo.area);
     return {
       aviso: 'Aprendi: 1 adulto ≈ ' + Math.round(mediana(foto.taughtAdult)) +
@@ -1035,7 +1201,7 @@ function ensinar(foto, x, y){
       reanalisar: true
     };
   }
-  state.brain.ex.push({ k: 'animal', t: 'bezerro', f });
+  state.brain.ex.push({ k: 'animal', t: 'bezerro', f, ...marca });
   foto.taughtCalf.push(alvo.area);
   return { aviso: 'Aprendi: tamanho de bezerro atualizado — contagens recalculadas', reanalisar: true };
 }
@@ -1074,12 +1240,12 @@ function esconderToast(){ $('toast').classList.remove('mostrar'); }
 
 /* ---------- modos ---------- */
 const DICAS_MODO = {
-  remover: '✖ Modo remover: toque numa marcação errada para apagá-la (toque de novo no mesmo lugar para restaurar).',
-  adulto: '➕ Modo adulto: toque na foto para marcar um adulto que a detecção não encontrou (ex.: animal escuro).',
-  bezerro: '➕ Modo bezerro: toque na foto para marcar um bezerro que a detecção não encontrou.',
-  'ens-adulto': '🎓 Ensinar: toque numa marcação que corresponde a UM adulto sozinho. O motor aprende o tamanho e recalcula todos os grupos (×N) na hora.',
-  'ens-bezerro': '🎓 Ensinar: toque numa marcação que é UM bezerro sozinho. Ajusta o limite adulto/bezerro desta foto.',
-  'ens-nada': '🎓 Ensinar: toque numa marcação que NÃO é animal (sombra, cocho, mancha). Ela sai da contagem e vira exemplo negativo do filtro.'
+  remover: 'Modo remover: toque numa marcação errada para apagá-la (toque de novo no mesmo lugar para restaurar).',
+  adulto: 'Modo adulto: toque na foto para marcar um adulto que a detecção não encontrou (ex.: animal escuro).',
+  bezerro: 'Modo bezerro: toque na foto para marcar um bezerro que a detecção não encontrou.',
+  'ens-adulto': 'Ensinar: toque numa marcação que corresponde a UM adulto sozinho. O motor aprende o tamanho e recalcula todos os grupos (×N) na hora.',
+  'ens-bezerro': 'Ensinar: toque numa marcação que é UM bezerro sozinho. Ajusta o limite adulto/bezerro desta foto.',
+  'ens-nada': 'Ensinar: toque numa marcação que NÃO é animal (sombra, cocho, mancha). Ela sai da contagem e vira exemplo negativo do filtro.'
 };
 function atualizarDica(){ $('modoDica').textContent = DICAS_MODO[state.modo]; }
 document.querySelectorAll('[data-modo]').forEach(btn => {
@@ -1115,14 +1281,19 @@ function renderEnsino(){
   const foto = fotoAtiva();
   let descartadas = 0;
   if (foto && foto.result) descartadas = foto.result.ignored.filter(c => c.aprendido).length;
+  const minEx = state.settings.minExemplos;
   let txt;
   if (!state.brain.ex.length){
     txt = 'Nenhum exemplo ainda — o contador usa só a detecção padrão.';
   } else {
     txt = 'Exemplos: ' + ad + ' adulto(s), ' + bz + ' bezerro(s), ' + na + ' não-animal. ';
-    txt += brainReady(state.brain)
-      ? 'Filtro aprendido ATIVO' + (descartadas ? ' — descartou ' + descartadas + ' mancha(s) nesta foto.' : '.')
-      : 'O filtro ativa com 3 exemplos de animal e 3 de não-animal.';
+    if (!state.settings.filtroAtivo){
+      txt += 'Filtro aprendido DESLIGADO nas configurações.';
+    } else {
+      txt += brainReady(state.brain, minEx)
+        ? 'Filtro aprendido ATIVO' + (descartadas ? ' — descartou ' + descartadas + ' mancha(s) nesta foto.' : '.')
+        : 'O filtro ativa com ' + minEx + ' exemplos de animal e ' + minEx + ' de não-animal.';
+    }
   }
   $('brainStatus').innerHTML = '';
   $('brainStatus').textContent = txt;
@@ -1165,49 +1336,82 @@ $('btnBrainZero').addEventListener('click', () => {
   toast('Aprendizado zerado.');
 });
 
-/* ---------- ajustes ---------- */
-$('btnAjustes').addEventListener('click', () => $('ajustes').classList.toggle('aberto'));
-function bindAjustes(){
-  $('sens').addEventListener('input', () => {
-    const v = parseInt($('sens').value, 10);
-    state.settings.offset = -v;   // mais sensível = limiar menor
-    $('vSens').textContent = v === 0 ? 'automática' : (v > 0 ? '+' + v : String(v));
-    salvarAjustes();
-    reprocessAll();
-  });
-  $('minFrac').addEventListener('input', () => {
-    state.settings.minFrac = parseInt($('minFrac').value, 10) / 100;
-    $('vMin').textContent = $('minFrac').value + '%';
-    salvarAjustes();
-    reprocessAll();
-  });
-  $('calfFrac').addEventListener('input', () => {
-    state.settings.calfFrac = parseInt($('calfFrac').value, 10) / 100;
-    $('vBez').textContent = $('calfFrac').value + '%';
-    salvarAjustes();
-    reprocessAll();
-  });
-  $('invertido').addEventListener('change', () => {
-    state.settings.inverted = $('invertido').checked;
-    salvarAjustes();
-    reprocessAll();
-  });
-  $('verIgnorados').addEventListener('change', () => {
-    state.settings.verIgnorados = $('verIgnorados').checked;
-    salvarAjustes();
-    renderAll();
-  });
+/* ---------- painel de configurações (aba à direita) ---------- */
+$('btnAjustes').addEventListener('click', () => {
+  const aberto = $('cfg').classList.toggle('aberto');
+  $('btnAjustes').classList.toggle('active', aberto);
+});
+$('btnCfgFechar').addEventListener('click', () => {
+  $('cfg').classList.remove('aberto');
+  $('btnAjustes').classList.remove('active');
+});
+
+function bindCfg(){
+  // controle deslizante: aplica no settings, atualiza o rótulo, salva e refaz o necessário
+  const faixa = (id, out, fmt, aplicar, depois) => {
+    $(id).addEventListener('input', () => {
+      const v = parseInt($(id).value, 10);
+      aplicar(v);
+      if (out) $(out).textContent = fmt ? fmt(v) : String(v);
+      salvarAjustes();
+      (depois || reprocessAll)();
+    });
+  };
+  const caixa = (id, aplicar, depois) => {
+    $(id).addEventListener('change', () => {
+      aplicar($(id).checked);
+      salvarAjustes();
+      (depois || reprocessAll)();
+    });
+  };
+  const cor = id => {
+    $(id).addEventListener('input', () => {
+      state.settings[id] = $(id).value;
+      salvarAjustes();
+      renderAll();
+    });
+  };
+  // detecção
+  faixa('sens', 'vSens', v => v === 0 ? 'automática' : (v > 0 ? '+' + v : String(v)),
+    v => { state.settings.offset = -v; });   // mais sensível = limiar menor
+  faixa('minFrac', 'vMin', v => v + '%', v => { state.settings.minFrac = v / 100; });
+  faixa('calfFrac', 'vBez', v => v + '%', v => { state.settings.calfFrac = v / 100; });
+  caixa('invertido', c => { state.settings.inverted = c; });
+  caixa('verIgnorados', c => { state.settings.verIgnorados = c; }, renderAll);
+  // contagem e alertas
+  faixa('cfgCap', 'vCap', null, v => { state.settings.cap = v; });
+  faixa('cfgAlerta', 'vAlerta', null, v => { state.settings.alertaGrupo = v; }, renderAll);
+  caixa('cfgMostrarAlerta', c => { state.settings.mostrarAlerta = c; }, renderAll);
+  // marcações
+  cor('corAdulto'); cor('corBezerro'); cor('corManual'); cor('corRemovido');
+  faixa('cfgEspessura', 'vEspessura', v => v + '%', v => { state.settings.espessura = v / 100; }, renderAll);
+  faixa('cfgTexto', 'vTexto', v => v + '%', v => { state.settings.tamanhoTexto = v / 100; }, renderAll);
+  caixa('cfgRotulos', c => { state.settings.mostrarRotulos = c; }, renderAll);
+  // aprendizado
+  caixa('cfgFiltro', c => { state.settings.filtroAtivo = c; });
+  faixa('cfgMinEx', 'vMinEx', null, v => { state.settings.minExemplos = v; });
+  faixa('cfgMargem', 'vMargem', null, v => { state.settings.margem = v / 100; });
+  // relatório PDF
+  caixa('cfgPdfFotos', c => { state.settings.pdfIncluirFotos = c; }, renderAll);
+  faixa('cfgPdfEx', 'vPdfEx', null, v => { state.settings.pdfMaxExemplos = v; }, renderAll);
+  // salvamento
+  caixa('cfgAutosave', c => {
+    state.settings.autosave = c;
+    if (c) for (const f of state.photos) agendarSalvar(f);   // grava o que estava pendente
+    renderSalvoInfo();
+  }, renderAll);
+  faixa('cfgJpeg', 'vJpeg', v => v + '%', v => {
+    state.settings.jpegQualidade = v / 100;
+    for (const f of state.photos) f.blobSalvo = null;        // regrava na nova qualidade
+  }, () => { for (const f of state.photos) agendarSalvar(f); });
   $('btnPadrao').addEventListener('click', () => {
-    $('sens').value = 0; $('minFrac').value = 18; $('calfFrac').value = 50;
-    $('invertido').checked = false;
-    state.settings.offset = 0; state.settings.minFrac = 0.18;
-    state.settings.calfFrac = 0.5; state.settings.inverted = false;
-    $('vSens').textContent = 'automática'; $('vMin').textContent = '18%'; $('vBez').textContent = '50%';
+    state.settings = Object.assign({}, CFG_PADRAO);
+    aplicarCfgNaUI();
     salvarAjustes();
     reprocessAll();
   });
 }
-bindAjustes();
+bindCfg();
 
 $('zoom').addEventListener('input', aplicarZoom);
 function aplicarZoom(){
@@ -1220,75 +1424,87 @@ function fotoAtiva(){
   return state.photos.find(f => f.id === state.activeId) || null;
 }
 
-function renderCanvas(){
-  const foto = fotoAtiva();
-  $('vazio').style.display = foto ? 'none' : 'flex';
-  if (!foto){ canvas.width = 0; canvas.height = 0; return; }
-  canvas.width = foto.W; canvas.height = foto.H;
-  ctx.drawImage(foto.baseCanvas, 0, 0);
+// desenha a foto com todas as marcações num contexto qualquer —
+// usado na tela e também para gerar as imagens do relatório PDF
+function desenharFotoEm(foto, c){
+  const s = state.settings;
+  c.drawImage(foto.baseCanvas, 0, 0);
   if (!foto.result) return;
-  const lw = Math.max(2, foto.W / 700);
-  ctx.font = 'bold ' + Math.max(13, foto.W / 70) + 'px system-ui, sans-serif';
-  ctx.textAlign = 'center';
+  const lw = Math.max(2, foto.W / 700) * (s.espessura || 1);
+  c.font = 'bold ' + Math.max(13, foto.W / 70) * (s.tamanhoTexto || 1) + 'px system-ui, sans-serif';
+  c.textAlign = 'center';
+  const contorno = (x, y, str, cor) => {
+    c.lineWidth = 4;
+    c.strokeStyle = 'rgba(0,0,0,0.75)';
+    c.strokeText(str, x, y);
+    c.fillStyle = cor;
+    c.fillText(str, x, y);
+  };
+  const rotulo = (x, y, str, cor) => { if (s.mostrarRotulos) contorno(x, y, str, cor); };
 
-  if (state.settings.verIgnorados){
-    ctx.setLineDash([6, 5]);
-    ctx.lineWidth = lw * 0.7;
-    for (const c of foto.result.ignored){
-      // vermelho fraco = descartada pelo filtro aprendido; branco = regra fixa
-      ctx.strokeStyle = c.aprendido ? 'rgba(255,93,93,0.55)' : 'rgba(255,255,255,0.35)';
-      ctx.strokeRect(c.minX, c.minY, c.maxX - c.minX + 1, c.maxY - c.minY + 1);
+  if (s.verIgnorados){
+    c.setLineDash([6, 5]);
+    c.lineWidth = lw * 0.7;
+    for (const ig of foto.result.ignored){
+      // cor de removido = descartada pelo filtro aprendido; branco = regra fixa
+      c.strokeStyle = ig.aprendido ? s.corRemovido : 'rgba(255,255,255,0.35)';
+      c.globalAlpha = ig.aprendido ? 0.55 : 1;
+      c.strokeRect(ig.minX, ig.minY, ig.maxX - ig.minX + 1, ig.maxY - ig.minY + 1);
     }
-    ctx.setLineDash([]);
+    c.globalAlpha = 1;
+    c.setLineDash([]);
   }
 
   for (const a of foto.result.animals){
     const removido = isRemoved(foto, a);
     const r = raioMarca(foto, a.area / a.count) * (a.count > 1 ? 1.25 : 1);
-    ctx.lineWidth = lw;
+    c.lineWidth = lw;
     if (removido){
-      ctx.strokeStyle = 'rgba(255,93,93,0.9)';
-      ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(a.x - r * 0.7, a.y - r * 0.7); ctx.lineTo(a.x + r * 0.7, a.y + r * 0.7);
-      ctx.moveTo(a.x + r * 0.7, a.y - r * 0.7); ctx.lineTo(a.x - r * 0.7, a.y + r * 0.7);
-      ctx.stroke();
+      c.strokeStyle = s.corRemovido;
+      c.globalAlpha = 0.9;
+      c.beginPath(); c.arc(a.x, a.y, r, 0, 7); c.stroke();
+      c.beginPath();
+      c.moveTo(a.x - r * 0.7, a.y - r * 0.7); c.lineTo(a.x + r * 0.7, a.y + r * 0.7);
+      c.moveTo(a.x + r * 0.7, a.y - r * 0.7); c.lineTo(a.x - r * 0.7, a.y + r * 0.7);
+      c.stroke();
+      c.globalAlpha = 1;
       continue;
     }
     if (a.saturado){
-      // aglomerado maior que o teto de estimativa: pede conferência humana
-      ctx.strokeStyle = '#ff5d5d';
-      ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
-      texto(a.x, a.y - r - lw * 2, '≥' + a.count, '#ff5d5d');
+      // aglomerado maior que o teto de estimativa: pede conferência humana —
+      // este aviso fica visível mesmo com os rótulos desligados
+      c.strokeStyle = s.corRemovido;
+      c.beginPath(); c.arc(a.x, a.y, r, 0, 7); c.stroke();
+      contorno(a.x, a.y - r - lw * 2, '≥' + a.count, s.corRemovido);
       continue;
     }
-    ctx.strokeStyle = a.type === 'bezerro' ? '#ffb020' : '#35e08a';
-    ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
+    c.strokeStyle = a.type === 'bezerro' ? s.corBezerro : s.corAdulto;
+    c.beginPath(); c.arc(a.x, a.y, r, 0, 7); c.stroke();
     if (a.count > 1){
-      texto(a.x, a.y - r - lw * 2, '×' + a.count, '#35e08a');
+      rotulo(a.x, a.y - r - lw * 2, '×' + a.count, s.corAdulto);
     } else if (a.type === 'bezerro'){
-      texto(a.x, a.y - r - lw * 2, 'B', '#ffb020');
+      rotulo(a.x, a.y - r - lw * 2, 'B', s.corBezerro);
     }
   }
 
-  // marcações manuais: sempre azul tracejado (como na legenda); B = bezerro
-  ctx.setLineDash([5, 4]);
+  // marcações manuais: tracejadas (como na legenda); B = bezerro
+  c.setLineDash([5, 4]);
   for (const m of foto.adds){
     const r = raioMarca(foto);
-    ctx.strokeStyle = '#4da3ff';
-    ctx.lineWidth = lw;
-    ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, 7); ctx.stroke();
-    if (m.type === 'bezerro') texto(m.x, m.y - r - lw * 2, 'B', '#ffb020');
+    c.strokeStyle = s.corManual;
+    c.lineWidth = lw;
+    c.beginPath(); c.arc(m.x, m.y, r, 0, 7); c.stroke();
+    if (m.type === 'bezerro') rotulo(m.x, m.y - r - lw * 2, 'B', s.corBezerro);
   }
-  ctx.setLineDash([]);
+  c.setLineDash([]);
 }
 
-function texto(x, y, s, cor){
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
-  ctx.strokeText(s, x, y);
-  ctx.fillStyle = cor;
-  ctx.fillText(s, x, y);
+function renderCanvas(){
+  const foto = fotoAtiva();
+  $('vazio').style.display = foto ? 'none' : 'flex';
+  if (!foto){ canvas.width = 0; canvas.height = 0; return; }
+  canvas.width = foto.W; canvas.height = foto.H;
+  desenharFotoEm(foto, ctx);
 }
 
 /* ---------- listas e totais ---------- */
@@ -1303,7 +1519,7 @@ function renderSidebar(){
       '<img alt="" src="' + foto.thumb + '">' +
       '<div class="info"><div class="nome"></div>' +
       '<div class="contagem"><b class="a">' + c.adultos + '</b> ad · <b class="b">' + c.bezerros + '</b> bez</div></div>' +
-      '<button class="x" title="Remover foto">✕</button>';
+      '<button class="x" title="Remover foto"><svg class="ic"><use href="#i-x"/></svg></button>';
     el.querySelector('.nome').textContent = foto.nome;
     el.addEventListener('click', () => { state.activeId = foto.id; renderAll(); });
     el.querySelector('.x').addEventListener('click', e => {
@@ -1339,18 +1555,19 @@ function renderTotais(){
 // é exatamente o caso em que ensinar o tamanho de 1 animal conserta tudo
 function renderAlerta(){
   const el = $('alerta');
+  const s = state.settings;
   const foto = fotoAtiva();
-  if (!foto || !foto.result || foto.taughtAdult.length){ el.style.display = 'none'; return; }
+  if (!s.mostrarAlerta || !foto || !foto.result || foto.taughtAdult.length){ el.style.display = 'none'; return; }
   let grandes = 0, total = 0;
   for (const a of foto.result.animals){
     if (isRemoved(foto, a)) continue;
     total += a.count;
-    if (a.count >= 10) grandes += a.count;
+    if (a.count >= s.alertaGrupo) grandes += a.count;
   }
   if (total > 0 && grandes / total > 0.3){
     el.style.display = 'block';
-    el.textContent = '⚠ Boa parte desta contagem vem de grupos estimados grandes (×10 ou mais). ' +
-      'Abra 🎓 Ensinar e toque num animal que está sozinho ("É 1 adulto") — os grupos ×N são recalculados na hora com o tamanho certo.';
+    el.textContent = 'Atenção: boa parte desta contagem vem de grupos estimados grandes (×' + s.alertaGrupo + ' ou mais). ' +
+      'Abra "Ensinar" e toque num animal que está sozinho ("É 1 adulto") — os grupos ×N são recalculados na hora com o tamanho certo.';
   } else {
     el.style.display = 'none';
   }
@@ -1363,6 +1580,195 @@ function renderAll(){
   renderAlerta();
   renderEnsino();
 }
+
+/* ---------- relatório de aprendizado em PDF ----------
+   Gerador de PDF mínimo, sem bibliotecas: texto Helvetica (WinAnsi, cobre os
+   acentos do português) + imagens JPEG embutidas. Tudo offline. */
+const PDF_W = 595.28, PDF_H = 841.89, PDF_M = 48;   // A4 em pontos
+
+function pdfEsc(s){
+  let out = '';
+  for (const ch of String(s)){
+    let c = ch.codePointAt(0);
+    if (c === 0x2014 || c === 0x2013) c = 45;            // travessões viram hífen
+    else if (c === 0x2018 || c === 0x2019) c = 39;
+    else if (c === 0x201C || c === 0x201D) c = 34;
+    else if (c === 0x2248) c = 126;                       // "aproximado" vira ~
+    else if (c === 0x2265){ out += '>='; continue; }
+    if (c > 255) continue;                                // fora do WinAnsi: omite
+    if (c === 40 || c === 41 || c === 92) out += '\\';
+    out += String.fromCharCode(c);
+  }
+  return out;
+}
+
+function novoPDF(){
+  const pages = [], imgs = [];
+  let cur = null, y = 0;
+  function pagina(){
+    cur = { ops: [] };
+    pages.push(cur);
+    y = PDF_H - PDF_M;
+  }
+  function precisa(h){ if (!cur || y - h < PDF_M) pagina(); }
+  function texto(str, size, opts){
+    const o = opts || {};
+    precisa(size);
+    cur.ops.push('BT /' + (o.bold ? 'F2' : 'F1') + ' ' + size + ' Tf ' + (o.cor || '0 0 0') + ' rg ' +
+      (PDF_M + (o.indent || 0)) + ' ' + (y - size).toFixed(2) + ' Td (' + pdfEsc(str) + ') Tj ET');
+    y -= size * 1.5;
+  }
+  function espaco(h){ y -= h; }
+  function linha(){
+    precisa(8);
+    cur.ops.push('0.7 G 0.8 w ' + PDF_M + ' ' + y.toFixed(2) + ' m ' + (PDF_W - PDF_M) + ' ' + y.toFixed(2) + ' l S');
+    y -= 12;
+  }
+  function imagem(dataUrl, wpx, hpx){
+    let w = Math.min(PDF_W - 2 * PDF_M, 480);
+    let h = w * hpx / wpx;
+    const maxH = PDF_H - 2 * PDF_M - 20;
+    if (h > maxH){ h = maxH; w = h * wpx / hpx; }
+    precisa(h + 6);
+    const id = 'Im' + (imgs.length + 1);
+    imgs.push({ id, b64: dataUrl.split(',')[1], wpx, hpx });
+    cur.ops.push('q ' + w.toFixed(2) + ' 0 0 ' + h.toFixed(2) + ' ' + PDF_M + ' ' + (y - h).toFixed(2) + ' cm /' + id + ' Do Q');
+    y -= h + 12;
+  }
+  function bytes(){
+    const chunks = [];
+    let off = 0;
+    const offs = [];
+    const put = s => {
+      const u = typeof s === 'string' ? Uint8Array.from(s, ch => ch.charCodeAt(0) & 0xff) : s;
+      chunks.push(u); off += u.length;
+    };
+    const obj = (n, corpo) => { offs[n] = off; put(n + ' 0 obj\n' + corpo + '\nendobj\n'); };
+    put('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+    const oImg = 5, oPage = oImg + imgs.length;
+    const kids = pages.map((_, i) => (oPage + i * 2) + ' 0 R');
+    obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    obj(2, '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + pages.length + ' >>');
+    obj(3, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+    obj(4, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+    let res = '<< /Font << /F1 3 0 R /F2 4 0 R >>';
+    if (imgs.length){
+      res += ' /XObject <<';
+      imgs.forEach((im, i) => { res += ' /' + im.id + ' ' + (oImg + i) + ' 0 R'; });
+      res += ' >>';
+    }
+    res += ' >>';
+    imgs.forEach((im, i) => {
+      const bin = atob(im.b64);
+      offs[oImg + i] = off;
+      put((oImg + i) + ' 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + im.wpx + ' /Height ' + im.hpx +
+          ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + bin.length + ' >>\nstream\n');
+      put(Uint8Array.from(bin, ch => ch.charCodeAt(0)));
+      put('\nendstream\nendobj\n');
+    });
+    pages.forEach((p, i) => {
+      const nP = oPage + i * 2, nC = nP + 1;
+      obj(nP, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + PDF_W + ' ' + PDF_H + '] /Resources ' + res + ' /Contents ' + nC + ' 0 R >>');
+      const sTxt = p.ops.join('\n');
+      offs[nC] = off;
+      put(nC + ' 0 obj\n<< /Length ' + sTxt.length + ' >>\nstream\n' + sTxt + '\nendstream\nendobj\n');
+    });
+    const total = oPage + pages.length * 2;
+    const xrefOff = off;
+    let xr = 'xref\n0 ' + total + '\n0000000000 65535 f \n';
+    for (let n = 1; n < total; n++) xr += String(offs[n]).padStart(10, '0') + ' 00000 n \n';
+    put(xr + 'trailer\n<< /Size ' + total + ' /Root 1 0 R >>\nstartxref\n' + xrefOff + '\n%%EOF');
+    const outBuf = new Uint8Array(off);
+    let p2 = 0;
+    for (const c of chunks){ outBuf.set(c, p2); p2 += c.length; }
+    return outBuf;
+  }
+  return { pagina, texto, espaco, linha, imagem, bytes };
+}
+
+function fotoComMarcacoes(foto){
+  const cv = document.createElement('canvas');
+  cv.width = foto.W; cv.height = foto.H;
+  desenharFotoEm(foto, cv.getContext('2d'));
+  return cv.toDataURL('image/jpeg', 0.82);
+}
+
+function gerarRelatorioPDF(){
+  const s = state.settings;
+  const pdf = novoPDF();
+  const agora = new Date();
+  pdf.pagina();
+  pdf.texto('RELATÓRIO DE APRENDIZADO - CONTADOR DE GADO', 16, { bold: true });
+  pdf.texto('Gerado em ' + agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR'), 10, { cor: '0.42 0.42 0.42' });
+  pdf.linha();
+
+  let ad = 0, bz = 0, na = 0, primeiro = null, ultimo = null;
+  for (const e of state.brain.ex){
+    if (e.k === 'nada') na++; else if (e.t === 'bezerro') bz++; else ad++;
+    if (e.quando){
+      if (!primeiro || e.quando < primeiro) primeiro = e.quando;
+      if (!ultimo || e.quando > ultimo) ultimo = e.quando;
+    }
+  }
+  pdf.texto('Resumo do aprendizado', 13, { bold: true });
+  pdf.texto('Exemplos ensinados: ' + state.brain.ex.length + ' (' + ad + ' adultos, ' + bz + ' bezerros, ' + na + ' não-animal)', 11);
+  pdf.texto('Filtro aprendido: ' + (!s.filtroAtivo
+    ? 'desligado nas configurações'
+    : (brainReady(state.brain, s.minExemplos)
+        ? 'ATIVO (descarta manchas parecidas com os exemplos negativos)'
+        : 'inativo - ativa com ' + s.minExemplos + ' exemplos de animal e ' + s.minExemplos + ' de não-animal')), 11);
+  if (primeiro) pdf.texto('Período do ensino: ' + new Date(primeiro).toLocaleString('pt-BR') + ' a ' + new Date(ultimo).toLocaleString('pt-BR'), 11);
+
+  if (state.brain.ex.length){
+    pdf.espaco(6);
+    pdf.texto('Exemplos (mais recentes primeiro):', 11, { bold: true });
+    const rot = e => e.k === 'nada' ? 'não é animal' : (e.t === 'bezerro' ? 'é 1 bezerro' : 'é 1 adulto');
+    const maxEx = s.pdfMaxExemplos || 30;
+    const ult = state.brain.ex.slice(-maxEx).reverse();
+    for (const e of ult){
+      pdf.texto('- ' + rot(e) +
+        (e.foto ? ' | foto: ' + e.foto : '') +
+        (e.quando ? ' | ' + new Date(e.quando).toLocaleString('pt-BR') : ''), 9, { indent: 8 });
+    }
+    if (state.brain.ex.length > maxEx){
+      pdf.texto('... e mais ' + (state.brain.ex.length - maxEx) + ' exemplo(s) anteriores.', 9, { indent: 8 });
+    }
+  }
+  pdf.linha();
+
+  if (!state.photos.length){
+    pdf.texto('Nenhuma foto carregada no momento.', 11);
+  }
+  for (const foto of state.photos){
+    const c = contagem(foto);
+    pdf.texto('Foto: ' + foto.nome, 13, { bold: true });
+    pdf.texto('Contagem: ' + c.adultos + ' adultos + ' + c.bezerros + ' bezerros = ' + c.total + ' animais', 11);
+    const u = foto.result ? Math.round(foto.result.unit) : 0;
+    pdf.texto('Tamanho de 1 adulto: ' + u + ' px ' + (foto.taughtAdult.length
+      ? '(ensinado com ' + foto.taughtAdult.length + ' exemplo(s))'
+      : '(estimado automaticamente)'), 11);
+    const desc = foto.result ? foto.result.ignored.filter(x => x.aprendido).length : 0;
+    pdf.texto('Correções manuais: ' + foto.adds.length + ' adicionada(s), ' + foto.removals.length + ' removida(s)' +
+      (desc ? ' | filtro aprendido descartou ' + desc + ' mancha(s)' : ''), 11);
+    if (s.pdfIncluirFotos){
+      pdf.espaco(4);
+      pdf.imagem(fotoComMarcacoes(foto), foto.W, foto.H);
+    }
+    pdf.espaco(6);
+  }
+  pdf.linha();
+  pdf.texto('Relatório gerado localmente no seu dispositivo - nenhuma foto foi enviada para a internet.', 9, { cor: '0.45 0.45 0.45' });
+
+  const nome = 'relatorio-aprendizado-' + agora.toISOString().slice(0, 10) + '.pdf';
+  const blob = new Blob([pdf.bytes()], { type: 'application/pdf' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = nome;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  toast('Relatório PDF gerado: ' + nome);
+}
+$('btnRelatorio').addEventListener('click', gerarRelatorioPDF);
 
 /* ---------- exportação ---------- */
 function resumoLinhas(){
@@ -1397,16 +1803,28 @@ $('btnResumo').addEventListener('click', async () => {
   const texto = linhas.slice(1).map(l => l[0] + ': ' + l[1] + ' adultos, ' + l[2] + ' bezerros (total ' + l[3] + ')').join('\n');
   try {
     await navigator.clipboard.writeText('CONTAGEM DE GADO\n' + texto);
-    $('btnResumo').textContent = '✅ Copiado!';
+    $('lblResumo').textContent = 'Copiado!';
   } catch {
     prompt('Copie o resumo:', texto);
   }
-  setTimeout(() => { $('btnResumo').textContent = '📋 Copiar resumo'; }, 1600);
+  setTimeout(() => { $('lblResumo').textContent = 'Copiar resumo'; }, 1600);
+});
+
+// descarrega gravações pendentes assim que a página é ocultada ou fechada,
+// para uma correção feita segundos antes de sair não se perder
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && saveQueue.size){
+    clearTimeout(saveTimer);
+    salvarPendentes();
+  }
+});
+window.addEventListener('pagehide', () => {
+  if (saveQueue.size){ clearTimeout(saveTimer); salvarPendentes(); }
 });
 
 // com o salvamento automático, só avisa ao sair se ainda houver algo por gravar
 window.addEventListener('beforeunload', e => {
-  if (state.photos.length && (!db || dbFalhou || saveQueue.size)){
+  if (state.photos.length && (!db || dbFalhou || saveQueue.size || !state.settings.autosave)){
     e.preventDefault(); e.returnValue = '';
   }
 });
