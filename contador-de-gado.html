@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contador de Gado — Fotos Aéreas</title>
+<style>
+  :root{
+    --bg:#10151c; --panel:#181f29; --panel2:#1f2833; --line:#2b3644;
+    --text:#e8edf3; --muted:#93a1b3;
+    --green:#35e08a; --amber:#ffb020; --red:#ff5d5d; --blue:#4da3ff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg); color:var(--text);
+    font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex; flex-direction:column;
+  }
+  header{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding:10px 16px; background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  header h1{font-size:17px; font-weight:700; letter-spacing:.2px;}
+  header h1 span{color:var(--green);}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-left:auto; align-items:center;}
+  .chip{
+    background:var(--panel2); border:1px solid var(--line); border-radius:999px;
+    padding:5px 14px; font-size:13px; white-space:nowrap;
+  }
+  .chip b{font-size:15px;}
+  .chip.adultos b{color:var(--green);} .chip.bezerros b{color:var(--amber);}
+  .chip.total{background:#233042;}
+  button{
+    background:var(--panel2); color:var(--text); border:1px solid var(--line);
+    border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer;
+  }
+  button:hover{border-color:#3d4c5f;}
+  button.primary{background:var(--green); border-color:var(--green); color:#06281a; font-weight:700;}
+  button.active{outline:2px solid var(--blue); outline-offset:-1px;}
+  button:disabled{opacity:.45; cursor:default;}
+  main{flex:1; display:flex; min-height:0;}
+  /* ---------- barra lateral ---------- */
+  aside{
+    width:250px; min-width:250px; background:var(--panel); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; min-height:0;
+  }
+  #dropzone{
+    margin:12px; padding:18px 10px; border:2px dashed #3a4a5e; border-radius:12px;
+    text-align:center; color:var(--muted); cursor:pointer; transition:.15s;
+  }
+  #dropzone.drag{border-color:var(--green); color:var(--green); background:#1b2a22;}
+  #dropzone .big{font-size:26px;}
+  #dropzone b{color:var(--text);}
+  #fotos{flex:1; overflow-y:auto; padding:0 12px 12px;}
+  .foto-item{
+    display:flex; gap:8px; align-items:center; padding:6px; border-radius:10px;
+    border:1px solid transparent; cursor:pointer; margin-bottom:6px; background:var(--panel2);
+  }
+  .foto-item.ativa{border-color:var(--green);}
+  .foto-item img{width:56px; height:42px; object-fit:cover; border-radius:6px; background:#000;}
+  .foto-item .info{flex:1; min-width:0;}
+  .foto-item .nome{font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .foto-item .contagem{font-size:12px; color:var(--muted);}
+  .foto-item .contagem b.a{color:var(--green);} .foto-item .contagem b.b{color:var(--amber);}
+  .foto-item .x{border:none; background:none; color:var(--muted); font-size:15px; padding:2px 6px;}
+  .foto-item .x:hover{color:var(--red);}
+  /* ---------- área principal ---------- */
+  #viewer{flex:1; display:flex; flex-direction:column; min-width:0; min-height:0;}
+  #toolbar{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding:8px 12px; background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  #toolbar .sep{width:1px; height:22px; background:var(--line); margin:0 2px;}
+  #toolbar label{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px;}
+  #ajustes{
+    display:none; padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line);
+    gap:22px; flex-wrap:wrap; align-items:flex-end;
+  }
+  #ajustes.aberto{display:flex;}
+  .ajuste{min-width:200px;}
+  .ajuste .titulo{font-size:12px; color:var(--muted); margin-bottom:2px;}
+  .ajuste .titulo b{color:var(--text);}
+  .ajuste input[type=range]{width:100%;}
+  .ajuste .extremos{display:flex; justify-content:space-between; font-size:10px; color:#5c6b7d;}
+  #ajustes .check{font-size:13px; color:var(--text); display:flex; gap:6px; align-items:center; padding-bottom:8px;}
+  #canvasWrap{flex:1; overflow:auto; background:#0a0e13; position:relative;}
+  #canvas{display:block; cursor:crosshair;}
+  #vazio{
+    position:absolute; inset:0; display:flex; flex-direction:column; gap:10px;
+    align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:24px;
+  }
+  #vazio .icone{font-size:44px;}
+  #vazio .dica{max-width:520px; font-size:13px;}
+  #legenda{
+    display:flex; gap:16px; flex-wrap:wrap; padding:6px 14px; font-size:12px;
+    color:var(--muted); background:var(--panel); border-top:1px solid var(--line);
+  }
+  .leg{display:flex; align-items:center; gap:6px;}
+  .dot{width:11px; height:11px; border-radius:50%; border:2px solid;}
+  .dot.a{border-color:var(--green);} .dot.b{border-color:var(--amber);}
+  .dot.m{border-color:var(--blue); border-style:dashed;}
+  .dot.r{border-color:var(--red);}
+  footer{
+    padding:6px 14px; font-size:11.5px; color:#5c6b7d; background:var(--panel);
+    border-top:1px solid var(--line); text-align:center;
+  }
+  @media (max-width:760px){
+    main{flex-direction:column;}
+    aside{width:100%; min-width:0; max-height:34vh; border-right:none; border-bottom:1px solid var(--line);}
+    #fotos{display:flex; gap:6px; padding:0 12px 10px;}
+    .foto-item{min-width:180px;}
+    .chips{margin-left:0; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐂 Contador de <span>Gado</span> · fotos aéreas</h1>
+  <div class="chips">
+    <span class="chip adultos">Adultos: <b id="tAdultos">0</b></span>
+    <span class="chip bezerros">Bezerros: <b id="tBezerros">0</b></span>
+    <span class="chip total">Total geral: <b id="tTotal">0</b> <small id="tFotos"></small></span>
+    <button id="btnCsv" title="Baixar planilha com a contagem de cada foto">⬇ Exportar CSV</button>
+    <button id="btnResumo" title="Copiar resumo em texto">📋 Copiar resumo</button>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <div id="dropzone" title="Clique ou arraste fotos aqui">
+      <div class="big">📷</div>
+      <div><b>Adicionar fotos</b></div>
+      <div style="font-size:12px">arraste aqui, clique ou cole (Ctrl+V)</div>
+    </div>
+    <input type="file" id="inputFotos" accept="image/*" multiple hidden>
+    <div id="fotos"></div>
+  </aside>
+
+  <section id="viewer">
+    <div id="toolbar">
+      <span style="font-size:12px;color:var(--muted)">Corrigir:</span>
+      <button id="mAdulto" data-modo="adulto" title="Clique na foto para marcar um adulto que faltou">➕ Adulto</button>
+      <button id="mBezerro" data-modo="bezerro" title="Clique na foto para marcar um bezerro que faltou">➕ Bezerro</button>
+      <button id="mRemover" data-modo="remover" class="active" title="Clique numa marcação errada para removê-la (ou restaurá-la)">✖ Remover</button>
+      <button id="btnDesfazer" title="Desfazer última correção">↩ Desfazer</button>
+      <div class="sep"></div>
+      <button id="btnAjustes">⚙ Ajustes</button>
+      <label>Zoom <input type="range" id="zoom" min="25" max="300" value="100" style="width:110px"></label>
+      <span class="chips" style="margin-left:auto">
+        <span class="chip adultos" title="Nesta foto">🐂 <b id="fAdultos">0</b></span>
+        <span class="chip bezerros" title="Nesta foto">🐄 <b id="fBezerros">0</b></span>
+      </span>
+    </div>
+
+    <div id="ajustes">
+      <div class="ajuste">
+        <div class="titulo">Sensibilidade da detecção: <b id="vSens">automática</b></div>
+        <input type="range" id="sens" min="-60" max="60" value="0" step="1">
+        <div class="extremos"><span>detecta menos</span><span>detecta mais</span></div>
+      </div>
+      <div class="ajuste">
+        <div class="titulo">Ignorar manchas menores que <b id="vMin">18%</b> de um animal</div>
+        <input type="range" id="minFrac" min="5" max="60" value="18" step="1">
+        <div class="extremos"><span>5%</span><span>60%</span></div>
+      </div>
+      <div class="ajuste">
+        <div class="titulo">É bezerro se tiver até <b id="vBez">50%</b> do tamanho de um adulto</div>
+        <input type="range" id="calfFrac" min="25" max="80" value="50" step="1">
+        <div class="extremos"><span>25%</span><span>80%</span></div>
+      </div>
+      <label class="check"><input type="checkbox" id="invertido"> Gado escuro em piso claro</label>
+      <label class="check"><input type="checkbox" id="verIgnorados"> Mostrar áreas ignoradas</label>
+      <button id="btnPadrao" title="Voltar aos valores padrão">Restaurar padrão</button>
+    </div>
+
+    <div id="canvasWrap">
+      <canvas id="canvas"></canvas>
+      <div id="vazio">
+        <div class="icone">🛩️</div>
+        <div><b>Solte as fotos do drone aqui</b></div>
+        <div class="dica">
+          A contagem funciona melhor em fotos aéreas (de cima) com o gado claro sobre piso escuro,
+          como em confinamentos. Grupos encostados são estimados pelo tamanho da mancha.
+          Depois é só corrigir com um clique o que faltar ou sobrar — inclusive animais escuros,
+          que podem não ser detectados sozinhos.
+        </div>
+      </div>
+    </div>
+
+    <div id="legenda">
+      <span class="leg"><span class="dot a"></span> adulto</span>
+      <span class="leg"><span class="dot b"></span> bezerro</span>
+      <span class="leg"><span class="dot a"></span><b>×3</b> grupo encostado (estimado)</span>
+      <span class="leg"><span class="dot m"></span> marcado manualmente</span>
+      <span class="leg"><span class="dot r"></span> removido</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  As fotos são processadas somente no seu dispositivo — nada é enviado para a internet.
+  A contagem automática é uma estimativa: confira e corrija com os botões acima.
+</footer>
+
+<script>
+"use strict";
+/* ============================ CORE START ============================
+   Algoritmo de contagem — funções puras, sem DOM (testáveis fora do navegador).
+   Estratégia: gado claro sobre piso escuro vira "manchas" brilhantes.
+   1. brancura = menor canal RGB (branco tem R,G,B altos; terra vermelha não)
+   2. limiar automático (Otsu) + ajuste do usuário
+   3. limpeza morfológica e componentes conexos
+   4. estima o tamanho de 1 animal (mediana robusta) e divide manchas grandes
+   5. mancha pequena = bezerro; mancha gigante/alongada = estrutura (cocho, pista)
+*/
+function otsuThreshold(hist, total){
+  let sum = 0;
+  for (let t = 0; t < 256; t++) sum += t * hist[t];
+  let sumB = 0, wB = 0, best = -1, thr = 127;
+  for (let t = 0; t < 256; t++){
+    wB += hist[t];
+    if (wB === 0) continue;
+    const wF = total - wB;
+    if (wF === 0) break;
+    sumB += t * hist[t];
+    const mB = sumB / wB, mF = (sum - sumB) / wF;
+    const v = wB * wF * (mB - mF) * (mB - mF);
+    if (v > best){ best = v; thr = t; }
+  }
+  return thr;
+}
+
+function erode(m, W, H){
+  const out = new Uint8Array(W * H);
+  for (let y = 1; y < H - 1; y++){
+    const row = y * W;
+    for (let x = 1; x < W - 1; x++){
+      const i = row + x;
+      if (m[i] && m[i-1] && m[i+1] && m[i-W] && m[i+W]) out[i] = 1;
+    }
+  }
+  return out;
+}
+
+function dilate(m, W, H){
+  const out = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++){
+    const row = y * W;
+    for (let x = 0; x < W; x++){
+      const i = row + x;
+      if (m[i] || (x > 0 && m[i-1]) || (x < W-1 && m[i+1]) || (y > 0 && m[i-W]) || (y < H-1 && m[i+W])) out[i] = 1;
+    }
+  }
+  return out;
+}
+
+function connectedComponents(mask, W, H){
+  const label = new Int32Array(W * H);
+  const stack = new Int32Array(W * H);
+  const comps = [];
+  let cur = 0;
+  for (let start = 0; start < W * H; start++){
+    if (!mask[start] || label[start]) continue;
+    cur++;
+    let sp = 0;
+    stack[sp++] = start;
+    label[start] = cur;
+    let area = 0, sx = 0, sy = 0, minX = W, maxX = 0, minY = H, maxY = 0;
+    while (sp > 0){
+      const p = stack[--sp];
+      const x = p % W, y = (p - x) / W;
+      area++; sx += x; sy += y;
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+      if (x > 0){ const q = p - 1; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (x < W-1){ const q = p + 1; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (y > 0){ const q = p - W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (y < H-1){ const q = p + W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+    }
+    comps.push({ area, cx: sx / area, cy: sy / area, minX, maxX, minY, maxY });
+  }
+  return comps;
+}
+
+function median(sortedArr){
+  return sortedArr[Math.floor(sortedArr.length / 2)];
+}
+
+/*
+  data: Uint8ClampedArray RGBA · opts: {offset, minFrac, calfFrac, inverted}
+  Retorna {animals, ignored, unit, threshold}
+  animals: [{x, y, count, type:'adulto'|'bezerro', area, bbox}]
+*/
+function analyzeRGBA(data, W, H, opts){
+  const o = Object.assign({ offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false }, opts);
+  const n = W * H;
+  const bright = new Uint8Array(n);
+  const hist = new Float64Array(256);
+  for (let i = 0, j = 0; i < n; i++, j += 4){
+    const r = data[j], g = data[j+1], b = data[j+2];
+    let v;
+    if (o.inverted){
+      const mx = r > g ? (r > b ? r : b) : (g > b ? g : b);
+      v = 255 - mx;              // animais escuros sobre piso claro
+    } else {
+      v = r < g ? (r < b ? r : b) : (g < b ? g : b);  // "brancura"
+    }
+    bright[i] = v;
+    hist[v]++;
+  }
+  const threshold = Math.max(1, Math.min(254, otsuThreshold(hist, n) + o.offset));
+  let mask = new Uint8Array(n);
+  for (let i = 0; i < n; i++) mask[i] = bright[i] > threshold ? 1 : 0;
+  mask = dilate(erode(mask, W, H), W, H);   // abertura: tira ruído fino
+
+  const comps = connectedComponents(mask, W, H);
+
+  // separa estruturas (pistas, cochos, faixas de concreto) e ruído grosso
+  const NOISE_PX = 12;
+  const kept = [], ignored = [];
+  for (const c of comps){
+    if (c.area < NOISE_PX) continue;
+    const bw = c.maxX - c.minX + 1, bh = c.maxY - c.minY + 1;
+    const fill = c.area / (bw * bh);
+    if (bw > 0.5 * W || bh > 0.5 * H || fill < 0.15){ ignored.push(c); continue; }
+    kept.push(c);
+  }
+  if (kept.length === 0) return { animals: [], ignored, unit: 0, threshold };
+
+  // tamanho típico de 1 animal: mediana iterada (robusta a grupos encostados)
+  let unit = median(kept.map(c => c.area).sort((a, b) => a - b));
+  for (let it = 0; it < 4; it++){
+    const per = kept
+      .map(c => c.area / Math.max(1, Math.round(c.area / unit)))
+      .sort((a, b) => a - b);
+    unit = median(per);
+  }
+
+  const minArea = o.minFrac * unit;
+  const calfArea = o.calfFrac * unit;
+  const animals = [];
+  for (const c of kept){
+    if (c.area < minArea){ ignored.push(c); continue; }
+    let count = Math.max(1, Math.round(c.area / unit));
+    if (count > 30) count = 30;
+    const type = (count === 1 && c.area < calfArea) ? 'bezerro' : 'adulto';
+    animals.push({
+      x: c.cx, y: c.cy, count, type, area: c.area,
+      bbox: [c.minX, c.minY, c.maxX, c.maxY]
+    });
+  }
+  return { animals, ignored, unit, threshold };
+}
+/* ============================ CORE END ============================ */
+
+/* ============================ INTERFACE ============================ */
+const $ = id => document.getElementById(id);
+const MAX_LADO = 1600;          // resolução de processamento
+const state = {
+  photos: [],                   // {id,nome,W,H,imageData,baseCanvas,thumb,result,adds,removals,history}
+  activeId: null,
+  modo: 'remover',
+  settings: { offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false, verIgnorados: false }
+};
+let seq = 0;
+
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d');
+
+/* ---------- entrada de arquivos ---------- */
+$('dropzone').addEventListener('click', () => $('inputFotos').click());
+$('inputFotos').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
+['dragover','dragenter'].forEach(ev => document.addEventListener(ev, e => {
+  e.preventDefault(); $('dropzone').classList.add('drag');
+}));
+['dragleave','drop'].forEach(ev => document.addEventListener(ev, e => {
+  e.preventDefault(); if (ev === 'drop' || e.target === document.documentElement) $('dropzone').classList.remove('drag');
+}));
+document.addEventListener('drop', e => { e.preventDefault(); addFiles(e.dataTransfer.files); });
+document.addEventListener('paste', e => {
+  if (e.clipboardData && e.clipboardData.files.length) addFiles(e.clipboardData.files);
+});
+
+async function addFiles(fileList){
+  const files = Array.from(fileList || []).filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|bmp)$/i.test(f.name));
+  if (!files.length) return;
+  for (const f of files){
+    try {
+      const foto = await loadPhoto(f);
+      state.photos.push(foto);
+      state.activeId = foto.id;
+      analyzePhoto(foto);
+    } catch (err){
+      console.error(err);
+      alert('Não consegui abrir a imagem "' + f.name + '". Formatos aceitos: JPG, PNG, WEBP.');
+    }
+    renderAll();
+    await new Promise(r => setTimeout(r, 0));   // deixa a tela respirar entre fotos
+  }
+}
+
+function loadPhoto(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const escala = Math.min(1, MAX_LADO / Math.max(img.naturalWidth, img.naturalHeight));
+      const W = Math.max(1, Math.round(img.naturalWidth * escala));
+      const H = Math.max(1, Math.round(img.naturalHeight * escala));
+      const base = document.createElement('canvas');
+      base.width = W; base.height = H;
+      const bctx = base.getContext('2d', { willReadFrequently: true });
+      bctx.drawImage(img, 0, 0, W, H);
+      const imageData = bctx.getImageData(0, 0, W, H);
+      const th = document.createElement('canvas');
+      const tScale = 90 / Math.max(W, H);
+      th.width = Math.max(1, Math.round(W * tScale));
+      th.height = Math.max(1, Math.round(H * tScale));
+      th.getContext('2d').drawImage(base, 0, 0, th.width, th.height);
+      resolve({
+        id: ++seq, nome: file.name || ('foto ' + seq), W, H,
+        imageData, baseCanvas: base, thumb: th.toDataURL('image/jpeg', 0.6),
+        result: null, adds: [], removals: [], history: []
+      });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+    img.src = url;
+  });
+}
+
+/* ---------- análise ---------- */
+function analyzePhoto(foto){
+  const s = state.settings;
+  foto.result = analyzeRGBA(foto.imageData.data, foto.W, foto.H, {
+    offset: s.offset, minFrac: s.minFrac, calfFrac: s.calfFrac, inverted: s.inverted
+  });
+}
+
+let reprocessTimer = null;
+function reprocessAll(){
+  clearTimeout(reprocessTimer);
+  reprocessTimer = setTimeout(async () => {
+    for (const foto of state.photos){
+      analyzePhoto(foto);
+      renderAll();
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }, 180);
+}
+
+/* ---------- contagem com correções ---------- */
+function raioMarca(foto, area){
+  const unit = (foto.result && foto.result.unit) || 250;
+  return Math.max(6, Math.sqrt((area || unit) / Math.PI) + 4);
+}
+function isRemoved(foto, a){
+  const r = Math.max(12, raioMarca(foto, a.area));
+  return foto.removals.some(p => Math.hypot(p.x - a.x, p.y - a.y) <= r);
+}
+function contagem(foto){
+  let adultos = 0, bezerros = 0;
+  if (foto.result){
+    for (const a of foto.result.animals){
+      if (isRemoved(foto, a)) continue;
+      if (a.type === 'bezerro') bezerros += a.count; else adultos += a.count;
+    }
+  }
+  for (const m of foto.adds) (m.type === 'bezerro') ? bezerros++ : adultos++;
+  return { adultos, bezerros, total: adultos + bezerros };
+}
+
+/* ---------- correções por clique ---------- */
+canvas.addEventListener('click', e => {
+  const foto = fotoAtiva();
+  if (!foto || !foto.result) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+  snapshot(foto);
+  if (state.modo === 'remover') corrigirRemover(foto, x, y);
+  else foto.adds.push({ x, y, type: state.modo === 'bezerro' ? 'bezerro' : 'adulto' });
+  renderAll();
+});
+
+function corrigirRemover(foto, x, y){
+  const alcance = Math.max(14, raioMarca(foto) * 1.3);
+  // 1º: apaga marcação manual próxima
+  let melhor = -1, dist = alcance;
+  foto.adds.forEach((m, i) => {
+    const d = Math.hypot(m.x - x, m.y - y);
+    if (d < dist){ dist = d; melhor = i; }
+  });
+  if (melhor >= 0){ foto.adds.splice(melhor, 1); return; }
+  // 2º: restaura um ponto removido próximo
+  melhor = -1; dist = alcance;
+  foto.removals.forEach((p, i) => {
+    const d = Math.hypot(p.x - x, p.y - y);
+    if (d < dist){ dist = d; melhor = i; }
+  });
+  if (melhor >= 0){ foto.removals.splice(melhor, 1); return; }
+  // 3º: remove a detecção automática mais próxima
+  let alvo = null; dist = alcance * 1.6;
+  for (const a of foto.result.animals){
+    const d = Math.hypot(a.x - x, a.y - y);
+    if (d < dist && !isRemoved(foto, a)){ dist = d; alvo = a; }
+  }
+  if (alvo) foto.removals.push({ x: alvo.x, y: alvo.y });
+}
+
+function snapshot(foto){
+  foto.history.push(JSON.stringify({ adds: foto.adds, removals: foto.removals }));
+  if (foto.history.length > 60) foto.history.shift();
+}
+$('btnDesfazer').addEventListener('click', () => {
+  const foto = fotoAtiva();
+  if (!foto || !foto.history.length) return;
+  const s = JSON.parse(foto.history.pop());
+  foto.adds = s.adds; foto.removals = s.removals;
+  renderAll();
+});
+
+/* ---------- modos ---------- */
+document.querySelectorAll('#toolbar [data-modo]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.modo = btn.dataset.modo;
+    document.querySelectorAll('#toolbar [data-modo]').forEach(b => b.classList.toggle('active', b === btn));
+  });
+});
+
+/* ---------- ajustes ---------- */
+$('btnAjustes').addEventListener('click', () => $('ajustes').classList.toggle('aberto'));
+function bindAjustes(){
+  $('sens').addEventListener('input', () => {
+    const v = parseInt($('sens').value, 10);
+    state.settings.offset = -v;   // mais sensível = limiar menor
+    $('vSens').textContent = v === 0 ? 'automática' : (v > 0 ? '+' + v : String(v));
+    reprocessAll();
+  });
+  $('minFrac').addEventListener('input', () => {
+    state.settings.minFrac = parseInt($('minFrac').value, 10) / 100;
+    $('vMin').textContent = $('minFrac').value + '%';
+    reprocessAll();
+  });
+  $('calfFrac').addEventListener('input', () => {
+    state.settings.calfFrac = parseInt($('calfFrac').value, 10) / 100;
+    $('vBez').textContent = $('calfFrac').value + '%';
+    reprocessAll();
+  });
+  $('invertido').addEventListener('change', () => {
+    state.settings.inverted = $('invertido').checked;
+    reprocessAll();
+  });
+  $('verIgnorados').addEventListener('change', () => {
+    state.settings.verIgnorados = $('verIgnorados').checked;
+    renderAll();
+  });
+  $('btnPadrao').addEventListener('click', () => {
+    $('sens').value = 0; $('minFrac').value = 18; $('calfFrac').value = 50;
+    $('invertido').checked = false;
+    state.settings.offset = 0; state.settings.minFrac = 0.18;
+    state.settings.calfFrac = 0.5; state.settings.inverted = false;
+    $('vSens').textContent = 'automática'; $('vMin').textContent = '18%'; $('vBez').textContent = '50%';
+    reprocessAll();
+  });
+}
+bindAjustes();
+
+$('zoom').addEventListener('input', aplicarZoom);
+function aplicarZoom(){
+  canvas.style.width = $('zoom').value + '%';
+  canvas.style.height = 'auto';
+}
+
+/* ---------- desenho ---------- */
+function fotoAtiva(){
+  return state.photos.find(f => f.id === state.activeId) || null;
+}
+
+function renderCanvas(){
+  const foto = fotoAtiva();
+  $('vazio').style.display = foto ? 'none' : 'flex';
+  if (!foto){ canvas.width = 0; canvas.height = 0; return; }
+  canvas.width = foto.W; canvas.height = foto.H;
+  ctx.drawImage(foto.baseCanvas, 0, 0);
+  if (!foto.result) return;
+  const lw = Math.max(2, foto.W / 700);
+  ctx.font = 'bold ' + Math.max(13, foto.W / 70) + 'px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+
+  if (state.settings.verIgnorados){
+    ctx.setLineDash([6, 5]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = lw * 0.7;
+    for (const c of foto.result.ignored){
+      ctx.strokeRect(c.minX, c.minY, c.maxX - c.minX + 1, c.maxY - c.minY + 1);
+    }
+    ctx.setLineDash([]);
+  }
+
+  for (const a of foto.result.animals){
+    const removido = isRemoved(foto, a);
+    const r = raioMarca(foto, a.area / a.count) * (a.count > 1 ? 1.25 : 1);
+    ctx.lineWidth = lw;
+    if (removido){
+      ctx.strokeStyle = 'rgba(255,93,93,0.9)';
+      ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(a.x - r * 0.7, a.y - r * 0.7); ctx.lineTo(a.x + r * 0.7, a.y + r * 0.7);
+      ctx.moveTo(a.x + r * 0.7, a.y - r * 0.7); ctx.lineTo(a.x - r * 0.7, a.y + r * 0.7);
+      ctx.stroke();
+      continue;
+    }
+    ctx.strokeStyle = a.type === 'bezerro' ? '#ffb020' : '#35e08a';
+    ctx.beginPath(); ctx.arc(a.x, a.y, r, 0, 7); ctx.stroke();
+    if (a.count > 1){
+      texto(a.x, a.y - r - lw * 2, '×' + a.count, '#35e08a');
+    } else if (a.type === 'bezerro'){
+      texto(a.x, a.y - r - lw * 2, 'B', '#ffb020');
+    }
+  }
+
+  ctx.setLineDash([5, 4]);
+  for (const m of foto.adds){
+    const r = raioMarca(foto);
+    ctx.strokeStyle = m.type === 'bezerro' ? '#ffb020' : '#4da3ff';
+    ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, 7); ctx.stroke();
+    texto(m.x, m.y - r - lw * 2, m.type === 'bezerro' ? 'B✋' : '✋', ctx.strokeStyle);
+  }
+  ctx.setLineDash([]);
+}
+
+function texto(x, y, s, cor){
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+  ctx.strokeText(s, x, y);
+  ctx.fillStyle = cor;
+  ctx.fillText(s, x, y);
+}
+
+/* ---------- listas e totais ---------- */
+function renderSidebar(){
+  const div = $('fotos');
+  div.innerHTML = '';
+  for (const foto of state.photos){
+    const c = contagem(foto);
+    const el = document.createElement('div');
+    el.className = 'foto-item' + (foto.id === state.activeId ? ' ativa' : '');
+    el.innerHTML =
+      '<img alt="" src="' + foto.thumb + '">' +
+      '<div class="info"><div class="nome"></div>' +
+      '<div class="contagem"><b class="a">' + c.adultos + '</b> ad · <b class="b">' + c.bezerros + '</b> bez</div></div>' +
+      '<button class="x" title="Remover foto">✕</button>';
+    el.querySelector('.nome').textContent = foto.nome;
+    el.addEventListener('click', () => { state.activeId = foto.id; renderAll(); });
+    el.querySelector('.x').addEventListener('click', e => {
+      e.stopPropagation();
+      state.photos = state.photos.filter(f => f.id !== foto.id);
+      if (state.activeId === foto.id) state.activeId = state.photos.length ? state.photos[state.photos.length - 1].id : null;
+      renderAll();
+    });
+    div.appendChild(el);
+  }
+}
+
+function renderTotais(){
+  let A = 0, B = 0;
+  for (const foto of state.photos){
+    const c = contagem(foto);
+    A += c.adultos; B += c.bezerros;
+  }
+  $('tAdultos').textContent = A;
+  $('tBezerros').textContent = B;
+  $('tTotal').textContent = A + B;
+  $('tFotos').textContent = state.photos.length ? '(' + state.photos.length + ' foto' + (state.photos.length > 1 ? 's' : '') + ')' : '';
+  const ativa = fotoAtiva();
+  const cf = ativa ? contagem(ativa) : { adultos: 0, bezerros: 0 };
+  $('fAdultos').textContent = cf.adultos;
+  $('fBezerros').textContent = cf.bezerros;
+  $('btnCsv').disabled = !state.photos.length;
+  $('btnResumo').disabled = !state.photos.length;
+}
+
+function renderAll(){
+  renderCanvas();
+  renderSidebar();
+  renderTotais();
+}
+
+/* ---------- exportação ---------- */
+function resumoLinhas(){
+  const linhas = [['Foto', 'Adultos', 'Bezerros', 'Total']];
+  let A = 0, B = 0;
+  for (const foto of state.photos){
+    const c = contagem(foto);
+    A += c.adultos; B += c.bezerros;
+    linhas.push([foto.nome, c.adultos, c.bezerros, c.total]);
+  }
+  linhas.push(['TOTAL GERAL', A, B, A + B]);
+  return linhas;
+}
+$('btnCsv').addEventListener('click', () => {
+  const csv = '﻿' + resumoLinhas()
+    .map(l => l.map(v => String(v).includes(';') ? '"' + v + '"' : v).join(';'))
+    .join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const d = new Date();
+  a.download = 'contagem-gado-' + d.toISOString().slice(0, 10) + '.csv';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+});
+$('btnResumo').addEventListener('click', async () => {
+  const linhas = resumoLinhas();
+  const texto = linhas.slice(1).map(l => l[0] + ': ' + l[1] + ' adultos, ' + l[2] + ' bezerros (total ' + l[3] + ')').join('\n');
+  try {
+    await navigator.clipboard.writeText('CONTAGEM DE GADO\n' + texto);
+    $('btnResumo').textContent = '✅ Copiado!';
+  } catch {
+    prompt('Copie o resumo:', texto);
+  }
+  setTimeout(() => { $('btnResumo').textContent = '📋 Copiar resumo'; }, 1600);
+});
+
+renderAll();
+aplicarZoom();
+</script>
+</body>
+</html>
