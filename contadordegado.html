@@ -295,6 +295,7 @@
           <div class="extremos"><span>25%</span><span>80%</span></div>
         </div>
         <label class="check"><input type="checkbox" id="invertido"> Gado escuro em piso claro</label>
+        <label class="check"><input type="checkbox" id="cfgAntiEstrutura" checked> Ignorar cercas, arames e estruturas automaticamente</label>
         <label class="check"><input type="checkbox" id="verIgnorados"> Mostrar áreas ignoradas</label>
       </details>
       <details>
@@ -464,6 +465,88 @@ function connectedComponents(mask, W, H, weights){
 }
 
 /*
+  Remove linhas compridas e finas (cerca, arame, cabo, régua de cocho) da
+  máscara BRUTA, antes da abertura morfológica. É o momento certo: a linha
+  ainda está inteira — comprida, fina e com pouca área para o tamanho da
+  caixa. Depois da erosão ela viraria um colar de pedacinhos com cara de
+  bezerro, muito mais difícil de reconhecer.
+*/
+function removeLines(mask, W, H){
+  const label = new Int32Array(W * H);
+  const stack = new Int32Array(W * H);
+  const minLen = 0.35 * Math.max(W, H);
+  const apagar = new Set();
+  let cur = 0;
+  for (let start = 0; start < W * H; start++){
+    if (!mask[start] || label[start]) continue;
+    cur++;
+    let sp = 0;
+    stack[sp++] = start;
+    label[start] = cur;
+    let area = 0, minX = W, maxX = 0, minY = H, maxY = 0;
+    while (sp > 0){
+      const p = stack[--sp];
+      const x = p % W, y = (p - x) / W;
+      area++;
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+      if (x > 0){ const q = p - 1; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (x < W - 1){ const q = p + 1; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (y > 0){ const q = p - W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+      if (y < H - 1){ const q = p + W; if (mask[q] && !label[q]){ label[q] = cur; stack[sp++] = q; } }
+    }
+    const bw = maxX - minX + 1, bh = maxY - minY + 1;
+    const len = Math.max(bw, bh);
+    const aspect = len / Math.min(bw, bh);
+    const fill = area / (bw * bh);
+    const thick = area / len;                    // espessura média ao longo da linha
+    if (len >= minLen && thick <= 8 && (aspect >= 8 || fill <= 0.10)) apagar.add(cur);
+  }
+  if (apagar.size){
+    for (let i = 0; i < W * H; i++) if (label[i] && apagar.has(label[i])) mask[i] = 0;
+  }
+  return mask;
+}
+
+/*
+  Cerca pontilhada: o arame reflete o sol em pontinhos que a limpeza não mata.
+  A assinatura é inconfundível — MUITAS manchas bem menores que os animais da
+  foto, alinhadas numa faixa estreita que a atravessa. Roda ANTES da estimativa
+  de escala: um colar de brilhos numeroso encolheria a régua do "1 animal" e
+  multiplicaria a contagem de cada vaca. A referência de tamanho é o percentil
+  90 das manchas (o porte dos animais grandes), não a mediana — que a própria
+  cerca contamina quando tem mais pontinhos que a foto tem vacas.
+*/
+function fenceChain(kept, W, H){
+  const cerca = new Set();
+  if (kept.length < 8) return cerca;
+  const areas = kept.map(c => c.area).sort((a, b) => a - b);
+  const p90 = areas[Math.min(areas.length - 1, Math.floor(areas.length * 0.9))];
+  const lim = Math.max(12, 0.25 * p90);
+  const peq = kept.filter(c => c.area <= lim);
+  if (peq.length < 6) return cerca;
+  const tolY = Math.max(6, H * 0.015);
+  const tolX = Math.max(6, W * 0.015);
+  for (const base of peq){
+    if (!cerca.has(base)){
+      const grupo = peq.filter(c => Math.abs(c.cy - base.cy) <= tolY);
+      if (grupo.length >= 6){
+        const xs = grupo.map(c => c.cx);
+        if (Math.max(...xs) - Math.min(...xs) >= 0.45 * W) grupo.forEach(c => cerca.add(c));
+      }
+    }
+    if (!cerca.has(base)){
+      const grupo = peq.filter(c => Math.abs(c.cx - base.cx) <= tolX);
+      if (grupo.length >= 6){
+        const ys = grupo.map(c => c.cy);
+        if (Math.max(...ys) - Math.min(...ys) >= 0.45 * H) grupo.forEach(c => cerca.add(c));
+      }
+    }
+  }
+  return cerca;
+}
+
+/*
   Tamanho típico de 1 animal.
   Régua principal: manchas com CARA de um animal só — preenchem bem a própria
   caixa (fill alto) e não são alongadas; grupos encostados falham nisso.
@@ -619,7 +702,8 @@ function brainClassify(model, f, margem){
 function analyzeRGBA(data, W, H, opts){
   const o = Object.assign({ offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false,
                             unitOverride: 0, calfMedian: 0, model: null,
-                            cap: 80, margem: 0.35, minExemplos: 3 }, opts);
+                            cap: 80, margem: 0.35, minExemplos: 3,
+                            antiEstrutura: true }, opts);
   const n = W * H;
   const bright = new Uint8Array(n);
   const hist = new Float64Array(256);
@@ -647,6 +731,7 @@ function analyzeRGBA(data, W, H, opts){
   const threshold = Math.max(1, Math.min(254, thr + o.offset));
   let mask = new Uint8Array(n);
   for (let i = 0; i < n; i++) mask[i] = bright[i] > threshold ? 1 : 0;
+  if (o.antiEstrutura) removeLines(mask, W, H);   // cerca/arame antes de partir
   mask = dilate(erode(mask, W, H), W, H);   // abertura: tira ruído fino
 
   const comps = connectedComponents(mask, W, H, bright);
@@ -669,14 +754,23 @@ function analyzeRGBA(data, W, H, opts){
   }
   if (kept.length === 0) return { animals: [], ignored, unit: 0, threshold };
 
+  // cerca pontilhada sai ANTES da régua (veja o comentário de fenceChain)
+  const cercas = o.antiEstrutura ? fenceChain(kept, W, H) : new Set();
+  const uteis = [];
+  for (const c of kept){
+    if (cercas.has(c)){ c.cerca = true; ignored.push(c); }
+    else uteis.push(c);
+  }
+  if (uteis.length === 0) return { animals: [], ignored, unit: 0, threshold };
+
   // escala: o que o usuário ensinou vale mais que a estimativa automática
   let unit;
   if (o.unitOverride > 0){
     unit = o.unitOverride;
   } else {
     // animais cortados pela margem têm área parcial: fora da estimativa de escala
-    const inteiros = kept.filter(c => !c.naBorda);
-    unit = estimateUnit(inteiros.length >= 3 ? inteiros : kept);
+    const inteiros = uteis.filter(c => !c.naBorda);
+    unit = estimateUnit(inteiros.length >= 3 ? inteiros : uteis);
     // piso absoluto: uma "unidade" de meia dúzia de pixels é cisco, não boi,
     // e faria cada mancha real virar um grupo de dezenas
     if (unit) unit = Math.max(unit, 16);
@@ -691,8 +785,19 @@ function analyzeRGBA(data, W, H, opts){
     : o.calfFrac * unit;
   const brainOn = o.model && brainReady(o.model, o.minExemplos);
   const animals = [];
-  for (const c of kept){
+  for (const c of uteis){
     if (c.area < minArea){ ignored.push(c); continue; }
+    if (o.antiEstrutura){
+      // alongado demais para ser animal (pedaço de cerca, cano, borda de
+      // cocho) — mas fileira comprida de animais encostados tem área grande
+      // e continua sendo contada
+      if (c.aspect >= 6 && c.area < 5 * unit){ c.cerca = true; ignored.push(c); continue; }
+      // retângulo grande quase perfeito (cocho, carroceria, lona): grupo de
+      // animais encostados nunca preenche a caixa tão certinho assim
+      if (c.area >= 3 * unit && c.fill >= 0.85 && c.aspect >= 2.2){
+        c.cerca = true; ignored.push(c); continue;
+      }
+    }
     if (brainOn && brainClassify(o.model, brainFeatures(c, unit), o.margem) === 'nada'){
       c.aprendido = true;        // descartado pelo motor de aprendizado
       ignored.push(c); continue;
@@ -701,6 +806,9 @@ function analyzeRGBA(data, W, H, opts){
     const saturado = count > CAP;
     if (saturado) count = CAP;
     // mancha na borda é sempre parcial — nunca vira "bezerro" por parecer pequena
+    if (count === 1 && c.area < calfArea && !c.naBorda && c.fill < 0.4){
+      ignored.push(c); continue;   // pequeno E esfarrapado = entulho, não bezerro
+    }
     const type = (count === 1 && c.area < calfArea && !c.naBorda) ? 'bezerro' : 'adulto';
     animals.push({
       x: c.cx, y: c.cy, count, type, area: c.area, saturado,
@@ -736,6 +844,7 @@ function mediana(arr){
 // todos os padrões num lugar só — "Restaurar padrão" volta exatamente para isto
 const CFG_PADRAO = {
   offset: 0, minFrac: 0.18, calfFrac: 0.5, inverted: false, verIgnorados: false,
+  antiEstrutura: true,
   cap: 80, alertaGrupo: 10, mostrarAlerta: true,
   corAdulto: '#35e08a', corBezerro: '#ffb020', corManual: '#4da3ff', corRemovido: '#ff5d5d',
   espessura: 1, tamanhoTexto: 1, mostrarRotulos: true,
@@ -777,6 +886,7 @@ function aplicarCfgNaUI(){
   $('calfFrac').value = String(Math.round(s.calfFrac * 100));
   $('vBez').textContent = $('calfFrac').value + '%';
   $('invertido').checked = !!s.inverted;
+  $('cfgAntiEstrutura').checked = !!s.antiEstrutura;
   $('verIgnorados').checked = !!s.verIgnorados;
   $('cfgCap').value = String(s.cap); $('vCap').textContent = s.cap;
   $('cfgAlerta').value = String(s.alertaGrupo); $('vAlerta').textContent = s.alertaGrupo;
@@ -1029,6 +1139,7 @@ function analyzePhoto(foto){
   foto.result = analyzeRGBA(idata.data, foto.W, foto.H, {
     offset: s.offset, minFrac: s.minFrac, calfFrac: s.calfFrac, inverted: s.inverted,
     cap: s.cap, margem: s.margem, minExemplos: s.minExemplos,
+    antiEstrutura: s.antiEstrutura,
     unitOverride: mediana(foto.taughtAdult),
     calfMedian: mediana(foto.taughtCalf),
     model: s.filtroAtivo ? state.brain : null
@@ -1377,6 +1488,7 @@ function bindCfg(){
   faixa('minFrac', 'vMin', v => v + '%', v => { state.settings.minFrac = v / 100; });
   faixa('calfFrac', 'vBez', v => v + '%', v => { state.settings.calfFrac = v / 100; });
   caixa('invertido', c => { state.settings.inverted = c; });
+  caixa('cfgAntiEstrutura', c => { state.settings.antiEstrutura = c; });
   caixa('verIgnorados', c => { state.settings.verIgnorados = c; }, renderAll);
   // contagem e alertas
   faixa('cfgCap', 'vCap', null, v => { state.settings.cap = v; });
