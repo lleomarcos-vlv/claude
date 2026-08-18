@@ -37,7 +37,8 @@ insert into auth.users (id, email) values
 insert into public.profiles (id, nome, email) values
   ('11111111-1111-1111-1111-111111111111', 'Ana',   'ana@lanchonete.test'),
   ('22222222-2222-2222-2222-222222222222', 'Bruno', 'bruno@farmacia.test'),
-  ('33333333-3333-3333-3333-333333333333', 'Carla', 'carla@lanchonete.test');
+  ('33333333-3333-3333-3333-333333333333', 'Carla', 'carla@lanchonete.test')
+on conflict (id) do update set nome = excluded.nome;  -- 0006 já criou via gatilho
 
 -- ===========================================================================
 -- 1. Cada usuário cria sua empresa

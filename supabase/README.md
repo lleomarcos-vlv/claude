@@ -3,6 +3,9 @@
 Postgres com Row Level Security. O isolamento entre empresas é garantido **no
 banco**, não na interface — uma falha no frontend não vaza dado entre clientes.
 
+Atalho: `./supabase/testar.sh` recria um banco limpo, aplica todas as
+migrations em ordem e roda todos os testes.
+
 ## Aplicar as migrations
 
 **Local (desenvolvimento):**
@@ -20,6 +23,19 @@ done
 
 **Supabase:** `supabase db push` (as migrations são compatíveis; o schema `auth`
 já existe lá e o shim local não sobrescreve nada).
+
+Depois do push, três configurações no painel do Supabase:
+
+1. **Settings → API → Exposed schemas:** adicione `app`. É por onde o
+   frontend chama `provisionar_tenant`, `convidar_usuario`, `minhas_empresas`…
+2. **Authentication → Rate limits:** os limites de login/cadastro são do
+   GoTrue; os padrões já servem, aperte se necessário.
+3. **Authentication → MFA (TOTP):** habilite para atender o item 34 do
+   briefing. O fluxo no app usa a API nativa (`supabase.auth.mfa`).
+
+Pendência declarada da Fase 2: o **envio do e-mail de convite** exige uma Edge
+Function com provedor de e-mail (Resend/SMTP). Até existir, a tela de usuários
+mostra o link do convite para copiar e enviar manualmente — sem fingir envio.
 
 ## Rodar os testes
 

@@ -1,0 +1,240 @@
+/* =============================================================================
+   Design system do Grafista — mesmos tokens dos protótipos (prototipos/*.html)
+   ============================================================================= */
+
+:root {
+  --ground:      #F4F6F5;
+  --panel:       #FFFFFF;
+  --panel-2:     #ECEFEE;
+  --line:        #DDE2E0;
+  --line-strong: #C3CBC8;
+  --text:        #161F1C;
+  --text-2:      #55605C;
+  --text-3:      #7C8783;
+
+  --primary:      #1B7A4B;
+  --primary-ink:  #135C39;
+  --primary-soft: #E3F1E9;
+  --primary-on:   #FFFFFF;
+
+  --ok:        #1F7A45;
+  --ok-soft:   #E4F1E9;
+  --warn:      #A9550B;
+  --warn-soft: #FAEEDF;
+  --crit:      #B42318;
+  --crit-soft: #FBE9E7;
+
+  --shadow:      0 1px 2px rgba(16, 28, 24, .06), 0 8px 24px rgba(16, 28, 24, .07);
+  --shadow-lift: 0 2px 4px rgba(16, 28, 24, .09), 0 16px 38px rgba(16, 28, 24, .14);
+
+  --display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --body:    "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:    "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0E1413;
+    --panel:       #161E1C;
+    --panel-2:     #1D2725;
+    --line:        #29332F;
+    --line-strong: #3A4642;
+    --text:        #E6EDEA;
+    --text-2:      #A2AEAA;
+    --text-3:      #7D8884;
+
+    --primary:      #35A96B;
+    --primary-ink:  #4CC282;
+    --primary-soft: #16301F;
+    --primary-on:   #07110C;
+
+    --ok:        #47B77A;
+    --ok-soft:   #14291C;
+    --warn:      #D98A3D;
+    --warn-soft: #33230F;
+    --crit:      #E2574B;
+    --crit-soft: #331512;
+
+    --shadow:      0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, .4), 0 16px 38px rgba(0, 0, 0, .5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground:      #0E1413;
+  --panel:       #161E1C;
+  --panel-2:     #1D2725;
+  --line:        #29332F;
+  --line-strong: #3A4642;
+  --text:        #E6EDEA;
+  --text-2:      #A2AEAA;
+  --text-3:      #7D8884;
+  --primary:      #35A96B;
+  --primary-ink:  #4CC282;
+  --primary-soft: #16301F;
+  --primary-on:   #07110C;
+  --ok:        #47B77A;
+  --ok-soft:   #14291C;
+  --warn:      #D98A3D;
+  --warn-soft: #33230F;
+  --crit:      #E2574B;
+  --crit-soft: #331512;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 14.5px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--display); letter-spacing: -.015em; margin: 0; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+a { color: var(--primary-ink); }
+
+/* --- blocos --------------------------------------------------------------- */
+.cartao {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+
+.pilha { display: flex; flex-direction: column; gap: 14px; }
+.linha { display: flex; align-items: center; gap: 10px; }
+.crescer { flex: 1; }
+
+/* --- formulários ----------------------------------------------------------- */
+label.campo { display: block; margin-bottom: 12px; }
+label.campo > span {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 5px;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+  border-color: var(--primary);
+}
+
+/* --- botões ---------------------------------------------------------------- */
+button {
+  font: inherit;
+  font-weight: 600;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+button:disabled { opacity: .55; cursor: not-allowed; }
+.bt-primario { background: var(--primary); color: var(--primary-on); }
+.bt-primario:hover:not(:disabled) { filter: brightness(1.06); }
+.bt-fantasma {
+  background: transparent;
+  color: var(--text-2);
+  border-color: var(--line-strong);
+}
+.bt-fantasma:hover:not(:disabled) { background: var(--panel-2); color: var(--text); }
+.bt-perigo { background: var(--crit-soft); color: var(--crit); }
+
+/* --- avisos ---------------------------------------------------------------- */
+.aviso { border-radius: var(--r-md); padding: 10px 14px; font-size: 13.5px; }
+.aviso-erro  { background: var(--crit-soft); color: var(--crit); }
+.aviso-ok    { background: var(--ok-soft);   color: var(--ok); }
+.aviso-atencao { background: var(--warn-soft); color: var(--warn); }
+
+.selo {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.selo-ok      { background: var(--ok-soft);      color: var(--ok); }
+.selo-atencao { background: var(--warn-soft);    color: var(--warn); }
+.selo-crit    { background: var(--crit-soft);    color: var(--crit); }
+.selo-neutro  { background: var(--panel-2);      color: var(--text-2); }
+.selo-primario{ background: var(--primary-soft); color: var(--primary-ink); }
+
+/* --- tabelas ---------------------------------------------------------------- */
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-3);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line-strong);
+}
+tbody td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tbody tr:hover { background: var(--panel-2); }
+
+/* --- telas de acesso (login etc.) ------------------------------------------ */
+.tela-acesso {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.tela-acesso .cartao { width: 100%; max-width: 420px; padding: 28px; }
+.marca {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px;
+}
+.marca-logo {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--primary); color: var(--primary-on);
+  display: grid; place-items: center;
+  font-family: var(--display); font-weight: 700; font-size: 20px;
+}
+
+/* --- shell do painel -------------------------------------------------------- */
+.shell { display: flex; min-height: 100%; }
+.shell-lateral {
+  width: 232px; flex-shrink: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 16px 10px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.shell-conteudo { flex: 1; padding: 24px; min-width: 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  color: var(--text-2);
+  text-decoration: none;
+  font-weight: 600; font-size: 13.5px;
+}
+.nav-item:hover { background: var(--panel-2); color: var(--text); }
+.nav-item.ativo { background: var(--primary-soft); color: var(--primary-ink); }
+
+@media (max-width: 760px) {
+  .shell { flex-direction: column; }
+  .shell-lateral {
+    width: 100%; flex-direction: row; overflow-x: auto;
+    border-right: 0; border-bottom: 1px solid var(--line);
+  }
+}
