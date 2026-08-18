@@ -6,6 +6,10 @@
 import { NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import Usuarios from './Usuarios'
+import Catalogo from './Catalogo'
+import Clientes from './Clientes'
+import Fornecedores from './Fornecedores'
+import EscolherNicho from './EscolherNicho'
 
 function EmConstrucao({ nome, fase }: { nome: string; fase: string }) {
   return (
@@ -30,6 +34,7 @@ export default function Painel() {
     { para: '/catalogo', rotulo: 'Catálogo', ver: pode('catalogo.ver') },
     { para: '/estoque', rotulo: 'Estoque', ver: pode('estoque.ver') },
     { para: '/compras', rotulo: 'Compras', ver: pode('compras.ver') },
+    { para: '/fornecedores', rotulo: 'Fornecedores', ver: pode('compras.ver') },
     { para: '/clientes', rotulo: 'Clientes', ver: pode('clientes.ver') },
     { para: '/financeiro', rotulo: 'Financeiro', ver: pode('financeiro.ver') },
     { para: '/fiscal', rotulo: 'Fiscal', ver: pode('fiscal.ver') },
@@ -76,13 +81,24 @@ export default function Painel() {
                 ativa. Os módulos de operação entram fase a fase — o menu mostra o
                 estado real de cada um.
               </p>
+              {!empresa?.vertical_chave && pode('empresa.editar') && (
+                <div className="aviso aviso-atencao">
+                  A empresa ainda não tem nicho definido.{' '}
+                  <a href="/nicho" onClick={(e) => { e.preventDefault(); navegar('/nicho') }}>
+                    Escolher o ramo da empresa
+                  </a>{' '}
+                  libera a terminologia e o catálogo inicial.
+                </div>
+              )}
             </div>
           } />
           <Route path="/pdv" element={<EmConstrucao nome="PDV" fase="Fase 5" />} />
-          <Route path="/catalogo" element={<EmConstrucao nome="Catálogo" fase="Fase 3" />} />
+          <Route path="/catalogo" element={<Catalogo />} />
+          <Route path="/nicho" element={<EscolherNicho />} />
           <Route path="/estoque" element={<EmConstrucao nome="Estoque" fase="Fase 4" />} />
           <Route path="/compras" element={<EmConstrucao nome="Compras" fase="Fase 6" />} />
-          <Route path="/clientes" element={<EmConstrucao nome="Clientes" fase="Fase 3" />} />
+          <Route path="/clientes" element={<Clientes />} />
+          <Route path="/fornecedores" element={<Fornecedores />} />
           <Route path="/financeiro" element={<EmConstrucao nome="Financeiro" fase="Fase 6" />} />
           <Route path="/fiscal" element={<EmConstrucao nome="Fiscal" fase="Fase 7" />} />
           <Route path="/relatorios" element={<EmConstrucao nome="Relatórios" fase="Fase 8" />} />
