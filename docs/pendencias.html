@@ -1,0 +1,328 @@
+<title>Mapa de Pendências</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground:      #F4F6F5;
+    --panel:       #FFFFFF;
+    --panel-2:     #ECEFEE;
+    --line:        #DDE2E0;
+    --line-strong: #C3CBC8;
+    --text:        #161F1C;
+    --text-2:      #4E5955;
+    --text-3:      #79847F;
+    --accent:      #17548C;
+    --accent-soft: #E2ECF6;
+    --ok:          #1F7A45;
+    --ok-soft:     #E4F1E9;
+    --warn:        #A9550B;
+    --warn-soft:   #FAEEDF;
+    --crit:        #B42318;
+    --crit-soft:   #FBE9E7;
+    --display: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --body:    "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono:    "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1413; --panel: #161E1C; --panel-2: #1D2725;
+      --line: #29332F; --line-strong: #3A4642;
+      --text: #E6EDEA; --text-2: #A6B2AE; --text-3: #7D8884;
+      --accent: #63A6E0; --accent-soft: #142433;
+      --ok: #47B77A; --ok-soft: #14291C;
+      --warn: #E0913D; --warn-soft: #2C2013;
+      --crit: #E5675A; --crit-soft: #321A17;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1413; --panel: #161E1C; --panel-2: #1D2725;
+    --line: #29332F; --line-strong: #3A4642;
+    --text: #E6EDEA; --text-2: #A6B2AE; --text-3: #7D8884;
+    --accent: #63A6E0; --accent-soft: #142433;
+    --ok: #47B77A; --ok-soft: #14291C;
+    --warn: #E0913D; --warn-soft: #2C2013;
+    --crit: #E5675A; --crit-soft: #321A17;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 22px 90px; }
+
+  header.hd { border-bottom: 2px solid var(--text); padding-bottom: 22px; margin-bottom: 34px; }
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: var(--body);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -.025em;
+    margin: 10px 0 12px;
+    text-wrap: balance;
+  }
+  .lede { font-size: 17px; color: var(--text-2); margin: 0; max-width: 62ch; }
+  .meta {
+    margin-top: 18px;
+    display: flex;
+    gap: 8px 22px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--text-3);
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -.02em;
+    margin: 48px 0 6px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  h2 .n {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--text-3);
+    font-weight: 600;
+    flex: none;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16.5px;
+    letter-spacing: -.01em;
+    margin: 28px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  .sub { color: var(--text-2); margin: 0 0 20px; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  ul, ol { margin: 0 0 16px; padding-left: 20px; }
+  li { margin-bottom: 7px; }
+  li::marker { color: var(--text-3); }
+
+  code {
+    font-family: var(--mono);
+    font-size: .88em;
+    background: var(--panel-2);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .verdict {
+    background: var(--crit-soft);
+    border-left: 3px solid var(--crit);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 20px;
+    margin: 26px 0;
+  }
+  .verdict strong { color: var(--crit); font-family: var(--display); }
+  .verdict p:last-child { margin-bottom: 0; }
+
+  .note {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 19px;
+    margin: 22px 0;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note .t {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    margin: 18px 0 24px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th {
+    text-align: left;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--text-3);
+    font-weight: 600;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+    background: var(--panel-2);
+  }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    font-family: var(--body);
+  }
+  .p-ok   { background: var(--ok-soft);   color: var(--ok); }
+  .p-warn { background: var(--warn-soft); color: var(--warn); }
+  .p-crit { background: var(--crit-soft); color: var(--crit); }
+  .p-mut  { background: var(--panel-2);   color: var(--text-2); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 22px 0 28px; }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .stat .k {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--text-3);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .stat .v {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: -.02em;
+    display: block;
+    line-height: 1;
+  }
+  .stat .d { font-size: 12.5px; color: var(--text-2); display: block; margin-top: 6px; }
+
+  .phases { display: flex; flex-direction: column; gap: 2px; margin: 20px 0 26px; }
+  .phase {
+    display: grid;
+    grid-template-columns: 62px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+  }
+  .phase:first-child { border-radius: 12px 12px 0 0; }
+  .phase:last-child { border-radius: 0 0 12px 12px; }
+  .phase + .phase { border-top: 0; }
+  .phase .id {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+  .phase .ttl { font-family: var(--display); font-weight: 600; font-size: 15px; display: block; }
+  .phase .dsc { font-size: 13.5px; color: var(--text-2); display: block; margin-top: 3px; }
+  .phase .tag { align-self: center; }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 560px) {
+    .phase { grid-template-columns: 1fr; gap: 5px; }
+    .phase .tag { justify-self: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+<style>
+  .fase { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 0 0 12px; }
+  .fase > .cab { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .fase h3 { margin: 0; font-size: 17px; }
+  .fase .id { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); }
+  .fase .obs { font-size: 13.5px; color: var(--text-2); margin: 6px 0 12px; }
+  .fase ul { margin: 0; font-size: 14.5px; }
+  .fase li { margin-bottom: 5px; }
+  .fase.destaque { border-color: var(--warn); border-left-width: 3px; }
+</style>
+
+<div class="wrap">
+<header class="hd">
+  <span class="eyebrow">Documento de pendências · 62 itens do briefing</span>
+  <h1>O que falta para o sistema ficar pronto</h1>
+  <p class="lede">Conferência item a item contra o código que existe hoje. Só entra em “pronto” o que roda e tem prova.</p>
+  <div class="meta"><span>Branch: claude/system-review-edit-4rdm8i</span><span>Data: 18/08/2026</span></div>
+</header>
+
+<div class="stats">
+  <div class="stat"><span class="k">Concluídos</span><span class="v">4</span><span class="d">6% dos 62 itens</span></div>
+  <div class="stat"><span class="k">Parciais</span><span class="v">7</span><span class="d">existe base, falta o resto</span></div>
+  <div class="stat"><span class="k">Não iniciados</span><span class="v">51</span><span class="d">82% dos 62 itens</span></div>
+  <div class="stat"><span class="k">Fases restantes</span><span class="v">10</span><span class="d">de 11 no total</span></div>
+</div>
+
+<div class="note">
+  <span class="t">Traduzindo os números</span>
+  <p>A fundação de segurança está pronta e testada: dá para criar duas empresas e provar que uma não enxerga a outra. Mas a <strong>operação do dia a dia</strong> — vender, comprar, controlar estoque, emitir nota — ainda não existe conectada a banco. As fases 4, 5, 7 e 9 são, cada uma, maiores que a Fase 1 já entregue.</p>
+</div>
+<h2><span class="n">01</span>O que está pronto</h2>
+<div class="tablewrap"><table><thead><tr><th>Entrega</th><th>Evidência</th></tr></thead><tbody><tr><td><strong>Banco multi-tenant</strong></td><td>4 migrations aplicadas em Postgres 16 limpo, em ordem</td></tr><tr><td><strong>Isolamento por RLS</strong></td><td>10 tabelas com RLS ativa, 21 policies</td></tr><tr><td><strong>41 permissões granulares</strong></td><td>migration 0002_rbac.sql</td></tr><tr><td><strong>13 perfis de acesso</strong></td><td>Proprietário → Somente leitura, com recortes distintos</td></tr><tr><td><strong>Trilha de auditoria</strong></td><td>gatilho com valor anterior, novo e campos alterados</td></tr><tr><td><strong>Provisionamento de empresa</strong></td><td>uma chamada cria empresa + matriz + 13 papéis + proprietário</td></tr><tr><td><strong>Testes de isolamento</strong></td><td>9/9 asserções, como usuário comum sem superusuário</td></tr><tr><td><strong>Design system e kits de nicho</strong></td><td>protótipos com 9 nichos, tema claro/escuro, responsivo</td></tr><tr><td><strong>Decisão de arquitetura</strong></td><td>ADR-001: nuvem + agente local Windows</td></tr></tbody></table></div>
+<h2><span class="n">02</span>O que falta, por fase</h2>
+<div class="fase"><div class="cab"><span class="id">FASE 2</span><h3>Autenticação e usuários</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">O RBAC existe no banco, mas ninguém consegue fazer login ainda.</p><ul><li>Tela de login, cadastro e recuperação de senha</li><li>Fluxo de convite: enviar, aceitar, expirar</li><li>MFA (item 34)</li><li>Sessões seguras, refresh token, logout de todos os dispositivos</li><li>Troca de empresa para quem atende mais de um tenant</li><li>Rate limiting no login</li><li>Tela de gestão de usuários e permissões — o banco já suporta, falta a interface</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 3</span><h3>Cadastros e configuração de nicho</h3><span class="pill p-warn">Parcial</span></div><p class="obs">Os 9 kits de nicho existem no protótipo, em JavaScript. Precisam virar tabela.</p><ul><li>Tabelas <code>verticals</code>, <code>vertical_fields</code>, <code>vertical_terminology</code></li><li>Migração dos 9 kits do protótipo para o banco</li><li>Produtos e serviços com foto, SKU e código de barras</li><li>Unidades de medida e conversão: kg, g, mg, L, ml, unidade, caixa, fardo, pacote, saco, garrafa, lata, porção (item 8)</li><li>Cadastro completo de clientes (item 21) e fornecedores (item 12)</li><li>Onboarding em 10 etapas com percentual (item 44)</li><li>Importador Excel/CSV com mapeamento de colunas e preview (item 45)</li><li>Multi-filial operacional (item 55) — tabelas existem, falta a operação</li></ul></div><div class="fase destaque"><div class="cab"><span class="id">FASE 4</span><h3>Estoque inteligente</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">Você marcou como uma das partes mais importantes. Nada disso existe hoje.</p><ul><li>Ficha técnica: produto composto por insumos (item 7)</li><li>Baixa em cascata — vender 1 Soda Italiana baixa xarope 50 ml, água 150 ml, gelo 100 g, copo, tampa e canudo</li><li>Conversão automática: fornecedor entrega 5 L, sistema controla 5.000 ml</li><li>Rendimento, perdas e desperdício</li><li>Estoque mínimo, máximo e ponto de reposição</li><li>Movimentação com 9 tipos (venda, compra, perda, desperdício, ajuste, devolução, transferência, produção, consumo interno)</li><li>Alertas com consumo médio e fornecedor sugerido (item 10)</li><li>Previsão de ruptura: “acaba em ~4 dias” (item 11)</li><li>Custo real a partir da ficha técnica (item 38) e precificação inteligente (item 39)</li><li>Relatório de consumo de insumos (item 37)</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 5</span><h3>PDV em produção</h3><span class="pill p-warn">Parcial</span></div><p class="obs">O protótipo tem o fluxo certo, mas não grava nada.</p><ul><li>Conectar ao banco: venda que persiste e sobrevive ao F5 e à queda de energia</li><li>Código de barras, leitor e foto do produto</li><li>Acréscimo (hoje só existe desconto)</li><li>Vincular cliente e vendedor à venda</li><li><strong>Pagamento dividido</strong> — R$ 40 Pix + R$ 60 cartão (item 5)</li><li>Vale e transferência como formas de pagamento</li><li>Abertura, sangria, suprimento e fechamento de caixa</li><li>Mesas e comandas persistentes, com transferência entre mesas (item 6)</li><li>Status do pedido: aberto → recebido → preparando → pronto → entregue → cancelado</li><li><strong>KDS, painel de cozinha</strong> (item 6)</li><li>Impressão de cupom e de pedido na cozinha</li><li><strong>PWA instalável</strong> com manifest e service worker (item 41)</li><li><strong>Modo offline</strong> com fila de sincronização e resolução de conflito (item 42)</li><li>Cancelamento e devolução com estorno de estoque</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 6</span><h3>Compras e financeiro</h3><span class="pill p-warn">Parcial</span></div><p class="obs">Existe listagem estática no protótipo. Falta tudo que é real.</p><ul><li>Pedido de compra com 6 status, de rascunho a recebido (item 13)</li><li>Entrada de mercadoria aumentando estoque automaticamente</li><li><strong>Upload e leitura de XML de NFe do fornecedor</strong> (item 14)</li><li>OCR de DANFE/PDF com tela de conferência antes de lançar (itens 14–15)</li><li>Contas a pagar e a receber de verdade</li><li>Fluxo de caixa, categorias e centros de custo</li><li>Contas bancárias, taxas de cartão, parcelamento e recorrência</li><li>Conciliação bancária</li><li>DRE gerencial, CMV, margem, lucro, custos fixos e variáveis</li></ul></div><div class="fase destaque"><div class="cab"><span class="id">FASE 7</span><h3>Fiscal</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">O maior risco do projeto. Nenhuma linha existe.</p><ul><li>Tabela <code>tax_rules</code> versionada com vigência, fonte e versão (item 17)</li><li>NCM, CEST, CFOP, CST/CSOSN, origem e regime por produto</li><li>Motor de cálculo configurável, sem regra fixa em tela (item 16)</li><li>Estrutura para <strong>IBS, CBS, Imposto Seletivo e cClassTrib</strong> — Reforma Tributária</li><li>Marcação “validação pelo contador necessária” onde a regra depender de interpretação</li><li><strong>Agente local Windows</strong> com ACBr, certificado A1 e impressora fiscal</li><li>Emissão de NFe, NFCe, NFSe e SAT</li><li>Homologação por estado junto à SEFAZ</li><li>Cancelamento, carta de correção e inutilização</li><li>Contingência quando a SEFAZ cair</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 8</span><h3>Contador e relatórios</h3><span class="pill p-crit">Não iniciada</span></div><ul><li>Central do Contador com envio por API, XML, PDF, Excel, CSV, ZIP ou e-mail (item 18)</li><li>Pacote mensal “CONTABILIDADE — AGOSTO/2026”</li><li>Histórico: enviado, recebido, erro, pendente, processado</li><li>Camada de integração com plataforma contábil (item 19)</li><li>Convite do contador como usuário restrito (item 52) — o perfil já existe no banco, falta o fluxo</li><li>Central de relatórios com 18 relatórios e exportação PDF/Excel/CSV (item 36)</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 9</span><h3>Integrações</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">Nenhuma linha. Todas dependem de credenciais suas.</p><ul><li>Adapters: iFood, Mercado Livre, Shopee, Uber Eats, Uber, 99</li><li>Central de Integrações com conectar / testar / desconectar / logs (item 53)</li><li>WhatsApp Business Platform: conversas, templates, avisos automáticos (item 26)</li><li>Meta / Instagram / Facebook: conta, campanhas, métricas (item 24)</li><li>Google Ads: campanhas, custo, ROAS (item 25)</li><li>Marketing: calendário, campanhas, público, ROAS, CAC (item 23)</li><li>CRM com funil Lead → VIP, tarefas e lembretes (item 22)</li><li>Segmentação automática de clientes (item 21)</li><li>Central de pedidos omnichannel (item 28)</li><li>Estoque omnichannel com reserva para pedidos pendentes (item 29)</li><li>API pública <code>/api/v1/…</code> com chaves, rate limit e OpenAPI (item 46)</li><li>Webhooks com 12 eventos (item 47) e sistema de jobs com retry e backoff (item 48)</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 10</span><h3>SaaS comercial</h3><span class="pill p-crit">Não iniciada</span></div><ul><li>Planos Básico / Profissional / Empresarial com feature flags (item 54)</li><li>Monitoramento de saúde: API, banco, integrações, filas (itens 30–31)</li><li>Central de alertas inteligentes com 14 tipos (item 40)</li><li>Backup automático, exportação, restauração e retenção (item 33)</li><li>LGPD: consentimento, anonimização, exportação, retenção (item 35)</li><li>Tela de auditoria — o banco já grava, falta a interface (item 32)</li><li>Camada de IA sobre dados reais do tenant (item 56)</li><li>Testes de ponta a ponta dos fluxos críticos (item 57)</li><li>Manuais do administrador, proprietário e contador</li><li>Checklists de produção, homologação, segurança e integração</li><li>Instruções de deploy e de instalação para cliente</li></ul></div>
+<h2><span class="n">03</span>Bloqueios que dependem de você</h2>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>O que preciso de você</th><th>Bloqueia</th><th>Urgência</th></tr></thead><tbody><tr><td class="num">B1</td><td><strong>Conta Supabase</strong> — projeto criado, URL e chaves</td><td>Fase 2 em diante — sem isso nada sai do banco local</td><td><span class="pill p-crit">Alta</span></td></tr><tr><td class="num">B2</td><td><strong>Certificado digital A1</strong> e CNPJ da empresa</td><td>Fase 7, emissão fiscal</td><td><span class="pill p-warn">Alta na fase 7</span></td></tr><tr><td class="num">B3</td><td><strong>Contador parceiro</strong> para validar regras tributárias</td><td>Fase 7 — não vou inventar regra fiscal</td><td><span class="pill p-crit">Alta</span></td></tr><tr><td class="num">B4</td><td><strong>Homologação na SEFAZ</strong> do seu estado</td><td>Fase 7 — processo externo, demora semanas</td><td><span class="pill p-crit">Iniciar cedo</span></td></tr><tr><td class="num">B5</td><td>Credenciais WhatsApp Business (Meta)</td><td>Fase 9, WhatsApp</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B6</td><td>Conta Meta Business com app aprovado</td><td>Fase 9, Instagram e Facebook</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B7</td><td>Conta Google Ads com acesso de API</td><td>Fase 9, Google</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B8</td><td>Credenciais iFood, Mercado Livre e Shopee</td><td>Fase 9, marketplaces</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B9</td><td>Acesso somente-leitura ao <strong>MySQL do G3 legado</strong></td><td>Migração dos dados históricos</td><td><span class="pill p-warn">Média</span></td></tr><tr><td class="num">B10</td><td>Máquina Windows para desenvolver e testar o agente ACBr</td><td>Fase 7</td><td><span class="pill p-warn">Alta na fase 7</span></td></tr><tr><td class="num">B11</td><td>Nome comercial e logo do produto</td><td>White-label</td><td><span class="pill p-mut">Baixa</span></td></tr></tbody></table></div>
+<div class="note"><span class="t">Sobre B3 e B4</span>
+<p>A homologação de NFCe costuma levar semanas e é processo externo. Se a emissão própria for para frente, vale iniciar isso em paralelo ao desenvolvimento, não no fim.</p></div>
+<h2><span class="n">04</span>Ordem recomendada</h2>
+
+<ol>
+<li><strong>Fase 2 — autenticação.</strong> Destrava tudo: sem login, nenhuma tela existe de verdade.</li>
+<li><strong>Fase 3 — cadastros.</strong> Produtos e clientes reais no banco, kits de nicho migrados.</li>
+<li><strong>Fase 4 — estoque com ficha técnica.</strong> O que você marcou como mais importante, e o que separa o produto de um PDV comum.</li>
+<li><strong>Fase 5 — PDV em produção.</strong> Aqui o protótipo vira sistema: venda que grava, PWA, offline.</li>
+<li><strong>Fase 6 — compras e financeiro.</strong> A partir daqui já é um ERP vendável.</li>
+<li><strong>Fase 7 — fiscal.</strong> Começar a homologação em paralelo à Fase 5.</li>
+<li><strong>Fases 8 a 10</strong> conforme a demanda comercial aparecer.</li>
+</ol>
+<p><strong>Corte para o primeiro cliente pagando:</strong> fases 2 a 6, com a 7 correndo em paralelo.</p>
+<h2><span class="n">05</span>Compromisso</h2>
+
+<p>Os 62 itens equivalem a um ERP com equipe dedicada e anos de estrada. Não existe caminho em que isso fique pronto rápido — existe caminho em que <strong>cada fase entregue já é usável</strong>, e é esse o plano.</p>
+<div class="verdict">
+<p><strong>O que não vai acontecer</strong>, conforme sua seção 50: nenhuma tela que finge funcionar, nenhuma integração marcada como “conectada” sem conexão real, nenhuma regra fiscal inventada. Onde faltar credencial, a entrega será o adapter real mais a tela de configuração, exibindo honestamente “não conectado”.</p>
+</div>
+
+<footer>Levantamento feito por conferência direta do código em 18/08/2026. Percentuais calculados sobre as 62 seções do briefing.</footer>
+</div>

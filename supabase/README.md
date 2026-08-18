@@ -1,0 +1,73 @@
+# Banco de dados
+
+Postgres com Row Level Security. O isolamento entre empresas é garantido **no
+banco**, não na interface — uma falha no frontend não vaza dado entre clientes.
+
+## Aplicar as migrations
+
+**Local (desenvolvimento):**
+
+```bash
+# subir um Postgres local na porta 55432
+initdb -D ./pgdata -U grafista --auth=trust
+pg_ctl -D ./pgdata -o "-p 55432" -l ./pgdata/server.log start
+
+# aplicar em ordem
+for f in supabase/migrations/*.sql; do
+  psql -p 55432 -U grafista -d postgres -v ON_ERROR_STOP=1 -f "$f"
+done
+```
+
+**Supabase:** `supabase db push` (as migrations são compatíveis; o schema `auth`
+já existe lá e o shim local não sobrescreve nada).
+
+## Rodar os testes
+
+```bash
+psql -p 55432 -U grafista -d postgres -v ON_ERROR_STOP=1 \
+  -f supabase/tests/0001_isolamento_e_permissoes.sql
+```
+
+Qualquer asserção que falhar aborta com erro. São 9 asserções cobrindo
+provisionamento, isolamento de leitura e escrita, permissões por papel,
+perfil do contador, auditoria e revogação de acesso.
+
+> Os testes rodam como o papel `authenticated`, sem privilégios de superusuário.
+> Rodar como superusuário invalidaria o resultado — superusuário ignora RLS.
+
+## Como o isolamento funciona
+
+```
+auth.uid()  →  memberships (status = 'ativo')  →  tenant_id  →  policy
+```
+
+Duas funções sustentam tudo:
+
+| Função | Uso |
+|---|---|
+| `app.tenants_do_usuario()` | tenants com vínculo ativo do usuário logado |
+| `app.pode(tenant, permissao)` | verdadeiro se o usuário tem a permissão naquele tenant |
+
+Ambas são `SECURITY DEFINER` e leem `auth.uid()` do token — **não aceitam
+tenant_id vindo do cliente**. Um `tenant_id` enviado na requisição só restringe
+mais o resultado; nunca amplia o acesso.
+
+## Papéis
+
+13 perfis-modelo em `role_templates`, copiados para cada empresa no
+provisionamento. Cada empresa pode ajustar as permissões dos seus papéis sem
+afetar as demais. Permissões novas entram por migration, nunca como dado.
+
+## Auditoria
+
+`app.fn_auditoria()` é um gatilho genérico que grava usuário, ação, valor
+anterior, valor novo e a lista de campos alterados. Aplicar em toda tabela
+sensível ou financeira:
+
+```sql
+create trigger trg_audit_<tabela> after insert or update or delete on public.<tabela>
+  for each row execute function app.fn_auditoria();
+```
+
+A trilha é somente-inserção: não há policy de `update` nem de `delete`, portanto
+nem o proprietário consegue reescrever o histórico pela aplicação.

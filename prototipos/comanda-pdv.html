@@ -1,0 +1,1370 @@
+<title>Comanda PDV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground:        #F4F7F5;
+    --panel:         #FFFFFF;
+    --panel-2:       #EDF1EE;
+    --line:          #DEE5E0;
+    --line-strong:   #C4CFC8;
+    --text:          #16211C;
+    --text-2:        #55645C;
+    --text-3:        #7D8B83;
+    --primary:       #1B7A4B;
+    --primary-ink:   #135C39;
+    --primary-on:    #FFFFFF;
+    --primary-soft:  #E3F1E9;
+    --ember:         #A9550B;
+    --ember-soft:    #FAEEDF;
+    --danger:        #B42318;
+    --danger-soft:   #FBE9E7;
+    --shadow:        0 1px 2px rgba(16, 32, 24, .06), 0 8px 24px rgba(16, 32, 24, .07);
+    --shadow-lift:   0 2px 4px rgba(16, 32, 24, .08), 0 14px 34px rgba(16, 32, 24, .12);
+
+    --display: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 14px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:       #0F1512;
+      --panel:        #17201C;
+      --panel-2:      #1E2823;
+      --line:         #2A3630;
+      --line-strong:  #3B4941;
+      --text:         #E7EEE9;
+      --text-2:       #A3B1A9;
+      --text-3:       #7E8C84;
+      --primary:      #35A96B;
+      --primary-ink:  #43BE7C;
+      --primary-on:   #08120C;
+      --primary-soft: #16301F;
+      --ember:        #E0913D;
+      --ember-soft:   #2D2113;
+      --danger:       #E5675A;
+      --danger-soft:  #331A17;
+      --shadow:       0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .34);
+      --shadow-lift:  0 2px 4px rgba(0, 0, 0, .45), 0 14px 34px rgba(0, 0, 0, .5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:       #0F1512;
+    --panel:        #17201C;
+    --panel-2:      #1E2823;
+    --line:         #2A3630;
+    --line-strong:  #3B4941;
+    --text:         #E7EEE9;
+    --text-2:       #A3B1A9;
+    --text-3:       #7E8C84;
+    --primary:      #35A96B;
+    --primary-ink:  #43BE7C;
+    --primary-on:   #08120C;
+    --primary-soft: #16301F;
+    --ember:        #E0913D;
+    --ember-soft:   #2D2113;
+    --danger:       #E5675A;
+    --danger-soft:  #331A17;
+    --shadow:       0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .34);
+    --shadow-lift:  0 2px 4px rgba(0, 0, 0, .45), 0 14px 34px rgba(0, 0, 0, .5);
+  }
+
+  * { box-sizing: border-box; }
+
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button, input, select { font: inherit; color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+  }
+
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ---------- Shell ---------- */
+
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 12px 18px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    margin-right: 4px;
+  }
+  .brand strong {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -.015em;
+  }
+  .brand span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+
+  .segmented {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    background: var(--panel-2);
+    border-radius: var(--r-md);
+  }
+  .segmented button {
+    border: 0;
+    background: transparent;
+    padding: 7px 15px;
+    border-radius: 7px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background .14s ease, color .14s ease;
+  }
+  .segmented button:hover { color: var(--text); }
+  .segmented button[aria-pressed="true"] {
+    background: var(--panel);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(16, 32, 24, .12);
+  }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .stat { text-align: right; line-height: 1.15; }
+  .stat .k {
+    display: block;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .stat .v { font-size: 15px; font-weight: 600; }
+
+  .caixa {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px 5px 9px;
+    border-radius: 100px;
+    background: var(--primary-soft);
+    color: var(--primary-ink);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .caixa i {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    display: block;
+  }
+
+  /* ---------- Main split ---------- */
+
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 384px;
+    align-items: start;
+    min-height: 0;
+  }
+
+  .catalog { padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  .searchrow { display: flex; gap: 10px; }
+
+  .search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 0 13px;
+    transition: border-color .14s ease;
+  }
+  .search:focus-within { border-color: var(--primary); }
+  .search svg { flex: none; color: var(--text-3); }
+  .search input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    padding: 11px 0;
+    outline: none;
+  }
+  .search input::placeholder { color: var(--text-3); }
+
+  .cats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cats button {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text-2);
+    padding: 7px 14px;
+    border-radius: 100px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .14s ease;
+  }
+  .cats button:hover { border-color: var(--line-strong); color: var(--text); }
+  .cats button[aria-pressed="true"] {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--ground);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+    gap: 11px;
+  }
+
+  .card {
+    position: relative;
+    text-align: left;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 14px 14px 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 108px;
+    transition: transform .12s ease, border-color .14s ease, box-shadow .14s ease;
+  }
+  .card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+  .card:active { transform: scale(.985); }
+
+  .card .eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+  .card .name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.25;
+    letter-spacing: -.01em;
+    margin-top: -4px;
+    text-wrap: balance;
+  }
+  .card .price {
+    margin-top: auto;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .card .qty {
+    position: absolute;
+    top: 10px; right: 10px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 100px;
+    background: var(--primary);
+    color: var(--primary-on);
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 12.5px;
+    display: grid;
+    place-items: center;
+  }
+  .card[data-in="1"] { border-color: var(--primary); }
+
+  .card[data-out="1"] { opacity: .5; cursor: not-allowed; }
+  .card[data-out="1"] .price { color: var(--ember); font-family: var(--body); font-size: 12.5px; font-weight: 600; }
+
+  .empty-grid {
+    grid-column: 1 / -1;
+    padding: 44px 10px;
+    text-align: center;
+    color: var(--text-3);
+  }
+
+  /* ---------- Ticket ---------- */
+
+  .ticket {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    border-left: 1px solid var(--line);
+  }
+
+  .ticket-head {
+    padding: 16px 18px 13px;
+    border-bottom: 1px dashed var(--line-strong);
+  }
+  .ticket-head .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ticket-head h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+  .ticket-head .sub {
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .linkbtn {
+    border: 0;
+    background: transparent;
+    color: var(--danger);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: var(--r-sm);
+  }
+  .linkbtn:hover { background: var(--danger-soft); }
+  .linkbtn[disabled] { color: var(--text-3); cursor: default; background: transparent; }
+
+  .items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+    min-height: 0;
+  }
+
+  .item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .item .nm {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .item .unit {
+    font-size: 11.5px;
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .item .amt {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: right;
+  }
+  .item .stepper {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    justify-self: end;
+  }
+  .stepper button {
+    width: 28px; height: 28px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text-2);
+    border-radius: 7px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    line-height: 1;
+    transition: all .12s ease;
+  }
+  .stepper button:hover { border-color: var(--primary); color: var(--primary); }
+  .stepper .n {
+    min-width: 30px;
+    text-align: center;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .item-flash { animation: flash .5s ease; }
+  @keyframes flash {
+    from { background: var(--primary-soft); }
+    to   { background: transparent; }
+  }
+
+  .ticket-empty {
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 8px;
+    padding: 30px;
+    text-align: center;
+    color: var(--text-3);
+  }
+  .ticket-empty strong {
+    font-family: var(--display);
+    font-size: 14.5px;
+    color: var(--text-2);
+    font-weight: 600;
+  }
+  .ticket-empty span { font-size: 13px; max-width: 24ch; }
+
+  .totals {
+    border-top: 1px dashed var(--line-strong);
+    padding: 14px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    background: var(--panel);
+  }
+  .trow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13.5px;
+    color: var(--text-2);
+  }
+  .trow .num { font-weight: 500; }
+
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle input { position: absolute; opacity: 0; pointer-events: none; }
+  .toggle .track {
+    width: 34px; height: 20px;
+    border-radius: 100px;
+    background: var(--line-strong);
+    position: relative;
+    transition: background .16s ease;
+    flex: none;
+  }
+  .toggle .track::after {
+    content: "";
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform .16s ease;
+  }
+  .toggle input:checked + .track { background: var(--primary); }
+  .toggle input:checked + .track::after { transform: translateX(14px); }
+  .toggle input:focus-visible + .track { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+  .total-final {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .total-final .lbl {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .total-final .val {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 27px;
+    letter-spacing: -.02em;
+  }
+
+  .btn-primary {
+    border: 0;
+    width: 100%;
+    background: var(--primary);
+    color: var(--primary-on);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15.5px;
+    letter-spacing: .01em;
+    padding: 15px;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: background .14s ease, transform .1s ease;
+  }
+  .btn-primary:hover { background: var(--primary-ink); }
+  .btn-primary:active { transform: scale(.99); }
+  .btn-primary[disabled] {
+    background: var(--panel-2);
+    color: var(--text-3);
+    cursor: default;
+    transform: none;
+  }
+
+  /* ---------- Mobile ticket drawer ---------- */
+
+  .mobilebar { display: none; }
+
+  @media (max-width: 900px) {
+    .main { grid-template-columns: minmax(0, 1fr); }
+    .catalog { padding-bottom: 88px; }
+
+    .ticket {
+      position: fixed;
+      inset: 0;
+      height: 100dvh;
+      z-index: 40;
+      border-left: 0;
+      transform: translateY(100%);
+      transition: transform .26s cubic-bezier(.32, .72, 0, 1);
+    }
+    .ticket[data-open="1"] { transform: none; }
+
+    .mobilebar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 30;
+      padding: 11px 14px calc(11px + env(safe-area-inset-bottom));
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -6px 22px rgba(16, 32, 24, .09);
+    }
+    .mobilebar .info { line-height: 1.2; }
+    .mobilebar .info .k {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--text-3);
+      font-weight: 600;
+    }
+    .mobilebar .info .v {
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      font-size: 19px;
+    }
+    .mobilebar .btn-primary { width: auto; margin-left: auto; padding: 13px 22px; font-size: 14.5px; }
+
+    .closebtn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: var(--text-2);
+      font-size: 18px;
+      line-height: 1;
+    }
+    .topbar-right .stat.hide-sm { display: none; }
+  }
+
+  @media (min-width: 901px) { .closebtn { display: none; } }
+
+  /* ---------- Payment dialog ---------- */
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(10, 20, 15, .5);
+    backdrop-filter: blur(3px);
+    display: grid;
+    place-items: center;
+    padding: 18px;
+  }
+  .overlay[hidden] { display: none; }
+
+  .modal {
+    width: min(440px, 100%);
+    max-height: calc(100dvh - 36px);
+    overflow-y: auto;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lift);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: rise .2s cubic-bezier(.32, .72, 0, 1);
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .modal h3 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.015em;
+  }
+  .modal .due {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 13px 15px;
+    background: var(--panel-2);
+    border-radius: var(--r-md);
+  }
+  .modal .due .k { font-size: 12.5px; color: var(--text-2); font-weight: 500; }
+  .modal .due .v {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 23px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    font-weight: 600;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .pays { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pays button {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: var(--r-md);
+    padding: 13px 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-2);
+    transition: all .14s ease;
+  }
+  .pays button:hover { border-color: var(--line-strong); color: var(--text); }
+  .pays button[aria-pressed="true"] {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    color: var(--primary-ink);
+  }
+
+  .cash { display: flex; flex-direction: column; gap: 10px; }
+  .cash[hidden] { display: none; }
+  .cash input[type="text"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: var(--r-md);
+    padding: 12px 13px;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 17px;
+    outline: none;
+  }
+  .cash input[type="text"]:focus { border-color: var(--primary); }
+  .quick { display: flex; gap: 7px; flex-wrap: wrap; }
+  .quick button {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text-2);
+    border-radius: 100px;
+    padding: 6px 13px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: var(--mono);
+    cursor: pointer;
+  }
+  .quick button:hover { border-color: var(--primary); color: var(--primary); }
+
+  .troco {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 11px 14px;
+    border-radius: var(--r-md);
+    background: var(--primary-soft);
+    color: var(--primary-ink);
+    font-weight: 600;
+  }
+  .troco .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 19px; }
+  .troco[data-short="1"] { background: var(--ember-soft); color: var(--ember); }
+
+  .modal-actions { display: flex; gap: 9px; }
+  .btn-ghost {
+    flex: none;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text-2);
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 14.5px;
+    padding: 15px 20px;
+    border-radius: var(--r-md);
+    cursor: pointer;
+  }
+  .btn-ghost:hover { border-color: var(--line-strong); color: var(--text); }
+
+  /* ---------- Toast ---------- */
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translate(-50%, 20px);
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--text);
+    color: var(--ground);
+    padding: 13px 19px;
+    border-radius: 100px;
+    box-shadow: var(--shadow-lift);
+    font-weight: 600;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast[data-show="1"] { opacity: 1; transform: translate(-50%, 0); }
+  .toast .dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--primary-on);
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    flex: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+    }
+  }
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <strong>Comanda</strong><span>PDV</span>
+    </div>
+
+    <div class="segmented" role="group" aria-label="Tipo de pedido">
+      <button type="button" data-mode="Balcão" aria-pressed="true">Balcão</button>
+      <button type="button" data-mode="Mesa" aria-pressed="false">Mesa</button>
+      <button type="button" data-mode="Delivery" aria-pressed="false">Delivery</button>
+    </div>
+
+    <div class="topbar-right">
+      <span class="caixa"><i></i> Caixa aberto</span>
+      <div class="stat hide-sm">
+        <span class="k">Vendas hoje</span>
+        <span class="v num" id="stat-count">0</span>
+      </div>
+      <div class="stat">
+        <span class="k">Faturamento</span>
+        <span class="v num" id="stat-total">R$ 0,00</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <section class="catalog" aria-label="Cardápio">
+      <div class="searchrow">
+        <label class="search">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path>
+          </svg>
+          <input type="search" id="search" placeholder="Buscar produto ou código…" autocomplete="off" aria-label="Buscar produto">
+        </label>
+      </div>
+
+      <div class="cats" id="cats" role="group" aria-label="Categorias"></div>
+
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <aside class="ticket" id="ticket" aria-label="Comanda">
+      <div class="ticket-head">
+        <div class="row">
+          <div>
+            <h2 id="ticket-title">Balcão · Pedido #1042</h2>
+            <p class="sub" id="ticket-sub">Nenhum item lançado</p>
+          </div>
+          <button type="button" class="closebtn" id="close-ticket" aria-label="Fechar comanda">×</button>
+        </div>
+      </div>
+
+      <div class="items" id="items"></div>
+
+      <div class="totals">
+        <div class="trow">
+          <span>Subtotal</span>
+          <span class="num" id="t-subtotal">R$ 0,00</span>
+        </div>
+        <div class="trow" id="row-servico">
+          <label class="toggle">
+            <input type="checkbox" id="servico">
+            <span class="track"></span>
+            <span>Taxa de serviço 10%</span>
+          </label>
+          <span class="num" id="t-servico">R$ 0,00</span>
+        </div>
+        <div class="trow" id="row-entrega" hidden>
+          <span>Taxa de entrega</span>
+          <span class="num" id="t-entrega">R$ 0,00</span>
+        </div>
+
+        <div class="total-final">
+          <span class="lbl">Total</span>
+          <span class="val" id="t-total" aria-live="polite">R$ 0,00</span>
+        </div>
+
+        <button type="button" class="btn-primary" id="finalizar" disabled>Finalizar venda</button>
+        <button type="button" class="linkbtn" id="limpar" disabled style="align-self:center">Cancelar comanda</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="mobilebar">
+    <div class="info">
+      <div class="k"><span id="m-count">0</span> itens</div>
+      <div class="v" id="m-total">R$ 0,00</div>
+    </div>
+    <button type="button" class="btn-primary" id="open-ticket">Ver pedido</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pay-title">
+    <h3 id="pay-title">Pagamento</h3>
+
+    <div class="due">
+      <span class="k">Total a receber</span>
+      <span class="v" id="pay-total">R$ 0,00</span>
+    </div>
+
+    <div>
+      <span class="field-label">Forma de pagamento</span>
+      <div class="pays" id="pays" role="group" aria-label="Forma de pagamento">
+        <button type="button" data-pay="Dinheiro" aria-pressed="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2.6"></circle></svg>
+          Dinheiro
+        </button>
+        <button type="button" data-pay="Cartão" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"></rect><path d="M2 10h20"></path></svg>
+          Cartão
+        </button>
+        <button type="button" data-pay="Pix" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l4.2 4.2L12 11.4 7.8 7.2z"></path><path d="M12 12.6l4.2 4.2L12 21l-4.2-4.2z"></path><path d="M3 12l4.2-4.2M21 12l-4.2-4.2"></path></svg>
+          Pix
+        </button>
+      </div>
+    </div>
+
+    <div class="cash" id="cash">
+      <div>
+        <label class="field-label" for="recebido">Valor recebido</label>
+        <input type="text" id="recebido" inputmode="decimal" placeholder="0,00">
+      </div>
+      <div class="quick" id="quick"></div>
+      <div class="troco" id="troco">
+        <span>Troco</span>
+        <span class="v" id="troco-val">R$ 0,00</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" id="pay-cancel">Voltar</button>
+      <button type="button" class="btn-primary" id="pay-confirm">Confirmar pagamento</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="dot">✓</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Dados do cardápio ----------
+
+  var PRODUTOS = [
+    { id: 1,  cat: "Lanches",    nome: "X-Burger",              preco: 18.90 },
+    { id: 2,  cat: "Lanches",    nome: "X-Salada",              preco: 21.90 },
+    { id: 3,  cat: "Lanches",    nome: "X-Bacon",               preco: 24.90 },
+    { id: 4,  cat: "Lanches",    nome: "X-Tudo",                preco: 29.90 },
+    { id: 5,  cat: "Lanches",    nome: "Misto Quente",          preco: 12.00 },
+    { id: 6,  cat: "Lanches",    nome: "Hambúrguer Simples",    preco: 14.50 },
+
+    { id: 10, cat: "Porções",    nome: "Batata Frita P",        preco: 22.00 },
+    { id: 11, cat: "Porções",    nome: "Batata Frita G",        preco: 34.00 },
+    { id: 12, cat: "Porções",    nome: "Frango a Passarinho",   preco: 42.00 },
+    { id: 13, cat: "Porções",    nome: "Calabresa Acebolada",   preco: 38.00 },
+    { id: 14, cat: "Porções",    nome: "Isca de Peixe",         preco: 46.00, semEstoque: true },
+
+    { id: 20, cat: "Pratos",     nome: "Executivo de Frango",   preco: 32.00 },
+    { id: 21, cat: "Pratos",     nome: "Executivo de Carne",    preco: 36.00 },
+    { id: 22, cat: "Pratos",     nome: "Filé à Parmegiana",     preco: 54.90 },
+    { id: 23, cat: "Pratos",     nome: "Marmitex Média",        preco: 24.00 },
+    { id: 24, cat: "Pratos",     nome: "Marmitex Grande",       preco: 28.00 },
+
+    { id: 30, cat: "Bebidas",    nome: "Refrigerante Lata",     preco: 7.00 },
+    { id: 31, cat: "Bebidas",    nome: "Água Mineral 500ml",    preco: 4.00 },
+    { id: 32, cat: "Bebidas",    nome: "Suco Natural 300ml",    preco: 9.50 },
+    { id: 33, cat: "Bebidas",    nome: "Cerveja Long Neck",     preco: 11.00 },
+    { id: 34, cat: "Bebidas",    nome: "Suco de Laranja 1L",    preco: 18.00 },
+
+    { id: 40, cat: "Sobremesas", nome: "Pudim de Leite",        preco: 12.00 },
+    { id: 41, cat: "Sobremesas", nome: "Açaí 300ml",            preco: 16.00 },
+    { id: 42, cat: "Sobremesas", nome: "Petit Gateau",          preco: 19.90 },
+
+    { id: 50, cat: "Cafeteria",  nome: "Café Expresso",         preco: 5.00 },
+    { id: 51, cat: "Cafeteria",  nome: "Cappuccino",            preco: 9.00 },
+    { id: 52, cat: "Cafeteria",  nome: "Pão de Queijo",         preco: 6.50 }
+  ];
+
+  var TAXA_ENTREGA = 8.00;
+
+  // ---------- Estado ----------
+
+  var state = {
+    modo: "Balcão",
+    categoria: "Todos",
+    busca: "",
+    itens: [],            // { id, nome, preco, qtd }
+    servico: false,
+    pedido: 1042,
+    vendas: 0,
+    faturamento: 0,
+    pagamento: "Dinheiro",
+    recebido: 0
+  };
+
+  var brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+  var money = function (v) { return brl.format(v || 0); };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- Cálculo ----------
+
+  function subtotal() {
+    return state.itens.reduce(function (s, i) { return s + i.preco * i.qtd; }, 0);
+  }
+  function servicoValor() {
+    return state.servico ? subtotal() * 0.10 : 0;
+  }
+  function entregaValor() {
+    return state.modo === "Delivery" && state.itens.length ? TAXA_ENTREGA : 0;
+  }
+  function total() {
+    return subtotal() + servicoValor() + entregaValor();
+  }
+
+  // ---------- Categorias ----------
+
+  var categorias = ["Todos"];
+  PRODUTOS.forEach(function (p) {
+    if (categorias.indexOf(p.cat) === -1) categorias.push(p.cat);
+  });
+
+  function renderCats() {
+    var html = categorias.map(function (c) {
+      var on = c === state.categoria ? "true" : "false";
+      return '<button type="button" data-cat="' + c + '" aria-pressed="' + on + '">' + c + "</button>";
+    }).join("");
+    $("cats").innerHTML = html;
+  }
+
+  // ---------- Grade de produtos ----------
+
+  function normalize(s) {
+    return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function visiveis() {
+    var q = normalize(state.busca.trim());
+    return PRODUTOS.filter(function (p) {
+      var okCat = state.categoria === "Todos" || p.cat === state.categoria;
+      var okQ = !q || normalize(p.nome).indexOf(q) !== -1 || String(p.id) === q;
+      return okCat && okQ;
+    });
+  }
+
+  function qtdDe(id) {
+    var it = state.itens.find(function (i) { return i.id === id; });
+    return it ? it.qtd : 0;
+  }
+
+  function renderGrid() {
+    var lista = visiveis();
+    if (!lista.length) {
+      $("grid").innerHTML = '<p class="empty-grid">Nenhum produto encontrado para essa busca.</p>';
+      return;
+    }
+    $("grid").innerHTML = lista.map(function (p) {
+      var q = qtdDe(p.id);
+      var badge = q ? '<span class="qty">' + q + "</span>" : "";
+      var preco = p.semEstoque
+        ? '<span class="price">Sem estoque</span>'
+        : '<span class="price">' + money(p.preco) + "</span>";
+      return (
+        '<button type="button" class="card" data-add="' + p.id + '"' +
+        (q ? ' data-in="1"' : "") +
+        (p.semEstoque ? ' data-out="1" disabled' : "") +
+        ' aria-label="' + p.nome + ", " + money(p.preco) + '">' +
+          badge +
+          '<span class="eyebrow">' + p.cat + "</span>" +
+          '<span class="name">' + p.nome + "</span>" +
+          preco +
+        "</button>"
+      );
+    }).join("");
+  }
+
+  // ---------- Comanda ----------
+
+  function renderTicket(flashId) {
+    var box = $("items");
+
+    if (!state.itens.length) {
+      box.innerHTML =
+        '<div class="ticket-empty">' +
+          "<strong>Comanda vazia</strong>" +
+          "<span>Toque nos produtos do cardápio para lançar o pedido.</span>" +
+        "</div>";
+    } else {
+      box.innerHTML = state.itens.map(function (i) {
+        return (
+          '<div class="item' + (i.id === flashId ? " item-flash" : "") + '">' +
+            '<div><div class="nm">' + i.nome + "</div>" +
+            '<div class="unit">' + money(i.preco) + " un" + "</div></div>" +
+            '<div class="amt">' + money(i.preco * i.qtd) + "</div>" +
+            '<div class="stepper">' +
+              '<button type="button" data-dec="' + i.id + '" aria-label="Diminuir ' + i.nome + '">−</button>' +
+              '<span class="n">' + i.qtd + "</span>" +
+              '<button type="button" data-inc="' + i.id + '" aria-label="Aumentar ' + i.nome + '">+</button>' +
+            "</div>" +
+          "</div>"
+        );
+      }).join("");
+    }
+
+    var qtdTotal = state.itens.reduce(function (s, i) { return s + i.qtd; }, 0);
+
+    $("ticket-title").textContent = state.modo + " · Pedido #" + state.pedido;
+    $("ticket-sub").textContent = qtdTotal
+      ? qtdTotal + (qtdTotal === 1 ? " item lançado" : " itens lançados")
+      : "Nenhum item lançado";
+
+    $("t-subtotal").textContent = money(subtotal());
+    $("t-servico").textContent = money(servicoValor());
+    $("t-entrega").textContent = money(entregaValor());
+    $("t-total").textContent = money(total());
+
+    $("row-entrega").hidden = state.modo !== "Delivery";
+    $("row-servico").hidden = state.modo === "Delivery";
+
+    $("finalizar").disabled = !state.itens.length;
+    $("limpar").disabled = !state.itens.length;
+
+    $("m-count").textContent = qtdTotal;
+    $("m-total").textContent = money(total());
+  }
+
+  function renderStats() {
+    $("stat-count").textContent = state.vendas;
+    $("stat-total").textContent = money(state.faturamento);
+  }
+
+  function render(flashId) {
+    renderGrid();
+    renderTicket(flashId);
+  }
+
+  // ---------- Ações da comanda ----------
+
+  function add(id) {
+    var p = PRODUTOS.find(function (x) { return x.id === id; });
+    if (!p || p.semEstoque) return;
+    var it = state.itens.find(function (i) { return i.id === id; });
+    if (it) it.qtd += 1;
+    else state.itens.push({ id: p.id, nome: p.nome, preco: p.preco, qtd: 1 });
+    render(id);
+  }
+
+  function inc(id) {
+    var it = state.itens.find(function (i) { return i.id === id; });
+    if (it) { it.qtd += 1; render(id); }
+  }
+
+  function dec(id) {
+    var idx = state.itens.findIndex(function (i) { return i.id === id; });
+    if (idx === -1) return;
+    state.itens[idx].qtd -= 1;
+    if (state.itens[idx].qtd <= 0) state.itens.splice(idx, 1);
+    render();
+  }
+
+  function limpar() {
+    state.itens = [];
+    state.servico = false;
+    $("servico").checked = false;
+    render();
+  }
+
+  // ---------- Toast ----------
+
+  var toastTimer = null;
+  function toast(msg) {
+    $("toast-msg").textContent = msg;
+    $("toast").setAttribute("data-show", "1");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      $("toast").removeAttribute("data-show");
+    }, 3200);
+  }
+
+  // ---------- Pagamento ----------
+
+  function parseValor(txt) {
+    var s = String(txt).replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
+    var n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function renderQuick() {
+    var t = total();
+    var opcoes = [t];
+    [20, 50, 100, 200].forEach(function (v) {
+      if (v > t && opcoes.indexOf(v) === -1) opcoes.push(v);
+    });
+    opcoes = opcoes.slice(0, 4);
+    $("quick").innerHTML = opcoes.map(function (v, i) {
+      return '<button type="button" data-quick="' + v + '">' +
+        (i === 0 ? "Valor exato" : money(v)) + "</button>";
+    }).join("");
+  }
+
+  function renderTroco() {
+    var dif = state.recebido - total();
+    var el = $("troco");
+    if (dif >= 0) {
+      el.removeAttribute("data-short");
+      el.firstElementChild.textContent = "Troco";
+      $("troco-val").textContent = money(dif);
+    } else {
+      el.setAttribute("data-short", "1");
+      el.firstElementChild.textContent = "Falta receber";
+      $("troco-val").textContent = money(Math.abs(dif));
+    }
+  }
+
+  function abrirPagamento() {
+    if (!state.itens.length) return;
+    state.pagamento = "Dinheiro";
+    state.recebido = 0;
+    $("recebido").value = "";
+    $("pay-total").textContent = money(total());
+    Array.prototype.forEach.call($("pays").children, function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-pay") === "Dinheiro" ? "true" : "false");
+    });
+    $("cash").hidden = false;
+    renderQuick();
+    renderTroco();
+    $("overlay").hidden = false;
+    $("recebido").focus();
+  }
+
+  function fecharPagamento() {
+    $("overlay").hidden = true;
+    $("finalizar").focus();
+  }
+
+  function confirmarPagamento() {
+    if (state.pagamento === "Dinheiro" && state.recebido < total() - 0.001) {
+      toast("Valor recebido é menor que o total.");
+      $("recebido").focus();
+      return;
+    }
+    var t = total();
+    var forma = state.pagamento;
+    state.vendas += 1;
+    state.faturamento += t;
+    state.pedido += 1;
+    limpar();
+    renderStats();
+    fecharPagamento();
+    $("ticket").removeAttribute("data-open");
+    toast("Venda de " + money(t) + " concluída · " + forma);
+  }
+
+  // ---------- Eventos ----------
+
+  $("grid").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-add]");
+    if (btn) add(Number(btn.getAttribute("data-add")));
+  });
+
+  $("items").addEventListener("click", function (e) {
+    var i = e.target.closest("[data-inc]");
+    if (i) { inc(Number(i.getAttribute("data-inc"))); return; }
+    var d = e.target.closest("[data-dec]");
+    if (d) dec(Number(d.getAttribute("data-dec")));
+  });
+
+  $("cats").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-cat]");
+    if (!b) return;
+    state.categoria = b.getAttribute("data-cat");
+    renderCats();
+    renderGrid();
+  });
+
+  document.querySelector(".segmented").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-mode]");
+    if (!b) return;
+    state.modo = b.getAttribute("data-mode");
+    Array.prototype.forEach.call(this.children, function (c) {
+      c.setAttribute("aria-pressed", c === b ? "true" : "false");
+    });
+    if (state.modo === "Delivery") { state.servico = false; $("servico").checked = false; }
+    renderTicket();
+  });
+
+  $("search").addEventListener("input", function () {
+    state.busca = this.value;
+    renderGrid();
+  });
+
+  $("servico").addEventListener("change", function () {
+    state.servico = this.checked;
+    renderTicket();
+  });
+
+  $("limpar").addEventListener("click", function () {
+    limpar();
+    toast("Comanda cancelada.");
+  });
+
+  $("finalizar").addEventListener("click", abrirPagamento);
+  $("pay-cancel").addEventListener("click", fecharPagamento);
+  $("pay-confirm").addEventListener("click", confirmarPagamento);
+
+  $("overlay").addEventListener("click", function (e) {
+    if (e.target === this) fecharPagamento();
+  });
+
+  $("pays").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-pay]");
+    if (!b) return;
+    state.pagamento = b.getAttribute("data-pay");
+    Array.prototype.forEach.call(this.children, function (c) {
+      c.setAttribute("aria-pressed", c === b ? "true" : "false");
+    });
+    $("cash").hidden = state.pagamento !== "Dinheiro";
+  });
+
+  $("recebido").addEventListener("input", function () {
+    state.recebido = parseValor(this.value);
+    renderTroco();
+  });
+
+  $("quick").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-quick]");
+    if (!b) return;
+    state.recebido = Number(b.getAttribute("data-quick"));
+    $("recebido").value = state.recebido.toFixed(2).replace(".", ",");
+    renderTroco();
+  });
+
+  $("open-ticket").addEventListener("click", function () {
+    $("ticket").setAttribute("data-open", "1");
+  });
+  $("close-ticket").addEventListener("click", function () {
+    $("ticket").removeAttribute("data-open");
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      if (!$("overlay").hidden) fecharPagamento();
+      else $("ticket").removeAttribute("data-open");
+    }
+    if (e.key === "Enter" && !$("overlay").hidden) confirmarPagamento();
+  });
+
+  // ---------- Start ----------
+
+  renderCats();
+  renderStats();
+  render();
+})();
+</script>

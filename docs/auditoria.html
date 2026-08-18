@@ -1,0 +1,472 @@
+<title>Auditoria do Núcleo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground:      #F4F6F5;
+    --panel:       #FFFFFF;
+    --panel-2:     #ECEFEE;
+    --line:        #DDE2E0;
+    --line-strong: #C3CBC8;
+    --text:        #161F1C;
+    --text-2:      #4E5955;
+    --text-3:      #79847F;
+    --accent:      #1B7A4B;
+    --accent-soft: #E3F1E9;
+    --ok:          #1F7A45;
+    --ok-soft:     #E4F1E9;
+    --warn:        #A9550B;
+    --warn-soft:   #FAEEDF;
+    --crit:        #B42318;
+    --crit-soft:   #FBE9E7;
+    --display: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --body:    "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono:    "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1413; --panel: #161E1C; --panel-2: #1D2725;
+      --line: #29332F; --line-strong: #3A4642;
+      --text: #E6EDEA; --text-2: #A6B2AE; --text-3: #7D8884;
+      --accent: #3FAF74; --accent-soft: #16301F;
+      --ok: #47B77A; --ok-soft: #14291C;
+      --warn: #E0913D; --warn-soft: #2C2013;
+      --crit: #E5675A; --crit-soft: #321A17;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1413; --panel: #161E1C; --panel-2: #1D2725;
+    --line: #29332F; --line-strong: #3A4642;
+    --text: #E6EDEA; --text-2: #A6B2AE; --text-3: #7D8884;
+    --accent: #3FAF74; --accent-soft: #16301F;
+    --ok: #47B77A; --ok-soft: #14291C;
+    --warn: #E0913D; --warn-soft: #2C2013;
+    --crit: #E5675A; --crit-soft: #321A17;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 22px 90px; }
+
+  header.hd { border-bottom: 2px solid var(--text); padding-bottom: 22px; margin-bottom: 34px; }
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: var(--body);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -.025em;
+    margin: 10px 0 12px;
+    text-wrap: balance;
+  }
+  .lede { font-size: 17px; color: var(--text-2); margin: 0; max-width: 62ch; }
+  .meta {
+    margin-top: 18px;
+    display: flex;
+    gap: 8px 22px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--text-3);
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -.02em;
+    margin: 48px 0 6px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  h2 .n {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--text-3);
+    font-weight: 600;
+    flex: none;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16.5px;
+    letter-spacing: -.01em;
+    margin: 28px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  .sub { color: var(--text-2); margin: 0 0 20px; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  ul, ol { margin: 0 0 16px; padding-left: 20px; }
+  li { margin-bottom: 7px; }
+  li::marker { color: var(--text-3); }
+
+  code {
+    font-family: var(--mono);
+    font-size: .88em;
+    background: var(--panel-2);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .verdict {
+    background: var(--crit-soft);
+    border-left: 3px solid var(--crit);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 20px;
+    margin: 26px 0;
+  }
+  .verdict strong { color: var(--crit); font-family: var(--display); }
+  .verdict p:last-child { margin-bottom: 0; }
+
+  .note {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 19px;
+    margin: 22px 0;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note .t {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    margin: 18px 0 24px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th {
+    text-align: left;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--text-3);
+    font-weight: 600;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+    background: var(--panel-2);
+  }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    font-family: var(--body);
+  }
+  .p-ok   { background: var(--ok-soft);   color: var(--ok); }
+  .p-warn { background: var(--warn-soft); color: var(--warn); }
+  .p-crit { background: var(--crit-soft); color: var(--crit); }
+  .p-mut  { background: var(--panel-2);   color: var(--text-2); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 22px 0 28px; }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .stat .k {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--text-3);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .stat .v {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: -.02em;
+    display: block;
+    line-height: 1;
+  }
+  .stat .d { font-size: 12.5px; color: var(--text-2); display: block; margin-top: 6px; }
+
+  .phases { display: flex; flex-direction: column; gap: 2px; margin: 20px 0 26px; }
+  .phase {
+    display: grid;
+    grid-template-columns: 62px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+  }
+  .phase:first-child { border-radius: 12px 12px 0 0; }
+  .phase:last-child { border-radius: 0 0 12px 12px; }
+  .phase + .phase { border-top: 0; }
+  .phase .id {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+  .phase .ttl { font-family: var(--display); font-weight: 600; font-size: 15px; display: block; }
+  .phase .dsc { font-size: 13.5px; color: var(--text-2); display: block; margin-top: 3px; }
+  .phase .tag { align-self: center; }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 560px) {
+    .phase { grid-template-columns: 1fr; gap: 5px; }
+    .phase .tag { justify-self: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+
+<div class="wrap">
+
+<header class="hd">
+  <span class="eyebrow">Relatório técnico · seção 58 do briefing</span>
+  <h1>Auditoria do projeto atual</h1>
+  <p class="lede">Levantamento factual do que existe hoje, antes de qualquer alteração de código, e o plano de evolução para um ERP SaaS multi-nicho.</p>
+  <div class="meta">
+    <span>Repositório: alexandremarquescoelho-gif/grafista</span>
+    <span>Branch: claude/system-review-edit-4rdm8i</span>
+    <span>Data: 18/08/2026</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <p><strong>Conclusão que muda o enquadramento do trabalho.</strong></p>
+  <p>Não existe, hoje, um sistema a ser evoluído. O repositório contém <strong>um único arquivo</strong> (<code>README.md</code>, 2 linhas). O que foi apresentado nesta sessão são <strong>dois protótipos de interface</strong> criados aqui mesmo, hoje: arquivos HTML autocontidos, sem backend, sem banco, sem autenticação e sem uma única chamada de rede.</p>
+  <p>O briefing pede para "não recriar o projeto do zero". Aplicando isso literalmente, o que há para preservar é o <strong>design system e o modelo de kits de nicho</strong> — não uma aplicação. Praticamente tudo do item 1 ao 62 precisa ser <strong>construído</strong>, não refatorado. Isso não é um problema; é o ponto de partida real, e é melhor saber agora.</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><span class="k">Arquivos no repo</span><span class="v">1</span><span class="d">apenas README.md</span></div>
+  <div class="stat"><span class="k">Linhas de aplicação</span><span class="v">2.322</span><span class="d">HTML+CSS+JS, protótipo</span></div>
+  <div class="stat"><span class="k">Chamadas de rede</span><span class="v">0</span><span class="d">fetch / XHR / websocket</span></div>
+  <div class="stat"><span class="k">Persistência</span><span class="v">0</span><span class="d">nada sobrevive ao F5</span></div>
+</div>
+
+<h2><span class="n">01</span> Arquitetura atual</h2>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Camada</th><th>Situação real</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td><strong>Stack</strong></td><td>HTML5 + CSS puro + JavaScript ES5 em arquivo único. Sem framework, sem build, sem gerenciador de pacotes, sem TypeScript.</td><td><span class="pill p-warn">Protótipo</span></td></tr>
+<tr><td><strong>Backend</strong></td><td>Inexistente. Nenhum servidor, nenhuma função serverless, nenhum processo.</td><td><span class="pill p-crit">Ausente</span></td></tr>
+<tr><td><strong>Banco de dados</strong></td><td>Inexistente. O estado vive em variáveis JavaScript na memória da aba do navegador.</td><td><span class="pill p-crit">Ausente</span></td></tr>
+<tr><td><strong>Rotas</strong></td><td>Não há roteamento. A troca de módulo reescreve <code>innerHTML</code>. Sem URL própria, sem histórico, sem deep link, sem F5 seguro.</td><td><span class="pill p-crit">Ausente</span></td></tr>
+<tr><td><strong>Autenticação</strong></td><td>Inexistente. Não há login, sessão, usuário, papel ou permissão.</td><td><span class="pill p-crit">Ausente</span></td></tr>
+<tr><td><strong>Multi-tenant</strong></td><td>Inexistente. Não há conceito de empresa, filial ou <code>tenant_id</code>.</td><td><span class="pill p-crit">Ausente</span></td></tr>
+<tr><td><strong>APIs</strong></td><td>Nenhuma API própria e nenhum consumo de API externa.</td><td><span class="pill p-crit">Ausente</span></td></tr>
+<tr><td><strong>Integrações</strong></td><td>Nenhuma. Fiscal, contábil, WhatsApp, Meta, Google, marketplaces: nada iniciado.</td><td><span class="pill p-crit">Ausente</span></td></tr>
+<tr><td><strong>Design system</strong></td><td>Tokens CSS completos, tipografia em 3 papéis, tema claro/escuro nos três estados, foco visível, <code>prefers-reduced-motion</code>.</td><td><span class="pill p-ok">Sólido</span></td></tr>
+<tr><td><strong>Responsividade</strong></td><td>Real e testável: quebras em 1080px e 900px, comanda vira gaveta no celular, navegação lateral vira barra rolável.</td><td><span class="pill p-ok">Sólido</span></td></tr>
+<tr><td><strong>Modelo multi-nicho</strong></td><td>Abstração <code>VERTICAIS[]</code> + <code>PEDE{}</code>: um nicho é um objeto de configuração que altera terminologia, modos, campos e regras sem tocar no núcleo.</td><td><span class="pill p-ok">Boa base</span></td></tr>
+</tbody>
+</table></div>
+
+<h3>Sobre o sistema legado (G3 SmallBusiness Food)</h3>
+<p>O sistema anterior <strong>não pôde ser auditado</strong>: o material disponível na pasta <code>C:\G3 Soft\small</code> é composto exclusivamente de binários compilados (<code>.dll</code>, <code>.exe</code>, <code>.config</code>) de uma aplicação .NET. Não há código-fonte (<code>.cs</code>, <code>.sln</code>, <code>.csproj</code>), o que impede análise de arquitetura, rotas, regras de negócio ou segurança.</p>
+<p>Ele permanece valioso por dois motivos, e ambos entram no plano: é a <strong>melhor fonte de requisitos reais</strong> (o que a operação de fato usa) e sua <strong>base MySQL contém os dados históricos</strong> — produtos, clientes, vendas — que deverão ser migrados. Recuperar o código-fonte com o programador anterior continua sendo a ação de maior retorno disponível.</p>
+
+<h2><span class="n">02</span> Problemas encontrados</h2>
+
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>Problema</th><th>Impacto</th><th>Gravidade</th></tr></thead>
+<tbody>
+<tr><td class="num">P1</td><td><strong>Perda total de dados a cada recarga.</strong> Vendas, estoque e faturamento existem só em memória.</td><td>Impede qualquer uso real. Uma queda de energia apaga o dia.</td><td><span class="pill p-crit">Crítico</span></td></tr>
+<tr><td class="num">P2</td><td><strong>Ausência de isolamento entre clientes.</strong> Sem <code>tenant_id</code>, sem RLS, sem policies.</td><td>Bloqueia a comercialização como SaaS. Risco de vazamento entre empresas.</td><td><span class="pill p-crit">Crítico</span></td></tr>
+<tr><td class="num">P3</td><td><strong>Nenhum controle de acesso.</strong> Qualquer pessoa com o link opera o sistema inteiro.</td><td>Incompatível com os 13 perfis exigidos e com a LGPD.</td><td><span class="pill p-crit">Crítico</span></td></tr>
+<tr><td class="num">P4</td><td><strong>100% dos dados são fixos no código.</strong> Catálogos, clientes, financeiro e histórico de 7 dias são gerados por semente determinística.</td><td>Nada é cadastrável de verdade; nenhum número é real.</td><td><span class="pill p-crit">Crítico</span></td></tr>
+<tr><td class="num">P5</td><td><strong>Renderização por concatenação em <code>innerHTML</code></strong> — 19 pontos no núcleo.</td><td>Hoje mitigado pela função <code>esc()</code>, mas é o padrão clássico de XSS assim que entrar dado de usuário. Não escala como arquitetura de UI.</td><td><span class="pill p-warn">Alto</span></td></tr>
+<tr><td class="num">P6</td><td><strong>Ausência total de testes</strong> e de qualquer verificação automatizada.</td><td>Regressão silenciosa garantida em qualquer evolução.</td><td><span class="pill p-warn">Alto</span></td></tr>
+<tr><td class="num">P7</td><td><strong>Estado global mutável</strong> compartilhado entre módulos, com re-render manual.</td><td>Fonte previsível de bugs de sincronização conforme o sistema cresce.</td><td><span class="pill p-warn">Alto</span></td></tr>
+<tr><td class="num">P8</td><td><strong>Estoque por unidade simples.</strong> Vender 1 item baixa 1 unidade; não há insumo, ficha técnica nem conversão de unidade.</td><td>Não atende ao item 7 do briefing, que é declaradamente uma das partes mais importantes.</td><td><span class="pill p-warn">Alto</span></td></tr>
+<tr><td class="num">P9</td><td><strong>Zero tratamento fiscal.</strong> Não há NCM, CFOP, CST/CSOSN, origem, regime nem motor de regras.</td><td>Impede venda legal do produto no Brasil.</td><td><span class="pill p-warn">Alto</span></td></tr>
+<tr><td class="num">P10</td><td><strong>Sem auditoria, sem log, sem backup.</strong></td><td>Impossível investigar divergência de caixa ou alteração de preço.</td><td><span class="pill p-warn">Alto</span></td></tr>
+<tr><td class="num">P11</td><td><strong>Sem trilha de erro para o usuário.</strong> Não há estados de carregamento, falha ou reconexão.</td><td>Qualquer indisponibilidade futura vira tela quebrada.</td><td><span class="pill p-mut">Médio</span></td></tr>
+<tr><td class="num">P12</td><td><strong>Sem PWA nem modo offline.</strong> Não há manifest nem service worker.</td><td>Itens 41 e 42 não iniciados; PDV para de vender se a internet cair.</td><td><span class="pill p-mut">Médio</span></td></tr>
+</tbody>
+</table></div>
+
+<div class="note">
+  <span class="t">Um ponto a favor da base atual</span>
+  <p>Nenhum segredo, chave ou token foi exposto — simplesmente porque não há integração alguma. A regra "nunca colocar <code>API_KEY</code> no frontend" começa, portanto, sem dívida acumulada. É mais fácil acertar isso desde a primeira linha do backend do que corrigir depois.</p>
+</div>
+
+<h2><span class="n">03</span> Funcionalidades existentes</h2>
+
+<p class="sub">O que de fato funciona hoje, verificado em execução — com a ressalva de que tudo opera sobre dados em memória.</p>
+
+<ul>
+<li><strong>Núcleo único com 9 kits de nicho</strong> — Food, Mercado, Moda, Farmácia, Autopeças, Petshop, Beleza, Distribuidora e Construção, trocáveis em tempo real, incluindo identidade visual por nicho (white-label).</li>
+<li><strong>PDV adaptativo</strong> — busca sem acento, categorias, modos de atendimento por nicho, quantidade, desconto (0/5/10%), taxa de serviço, taxa de entrega e comissão de profissional.</li>
+<li><strong>Campos especiais por nicho</strong> — grade tamanho/cor (moda), peso em kg (mercado, agro), metragem em m² (construção), lote e validade (farmácia), aplicação veicular (autopeças), dados do pet, profissional responsável e observação de cozinha.</li>
+<li><strong>Fechamento de venda</strong> — dinheiro, cartão, Pix e a prazo, com cálculo de troco e bloqueio de valor insuficiente.</li>
+<li><strong>Baixa de estoque na venda</strong> e destaque de itens em nível de reposição.</li>
+<li><strong>Painel</strong> com 4 indicadores, gráfico de 7 dias com tooltip e alternativa em tabela, e ranking de mais vendidos.</li>
+<li><strong>Catálogo, Estoque, Clientes e Financeiro</strong> navegáveis, com edição de preço e ajuste de saldo.</li>
+<li><strong>Acessibilidade e responsividade</strong> — foco visível, <code>aria-live</code> no total, rótulos em botões de ícone, tema claro/escuro correto nos três estados do visualizador.</li>
+</ul>
+
+<h2><span class="n">04</span> Funcionalidades faltantes</h2>
+
+<p class="sub">Mapeadas contra os 62 itens do briefing. "Não iniciado" significa que não existe nem estrutura.</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Bloco do briefing</th><th>Situação</th></tr></thead>
+<tbody>
+<tr><td>2–3 · Multi-tenant, filiais, 13 perfis de acesso</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>4 · Dashboard completo (lucro, margem, CMV, impostos, períodos)</td><td><span class="pill p-warn">Parcial — 4 de ~25 indicadores</span></td></tr>
+<tr><td>5 · PDV: código de barras, foto, acréscimo, cliente, pagamento dividido</td><td><span class="pill p-warn">Parcial</span></td></tr>
+<tr><td>6 · Mesas, comandas, status de pedido, KDS de cozinha</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>7–11 · Ficha técnica, insumos, conversão de unidades, movimentações, alertas, previsão de ruptura</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>12–13 · Fornecedores e pedidos de compra</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>14–15 · Entrada de XML/DANFE, OCR, conferência de nota</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>16–17 · Motor fiscal configurável, versionamento de regras, IBS/CBS/IS</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>18–19, 52 · Central e API do contador, contador como usuário</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>20 · Financeiro real: fluxo de caixa, DRE, CMV, conciliação</td><td><span class="pill p-warn">Parcial — só listagem</span></td></tr>
+<tr><td>21–22 · Cadastro completo de clientes, segmentação, CRM e funil</td><td><span class="pill p-warn">Parcial — só listagem</span></td></tr>
+<tr><td>23–26 · Marketing, Meta, Google Ads, WhatsApp</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>27–29 · Marketplaces, central omnichannel, estoque compartilhado</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>30–33 · Monitoramento, auditoria, backup</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>34–35 · Segurança e LGPD</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>36–39 · Relatórios, consumo de insumos, custo real, precificação</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>41–42 · PWA e modo offline</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>43–45 · Onboarding e importação de planilhas</td><td><span class="pill p-warn">Parcial — troca de nicho existe</span></td></tr>
+<tr><td>46–48 · API pública, webhooks, fila de jobs</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>54–55 · Planos, feature flags, multi-filial</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+<tr><td>57 · Testes automatizados</td><td><span class="pill p-crit">Não iniciado</span></td></tr>
+</tbody>
+</table></div>
+
+<h2><span class="n">05</span> Banco de dados</h2>
+
+<p><strong>Não existe.</strong> Não há schema, migration, ORM, string de conexão ou arquivo <code>.sql</code> no projeto. O "banco" atual são três objetos JavaScript: <code>produtos[]</code>, <code>estoque{}</code> e <code>state{}</code>.</p>
+
+<p>Consequência direta: <strong>o item 59 do briefing ("não quebrar banco existente", "não alterar schema sem migration") não se aplica</strong> — não há schema a preservar. Isso é, na prática, uma vantagem: o modelo de dados pode nascer já multi-tenant, auditado e versionado, sem carregar decisões erradas de um sistema anterior.</p>
+
+<p>O banco que <em>existe de verdade</em> é o <strong>MySQL do G3 legado</strong>, em produção na loja. Ele não é o banco deste projeto, mas é a <strong>fonte da migração de dados</strong> e deve ser tratado como somente-leitura até que a migração seja validada.</p>
+
+<h2><span class="n">06</span> Integrações</h2>
+
+<p>Nenhuma integração existe, está configurada ou está simulada. Verificado por varredura: <strong>zero</strong> ocorrências de <code>fetch</code>, <code>XMLHttpRequest</code>, WebSocket ou service worker nos dois protótipos.</p>
+
+<p>Registrando o compromisso do item 50 do briefing, que passa a valer daqui em diante: nenhuma tela exibirá "conectado" sem conexão real, e nenhuma integração será representada por dado falso. Onde faltar credencial, a entrega será o <strong>adapter real mais a tela de configuração</strong>, com o estado honesto de "não conectado".</p>
+
+<h2><span class="n">07</span> Dívida técnica e o que preservar</h2>
+
+<h3>Preservar</h3>
+<ul>
+<li><strong>Design system inteiro</strong> — tokens, escala tipográfica, tema triplo, responsividade. É a identidade visual que o briefing manda não destruir (item 49).</li>
+<li><strong>Modelo de kits de nicho</strong> — a abstração está correta e deve virar tabela no banco (<code>verticals</code> + <code>vertical_fields</code>), não código.</li>
+<li><strong>Fluxos de PDV já validados</strong> — sequência de lançamento, comanda, pagamento e troco.</li>
+<li><strong>Catálogos por nicho</strong> — viram dados de <em>seed</em> para demonstração e onboarding, jamais dados de produção.</li>
+</ul>
+
+<h3>Refatorar</h3>
+<ul>
+<li>Renderização por <code>innerHTML</code> → componentes com escape automático.</li>
+<li>Estado global mutável → store tipado com origem única de verdade.</li>
+<li>Arquivo único → módulos, build e TypeScript.</li>
+</ul>
+
+<h3>Criar do zero</h3>
+<p>Backend, banco, autenticação, multi-tenant, permissões, ficha técnica, compras, fiscal, financeiro real, integrações, API, webhooks, jobs, auditoria, PWA e testes.</p>
+
+<h2><span class="n">08</span> Plano de implementação</h2>
+
+<p class="sub">Ordem ditada por dependência técnica: cada fase só é possível depois da anterior. As três primeiras não produzem tela nova — produzem a fundação sem a qual todo o resto seria retrabalho.</p>
+
+<div class="phases">
+  <div class="phase"><span class="id">FASE 0</span><span><span class="ttl">Decisões e fundação</span><span class="dsc">Escolha de stack e infraestrutura, repositório estruturado, CI, ambientes de desenvolvimento e homologação.</span></span><span class="tag"><span class="pill p-mut">Bloqueia tudo</span></span></div>
+  <div class="phase"><span class="id">FASE 1</span><span><span class="ttl">Banco, multi-tenant e segurança</span><span class="dsc">Schema com <code>tenant_id</code>, Row Level Security, migrations versionadas, auditoria e backup desde o primeiro dia.</span></span><span class="tag"><span class="pill p-crit">Crítico</span></span></div>
+  <div class="phase"><span class="id">FASE 2</span><span><span class="ttl">Autenticação e permissões</span><span class="dsc">Login, sessão, convite de usuário, 13 perfis, matriz de permissões granular, MFA.</span></span><span class="tag"><span class="pill p-crit">Crítico</span></span></div>
+  <div class="phase"><span class="id">FASE 3</span><span><span class="ttl">Cadastros e configuração de nicho</span><span class="dsc">Empresa, filiais, produtos, serviços, unidades, clientes, fornecedores. Kits de nicho migram para o banco. Onboarding e importação de planilha.</span></span><span class="tag"><span class="pill p-mut">Base</span></span></div>
+  <div class="phase"><span class="id">FASE 4</span><span><span class="ttl">Estoque inteligente</span><span class="dsc">Ficha técnica, insumos, conversão de unidades, movimentações com histórico, alertas, previsão de ruptura, custo real.</span></span><span class="tag"><span class="pill p-warn">Alto valor</span></span></div>
+  <div class="phase"><span class="id">FASE 5</span><span><span class="ttl">PDV em produção</span><span class="dsc">O protótipo atual conectado ao backend: venda real, pagamento dividido, comandas, mesas, KDS, PWA e fila offline.</span></span><span class="tag"><span class="pill p-warn">Alto valor</span></span></div>
+  <div class="phase"><span class="id">FASE 6</span><span><span class="ttl">Compras e financeiro</span><span class="dsc">Fornecedores, pedidos de compra, entrada por XML, contas a pagar e receber, fluxo de caixa, DRE, CMV e margem.</span></span><span class="tag"><span class="pill p-mut">Gestão</span></span></div>
+  <div class="phase"><span class="id">FASE 7</span><span><span class="ttl">Motor fiscal</span><span class="dsc">Tabela versionada de regras com vigência, NCM, CFOP, CST/CSOSN, preparo para IBS/CBS/IS e emissão via provedor homologado.</span></span><span class="tag"><span class="pill p-crit">Especialista</span></span></div>
+  <div class="phase"><span class="id">FASE 8</span><span><span class="ttl">Contador e relatórios</span><span class="dsc">Central do contador, pacote mensal, contador como usuário restrito, central de relatórios com exportação.</span></span><span class="tag"><span class="pill p-mut">Gestão</span></span></div>
+  <div class="phase"><span class="id">FASE 9</span><span><span class="ttl">Integrações externas</span><span class="dsc">Camada de adapters, fila de jobs, webhooks, API pública. Depois: WhatsApp, Meta, Google, iFood, Mercado Livre, Shopee.</span></span><span class="tag"><span class="pill p-mut">Expansão</span></span></div>
+  <div class="phase"><span class="id">FASE 10</span><span><span class="ttl">SaaS comercial</span><span class="dsc">Planos, feature flags, monitoramento, central de alertas, LGPD, manuais e checklists de produção.</span></span><span class="tag"><span class="pill p-mut">Comercial</span></span></div>
+</div>
+
+<div class="note">
+  <span class="t">Corte sugerido para o primeiro produto vendável</span>
+  <p>As fases 0 a 6 já formam um ERP que se vende: multi-tenant seguro, cadastros, estoque com ficha técnica, PDV real e financeiro. O fiscal (fase 7) é o que separa "vendável" de "obrigatório no Brasil" — e é a fase que exige um contador ao lado, não só programação. Marketing e marketplaces (fase 9) são diferenciais competitivos, não pré-requisitos.</p>
+</div>
+
+<h2><span class="n">09</span> Riscos declarados</h2>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Risco</th><th>Como será tratado</th></tr></thead>
+<tbody>
+<tr><td><strong>Dimensão do escopo.</strong> Os 62 itens descrevem um produto de porte equivalente a ERPs com equipes dedicadas e anos de estrada.</td><td>Entrega por fases, cada uma utilizável em produção por si só. Nenhuma fase depende de todas as outras estarem prontas.</td></tr>
+<tr><td><strong>Regras fiscais.</strong> Errar tributação gera passivo legal para o cliente final.</td><td>Nenhuma regra será inventada. Motor configurável, fonte oficial registrada em cada regra e marcação explícita de "validação pelo contador necessária".</td></tr>
+<tr><td><strong>Reforma Tributária.</strong> 2026 é período de transição, com leiautes e notas técnicas em atualização.</td><td>Regras versionadas com vigência desde a fase 1 do fiscal — atualizar é inserir linha, nunca reprogramar.</td></tr>
+<tr><td><strong>APIs de terceiros.</strong> iFood, Meta, Google e Mercado Livre exigem aprovação, conta business e credenciais do titular.</td><td>Adapter e tela de configuração entregues primeiro; conexão real só após o titular fornecer as credenciais. Status honesto sempre.</td></tr>
+<tr><td><strong>Migração do G3 legado.</strong> Dados históricos em MySQL de produção.</td><td>Acesso somente-leitura, migração validada em homologação e conferida item a item antes de qualquer virada.</td></tr>
+</tbody>
+</table></div>
+
+<h2><span class="n">10</span> Próximo passo</h2>
+
+<p>A auditoria está fechada e <strong>nenhuma linha do projeto foi alterada</strong> — os dois protótipos permanecem como estavam.</p>
+
+<p>A Fase 0 depende de três decisões que são do proprietário, não do arquiteto, porque envolvem custo recorrente, propriedade da infraestrutura e onde o sistema roda. Elas estão detalhadas na conversa. Definidas essas três, a Fase 1 começa e passa a haver código de produção neste repositório.</p>
+
+<footer>
+  Auditoria conduzida sobre o estado do repositório em 18/08/2026, sem alteração de código. Métricas obtidas por inspeção direta dos arquivos e varredura de padrões.
+</footer>
+
+</div>
