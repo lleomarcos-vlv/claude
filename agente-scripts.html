@@ -1,0 +1,1388 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agente de Scripts — gerador automático</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --line:#2a3240;
+    --txt:#e6edf3; --dim:#9aa7b4; --accent:#4f9cf9; --accent2:#37d39a;
+    --warn:#f2b544; --err:#ff6b6b; --radius:10px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+         padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{font-size:17px;margin:0;font-weight:650}
+  header .tag{font-size:12px;color:var(--dim);border:1px solid var(--line);
+              padding:2px 8px;border-radius:99px}
+  .layout{display:grid;grid-template-columns:320px 1fr;gap:18px;padding:18px;
+          align-items:start;max-width:1500px;margin:0 auto}
+  @media (max-width:920px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;
+           color:var(--dim);margin:0 0 10px}
+  label{display:block;font-size:12px;color:var(--dim);margin:10px 0 4px}
+  select,input,textarea{width:100%;background:var(--panel2);color:var(--txt);
+    border:1px solid var(--line);border-radius:8px;padding:9px 10px;font:inherit;outline:none}
+  select:focus,input:focus,textarea:focus{border-color:var(--accent)}
+  textarea{resize:vertical;min-height:96px}
+  button{background:var(--accent);color:#06121f;border:0;border-radius:8px;
+         padding:10px 14px;font:inherit;font-weight:650;cursor:pointer}
+  button:hover{filter:brightness(1.08)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500}
+  button.small{padding:6px 10px;font-size:13px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .hint{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.45}
+  .hint a{color:var(--accent)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;
+        padding:5px 11px;font-size:12.5px;cursor:pointer;color:var(--dim)}
+  .chip:hover{border-color:var(--accent);color:var(--txt)}
+  .main{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .status{font-size:13px;color:var(--dim);min-height:20px}
+  .status.err{color:var(--err)}
+  .status.ok{color:var(--accent2)}
+  pre{margin:0;background:#0b0f16;border:1px solid var(--line);border-radius:8px;
+      padding:14px;overflow:auto;max-height:60vh;font-family:var(--mono);font-size:13px;line-height:1.55}
+  code{font-family:var(--mono)}
+  .codehead{display:flex;justify-content:space-between;align-items:center;gap:8px;
+            flex-wrap:wrap;margin-bottom:8px}
+  .codehead .fname{font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+  .explica h3{font-size:14px;margin:14px 0 6px}
+  .explica p{margin:6px 0}
+  .explica ul{margin:6px 0;padding-left:20px}
+  .explica code{background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:12.5px}
+  .hist{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow:auto}
+  .hist button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    text-align:left;font-weight:400;font-size:13px;padding:8px 10px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  .hidden{display:none}
+  .out{font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;background:#0b0f16;
+       border:1px solid var(--line);border-radius:8px;padding:12px;max-height:240px;overflow:auto}
+  .badge{font-size:11px;padding:2px 7px;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
+  .cursor::after{content:"▌";color:var(--accent);animation:b .9s steps(2) infinite}
+  @keyframes b{50%{opacity:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🤖 Agente de Scripts</h1>
+  <span class="tag">arquivo único · roda no navegador</span>
+  <span class="tag" id="modo-atual">modo: offline</span>
+</header>
+
+<div class="layout">
+
+  <!-- ===================== COLUNA DE CONFIGURAÇÃO ===================== -->
+  <aside style="display:flex;flex-direction:column;gap:14px">
+
+    <section class="card">
+      <h2>Motor do agente</h2>
+
+      <label for="provider">Provedor</label>
+      <select id="provider">
+        <option value="local">Offline — modelos de script prontos (sem chave)</option>
+        <option value="gemini">Google Gemini — camada gratuita</option>
+        <option value="groq">Groq — camada gratuita</option>
+        <option value="openrouter">OpenRouter — modelos :free</option>
+      </select>
+
+      <label for="model">Modelo</label>
+      <select id="model"></select>
+
+      <div id="box-chave">
+        <label for="apikey">Chave de API</label>
+        <input id="apikey" type="password" placeholder="cole a chave aqui" autocomplete="off">
+        <div class="row" style="margin-top:8px">
+          <button class="ghost small" id="btn-salvar-chave">Salvar no navegador</button>
+          <button class="ghost small" id="btn-limpar-chave">Apagar chave</button>
+        </div>
+        <p class="hint" id="hint-chave"></p>
+      </div>
+
+      <p class="hint" id="hint-local">
+        O modo offline não usa internet nem chave: ele monta o script a partir de modelos
+        embutidos (backup, renomear em lote, organizar pastas, CSV→JSON, consumir API,
+        limpeza por idade, monitorar site). Para pedidos livres, escolha um provedor.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Saída</h2>
+      <label for="lang">Linguagem do script</label>
+      <select id="lang">
+        <option value="bash">Bash (.sh)</option>
+        <option value="python">Python (.py)</option>
+        <option value="javascript">JavaScript / Node (.js)</option>
+        <option value="powershell">PowerShell (.ps1)</option>
+        <option value="sql">SQL (.sql)</option>
+        <option value="html">HTML (.html)</option>
+      </select>
+
+      <label for="nivel">Estilo</label>
+      <select id="nivel">
+        <option value="pronto">Pronto para produção (erros + argumentos + log)</option>
+        <option value="simples">Mais curto e direto possível</option>
+        <option value="comentado">Didático, muito comentado</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h2>Histórico</h2>
+      <div class="hist" id="hist"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="ghost small" id="btn-limpar-hist">Limpar histórico</button>
+      </div>
+    </section>
+  </aside>
+
+  <!-- ===================== COLUNA PRINCIPAL ===================== -->
+  <main class="main">
+
+    <section class="card">
+      <h2>O que o script precisa fazer?</h2>
+      <textarea id="pedido" placeholder="Ex.: um script que percorre uma pasta, acha todas as fotos com mais de 2 anos, comprime em .zip por ano e move para uma pasta de arquivo morto"></textarea>
+      <div class="chips" id="exemplos"></div>
+      <div class="row" style="margin-top:12px">
+        <button id="btn-gerar">Gerar script</button>
+        <button class="ghost" id="btn-parar" disabled>Parar</button>
+        <button class="ghost" id="btn-nova">Nova tarefa</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+
+    <section class="card hidden" id="painel-codigo">
+      <div class="codehead">
+        <div class="row" style="align-items:center">
+          <h2 style="margin:0">Script gerado</h2>
+          <span class="fname" id="nome-arquivo">script.sh</span>
+          <span class="badge" id="badge-origem"></span>
+        </div>
+        <div class="row">
+          <button class="ghost small" id="btn-copiar">Copiar</button>
+          <button class="ghost small" id="btn-baixar">Baixar</button>
+          <button class="ghost small hidden" id="btn-rodar">Rodar aqui (JS)</button>
+        </div>
+      </div>
+      <pre><code id="codigo"></code></pre>
+
+      <div id="painel-exec" class="hidden">
+        <label>Saída da execução (sandbox isolado)</label>
+        <div class="out" id="saida-exec"></div>
+      </div>
+
+      <div class="explica" id="explicacao"></div>
+
+      <div id="box-ajuste">
+        <label for="ajuste">Pedir ajuste (o agente lembra do script acima)</label>
+        <input id="ajuste" placeholder="Ex.: adiciona um modo --dry-run e log em arquivo">
+        <div class="row" style="margin-top:8px">
+          <button class="small" id="btn-ajustar">Aplicar ajuste</button>
+          <button class="ghost small" id="btn-erro">Colar erro e corrigir</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Como isso funciona</h2>
+      <p class="hint">
+        Este arquivo é um agente completo em HTML+JS puro: sem servidor, sem build, sem dependência.
+        Ele monta o prompt de sistema, conversa com a API do provedor escolhido direto do navegador
+        (streaming), separa o bloco de código da explicação, e mantém o contexto para você pedir
+        ajustes em cima do mesmo script. A chave de API fica só no <code>localStorage</code> da sua
+        máquina — nunca é enviada para outro lugar além do provedor. Use chave pessoal e não publique
+        este arquivo com a chave preenchida.
+      </p>
+    </section>
+  </main>
+</div>
+
+<iframe id="sandbox" class="hidden" sandbox="allow-scripts"></iframe>
+
+<script>
+/* =====================================================================
+   Agente de Scripts — núcleo
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+
+const PROVEDORES = {
+  local: {
+    rotulo: 'Offline (modelos embutidos)',
+    precisaChave: false,
+    modelos: [['templates', 'Modelos embutidos (sem internet)']]
+  },
+  gemini: {
+    rotulo: 'Google Gemini',
+    precisaChave: true,
+    urlChave: 'https://aistudio.google.com/apikey',
+    modelos: [
+      ['gemini-2.0-flash', 'gemini-2.0-flash (rápido, cota generosa)'],
+      ['gemini-2.5-flash', 'gemini-2.5-flash'],
+      ['gemini-2.5-pro', 'gemini-2.5-pro (mais forte, cota menor)']
+    ]
+  },
+  groq: {
+    rotulo: 'Groq',
+    precisaChave: true,
+    urlChave: 'https://console.groq.com/keys',
+    modelos: [
+      ['llama-3.3-70b-versatile', 'llama-3.3-70b (bom para código)'],
+      ['llama-3.1-8b-instant', 'llama-3.1-8b (mais rápido)']
+    ]
+  },
+  openrouter: {
+    rotulo: 'OpenRouter',
+    precisaChave: true,
+    urlChave: 'https://openrouter.ai/keys',
+    modelos: [
+      ['deepseek/deepseek-chat-v3-0324:free', 'deepseek-chat-v3 :free'],
+      ['qwen/qwen-2.5-coder-32b-instruct:free', 'qwen2.5-coder-32b :free'],
+      ['meta-llama/llama-3.3-70b-instruct:free', 'llama-3.3-70b :free']
+    ]
+  }
+};
+
+const EXT = { bash:'sh', python:'py', javascript:'js', powershell:'ps1', sql:'sql', html:'html' };
+
+const EXEMPLOS = [
+  'Backup diário de uma pasta em .zip, mantendo só os 7 últimos',
+  'Renomear em lote todos os arquivos de uma pasta com data e contador',
+  'Ler um CSV e gerar um JSON agrupado por coluna',
+  'Consumir uma API REST paginada e salvar tudo em arquivo',
+  'Apagar arquivos com mais de 30 dias de uma pasta temporária',
+  'Monitorar se um site está no ar e avisar quando cair',
+  'Organizar a pasta Downloads por tipo de arquivo'
+];
+
+let conversa = [];      // [{role:'user'|'assistant', content}]
+let ultimoCodigo = '';
+let abortador = null;
+
+/* ---------- estado / persistência ---------- */
+const LS = {
+  get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch (e) { return d } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) {} }
+};
+const chaveDe = p => LS.get('ag_key_' + p, '');
+
+/* ---------- UI: montagem inicial ---------- */
+function montarModelos() {
+  const p = $('#provider').value;
+  const sel = $('#model');
+  sel.innerHTML = '';
+  PROVEDORES[p].modelos.forEach(([v, t]) => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = t; sel.appendChild(o);
+  });
+  const salvo = LS.get('ag_model_' + p, '');
+  if (salvo && [...sel.options].some(o => o.value === salvo)) sel.value = salvo;
+
+  const precisa = PROVEDORES[p].precisaChave;
+  $('#box-chave').classList.toggle('hidden', !precisa);
+  $('#hint-local').classList.toggle('hidden', precisa);
+  $('#apikey').value = chaveDe(p);
+  $('#hint-chave').innerHTML = precisa
+    ? 'Pegue uma chave gratuita em <a href="' + PROVEDORES[p].urlChave + '" target="_blank" rel="noopener">' +
+      PROVEDORES[p].urlChave + '</a>. Ela fica salva só neste navegador.'
+    : '';
+  $('#modo-atual').textContent = 'modo: ' + (p === 'local' ? 'offline' : PROVEDORES[p].rotulo);
+  LS.set('ag_provider', p);
+}
+
+function montarExemplos() {
+  const box = $('#exemplos');
+  EXEMPLOS.forEach(txt => {
+    const c = document.createElement('span');
+    c.className = 'chip'; c.textContent = txt;
+    c.onclick = () => { $('#pedido').value = txt; $('#pedido').focus(); };
+    box.appendChild(c);
+  });
+}
+
+function montarHistorico() {
+  const box = $('#hist');
+  const itens = LS.get('ag_hist', []);
+  box.innerHTML = '';
+  if (!itens.length) { box.innerHTML = '<span class="hint">Nada ainda.</span>'; return; }
+  itens.forEach((it, i) => {
+    const b = document.createElement('button');
+    b.textContent = it.pedido.slice(0, 60);
+    b.title = it.pedido + '\n\n(' + it.origem + ')';
+    b.onclick = () => {
+      mostrarCodigo(it.codigo, it.lang, it.origem);
+      renderExplicacao(it.explicacao || '');
+      conversa = it.conversa || [];
+      $('#pedido').value = it.pedido;
+    };
+    box.appendChild(b);
+  });
+}
+
+function salvarHistorico(pedido, codigo, lang, origem, explicacao) {
+  const itens = LS.get('ag_hist', []);
+  itens.unshift({ pedido, codigo, lang, origem, explicacao, conversa, ts: Date.now() });
+  LS.set('ag_hist', itens.slice(0, 25));
+  montarHistorico();
+}
+
+/* ---------- prompts ---------- */
+function promptSistema(lang, nivel) {
+  const estilo = {
+    pronto: 'Código pronto para produção: valida entradas, trata erros, aceita argumentos de linha de comando, escreve mensagens claras de log.',
+    simples: 'O código mais curto e direto que resolve o pedido, sem abstrações desnecessárias.',
+    comentado: 'Código didático, com comentários curtos em português explicando cada etapa.'
+  }[nivel];
+  return [
+    'Você é um agente que escreve scripts sob demanda.',
+    'Linguagem obrigatória da resposta: ' + lang + '.',
+    estilo,
+    'Regras de formato, sempre:',
+    '1. Comece pelo script completo dentro de UM único bloco de código cercado por ```' + lang,
+    '2. O script deve rodar sem edição manual, exceto valores que o usuário obviamente precisa informar (caminhos, chaves), que devem estar no topo como variáveis ou argumentos.',
+    '3. Depois do bloco, escreva as seções "### Requisitos", "### Como usar" e "### Cuidados" em português, curtas.',
+    '4. Nunca invente bibliotecas ou APIs que não existem. Prefira biblioteca padrão.',
+    '5. Nada de operação destrutiva silenciosa: exclusões e sobrescritas exigem confirmação ou modo --dry-run.',
+    'Responda em português do Brasil.'
+  ].join('\n');
+}
+
+/* ---------- chamadas de API (streaming) ---------- */
+async function* lerSSE(res) {
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const linhas = buf.split('\n');
+    buf = linhas.pop();
+    for (const l of linhas) {
+      const t = l.trim();
+      if (!t.startsWith('data:')) continue;
+      const dado = t.slice(5).trim();
+      if (dado === '[DONE]') return;
+      try { yield JSON.parse(dado) } catch (e) {}
+    }
+  }
+}
+
+async function chamarGemini(modelo, chave, sistema, msgs, onTexto, signal) {
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
+              encodeURIComponent(modelo) + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(chave);
+  const corpo = {
+    systemInstruction: { parts: [{ text: sistema }] },
+    contents: msgs.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
+    generationConfig: { temperature: 0.25, maxOutputTokens: 8192 }
+  };
+  const res = await fetch(url, {
+    method: 'POST', signal,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo)
+  });
+  if (!res.ok) throw new Error('Gemini ' + res.status + ': ' + (await res.text()).slice(0, 300));
+  for await (const j of lerSSE(res)) {
+    const partes = j?.candidates?.[0]?.content?.parts || [];
+    for (const p of partes) if (p.text) onTexto(p.text);
+  }
+}
+
+async function chamarOpenAICompat(base, extraHeaders, modelo, chave, sistema, msgs, onTexto, signal) {
+  const res = await fetch(base + '/chat/completions', {
+    method: 'POST', signal,
+    headers: Object.assign({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + chave
+    }, extraHeaders),
+    body: JSON.stringify({
+      model: modelo,
+      temperature: 0.25,
+      stream: true,
+      messages: [{ role: 'system', content: sistema }].concat(msgs)
+    })
+  });
+  if (!res.ok) throw new Error(res.status + ': ' + (await res.text()).slice(0, 300));
+  for await (const j of lerSSE(res)) {
+    const d = j?.choices?.[0]?.delta?.content;
+    if (d) onTexto(d);
+  }
+}
+
+/* =====================================================================
+   MODO OFFLINE — gerador por modelos embutidos
+   ===================================================================== */
+const MODELOS = {
+  backup: {
+    palavras: ['backup', 'compactar', 'zip', 'tar', 'copia de seguranca', 'cópia de segurança', 'arquivar'],
+    titulo: 'Backup compactado com rotação',
+    bash: `#!/usr/bin/env bash
+# Backup compactado de uma pasta, com rotacao das copias antigas.
+# Uso: ./backup.sh <pasta-origem> <pasta-destino> [quantas-manter]
+set -Eeo pipefail
+
+ORIGEM="\${1:?informe a pasta de origem}"
+DESTINO="\${2:?informe a pasta de destino}"
+MANTER="\${3:-7}"
+
+[ -d "$ORIGEM" ]  || { echo "Origem nao existe: $ORIGEM" >&2; exit 1; }
+mkdir -p "$DESTINO"
+
+NOME="$(basename "$ORIGEM")-$(date +%Y%m%d-%H%M%S).tar.gz"
+ALVO="$DESTINO/$NOME"
+
+echo "Compactando $ORIGEM -> $ALVO"
+tar -czf "$ALVO" -C "$(dirname "$ORIGEM")" "$(basename "$ORIGEM")"
+echo "Tamanho: $(du -h "$ALVO" | cut -f1)"
+
+# Rotacao: apaga os backups mais antigos que excedem o limite
+echo "Mantendo os $MANTER backups mais recentes..."
+ls -1t "$DESTINO"/*.tar.gz 2>/dev/null | tail -n +$((MANTER + 1)) | while read -r velho; do
+  echo "  removendo $velho"
+  rm -f -- "$velho"
+done
+
+echo "Backup concluido."`,
+    python: `#!/usr/bin/env python3
+"""Backup compactado de uma pasta, com rotacao das copias antigas."""
+import argparse, shutil, sys
+from datetime import datetime
+from pathlib import Path
+
+def main():
+    p = argparse.ArgumentParser(description="Backup compactado com rotacao")
+    p.add_argument("origem", type=Path)
+    p.add_argument("destino", type=Path)
+    p.add_argument("--manter", type=int, default=7, help="quantos backups preservar")
+    p.add_argument("--dry-run", action="store_true", help="mostra o que faria, sem escrever")
+    a = p.parse_args()
+
+    if not a.origem.is_dir():
+        sys.exit(f"Origem nao existe: {a.origem}")
+    a.destino.mkdir(parents=True, exist_ok=True)
+
+    carimbo = datetime.now().strftime("%Y%m%d-%H%M%S")
+    base = a.destino / f"{a.origem.name}-{carimbo}"
+
+    if a.dry_run:
+        print(f"[dry-run] criaria {base}.zip")
+    else:
+        arquivo = shutil.make_archive(str(base), "zip", root_dir=a.origem)
+        print(f"Criado: {arquivo} ({Path(arquivo).stat().st_size / 1e6:.1f} MB)")
+
+    # rotacao
+    copias = sorted(a.destino.glob(f"{a.origem.name}-*.zip"),
+                    key=lambda f: f.stat().st_mtime, reverse=True)
+    for velho in copias[a.manter:]:
+        print(("[dry-run] removeria " if a.dry_run else "Removendo ") + str(velho))
+        if not a.dry_run:
+            velho.unlink()
+
+if __name__ == "__main__":
+    main()`
+  },
+
+  renomear: {
+    palavras: ['renomear', 'renomeia', 'rename', 'nome dos arquivos', 'em lote'],
+    titulo: 'Renomear arquivos em lote',
+    bash: `#!/usr/bin/env bash
+# Renomeia em lote os arquivos de uma pasta: prefixo + data + contador.
+# Uso: ./renomear.sh <pasta> <prefixo> [--aplicar]
+set -Eeo pipefail
+
+PASTA="\${1:?informe a pasta}"
+PREFIXO="\${2:?informe o prefixo}"
+APLICAR="\${3:-}"
+
+[ -d "$PASTA" ] || { echo "Pasta nao existe: $PASTA" >&2; exit 1; }
+[ "$APLICAR" = "--aplicar" ] || echo "== SIMULACAO (use --aplicar para renomear de verdade) =="
+
+DATA="$(date +%Y%m%d)"
+N=0
+for f in "$PASTA"/*; do
+  [ -f "$f" ] || continue
+  N=$((N + 1))
+  EXT="\${f##*.}"
+  [ "$EXT" = "$f" ] && EXT=""
+  NOVO="$PASTA/$PREFIXO-$DATA-$(printf '%03d' "$N")"
+  [ -n "$EXT" ] && NOVO="$NOVO.$EXT"
+  echo "$f  ->  $NOVO"
+  if [ "$APLICAR" = "--aplicar" ]; then
+    [ -e "$NOVO" ] && { echo "  ja existe, pulando" >&2; continue; }
+    mv -- "$f" "$NOVO"
+  fi
+done
+echo "$N arquivo(s) processado(s)."`,
+    python: `#!/usr/bin/env python3
+"""Renomeia arquivos em lote: prefixo + data + contador. Simula por padrao."""
+import argparse
+from datetime import date
+from pathlib import Path
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("pasta", type=Path)
+    p.add_argument("prefixo")
+    p.add_argument("--ext", default="*", help="filtrar extensao, ex.: jpg")
+    p.add_argument("--aplicar", action="store_true", help="sem isso, apenas simula")
+    a = p.parse_args()
+
+    padrao = "*" if a.ext == "*" else f"*.{a.ext.lstrip('.')}"
+    arquivos = sorted(f for f in a.pasta.glob(padrao) if f.is_file())
+    if not arquivos:
+        print("Nenhum arquivo encontrado.")
+        return
+    if not a.aplicar:
+        print("== SIMULACAO (use --aplicar para renomear) ==")
+
+    hoje = date.today().strftime("%Y%m%d")
+    for i, f in enumerate(arquivos, 1):
+        novo = f.with_name(f"{a.prefixo}-{hoje}-{i:03d}{f.suffix}")
+        if novo.exists():
+            print(f"[pula] ja existe: {novo.name}")
+            continue
+        print(f"{f.name}  ->  {novo.name}")
+        if a.aplicar:
+            f.rename(novo)
+    print(f"{len(arquivos)} arquivo(s).")
+
+if __name__ == "__main__":
+    main()`
+  },
+
+  organizar: {
+    palavras: ['organizar', 'organiza', 'separar por', 'por tipo', 'por extensao', 'por extensão', 'downloads'],
+    titulo: 'Organizar pasta por tipo de arquivo',
+    bash: `#!/usr/bin/env bash
+# Organiza uma pasta movendo arquivos para subpastas por extensao.
+# Uso: ./organizar.sh <pasta> [--aplicar]
+set -Eeo pipefail
+
+PASTA="\${1:?informe a pasta}"
+APLICAR="\${2:-}"
+[ -d "$PASTA" ] || { echo "Pasta nao existe: $PASTA" >&2; exit 1; }
+[ "$APLICAR" = "--aplicar" ] || echo "== SIMULACAO (use --aplicar) =="
+
+for f in "$PASTA"/*; do
+  [ -f "$f" ] || continue
+  EXT="\${f##*.}"
+  case "$EXT" in
+    "$f") DEST="sem-extensao" ;;
+    jpg|jpeg|png|gif|webp|heic) DEST="imagens" ;;
+    pdf|doc|docx|txt|odt|md)    DEST="documentos" ;;
+    xls|xlsx|csv|ods)           DEST="planilhas" ;;
+    zip|tar|gz|rar|7z)          DEST="compactados" ;;
+    mp4|mov|mkv|avi)            DEST="videos" ;;
+    mp3|wav|flac|m4a)           DEST="audio" ;;
+    *)                          DEST="outros" ;;
+  esac
+  echo "$(basename "$f")  ->  $DEST/"
+  if [ "$APLICAR" = "--aplicar" ]; then
+    mkdir -p "$PASTA/$DEST"
+    mv -n -- "$f" "$PASTA/$DEST/"
+  fi
+done
+echo "Pronto."`,
+    python: `#!/usr/bin/env python3
+"""Organiza uma pasta movendo arquivos para subpastas por categoria."""
+import argparse, shutil
+from pathlib import Path
+
+CATEGORIAS = {
+    "imagens":     {".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic"},
+    "documentos":  {".pdf", ".doc", ".docx", ".txt", ".odt", ".md"},
+    "planilhas":   {".xls", ".xlsx", ".csv", ".ods"},
+    "compactados": {".zip", ".tar", ".gz", ".rar", ".7z"},
+    "videos":      {".mp4", ".mov", ".mkv", ".avi"},
+    "audio":       {".mp3", ".wav", ".flac", ".m4a"},
+}
+
+def categoria(sufixo):
+    s = sufixo.lower()
+    for nome, exts in CATEGORIAS.items():
+        if s in exts:
+            return nome
+    return "outros" if s else "sem-extensao"
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("pasta", type=Path)
+    p.add_argument("--aplicar", action="store_true", help="sem isso, apenas simula")
+    a = p.parse_args()
+
+    if not a.aplicar:
+        print("== SIMULACAO (use --aplicar) ==")
+    movidos = 0
+    for f in a.pasta.iterdir():
+        if not f.is_file():
+            continue
+        destino = a.pasta / categoria(f.suffix)
+        print(f"{f.name}  ->  {destino.name}/")
+        if a.aplicar:
+            destino.mkdir(exist_ok=True)
+            alvo = destino / f.name
+            if alvo.exists():
+                print("  [pula] ja existe no destino")
+                continue
+            shutil.move(str(f), str(alvo))
+        movidos += 1
+    print(f"{movidos} arquivo(s).")
+
+if __name__ == "__main__":
+    main()`
+  },
+
+  csv: {
+    palavras: ['csv', 'planilha', 'json', 'excel', 'tabela', 'relatorio', 'relatório'],
+    titulo: 'Ler CSV, agrupar e gerar JSON/relatório',
+    bash: `#!/usr/bin/env bash
+# Resumo rapido de um CSV: contagem por coluna escolhida.
+# Uso: ./resumo.sh <arquivo.csv> <numero-da-coluna>
+set -Eeo pipefail
+
+ARQ="\${1:?informe o csv}"
+COL="\${2:-1}"
+[ -f "$ARQ" ] || { echo "Arquivo nao existe: $ARQ" >&2; exit 1; }
+
+echo "Linhas (sem cabecalho): $(($(wc -l < "$ARQ") - 1))"
+echo
+echo "Contagem por coluna $COL:"
+tail -n +2 "$ARQ" | cut -d',' -f"$COL" | sed 's/^"//; s/"$//' \\
+  | sort | uniq -c | sort -rn | head -20 \\
+  | awk '{ qtd=$1; $1=""; sub(/^ /,""); printf "  %-30s %s\\n", $0, qtd }'`,
+    python: `#!/usr/bin/env python3
+"""Le um CSV, agrupa por uma coluna e grava o resultado em JSON.
+
+Atencao: nao salve este arquivo como csv.py — o nome esconde o modulo csv
+da biblioteca padrao e o script quebra. Use agrupar_csv.py, por exemplo.
+"""
+import argparse, csv, json
+from collections import defaultdict
+from pathlib import Path
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("csv_entrada", type=Path)
+    p.add_argument("coluna", help="nome da coluna usada para agrupar")
+    p.add_argument("-o", "--saida", type=Path, default=Path("saida.json"))
+    p.add_argument("--soma", help="coluna numerica a somar por grupo")
+    p.add_argument("--sep", default=",", help="separador do CSV")
+    a = p.parse_args()
+
+    grupos = defaultdict(list)
+    with a.csv_entrada.open(newline="", encoding="utf-8-sig") as fh:
+        leitor = csv.DictReader(fh, delimiter=a.sep)
+        if a.coluna not in (leitor.fieldnames or []):
+            raise SystemExit(f"Coluna '{a.coluna}' nao existe. Disponiveis: {leitor.fieldnames}")
+        for linha in leitor:
+            grupos[linha[a.coluna].strip()].append(linha)
+
+    resumo = {}
+    for chave, linhas in sorted(grupos.items(), key=lambda kv: -len(kv[1])):
+        item = {"quantidade": len(linhas)}
+        if a.soma:
+            total = 0.0
+            for l in linhas:
+                bruto = (l.get(a.soma) or "0").replace(".", "").replace(",", ".")
+                try:
+                    total += float(bruto)
+                except ValueError:
+                    pass
+            item["total"] = round(total, 2)
+        item["itens"] = linhas
+        resumo[chave] = item
+
+    a.saida.write_text(json.dumps(resumo, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"{len(grupos)} grupo(s) gravado(s) em {a.saida}")
+    for chave, item in list(resumo.items())[:10]:
+        extra = f" | total {item['total']}" if "total" in item else ""
+        print(f"  {chave:<30} {item['quantidade']}{extra}")
+
+if __name__ == "__main__":
+    main()`
+  },
+
+  api: {
+    palavras: ['api', 'rest', 'requisicao', 'requisição', 'http', 'endpoint', 'consumir', 'webhook', 'integrar'],
+    titulo: 'Consumir API REST paginada',
+    bash: `#!/usr/bin/env bash
+# Consome uma API REST paginada e salva as respostas em JSON.
+# Uso: TOKEN=xxx ./consumir.sh "https://api.exemplo.com/itens" saida.json
+set -Eeo pipefail
+
+URL="\${1:?informe a url base}"
+SAIDA="\${2:-saida.json}"
+TOKEN="\${TOKEN:-}"
+PAGINA=1
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+
+while :; do
+  echo "Baixando pagina $PAGINA..."
+  CODIGO=$(curl -sS -o "$TMP/p$PAGINA.json" -w '%{http_code}' \\
+    \${TOKEN:+-H "Authorization: Bearer $TOKEN"} \\
+    -H 'Accept: application/json' \\
+    "$URL?page=$PAGINA&per_page=100") || { echo "falha de rede" >&2; exit 1; }
+
+  [ "$CODIGO" = "200" ] || { echo "HTTP $CODIGO na pagina $PAGINA" >&2; exit 1; }
+  QTD=$(jq 'if type=="array" then length else (.data // .items // []) | length end' "$TMP/p$PAGINA.json")
+  echo "  $QTD item(ns)"
+  [ "$QTD" -eq 0 ] && break
+  PAGINA=$((PAGINA + 1))
+  sleep 0.3   # gentileza com o servidor
+done
+
+jq -s 'map(if type=="array" then . else (.data // .items // []) end) | add' "$TMP"/p*.json > "$SAIDA"
+echo "Total: $(jq 'length' "$SAIDA") item(ns) em $SAIDA"`,
+    python: `#!/usr/bin/env python3
+"""Consome uma API REST paginada com retentativa e salva tudo em JSON."""
+import argparse, json, os, time, urllib.error, urllib.parse, urllib.request
+from pathlib import Path
+
+def buscar(url, token, tentativas=3):
+    req = urllib.request.Request(url, headers={"Accept": "application/json"})
+    if token:
+        req.add_header("Authorization", f"Bearer {token}")
+    for n in range(1, tentativas + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except (urllib.error.URLError, TimeoutError) as e:
+            if n == tentativas:
+                raise
+            espera = 2 ** n
+            print(f"  falhou ({e}); nova tentativa em {espera}s")
+            time.sleep(espera)
+
+def extrair(bloco):
+    if isinstance(bloco, list):
+        return bloco
+    for chave in ("data", "items", "results", "records"):
+        if isinstance(bloco.get(chave), list):
+            return bloco[chave]
+    return []
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("url", help="URL base, sem os parametros de pagina")
+    p.add_argument("-o", "--saida", type=Path, default=Path("saida.json"))
+    p.add_argument("--por-pagina", type=int, default=100)
+    p.add_argument("--max-paginas", type=int, default=50)
+    a = p.parse_args()
+
+    token = os.environ.get("TOKEN")  # nunca deixe a chave no codigo
+    todos, pagina = [], 1
+    while pagina <= a.max_paginas:
+        sep = "&" if "?" in a.url else "?"
+        url = f"{a.url}{sep}" + urllib.parse.urlencode({"page": pagina, "per_page": a.por_pagina})
+        print(f"Pagina {pagina}...")
+        itens = extrair(buscar(url, token))
+        print(f"  {len(itens)} item(ns)")
+        if not itens:
+            break
+        todos.extend(itens)
+        pagina += 1
+        time.sleep(0.3)
+
+    a.saida.write_text(json.dumps(todos, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"Total: {len(todos)} item(ns) em {a.saida}")
+
+if __name__ == "__main__":
+    main()`
+  },
+
+  limpar: {
+    palavras: ['limpar', 'apagar', 'deletar', 'excluir', 'antigos', 'temporario', 'temporário', 'espaco', 'espaço'],
+    titulo: 'Limpar arquivos antigos com segurança',
+    bash: `#!/usr/bin/env bash
+# Remove arquivos mais antigos que N dias. Simula por padrao.
+# Uso: ./limpar.sh <pasta> <dias> [--aplicar]
+set -Eeo pipefail
+
+PASTA="\${1:?informe a pasta}"
+DIAS="\${2:?informe a idade em dias}"
+APLICAR="\${3:-}"
+
+[ -d "$PASTA" ] || { echo "Pasta nao existe: $PASTA" >&2; exit 1; }
+case "$PASTA" in
+  /|/home|/etc|/usr|/var) echo "Recusando operar em $PASTA" >&2; exit 1 ;;
+esac
+
+echo "Arquivos com mais de $DIAS dia(s) em $PASTA:"
+TOTAL=$(find "$PASTA" -type f -mtime +"$DIAS" -printf '%s\\n' 2>/dev/null | awk '{s+=$1} END {print s+0}')
+find "$PASTA" -type f -mtime +"$DIAS" -printf '  %TY-%Tm-%Td  %p\\n' | head -50
+echo "Espaco a liberar: $(awk -v b="$TOTAL" 'BEGIN {printf "%.1f MB", b/1048576}')"
+
+if [ "$APLICAR" = "--aplicar" ]; then
+  read -r -p "Confirma a exclusao? (digite SIM) " R
+  [ "$R" = "SIM" ] || { echo "Cancelado."; exit 0; }
+  find "$PASTA" -type f -mtime +"$DIAS" -delete
+  echo "Removidos."
+else
+  echo "== SIMULACAO: use --aplicar para excluir de verdade =="
+fi`,
+    python: `#!/usr/bin/env python3
+"""Remove arquivos mais antigos que N dias. Simula por padrao."""
+import argparse, time
+from pathlib import Path
+
+PROTEGIDAS = {Path("/"), Path.home(), Path("/etc"), Path("/usr"), Path("/var")}
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("pasta", type=Path)
+    p.add_argument("dias", type=int)
+    p.add_argument("--padrao", default="*", help="ex.: *.log")
+    p.add_argument("--aplicar", action="store_true")
+    a = p.parse_args()
+
+    alvo = a.pasta.resolve()
+    if alvo in PROTEGIDAS:
+        raise SystemExit(f"Recusando operar em {alvo}")
+
+    limite = time.time() - a.dias * 86400
+    velhos = [f for f in alvo.rglob(a.padrao) if f.is_file() and f.stat().st_mtime < limite]
+    if not velhos:
+        print("Nada a remover.")
+        return
+
+    bytes_total = sum(f.stat().st_size for f in velhos)
+    for f in velhos[:50]:
+        print(f"  {time.strftime('%Y-%m-%d', time.localtime(f.stat().st_mtime))}  {f}")
+    if len(velhos) > 50:
+        print(f"  ... e mais {len(velhos) - 50}")
+    print(f"{len(velhos)} arquivo(s), {bytes_total / 1048576:.1f} MB")
+
+    if not a.aplicar:
+        print("== SIMULACAO: use --aplicar para excluir ==")
+        return
+    if input("Confirma a exclusao? (digite SIM) ") != "SIM":
+        print("Cancelado.")
+        return
+    for f in velhos:
+        f.unlink()
+    print("Removidos.")
+
+if __name__ == "__main__":
+    main()`
+  },
+
+  monitorar: {
+    palavras: ['monitorar', 'monitora', 'no ar', 'ping', 'uptime', 'caiu', 'disponibilidade', 'alerta', 'avisar'],
+    titulo: 'Monitorar site e alertar quando cair',
+    bash: `#!/usr/bin/env bash
+# Monitora uma URL e registra quedas em log. Uso: ./monitor.sh https://site.com 60
+set -Eeo pipefail
+
+URL="\${1:?informe a url}"
+INTERVALO="\${2:-60}"
+LOG="monitor.log"
+ESTADO="ok"
+
+registrar() { echo "$(date '+%F %T')  $*" | tee -a "$LOG"; }
+
+registrar "Monitorando $URL a cada $INTERVALO s (Ctrl+C para parar)"
+while :; do
+  INICIO=$(date +%s%N)
+  CODIGO=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$URL" || echo "000")
+  MS=$(( ($(date +%s%N) - INICIO) / 1000000 ))
+
+  if [ "$CODIGO" = "200" ]; then
+    [ "$ESTADO" = "fora" ] && registrar "RECUPERADO ($MS ms)"
+    ESTADO="ok"
+  else
+    [ "$ESTADO" = "ok" ] && registrar "FORA DO AR - HTTP $CODIGO"
+    ESTADO="fora"
+  fi
+  sleep "$INTERVALO"
+done`,
+    python: `#!/usr/bin/env python3
+"""Monitora uma URL, registra quedas e recuperacoes em log."""
+import argparse, time, urllib.error, urllib.request
+from datetime import datetime
+
+def registrar(msg, log):
+    linha = f"{datetime.now():%Y-%m-%d %H:%M:%S}  {msg}"
+    print(linha, flush=True)
+    with open(log, "a", encoding="utf-8") as fh:
+        fh.write(linha + "\\n")
+
+def checar(url, timeout=10):
+    inicio = time.monotonic()
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as r:
+            return r.status, int((time.monotonic() - inicio) * 1000), None
+    except urllib.error.HTTPError as e:
+        return e.code, int((time.monotonic() - inicio) * 1000), None
+    except Exception as e:
+        return 0, int((time.monotonic() - inicio) * 1000), str(e)
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("url")
+    p.add_argument("--intervalo", type=int, default=60)
+    p.add_argument("--log", default="monitor.log")
+    a = p.parse_args()
+
+    registrar(f"Monitorando {a.url} a cada {a.intervalo}s", a.log)
+    no_ar = True
+    try:
+        while True:
+            codigo, ms, erro = checar(a.url)
+            if codigo == 200:
+                if not no_ar:
+                    registrar(f"RECUPERADO ({ms} ms)", a.log)
+                no_ar = True
+            else:
+                if no_ar:
+                    registrar(f"FORA DO AR - HTTP {codigo} {erro or ''}".strip(), a.log)
+                no_ar = False
+            time.sleep(a.intervalo)
+    except KeyboardInterrupt:
+        registrar("Monitoramento encerrado.", a.log)
+
+if __name__ == "__main__":
+    main()`
+  }
+};
+
+const ESQUELETO = {
+  bash: `#!/usr/bin/env bash
+# TAREFA
+set -Eeo pipefail
+
+ENTRADA="\${1:?informe o parametro principal}"
+MODO="\${2:-simulacao}"
+
+log() { echo "$(date '+%F %T')  $*"; }
+
+principal() {
+  log "Iniciando com: $ENTRADA"
+  # TODO: implemente a logica aqui
+  log "Concluido."
+}
+
+principal "$@"`,
+  python: `#!/usr/bin/env python3
+"""TAREFA"""
+import argparse, logging, sys
+from pathlib import Path
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(message)s", datefmt="%H:%M:%S")
+log = logging.getLogger(__name__)
+
+def processar(entrada: Path, aplicar: bool) -> int:
+    log.info("Processando %s", entrada)
+    # TODO: implemente a logica aqui
+    return 0
+
+def main():
+    p = argparse.ArgumentParser(description="TAREFA")
+    p.add_argument("entrada", type=Path)
+    p.add_argument("--aplicar", action="store_true", help="sem isso, apenas simula")
+    a = p.parse_args()
+    try:
+        sys.exit(processar(a.entrada, a.aplicar))
+    except KeyboardInterrupt:
+        sys.exit(130)
+
+if __name__ == "__main__":
+    main()`,
+  javascript: `#!/usr/bin/env node
+/* TAREFA */
+'use strict';
+const fs = require('node:fs/promises');
+const path = require('node:path');
+
+const args = process.argv.slice(2);
+const entrada = args[0];
+const aplicar = args.includes('--aplicar');
+
+if (!entrada) {
+  console.error('Uso: node script.js <entrada> [--aplicar]');
+  process.exit(1);
+}
+
+async function principal() {
+  console.log('Processando', entrada, aplicar ? '' : '(simulacao)');
+  // TODO: implemente a logica aqui
+}
+
+principal().catch(err => { console.error('Erro:', err.message); process.exit(1); });`,
+  powershell: `<#  TAREFA  #>
+[CmdletBinding(SupportsShouldProcess)]
+param(
+  [Parameter(Mandatory)][string]$Entrada,
+  [switch]$Aplicar
+)
+
+$ErrorActionPreference = 'Stop'
+
+function Write-Log($msg) { Write-Host ("{0}  {1}" -f (Get-Date -Format 'HH:mm:ss'), $msg) }
+
+try {
+  Write-Log "Processando $Entrada"
+  # TODO: implemente a logica aqui
+  Write-Log 'Concluido.'
+} catch {
+  Write-Error $_.Exception.Message
+  exit 1
+}`,
+  sql: `-- TAREFA
+-- Sempre revise o WHERE antes de rodar UPDATE/DELETE em producao.
+BEGIN;
+
+WITH base AS (
+  SELECT
+    id,
+    criado_em,
+    status
+  FROM tabela
+  WHERE criado_em >= CURRENT_DATE - INTERVAL '30 days'
+)
+SELECT
+  status,
+  COUNT(*) AS quantidade
+FROM base
+GROUP BY status
+ORDER BY quantidade DESC;
+
+ROLLBACK;  -- troque por COMMIT quando tiver certeza`,
+  html: `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAREFA</title>
+<style>
+  body{font:16px/1.5 system-ui,sans-serif;margin:0;padding:24px;background:#0e1117;color:#e6edf3}
+  .caixa{max-width:720px;margin:0 auto;background:#161b22;border:1px solid #2a3240;border-radius:10px;padding:20px}
+  button{background:#4f9cf9;border:0;border-radius:8px;padding:10px 14px;font:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="caixa">
+    <h1>TAREFA</h1>
+    <button id="acao">Executar</button>
+    <pre id="saida"></pre>
+  </div>
+<script>
+  document.getElementById('acao').onclick = () => {
+    // TODO: implemente a logica aqui
+    document.getElementById('saida').textContent = 'ok';
+  };
+<\/script>
+</body>
+</html>`
+};
+
+function gerarOffline(pedido, lang) {
+  const alvo = pedido.toLowerCase();
+  let escolhido = null, melhor = 0;
+  for (const [chave, m] of Object.entries(MODELOS)) {
+    const pontos = m.palavras.filter(p => alvo.includes(p)).length;
+    if (pontos > melhor) { melhor = pontos; escolhido = chave; }
+  }
+
+  if (escolhido && MODELOS[escolhido][lang]) {
+    const m = MODELOS[escolhido];
+    return {
+      codigo: m[lang],
+      explicacao: '### Modelo aplicado\n' + m.titulo + ' (reconhecido pelas palavras do seu pedido).\n\n' +
+        '### Como usar\nSalve o arquivo, dê permissão de execução se for shell (`chmod +x`) e rode passando os argumentos indicados no cabeçalho do script. Ele **simula por padrão** — só altera arquivos com `--aplicar`.\n\n' +
+        '### Cuidados\nEste é um modelo genérico gerado sem IA. Confira caminhos e teste em uma cópia antes de usar em dados reais. Para um script feito sob medida para o seu pedido exato, escolha um provedor de IA no painel à esquerda.'
+    };
+  }
+
+  const base = (MODELOS[escolhido] && MODELOS[escolhido].python) ? null : null;
+  const esq = (ESQUELETO[lang] || ESQUELETO.python).replace(/TAREFA/g, pedido.trim().slice(0, 120) || 'Tarefa');
+  return {
+    codigo: esq,
+    explicacao: '### Modelo aplicado\nEsqueleto de CLI em ' + lang + ' — o modo offline não tem um modelo pronto específico para este pedido.\n\n' +
+      '### Como usar\nPreencha o trecho marcado com `TODO`. A estrutura já traz argumentos, log e modo de simulação.\n\n' +
+      '### Cuidados\nPara o script **completo e sob medida**, selecione Gemini, Groq ou OpenRouter no painel à esquerda e cole uma chave gratuita — aí o agente escreve a lógica inteira sozinho.'
+  };
+}
+
+/* =====================================================================
+   Renderização
+   ===================================================================== */
+function escapar(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function separarCodigo(texto) {
+  const m = texto.match(/```[a-zA-Z0-9_+-]*\n([\s\S]*?)```/);
+  if (!m) return { codigo: texto.trim(), resto: '' };
+  const resto = (texto.slice(0, m.index) + '\n' + texto.slice(m.index + m[0].length))
+                  .replace(/^\s+|\s+$/g, '');
+  return { codigo: m[1].replace(/\s+$/, ''), resto };
+}
+
+function renderMarkdown(md) {
+  if (!md) return '';
+  const inline = t => t.replace(/`([^`]+)`/g, '<code>$1</code>')
+                       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  let html = '', paragrafo = [], lista = [];
+  const fecharP = () => { if (paragrafo.length) { html += '<p>' + paragrafo.map(inline).join('<br>') + '</p>'; paragrafo = []; } };
+  const fecharL = () => { if (lista.length) { html += '<ul>' + lista.map(i => '<li>' + inline(i) + '</li>').join('') + '</ul>'; lista = []; } };
+
+  for (const linha of escapar(md).split('\n')) {
+    const t = linha.trim();
+    if (!t) { fecharP(); fecharL(); continue; }
+    const cabecalho = t.match(/^#{1,6}\s+(.*)$/);
+    if (cabecalho) { fecharP(); fecharL(); html += '<h3>' + inline(cabecalho[1]) + '</h3>'; continue; }
+    const item = t.match(/^(?:[-*]|\d+\.)\s+(.*)$/);
+    if (item) { fecharP(); lista.push(item[1]); continue; }
+    fecharL(); paragrafo.push(t);
+  }
+  fecharP(); fecharL();
+  return html;
+}
+
+function mostrarCodigo(codigo, lang, origem) {
+  ultimoCodigo = codigo;
+  $('#painel-codigo').classList.remove('hidden');
+  $('#codigo').textContent = codigo;
+  $('#codigo').classList.remove('cursor');
+  $('#nome-arquivo').textContent = 'script.' + (EXT[lang] || 'txt');
+  $('#badge-origem').textContent = origem || '';
+  $('#btn-rodar').classList.toggle('hidden', lang !== 'javascript' && lang !== 'html');
+}
+
+function renderExplicacao(md) {
+  $('#explicacao').innerHTML = renderMarkdown(md);
+}
+
+function status(msg, tipo) {
+  const el = $('#status');
+  el.textContent = msg;
+  el.className = 'status' + (tipo ? ' ' + tipo : '');
+}
+
+/* =====================================================================
+   Orquestração do agente
+   ===================================================================== */
+async function executarAgente(mensagemUsuario, ehAjuste) {
+  const prov = $('#provider').value;
+  const modelo = $('#model').value;
+  const lang = $('#lang').value;
+  const nivel = $('#nivel').value;
+  const chave = $('#apikey').value.trim();
+
+  if (!mensagemUsuario.trim()) { status('Descreva o que o script precisa fazer.', 'err'); return; }
+  LS.set('ag_model_' + prov, modelo);
+  LS.set('ag_lang', lang); LS.set('ag_nivel', nivel);
+
+  /* ---- modo offline ---- */
+  if (prov === 'local') {
+    status('Montando a partir dos modelos embutidos...');
+    const r = gerarOffline(mensagemUsuario, lang);
+    mostrarCodigo(r.codigo, lang, 'offline');
+    renderExplicacao(r.explicacao);
+    salvarHistorico(mensagemUsuario, r.codigo, lang, 'offline', r.explicacao);
+    status('Pronto (offline).', 'ok');
+    return;
+  }
+
+  if (!chave) { status('Cole a chave de API do provedor escolhido.', 'err'); return; }
+
+  if (!ehAjuste) conversa = [];
+  conversa.push({ role: 'user', content: mensagemUsuario });
+
+  const sistema = promptSistema(lang, nivel);
+  let acumulado = '';
+  abortador = new AbortController();
+  $('#btn-gerar').disabled = true; $('#btn-ajustar').disabled = true; $('#btn-parar').disabled = false;
+  $('#painel-codigo').classList.remove('hidden');
+  $('#codigo').textContent = ''; $('#codigo').classList.add('cursor');
+  $('#explicacao').innerHTML = '';
+  $('#painel-exec').classList.add('hidden');
+  status('Gerando com ' + modelo + '...');
+
+  const onTexto = t => {
+    acumulado += t;
+    const parcial = separarCodigo(acumulado);
+    $('#codigo').textContent = parcial.codigo || acumulado;
+    $('#codigo').scrollTop = $('#codigo').scrollHeight;
+  };
+
+  try {
+    if (prov === 'gemini') {
+      await chamarGemini(modelo, chave, sistema, conversa, onTexto, abortador.signal);
+    } else if (prov === 'groq') {
+      await chamarOpenAICompat('https://api.groq.com/openai/v1', {}, modelo, chave, sistema, conversa, onTexto, abortador.signal);
+    } else {
+      await chamarOpenAICompat('https://openrouter.ai/api/v1',
+        { 'HTTP-Referer': location.origin || 'https://localhost', 'X-Title': 'Agente de Scripts' },
+        modelo, chave, sistema, conversa, onTexto, abortador.signal);
+    }
+
+    if (!acumulado.trim()) throw new Error('O provedor devolveu resposta vazia (cota esgotada ou modelo indisponível).');
+    conversa.push({ role: 'assistant', content: acumulado });
+
+    const { codigo, resto } = separarCodigo(acumulado);
+    mostrarCodigo(codigo, lang, PROVEDORES[prov].rotulo + ' · ' + modelo);
+    renderExplicacao(resto);
+    salvarHistorico(mensagemUsuario, codigo, lang, PROVEDORES[prov].rotulo, resto);
+    status('Pronto.', 'ok');
+  } catch (e) {
+    $('#codigo').classList.remove('cursor');
+    if (e.name === 'AbortError') { status('Interrompido.'); return; }
+    let msg = e.message || String(e);
+    if (/Failed to fetch|NetworkError|CORS/i.test(msg)) {
+      msg += ' — se estiver abrindo o arquivo direto do disco (file://), alguns provedores bloqueiam. ' +
+             'Sirva a pasta com "python3 -m http.server 8000" e abra http://localhost:8000.';
+    }
+    status('Erro: ' + msg, 'err');
+  } finally {
+    abortador = null;
+    $('#btn-gerar').disabled = false; $('#btn-ajustar').disabled = false; $('#btn-parar').disabled = true;
+  }
+}
+
+/* =====================================================================
+   Sandbox de execução (só JS/HTML de navegador)
+   ===================================================================== */
+function rodarNoSandbox(codigo, lang) {
+  const box = $('#painel-exec');
+  const saida = $('#saida-exec');
+  box.classList.remove('hidden');
+  saida.textContent = '';
+
+  const seguro = codigo.replace(/<\/script/gi, '<\\/script');
+  const cabeca = '<!doctype html><meta charset="utf-8"><scr' + 'ipt>(function(){' +
+    'var env=function(t,a){parent.postMessage({__ag:1,t:t,m:Array.prototype.map.call(a,function(x){' +
+    'try{return (typeof x==="object")?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")},"*")};' +
+    '["log","info","warn","error"].forEach(function(k){var o=console[k].bind(console);' +
+    'console[k]=function(){env(k,arguments);o.apply(null,arguments)}});' +
+    'window.onerror=function(m){env("error",[m]);return true};try{';
+  const rabo = '}catch(e){env("error",[(e&&e.message)||e])}env("fim",["— execução encerrada —"])})();<\/scr' + 'ipt>';
+
+  const doc = lang === 'html' ? seguro : (cabeca + seguro + rabo);
+  const frame = $('#sandbox');
+  frame.srcdoc = doc;
+  if (lang === 'html') {
+    saida.textContent = 'HTML renderizado no sandbox (sem acesso à sua máquina). ' +
+                        'Para ver o resultado visual, baixe o arquivo e abra no navegador.';
+  } else {
+    saida.textContent = 'executando...\n';
+  }
+}
+
+window.addEventListener('message', ev => {
+  const d = ev.data;
+  if (!d || d.__ag !== 1) return;
+  const saida = $('#saida-exec');
+  if (saida.textContent === 'executando...\n') saida.textContent = '';
+  const marca = { log: '', info: 'ℹ ', warn: '⚠ ', error: '✖ ', fim: '' }[d.t] || '';
+  saida.textContent += marca + d.m + '\n';
+  saida.scrollTop = saida.scrollHeight;
+});
+
+/* =====================================================================
+   Eventos
+   ===================================================================== */
+$('#provider').addEventListener('change', montarModelos);
+
+$('#btn-salvar-chave').onclick = () => {
+  const p = $('#provider').value;
+  LS.set('ag_key_' + p, $('#apikey').value.trim());
+  status('Chave salva neste navegador.', 'ok');
+};
+$('#btn-limpar-chave').onclick = () => {
+  const p = $('#provider').value;
+  localStorage.removeItem('ag_key_' + p);
+  $('#apikey').value = '';
+  status('Chave apagada.');
+};
+
+$('#btn-gerar').onclick = () => executarAgente($('#pedido').value, false);
+$('#btn-parar').onclick = () => { if (abortador) abortador.abort(); };
+$('#btn-nova').onclick = () => {
+  conversa = []; ultimoCodigo = '';
+  $('#pedido').value = ''; $('#ajuste').value = '';
+  $('#painel-codigo').classList.add('hidden');
+  status('Contexto limpo.');
+  $('#pedido').focus();
+};
+
+$('#pedido').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') $('#btn-gerar').click();
+});
+
+$('#btn-ajustar').onclick = () => {
+  const t = $('#ajuste').value.trim();
+  if (!t) { status('Escreva o ajuste desejado.', 'err'); return; }
+  if ($('#provider').value === 'local') {
+    status('Ajustes exigem um provedor de IA — o modo offline só entrega modelos fixos.', 'err');
+    return;
+  }
+  $('#ajuste').value = '';
+  executarAgente('Ajuste o script anterior: ' + t + '\nDevolva o script COMPLETO novamente, no mesmo formato.', true);
+};
+
+$('#btn-erro').onclick = () => {
+  const erro = prompt('Cole a mensagem de erro que apareceu ao rodar o script:');
+  if (!erro) return;
+  if ($('#provider').value === 'local') {
+    status('Correção automática exige um provedor de IA.', 'err');
+    return;
+  }
+  executarAgente('Ao rodar o script, deu este erro:\n\n' + erro +
+    '\n\nExplique a causa em uma frase e devolva o script COMPLETO corrigido.', true);
+};
+
+$('#btn-copiar').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText($('#codigo').textContent);
+    status('Copiado.', 'ok');
+  } catch (e) { status('O navegador bloqueou a cópia — selecione o texto manualmente.', 'err'); }
+};
+
+$('#btn-baixar').onclick = () => {
+  const nome = $('#nome-arquivo').textContent;
+  const blob = new Blob([$('#codigo').textContent], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = nome;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  status('Baixado como ' + nome + '.', 'ok');
+};
+
+$('#btn-rodar').onclick = () => {
+  const lang = $('#lang').value;
+  const codigo = $('#codigo').textContent;
+  if (/require\s*\(|process\.|node:/.test(codigo) && lang === 'javascript') {
+    if (!confirm('Este script parece usar APIs do Node (arquivos, processo), que não existem no navegador. ' +
+                 'Rodar aqui vai falhar nessas partes. Continuar mesmo assim?')) return;
+  }
+  rodarNoSandbox(codigo, lang);
+};
+
+$('#btn-limpar-hist').onclick = () => {
+  if (!confirm('Apagar todo o histórico salvo?')) return;
+  localStorage.removeItem('ag_hist');
+  montarHistorico();
+};
+
+/* =====================================================================
+   Início
+   ===================================================================== */
+(function init() {
+  $('#provider').value = LS.get('ag_provider', 'local');
+  montarModelos();
+  $('#lang').value = LS.get('ag_lang', 'bash');
+  $('#nivel').value = LS.get('ag_nivel', 'pronto');
+  montarExemplos();
+  montarHistorico();
+  status('Pronto. Descreva a tarefa e clique em Gerar script (Ctrl+Enter).');
+})();
+</script>
+</body>
+</html>
