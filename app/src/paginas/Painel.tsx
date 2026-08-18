@@ -14,6 +14,7 @@ import Estoque from './Estoque'
 import Pdv from './Pdv'
 import Compras from './Compras'
 import Financeiro from './Financeiro'
+import Fiscal from './Fiscal'
 
 function EmConstrucao({ nome, fase }: { nome: string; fase: string }) {
   return (
@@ -104,7 +105,7 @@ export default function Painel() {
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/fornecedores" element={<Fornecedores />} />
           <Route path="/financeiro" element={<Financeiro />} />
-          <Route path="/fiscal" element={<EmConstrucao nome="Fiscal" fase="Fase 7" />} />
+          <Route path="/fiscal" element={<Fiscal />} />
           <Route path="/relatorios" element={<EmConstrucao nome="Relatórios" fase="Fase 8" />} />
           <Route path="/usuarios/*" element={<Usuarios />} />
           <Route path="*" element={<Navigate to="/" replace />} />
