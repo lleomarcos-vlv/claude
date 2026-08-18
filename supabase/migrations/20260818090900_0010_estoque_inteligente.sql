@@ -215,10 +215,21 @@ begin
     raise exception 'Quantidade deve ser positiva; o sentido vem do tipo.' using errcode = '22023';
   end if;
 
-  -- Permissão: ajuste de inventário exige mais que movimentar.
+  -- Permissão acompanha o ato de negócio, não a mecânica:
+  --   venda/devolução  → quem vende ou cancela venda
+  --   ajuste           → inventário (estoque.ajustar)
+  --   demais           → estoque.movimentar
   if p_tipo = 'ajuste' then
     if not app.pode(p_tenant, 'estoque.ajustar') then
       raise exception 'Ajuste de inventário exige a permissão estoque.ajustar.' using errcode = '42501';
+    end if;
+  elsif p_tipo = 'venda' then
+    if not (app.pode(p_tenant, 'vendas.criar') or app.pode(p_tenant, 'estoque.movimentar')) then
+      raise exception 'Sem permissão para baixar estoque por venda.' using errcode = '42501';
+    end if;
+  elsif p_tipo = 'devolucao' then
+    if not (app.pode(p_tenant, 'vendas.cancelar') or app.pode(p_tenant, 'estoque.movimentar')) then
+      raise exception 'Sem permissão para estornar estoque.' using errcode = '42501';
     end if;
   elsif not app.pode(p_tenant, 'estoque.movimentar') then
     raise exception 'Sem permissão para movimentar estoque.' using errcode = '42501';

@@ -5,6 +5,13 @@ import App from './App'
 import { AuthProvider } from './lib/auth'
 import './styles.css'
 
+// PWA: registra o service worker (shell offline; dados offline são da fila do PDV)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js')
+  })
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
