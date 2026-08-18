@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grafista ERP · Demonstração</title>
+<style>
+/* =============================================================================
+   GRAFISTA · DEMONSTRAÇÃO COMERCIAL
+   Arquivo único, sem internet, sem instalação. Nada é gravado.
+   ============================================================================= */
+:root {
+  --accent:      #35A96B;           /* trocado pelo nicho ativo */
+  --accent-soft: rgba(53,169,107,.14);
+  --accent-line: rgba(53,169,107,.42);
+
+  --void:    #07090B;
+  --ground:  #0B0E11;
+  --panel:   #10151A;
+  --panel-2: #161D24;
+  --line:    #1F2830;
+  --line-2:  #2C3844;
+  --text:    #E8EDF1;
+  --text-2:  #94A3B0;
+  --text-3:  #5C6B77;
+
+  --ok:   #3DBB7D;  --ok-soft:   rgba(61,187,125,.14);
+  --warn: #E0A33C;  --warn-soft: rgba(224,163,60,.14);
+  --crit: #E85D55;  --crit-soft: rgba(232,93,85,.14);
+
+  --sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --mono: "Cascadia Code", "Consolas", ui-monospace, monospace;
+  --r: 14px;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body {
+  background:
+    radial-gradient(1100px 500px at 78% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(70,110,160,.07), transparent 60%),
+    var(--ground);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14.5px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+
+/* grade técnica de fundo */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(80% 70% at 50% 30%, #000 30%, transparent 100%);
+}
+
+svg.ic { width: 17px; height: 17px; stroke: currentColor; fill: none;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- layout ---------- */
+.app { display: grid; grid-template-columns: 228px 1fr; min-height: 100vh; position: relative; }
+.lateral {
+  background: linear-gradient(180deg, var(--panel), var(--void));
+  border-right: 1px solid var(--line);
+  padding: 20px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+  position: sticky; top: 0; height: 100vh;
+}
+.marca { display: flex; align-items: center; gap: 11px; padding: 2px 8px 18px; }
+.marca .logo {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #000));
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 20px; color: #fff;
+  box-shadow: 0 0 24px var(--accent-soft), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.marca .nome { font-weight: 700; font-size: 16px; letter-spacing: -.02em; }
+.marca .sub { font-size: 10.5px; color: var(--text-3); text-transform: uppercase; letter-spacing: .14em; }
+
+.nav-bt {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px; border-radius: 10px;
+  background: none; border: 1px solid transparent;
+  color: var(--text-2); font: inherit; font-weight: 600; font-size: 13.5px;
+  cursor: pointer; text-align: left; width: 100%;
+  transition: all .18s ease;
+}
+.nav-bt:hover { color: var(--text); background: var(--panel-2); }
+.nav-bt.on {
+  color: var(--text); background: var(--accent-soft);
+  border-color: var(--accent-line);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.lateral .rodape { margin-top: auto; padding: 12px 8px 0; font-size: 11px; color: var(--text-3); line-height: 1.6; }
+.lateral .rodape b { color: var(--text-2); }
+
+.principal { padding: 22px 26px 60px; min-width: 0; }
+
+/* ---------- topo: faixa demo + seletor de nicho ---------- */
+.faixa-demo {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--warn); background: var(--warn-soft);
+  color: var(--warn); border-radius: 10px;
+  padding: 8px 14px; font-size: 12.5px; font-weight: 600;
+  margin-bottom: 16px;
+}
+.faixa-demo .pulso {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--warn);
+  animation: pulso 1.6s ease-in-out infinite;
+}
+@keyframes pulso { 50% { opacity: .25; transform: scale(.7); } }
+
+.nichos { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.nicho-bt {
+  display: flex; align-items: center; gap: 9px;
+  background: var(--panel); border: 1px solid var(--line);
+  color: var(--text-2); border-radius: 999px;
+  padding: 7px 14px 7px 8px; font: inherit; font-size: 12.5px; font-weight: 600;
+  cursor: pointer; transition: all .18s ease;
+}
+.nicho-bt .sg {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 10.5px; font-weight: 800; color: #fff;
+  font-family: var(--mono);
+}
+.nicho-bt:hover { border-color: var(--line-2); color: var(--text); transform: translateY(-1px); }
+.nicho-bt.on {
+  border-color: var(--accent-line); color: var(--text);
+  background: var(--accent-soft);
+  box-shadow: 0 0 18px var(--accent-soft);
+}
+
+.cabecalho { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.cabecalho h1 { font-size: 24px; font-weight: 800; letter-spacing: -.03em; }
+.cabecalho .desc { color: var(--text-3); font-size: 13px; }
+
+/* ---------- painéis ---------- */
+.cartao {
+  background: linear-gradient(180deg, var(--panel), color-mix(in srgb, var(--panel) 82%, #000));
+  border: 1px solid var(--line); border-radius: var(--r);
+  padding: 18px;
+  animation: surgir .35s ease both;
+}
+@keyframes surgir { from { opacity: 0; transform: translateY(8px); } }
+.cartao h3 {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .13em; color: var(--text-3); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.grade { display: grid; gap: 14px; }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+.kpi .v { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+.kpi .d { font-size: 12px; color: var(--text-3); margin-top: 3px; display: flex; gap: 6px; align-items: center; }
+.kpi .d.up { color: var(--ok); }
+
+.selo {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+}
+.s-ok   { background: var(--ok-soft);   color: var(--ok); }
+.s-warn { background: var(--warn-soft); color: var(--warn); }
+.s-crit { background: var(--crit-soft); color: var(--crit); }
+.s-mut  { background: var(--panel-2);   color: var(--text-2); }
+.s-acc  { background: var(--accent-soft); color: var(--accent); }
+
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em;
+     color: var(--text-3); padding: 8px 10px; border-bottom: 1px solid var(--line-2); }
+td { padding: 9px 10px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+tbody tr { transition: background .15s; }
+tbody tr:hover { background: rgba(255,255,255,.025); }
+.dir { text-align: right; }
+
+/* ---------- botões ---------- */
+.bt {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: inherit; font-weight: 700; font-size: 13.5px;
+  border-radius: 10px; padding: 10px 16px; cursor: pointer;
+  border: 1px solid transparent; transition: all .15s ease;
+}
+.bt:disabled { opacity: .4; cursor: not-allowed; }
+.bt-acc {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000));
+  color: #fff; box-shadow: 0 4px 18px var(--accent-soft);
+}
+.bt-acc:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+.bt-borda { background: transparent; border-color: var(--line-2); color: var(--text-2); }
+.bt-borda:hover:not(:disabled) { color: var(--text); border-color: var(--text-3); }
+.bt-mini { padding: 4px 10px; font-size: 12.5px; border-radius: 8px; }
+
+input, select {
+  font: inherit; color: var(--text);
+  background: var(--panel-2); border: 1px solid var(--line-2);
+  border-radius: 9px; padding: 8px 11px; width: 100%;
+}
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+/* ---------- PDV ---------- */
+.pdv { display: grid; grid-template-columns: minmax(0,1fr) 330px; gap: 16px; align-items: start; }
+.prods { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
+.prod {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px; cursor: pointer; text-align: left; color: var(--text);
+  font: inherit; transition: all .15s ease; position: relative; overflow: hidden;
+}
+.prod:hover { border-color: var(--accent-line); transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.35); }
+.prod .cat { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); }
+.prod .n { font-weight: 600; font-size: 13px; margin: 3px 0 7px; line-height: 1.3; }
+.prod .p { font-family: var(--mono); color: var(--accent); font-weight: 600; font-size: 13.5px; }
+.prod.add::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--accent-soft); animation: piscar .4s ease;
+}
+@keyframes piscar { from { opacity: 1; } to { opacity: 0; } }
+
+.carrinho { position: sticky; top: 16px; }
+.c-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px;
+  border-bottom: 1px dashed var(--line); }
+.c-item .qtd-bt {
+  width: 24px; height: 24px; border-radius: 7px; border: 1px solid var(--line-2);
+  background: none; color: var(--text-2); cursor: pointer; font: inherit; line-height: 1;
+}
+.c-item .qtd-bt:hover { color: var(--text); border-color: var(--text-3); }
+.total-linha { display: flex; justify-content: space-between; align-items: baseline;
+  padding-top: 12px; margin-top: 6px; border-top: 1px solid var(--line-2); }
+.total-linha .v { font-size: 22px; font-weight: 800; font-family: var(--mono); }
+
+.pag-linha { display: flex; gap: 8px; margin-top: 8px; }
+.pag-linha select { flex: 1; }
+.pag-linha input { width: 96px; text-align: right; font-family: var(--mono); }
+
+.modos { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.modo-bt { font: inherit; font-size: 12px; font-weight: 600; padding: 5px 12px;
+  border-radius: 999px; border: 1px solid var(--line-2); background: none;
+  color: var(--text-2); cursor: pointer; }
+.modo-bt.on { border-color: var(--accent-line); color: var(--accent); background: var(--accent-soft); }
+
+/* ---------- gráfico de barras ---------- */
+.barras { display: flex; align-items: flex-end; gap: 8px; height: 130px; padding-top: 8px; }
+.barra { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+.barra .b {
+  width: 100%; border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 45%, transparent));
+  box-shadow: 0 0 14px var(--accent-soft);
+  transition: height .6s cubic-bezier(.2,.8,.2,1);
+  min-height: 4px;
+}
+.barra .rot { font-size: 10.5px; color: var(--text-3); font-family: var(--mono); }
+
+/* ---------- cascata (ficha técnica) ---------- */
+.cascata { display: flex; flex-direction: column; gap: 7px; }
+.casc-item {
+  display: flex; align-items: center; gap: 10px; font-size: 13px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 9px; padding: 8px 12px;
+  opacity: 0; transform: translateX(-10px);
+}
+.casc-item.mostrar { animation: entrar .35s ease forwards; }
+@keyframes entrar { to { opacity: 1; transform: none; } }
+.casc-item .delta { margin-left: auto; font-family: var(--mono); color: var(--crit); font-weight: 600; }
+
+/* ---------- modal recibo ---------- */
+.veu {
+  position: fixed; inset: 0; background: rgba(4,6,8,.8); backdrop-filter: blur(4px);
+  display: grid; place-items: center; z-index: 50; animation: surgir .2s ease;
+}
+.recibo {
+  width: min(360px, 92vw); background: var(--panel);
+  border: 1px solid var(--line-2); border-radius: 16px; padding: 24px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+}
+.recibo .ok-circ {
+  width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 14px;
+  background: var(--ok-soft); border: 1px solid var(--ok);
+  display: grid; place-items: center; color: var(--ok);
+}
+.recibo .linhas { font-size: 13px; margin: 14px 0; }
+.recibo .linhas div { display: flex; justify-content: space-between; padding: 5px 0;
+  border-bottom: 1px dashed var(--line); }
+
+/* ---------- termômetro dos pagamentos ---------- */
+.medidor { height: 7px; border-radius: 99px; background: var(--panel-2); overflow: hidden; margin: 8px 0 4px; }
+.medidor .fill { height: 100%; border-radius: 99px; background: var(--accent);
+  transition: width .3s ease, background .3s ease; }
+
+.dica { font-size: 12px; color: var(--text-3); }
+.secao { display: none; }
+.secao.on { display: block; animation: surgir .3s ease; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .lateral { position: static; height: auto; flex-direction: row; overflow-x: auto; align-items: center; }
+  .lateral .rodape, .marca .sub { display: none; }
+  .pdv { grid-template-columns: 1fr; }
+  .carrinho { position: static; }
+}
+</style>
+</head>
+<body>
+
+<!-- sprite de ícones (traço, sem emoji) -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.6 11.2a1.6 1.6 0 0 0 1.6 1.3h7.7a1.6 1.6 0 0 0 1.6-1.3L20 8H6"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8.5 12 4 3 8.5v7L12 20l9-4.5z"/><path d="M3 8.5 12 13l9-4.5M12 13v7"/></symbol>
+  <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6"/><path d="M4.5 12v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5z"/><path d="M14 3v4.5h4.5M9 12h6M9 16h6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4.2M12 17.2v.1"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m4.5 12.5 5 5L19.5 7"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M3.5 17.5 9.5 11l4 4 7-8"/><path d="M15 7h5.5v5.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-split" viewBox="0 0 24 24"><path d="M12 3v7M12 10 6 21M12 10l6 11"/><circle cx="12" cy="3" r="1.4"/></symbol>
+  <symbol id="i-flow" viewBox="0 0 24 24"><path d="M4 7h9M4 12h13M4 17h7"/><path d="m15 4 3 3-3 3M19 14l3 3-3 3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 3 8.4 7 10 4-1.6 7-5.4 7-10V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.1"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L11 21l8-10.5h-6z"/></symbol>
+</svg>
+
+<div class="app">
+  <aside class="lateral">
+    <div class="marca">
+      <div class="logo">G</div>
+      <div>
+        <div class="nome">Grafista</div>
+        <div class="sub">ERP multi-nicho</div>
+      </div>
+    </div>
+    <button class="nav-bt on" data-sec="painel"><svg class="ic"><use href="#i-grid"/></svg>Painel</button>
+    <button class="nav-bt" data-sec="pdv"><svg class="ic"><use href="#i-cart"/></svg><span id="nav-pdv">PDV</span></button>
+    <button class="nav-bt" data-sec="estoque"><svg class="ic"><use href="#i-box"/></svg>Estoque</button>
+    <button class="nav-bt" data-sec="financeiro"><svg class="ic"><use href="#i-coins"/></svg>Financeiro</button>
+    <button class="nav-bt" data-sec="sobre"><svg class="ic"><use href="#i-info"/></svg>Sobre a demo</button>
+    <div class="rodape">
+      <b>Modo demonstração.</b><br>
+      Dados fictícios, nada é gravado.<br>
+      O sistema completo é instalado após o fechamento.
+    </div>
+  </aside>
+
+  <main class="principal">
+    <div class="faixa-demo">
+      <span class="pulso"></span>
+      DEMONSTRAÇÃO INTERATIVA — dados fictícios · nada é gravado · recarregue para reiniciar
+    </div>
+
+    <div class="nichos" id="nichos"></div>
+
+    <!-- ============================ PAINEL ============================ -->
+    <section class="secao on" id="sec-painel">
+      <div class="cabecalho">
+        <h1 id="painel-titulo">Painel</h1>
+        <span class="desc" id="painel-desc"></span>
+      </div>
+      <div class="grade g4" style="margin-bottom:14px">
+        <div class="cartao kpi">
+          <h3><svg class="ic"><use href="#i-up"/></svg>Vendas hoje</h3>
+          <div class="v num" id="kpi-vendas">—</div>
+          <div class="d up"><svg class="ic" style="width:13px;height:13px"><use href="#i-up"/></svg><span id="kpi-vendas-var"></span></div>
+        </div>
+        <div class="cartao kpi">
+          <h3><svg class="ic"><use href="#i-cart"/></svg><span id="kpi-doc-rotulo">Documentos</span></h3>
+          <div class="v num" id="kpi-docs">—</div>
+          <div class="d">ticket médio <span class="num" id="kpi-ticket"></span></div>
+        </div>
+        <div class="cartao kpi">
+          <h3><svg class="ic"><use href="#i-box"/></svg>Alertas de estoque</h3>
+          <div class="v num" id="kpi-alertas">—</div>
+          <div class="d">itens pedindo reposição</div>
+        </div>
+        <div class="cartao kpi">
+          <h3><svg class="ic"><use href="#i-coins"/></svg>Caixa</h3>
+          <div class="v num" id="kpi-caixa">—</div>
+          <div class="d"><span class="selo s-ok"><svg class="ic" style="width:11px;height:11px"><use href="#i-check"/></svg>aberto</span></div>
+        </div>
+      </div>
+      <div class="grade g2">
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-up"/></svg>Faturamento · últimos 7 dias</h3>
+          <div class="barras" id="grafico"></div>
+        </div>
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-bolt"/></svg>Mais vendidos</h3>
+          <table><tbody id="top-produtos"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ PDV ============================ -->
+    <section class="secao" id="sec-pdv">
+      <div class="cabecalho">
+        <h1 id="pdv-titulo">PDV</h1>
+        <span class="desc">toque nos produtos · pagamento pode ser dividido</span>
+      </div>
+      <div class="pdv">
+        <div>
+          <div class="modos" id="modos"></div>
+          <input id="busca" placeholder="Buscar produto..." style="margin-bottom:12px">
+          <div class="prods" id="prods"></div>
+        </div>
+        <div class="cartao carrinho">
+          <h3><svg class="ic"><use href="#i-cart"/></svg><span id="carrinho-titulo">Comanda</span></h3>
+          <div id="itens"><div class="dica">Toque nos produtos ao lado para lançar.</div></div>
+          <div class="total-linha"><span>Total</span><span class="v" id="total">R$ 0,00</span></div>
+          <div id="area-pagto" style="display:none">
+            <div id="pagtos"></div>
+            <button class="bt bt-borda bt-mini" id="dividir" style="margin-top:8px">
+              <svg class="ic" style="width:13px;height:13px"><use href="#i-split"/></svg>dividir pagamento
+            </button>
+            <div class="medidor"><div class="fill" id="medidor" style="width:0%"></div></div>
+            <div class="dica"><span class="num" id="soma-pagto">R$ 0,00</span> informados de <span class="num" id="falta-pagto"></span></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="bt bt-borda" id="limpar" style="flex:1">Limpar</button>
+            <button class="bt bt-acc" id="receber" style="flex:2" disabled>Receber</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ ESTOQUE ============================ -->
+    <section class="secao" id="sec-estoque">
+      <div class="cabecalho">
+        <h1>Estoque</h1>
+        <span class="desc">saldos na unidade-base · alertas automáticos de reposição</span>
+      </div>
+      <div class="grade g2">
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-box"/></svg>Posição atual</h3>
+          <table>
+            <thead><tr><th>Item</th><th class="dir">Saldo</th><th class="dir">Mínimo</th><th>Status</th></tr></thead>
+            <tbody id="estoque-corpo"></tbody>
+          </table>
+        </div>
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-flow"/></svg>Ficha técnica em cascata</h3>
+          <p class="dica" style="margin-bottom:12px" id="cascata-desc"></p>
+          <button class="bt bt-acc" id="bt-cascata">
+            <svg class="ic"><use href="#i-bolt"/></svg><span id="bt-cascata-rotulo"></span>
+          </button>
+          <div class="cascata" id="cascata" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ FINANCEIRO ============================ -->
+    <section class="secao" id="sec-financeiro">
+      <div class="cabecalho">
+        <h1>Financeiro</h1>
+        <span class="desc">DRE do dia calculado das vendas desta demonstração</span>
+      </div>
+      <div class="grade g2">
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-doc"/></svg>DRE gerencial · hoje</h3>
+          <table><tbody id="dre-corpo"></tbody></table>
+        </div>
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-coins"/></svg>Recebimentos por forma</h3>
+          <table><tbody id="formas-corpo"></tbody></table>
+          <p class="dica" style="margin-top:10px">
+            Feche vendas no PDV e veja estes números mudarem na hora.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SOBRE ============================ -->
+    <section class="secao" id="sec-sobre">
+      <div class="cabecalho"><h1>Sobre esta demonstração</h1></div>
+      <div class="grade g2">
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-info"/></svg>O que você está vendo</h3>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.7">
+            Um único arquivo HTML com os <b style="color:var(--text)">9 nichos</b> do
+            Grafista: troque o ramo no topo e veja cores, terminologia, modos de venda
+            e catálogo mudarem na hora. Tudo aqui roda na memória do navegador —
+            <b style="color:var(--text)">nada é gravado</b> e recarregar a página
+            reinicia a demonstração.
+          </p>
+        </div>
+        <div class="cartao">
+          <h3><svg class="ic"><use href="#i-shield"/></svg>O sistema completo (instalado após o fechamento)</h3>
+          <ul style="font-size:13.5px;color:var(--text-2);line-height:2;padding-left:18px">
+            <li>Banco na nuvem com isolamento por empresa e trilha de auditoria</li>
+            <li>Login com permissões — 13 papéis prontos (caixa, garçom, contador...)</li>
+            <li>Estoque com ficha técnica e baixa em cascata de verdade</li>
+            <li>PDV que grava, funciona offline e sincroniza ao reconectar</li>
+            <li>Compras com leitura de XML de NFe, financeiro com DRE e fluxo</li>
+            <li>Relatórios com exportação, alertas inteligentes e pacote do contador</li>
+            <li>Instala como aplicativo no PC, tablet e celular (PWA)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal"></div>
+
+<script>
+"use strict";
+/* ===========================================================================
+   DADOS DOS 9 NICHOS  (injetados do banco real do projeto)
+   =========================================================================== */
+const VERTICAIS = [{"id":"food","nome":"Food & Delivery","desc":"Restaurante, lanchonete, pizzaria, food truck","cor":"#1B7A4B","sigla":"FD","termos":{"venda":"Comanda","doc":"Comanda","acao":"Finalizar venda"},"modos":["Balcão","Mesa","Delivery"],"prods":[["Lanches","X-Burger",18.9],["Lanches","X-Salada",21.9],["Lanches","X-Bacon",24.9],["Lanches","X-Tudo",29.9],["Lanches","Misto Quente",12],["Porções","Batata Frita P",22],["Porções","Batata Frita G",34],["Porções","Frango a Passarinho",42],["Porções","Calabresa Acebolada",38],["Pratos","Executivo de Frango",32],["Pratos","Executivo de Carne",36],["Pratos","Filé à Parmegiana",54.9],["Pratos","Marmitex Grande",28],["Bebidas","Refrigerante Lata",7],["Bebidas","Água Mineral 500ml",4],["Bebidas","Suco Natural 300ml",9.5],["Bebidas","Cerveja Long Neck",11],["Sobremesas","Pudim de Leite",12],["Sobremesas","Açaí 300ml",16],["Sobremesas","Petit Gateau",19.9],["Cafeteria","Café Expresso",5],["Cafeteria","Cappuccino",9],["Cafeteria","Pão de Queijo",6.5]]},{"id":"mercado","nome":"Mercado & Mercearia","desc":"Supermercado, hortifruti, açougue, padaria","cor":"#0E6E75","sigla":"MC","termos":{"venda":"Frente de Caixa","doc":"Cupom","acao":"Fechar cupom"},"modos":["Caixa","Delivery"],"prods":[["Hortifruti","Banana Prata",6.99],["Hortifruti","Tomate",8.49],["Hortifruti","Batata Inglesa",5.99],["Hortifruti","Cebola",4.79],["Açougue","Patinho Bovino",42.9],["Açougue","Frango Inteiro",12.9],["Açougue","Linguiça Toscana",24.9],["Mercearia","Arroz Tipo 1 5kg",27.9],["Mercearia","Feijão Carioca 1kg",8.49],["Mercearia","Açúcar Refinado 1kg",4.29],["Mercearia","Óleo de Soja 900ml",7.19],["Mercearia","Café Torrado 500g",18.9],["Bebidas","Refrigerante 2L",9.49],["Bebidas","Cerveja Lata 350ml",3.99],["Bebidas","Água 1,5L",3.29],["Bebidas","Leite Integral 1L",5.49],["Limpeza","Detergente 500ml",2.79],["Limpeza","Sabão em Pó 1kg",12.9],["Limpeza","Água Sanitária 1L",4.59],["Padaria","Pão Francês",16.9],["Padaria","Bolo Caseiro Fatia",6.5]]},{"id":"moda","nome":"Moda & Calçados","desc":"Boutique, loja de roupas, sapataria","cor":"#A02B62","sigla":"MD","termos":{"venda":"Venda","doc":"Venda","acao":"Fechar venda"},"modos":["Loja","Troca","Encomenda"],"prods":[["Feminino","Vestido Midi",189.9],["Feminino","Blusa Cropped",79.9],["Feminino","Calça Jeans Skinny",159.9],["Feminino","Saia Plissada",119.9],["Masculino","Camisa Social",149.9],["Masculino","Camiseta Básica",59.9],["Masculino","Bermuda Sarja",109.9],["Masculino","Calça Jeans Reta",169.9],["Calçados","Tênis Casual",249.9],["Calçados","Sandália Rasteira",89.9],["Calçados","Bota Coturno",299.9],["Acessórios","Cinto de Couro",79.9],["Acessórios","Bolsa Transversal",189.9],["Acessórios","Boné Aba Reta",69.9]]},{"id":"farmacia","nome":"Farmácia & Saúde","desc":"Drogaria, farmácia de manipulação, suplementos","cor":"#17548C","sigla":"FM","termos":{"venda":"Balcão","doc":"Venda","acao":"Fechar venda"},"modos":["Balcão","Convênio","Delivery"],"prods":[["Medicamentos","Dipirona 500mg",12.9],["Medicamentos","Amoxicilina 500mg",38.9],["Medicamentos","Losartana 50mg",24.5],["Medicamentos","Omeprazol 20mg",19.9],["Genéricos","Paracetamol 750mg",9.9],["Genéricos","Ibuprofeno 600mg",16.4],["Higiene","Shampoo Anticaspa",29.9],["Higiene","Creme Dental 90g",8.9],["Higiene","Sabonete Antibacteriano",4.5],["Dermocosméticos","Protetor Solar FPS 50",74.9],["Dermocosméticos","Hidratante Corporal",49.9],["Infantil","Fralda Tam M 60un",79.9],["Infantil","Lenço Umedecido",14.9]]},{"id":"autopecas","nome":"Autopeças & Oficina","desc":"Peças, acessórios, oficina mecânica","cor":"#2F4858","sigla":"AP","termos":{"venda":"Balcão","doc":"Orçamento","acao":"Fechar pedido"},"modos":["Balcão","Orçamento","Ordem de Serviço"],"prods":[["Motor","Filtro de Óleo",38.9],["Motor","Filtro de Ar",52],["Motor","Vela de Ignição",29.9],["Motor","Correia Dentada",189],["Freios","Pastilha Dianteira",149.9],["Freios","Disco de Freio",219],["Freios","Fluido de Freio DOT4",34.9],["Suspensão","Amortecedor Dianteiro",329],["Suspensão","Batente e Coifa",45],["Elétrica","Bateria 60Ah",429],["Elétrica","Lâmpada H4",24.9],["Elétrica","Alternador",689],["Lubrificantes","Óleo 5W30 1L",54.9],["Lubrificantes","Aditivo Radiador",29.9],["Serviços","Troca de Óleo",60],["Serviços","Alinhamento e Balanceamento",90],["Serviços","Revisão Completa",280]]},{"id":"petshop","nome":"Petshop & Agro","desc":"Pet shop, banho e tosa, agropecuária","cor":"#4F6B22","sigla":"PT","termos":{"venda":"Atendimento","doc":"Venda","acao":"Fechar atendimento"},"modos":["Loja","Banho & Tosa","Delivery"],"prods":[["Rações","Ração Cão Adulto 15kg",189.9],["Rações","Ração Gato Castrado 10kg",219.9],["Rações","Ração a Granel",12.9],["Serviços","Banho Porte Pequeno",55],["Serviços","Banho + Tosa Porte Médio",95],["Serviços","Tosa Higiênica",45],["Serviços","Consulta Veterinária",120],["Medicamentos","Antipulgas",89.9],["Medicamentos","Vermífugo",42],["Acessórios","Coleira Ajustável",39.9],["Acessórios","Comedouro Inox",34.9],["Acessórios","Brinquedo Mordedor",24.9],["Agro","Milho em Grão",3.49],["Agro","Sal Mineral 25kg",89]]},{"id":"beleza","nome":"Beleza & Barbearia","desc":"Salão, barbearia, estética, manicure","cor":"#6D3AA3","sigla":"BL","termos":{"venda":"Atendimento","doc":"Comanda","acao":"Fechar comanda"},"modos":["Agenda","Balcão"],"prods":[["Cabelo","Corte Feminino",80],["Cabelo","Corte Masculino",45],["Cabelo","Escova",60],["Cabelo","Coloração",190],["Barba","Barba Completa",40],["Barba","Barba + Corte",75],["Estética","Design de Sobrancelha",45],["Estética","Limpeza de Pele",130],["Estética","Manicure",40],["Estética","Pedicure",45],["Produtos","Shampoo Profissional",89.9],["Produtos","Máscara Capilar",119.9],["Produtos","Pomada Modeladora",49.9]]},{"id":"distribuidora","nome":"Distribuidora & Atacado","desc":"Atacadista, representante, venda externa","cor":"#3B3F8F","sigla":"DT","termos":{"venda":"Pedido","doc":"Pedido","acao":"Gravar pedido"},"modos":["Pedido","Romaneio"],"prods":[["Bebidas","Refrigerante 2L · fardo 6",54],["Bebidas","Cerveja Lata · fardo 12",46.8],["Bebidas","Água 500ml · fardo 12",21.6],["Alimentos","Arroz 5kg · fardo 6",159],["Alimentos","Óleo 900ml · cx 20",138],["Alimentos","Macarrão 500g · fardo 20",78],["Limpeza","Detergente · cx 24",62.4],["Limpeza","Sabão em Pó 1kg · cx 12",142.8],["Descartáveis","Copo 200ml · cx 5000",210],["Descartáveis","Guardanapo · fardo 30",89]]},{"id":"construcao","nome":"Construção & Materiais","desc":"Depósito, material de construção, ferragem","cor":"#7A5C3A","sigla":"CT","termos":{"venda":"Balcão","doc":"Orçamento","acao":"Fechar pedido"},"modos":["Balcão","Orçamento","Entrega"],"prods":[["Básicos","Cimento CP-II 50kg",42.9],["Básicos","Areia Média m³",120],["Básicos","Brita 1 m³",145],["Básicos","Cal Hidratada 20kg",24.9],["Acabamento","Porcelanato 60x60",79.9],["Acabamento","Rejunte 5kg",28.9],["Acabamento","Argamassa AC-II 20kg",32.9],["Hidráulica","Tubo PVC 100mm 6m",89.9],["Hidráulica","Joelho 100mm",12.9],["Hidráulica","Registro Gaveta 3/4",49.9],["Elétrica","Cabo Flexível 2,5mm 100m",289],["Elétrica","Disjuntor 20A",24.9],["Elétrica","Tomada 2P+T",18.9],["Ferramentas","Furadeira de Impacto",289],["Ferramentas","Trena 5m",32.9]]}];
+
+/* ===========================================================================
+   NÚCLEO DA DEMO
+   =========================================================================== */
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+// gerador determinístico por nicho (números estáveis entre cliques)
+function semente(str) {
+  let h = 2166136261;
+  for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return () => {
+    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
+    return ((h >>> 0) % 1000) / 1000;
+  };
+}
+
+const FORMAS = ['dinheiro', 'pix', 'crédito', 'débito', 'vale'];
+
+const estado = {
+  nicho: VERTICAIS[0],
+  modo: null,
+  carrinho: [],          // {nome, cat, preco, qtd}
+  pagtos: [],            // {forma, valor}
+  vendasDemo: [],        // vendas fechadas nesta sessão {total, pagtos}
+  numero: 1042,
+  filtro: '',
+};
+
+/* ---------- seletor de nichos ---------- */
+function montarNichos() {
+  $('#nichos').innerHTML = VERTICAIS.map((v, i) => `
+    <button class="nicho-bt${v.id === estado.nicho.id ? ' on' : ''}" data-i="${i}">
+      <span class="sg" style="background:${v.cor}">${v.sigla}</span>${v.nome}
+    </button>`).join('');
+  $$('.nicho-bt').forEach((b) => b.onclick = () => trocarNicho(VERTICAIS[+b.dataset.i]));
+}
+
+function trocarNicho(v) {
+  estado.nicho = v;
+  estado.modo = v.modos[0];
+  estado.carrinho = []; estado.pagtos = []; estado.filtro = '';
+  const r = document.documentElement.style;
+  r.setProperty('--accent', v.cor);
+  r.setProperty('--accent-soft', v.cor + '24');
+  r.setProperty('--accent-line', v.cor + '6e');
+  montarNichos(); renderTudo();
+}
+
+/* ---------- painel ---------- */
+function dadosPainel() {
+  const rnd = semente(estado.nicho.id);
+  const base = 900 + rnd() * 2600;
+  const docsBase = 18 + Math.round(rnd() * 46);
+  const extra = estado.vendasDemo.reduce((s, x) => s + x.total, 0);
+  return {
+    vendas: base + extra,
+    docs: docsBase + estado.vendasDemo.length,
+    ticket: (base + extra) / (docsBase + estado.vendasDemo.length),
+    alertas: 2 + Math.round(rnd() * 3),
+    caixa: 250 + rnd() * 400 + estado.vendasDemo
+      .flatMap((x) => x.pagtos).filter((p) => p.forma === 'dinheiro')
+      .reduce((s, p) => s + p.valor, 0),
+    variacao: 4 + Math.round(rnd() * 14),
+    dias: [...Array(7)].map((_, i) => ({
+      rot: ['S','T','Q','Q','S','S','D'][i],
+      v: 0.35 + rnd() * 0.65,
+    })),
+  };
+}
+
+function animarNumero(el, alvo, fmt) {
+  const ini = performance.now();
+  const passo = (t) => {
+    const k = Math.min(1, (t - ini) / 550);
+    const e = 1 - Math.pow(1 - k, 3);
+    el.textContent = fmt(alvo * e);
+    if (k < 1) requestAnimationFrame(passo);
+  };
+  requestAnimationFrame(passo);
+}
+
+function renderPainel() {
+  const v = estado.nicho, d = dadosPainel();
+  $('#painel-titulo').textContent = 'Painel · ' + v.nome;
+  $('#painel-desc').textContent = v.desc;
+  $('#kpi-doc-rotulo').textContent = v.termos.doc + 's';
+  animarNumero($('#kpi-vendas'), d.vendas, (x) => brl(x));
+  animarNumero($('#kpi-docs'), d.docs, (x) => Math.round(x).toString());
+  $('#kpi-ticket').textContent = brl(d.ticket);
+  animarNumero($('#kpi-alertas'), d.alertas, (x) => Math.round(x).toString());
+  animarNumero($('#kpi-caixa'), d.caixa, (x) => brl(x));
+  $('#kpi-vendas-var').textContent = '+' + d.variacao + '% vs. semana passada';
+
+  $('#grafico').innerHTML = d.dias.map((x) => `
+    <div class="barra"><div class="b" style="height:0%"></div><span class="rot">${x.rot}</span></div>`).join('');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $$('#grafico .b').forEach((b, i) => b.style.height = (d.dias[i].v * 100) + '%');
+  }));
+
+  const rnd = semente(v.id + 'top');
+  const tops = [...v.prods].sort(() => rnd() - 0.5).slice(0, 5);
+  $('#top-produtos').innerHTML = tops.map((p, i) => `
+    <tr>
+      <td style="width:26px" class="num" style="color:var(--text-3)">${i + 1}</td>
+      <td>${p[1]}<div style="font-size:11px;color:var(--text-3)">${p[0]}</div></td>
+      <td class="dir num">${Math.round(6 + rnd() * 40)} un</td>
+      <td class="dir num" style="color:var(--accent)">${brl(p[2] * (6 + rnd() * 40))}</td>
+    </tr>`).join('');
+}
+
+/* ---------- PDV ---------- */
+function renderPdv() {
+  const v = estado.nicho;
+  $('#pdv-titulo').textContent = v.termos.venda;
+  $('#nav-pdv').textContent = v.termos.venda;
+  $('#carrinho-titulo').textContent = v.termos.doc + ' · nº ' + estado.numero;
+
+  $('#modos').innerHTML = v.modos.map((m) => `
+    <button class="modo-bt${m === estado.modo ? ' on' : ''}" data-m="${m}">${m}</button>`).join('');
+  $$('.modo-bt').forEach((b) => b.onclick = () => { estado.modo = b.dataset.m; renderPdv(); });
+
+  const f = estado.filtro.toLowerCase();
+  const lista = v.prods.filter((p) => !f || p[1].toLowerCase().includes(f));
+  $('#prods').innerHTML = lista.map((p, i) => `
+    <button class="prod" data-i="${v.prods.indexOf(p)}">
+      <div class="cat">${p[0]}</div>
+      <div class="n">${p[1]}</div>
+      <div class="p">${brl(p[2])}</div>
+    </button>`).join('');
+  $$('.prod').forEach((b) => b.onclick = () => {
+    const p = v.prods[+b.dataset.i];
+    b.classList.remove('add'); void b.offsetWidth; b.classList.add('add');
+    const ex = estado.carrinho.find((x) => x.nome === p[1]);
+    if (ex) ex.qtd += 1;
+    else estado.carrinho.push({ cat: p[0], nome: p[1], preco: p[2], qtd: 1 });
+    renderCarrinho();
+  });
+  renderCarrinho();
+}
+
+const totalCarrinho = () => estado.carrinho.reduce((s, i) => s + i.qtd * i.preco, 0);
+const somaPagtos = () => estado.pagtos.reduce((s, p) => s + (p.valor || 0), 0);
+
+function renderCarrinho() {
+  const t = totalCarrinho();
+  $('#itens').innerHTML = estado.carrinho.length === 0
+    ? '<div class="dica">Toque nos produtos ao lado para lançar.</div>'
+    : estado.carrinho.map((i, idx) => `
+      <div class="c-item">
+        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.nome}</span>
+        <button class="qtd-bt" data-idx="${idx}" data-d="-1">–</button>
+        <span class="num">${i.qtd}</span>
+        <button class="qtd-bt" data-idx="${idx}" data-d="1">+</button>
+        <span class="num" style="width:74px;text-align:right">${brl(i.qtd * i.preco)}</span>
+      </div>`).join('');
+  $$('.qtd-bt').forEach((b) => b.onclick = () => {
+    const i = estado.carrinho[+b.dataset.idx];
+    i.qtd += +b.dataset.d;
+    if (i.qtd <= 0) estado.carrinho.splice(+b.dataset.idx, 1);
+    renderCarrinho();
+  });
+
+  $('#total').textContent = brl(t);
+  const area = $('#area-pagto');
+  if (estado.carrinho.length > 0) {
+    area.style.display = 'block';
+    if (estado.pagtos.length === 0) estado.pagtos = [{ forma: 'pix', valor: t }];
+    else if (estado.pagtos.length === 1) estado.pagtos[0].valor = t;
+    renderPagtos();
+  } else {
+    area.style.display = 'none';
+    estado.pagtos = [];
+    $('#receber').disabled = true;
+  }
+}
+
+function renderPagtos() {
+  const t = totalCarrinho();
+  $('#pagtos').innerHTML = estado.pagtos.map((p, i) => `
+    <div class="pag-linha">
+      <select data-i="${i}">
+        ${FORMAS.map((f) => `<option${f === p.forma ? ' selected' : ''}>${f}</option>`).join('')}
+      </select>
+      <input type="number" step="0.01" min="0" data-i="${i}" value="${p.valor.toFixed(2)}">
+      ${estado.pagtos.length > 1 ? `<button class="bt bt-borda bt-mini" data-rm="${i}"><svg class="ic" style="width:12px;height:12px"><use href="#i-x"/></svg></button>` : ''}
+    </div>`).join('');
+  $$('#pagtos select').forEach((s) => s.onchange = () => { estado.pagtos[+s.dataset.i].forma = s.value; });
+  $$('#pagtos input').forEach((inp) => inp.oninput = () => {
+    estado.pagtos[+inp.dataset.i].valor = parseFloat(inp.value) || 0;
+    atualizarMedidor();
+  });
+  $$('#pagtos [data-rm]').forEach((b) => b.onclick = () => {
+    estado.pagtos.splice(+b.dataset.rm, 1); renderPagtos();
+  });
+  atualizarMedidor();
+}
+
+function atualizarMedidor() {
+  const t = totalCarrinho(), s = somaPagtos();
+  const pct = t > 0 ? Math.min(100, s / t * 100) : 0;
+  const bate = Math.round(s * 100) === Math.round(t * 100) && t > 0;
+  const fill = $('#medidor');
+  fill.style.width = pct + '%';
+  fill.style.background = bate ? 'var(--ok)' : s > t ? 'var(--crit)' : 'var(--accent)';
+  $('#soma-pagto').textContent = brl(s);
+  $('#falta-pagto').textContent = brl(t);
+  $('#receber').disabled = !bate;
+}
+
+$('#dividir').onclick = () => {
+  const resto = Math.max(0, totalCarrinho() - somaPagtos());
+  estado.pagtos.push({ forma: 'crédito', valor: +resto.toFixed(2) });
+  renderPagtos();
+};
+$('#busca').oninput = (e) => { estado.filtro = e.target.value; renderPdv(); };
+$('#limpar').onclick = () => { estado.carrinho = []; estado.pagtos = []; renderCarrinho(); };
+
+$('#receber').onclick = () => {
+  const v = estado.nicho;
+  const venda = {
+    numero: estado.numero,
+    total: totalCarrinho(),
+    itens: estado.carrinho.map((i) => ({ ...i })),
+    pagtos: estado.pagtos.map((p) => ({ ...p })),
+    modo: estado.modo,
+  };
+  estado.vendasDemo.push(venda);
+  estado.numero += 1;
+
+  $('#modal').innerHTML = `
+    <div class="veu" id="veu">
+      <div class="recibo">
+        <div class="ok-circ"><svg class="ic" style="width:26px;height:26px"><use href="#i-check"/></svg></div>
+        <div style="text-align:center;font-weight:800;font-size:16px">${v.termos.doc} nº ${venda.numero}</div>
+        <div style="text-align:center;font-size:12px;color:var(--text-3)">${v.termos.acao} · modo ${venda.modo}</div>
+        <div class="linhas">
+          ${venda.itens.map((i) => `<div><span>${i.qtd}× ${i.nome}</span><span class="num">${brl(i.qtd * i.preco)}</span></div>`).join('')}
+          ${venda.pagtos.map((p) => `<div style="color:var(--text-2)"><span>${p.forma}</span><span class="num">${brl(p.valor)}</span></div>`).join('')}
+          <div style="font-weight:800;border-bottom:0"><span>Total</span><span class="num">${brl(venda.total)}</span></div>
+        </div>
+        <div class="dica" style="text-align:center;margin-bottom:12px">
+          Demonstração: no sistema real esta venda estaria gravada no banco,
+          com estoque baixado e caixa atualizado.
+        </div>
+        <button class="bt bt-acc" style="width:100%" id="fechar-recibo">Nova venda</button>
+      </div>
+    </div>`;
+  $('#fechar-recibo').onclick = () => { $('#modal').innerHTML = ''; };
+  $('#veu').onclick = (e) => { if (e.target.id === 'veu') $('#modal').innerHTML = ''; };
+
+  estado.carrinho = []; estado.pagtos = [];
+  renderCarrinho(); renderPainel(); renderFinanceiro();
+};
+
+/* ---------- estoque ---------- */
+const CASCATAS = {
+  food: {
+    rotulo: 'Simular venda de 1 Soda Italiana',
+    desc: 'Produto composto: vender 1 unidade baixa cada insumo da ficha técnica, com conversão de unidade automática.',
+    itens: [
+      ['Xarope de morango', '−50 ml'], ['Água com gás', '−150 ml'],
+      ['Gelo', '−100 g'], ['Copo 300 ml', '−1 un'],
+      ['Tampa', '−1 un'], ['Canudo', '−1 un'],
+    ],
+  },
+  beleza: {
+    rotulo: 'Simular 1 coloração',
+    desc: 'Serviço com consumo de insumos: cada atendimento baixa o material usado e calcula a comissão do profissional.',
+    itens: [
+      ['Tintura 6.0', '−60 g'], ['Oxidante 30 vol', '−90 ml'],
+      ['Luvas descartáveis', '−1 par'], ['Comissão do profissional', '40%'],
+    ],
+  },
+  padrao: (v) => ({
+    rotulo: 'Simular entrada de 1 caixa',
+    desc: 'Conversão de embalagem: o fornecedor entrega em caixa, o estoque controla por unidade — automático.',
+    itens: [
+      ['Caixa com 12 unidades', '+1 cx'],
+      ['Estoque em unidades', '+12 un'],
+      ['Custo médio recalculado', 'automático'],
+      ['Alerta de reposição', 'reavaliado'],
+    ],
+  }),
+};
+
+function renderEstoque() {
+  const v = estado.nicho;
+  const rnd = semente(v.id + 'stq');
+  const linhas = v.prods.slice(0, 8).map((p, i) => {
+    const min = 8 + Math.round(rnd() * 20);
+    const saldo = Math.round(rnd() * 60);
+    const status = saldo === 0 ? ['s-crit', 'ruptura']
+      : saldo < min ? ['s-warn', 'repor']
+      : ['s-ok', 'ok'];
+    return `<tr>
+      <td>${p[1]}<div style="font-size:11px;color:var(--text-3)">${p[0]}</div></td>
+      <td class="dir num">${saldo} un</td>
+      <td class="dir num" style="color:var(--text-3)">${min}</td>
+      <td><span class="selo ${status[0]}">${status[1]}</span></td>
+    </tr>`;
+  }).join('');
+  $('#estoque-corpo').innerHTML = linhas;
+
+  const c = CASCATAS[v.id] ?? CASCATAS.padrao(v);
+  $('#bt-cascata-rotulo').textContent = c.rotulo;
+  $('#cascata-desc').textContent = c.desc;
+  $('#cascata').innerHTML = '';
+  $('#bt-cascata').onclick = () => {
+    $('#cascata').innerHTML = c.itens.map(([n, d]) => `
+      <div class="casc-item">
+        <svg class="ic" style="color:var(--accent)"><use href="#i-flow"/></svg>
+        ${n}<span class="delta">${d}</span>
+      </div>`).join('');
+    $$('.casc-item').forEach((el, i) =>
+      setTimeout(() => el.classList.add('mostrar'), 90 * i));
+  };
+}
+
+/* ---------- financeiro ---------- */
+function renderFinanceiro() {
+  const rnd = semente(estado.nicho.id + 'fin');
+  const receitaBase = 900 + rnd() * 2600;
+  const receitaDemo = estado.vendasDemo.reduce((s, x) => s + x.total, 0);
+  const receita = receitaBase + receitaDemo;
+  const cmv = receita * (0.30 + rnd() * 0.12);
+  const taxas = receita * 0.021;
+  const despesas = 180 + rnd() * 260;
+  const resultado = receita - cmv - taxas - despesas;
+
+  const linha = (n, v2, forte, cor) => `
+    <tr style="${forte ? 'font-weight:800' : ''}">
+      <td>${n}</td>
+      <td class="dir num" style="${cor ? 'color:' + cor : ''}">${brl(v2)}</td>
+    </tr>`;
+  $('#dre-corpo').innerHTML =
+    linha('Receita líquida', receita, true) +
+    linha('(−) CMV — custo congelado na venda', -cmv) +
+    linha('Margem bruta', receita - cmv, true) +
+    linha('(−) Taxas de cartão', -taxas) +
+    linha('(−) Despesas', -despesas) +
+    linha('Resultado do dia', resultado, true, resultado >= 0 ? 'var(--ok)' : 'var(--crit)');
+
+  const porForma = {};
+  for (const f of FORMAS) porForma[f] = 0;
+  porForma['pix'] += receitaBase * 0.4; porForma['crédito'] += receitaBase * 0.3;
+  porForma['dinheiro'] += receitaBase * 0.2; porForma['débito'] += receitaBase * 0.1;
+  for (const venda of estado.vendasDemo)
+    for (const p of venda.pagtos) porForma[p.forma] = (porForma[p.forma] || 0) + p.valor;
+  const maior = Math.max(...Object.values(porForma), 1);
+  $('#formas-corpo').innerHTML = Object.entries(porForma)
+    .filter(([, v2]) => v2 > 0)
+    .sort((a, b) => b[1] - a[1])
+    .map(([f, v2]) => `
+      <tr><td style="width:90px;text-transform:capitalize">${f}</td>
+      <td><div class="medidor" style="margin:0"><div class="fill" style="width:${v2 / maior * 100}%"></div></div></td>
+      <td class="dir num" style="width:110px">${brl(v2)}</td></tr>`).join('');
+}
+
+/* ---------- navegação ---------- */
+$$('.nav-bt').forEach((b) => b.onclick = () => {
+  $$('.nav-bt').forEach((x) => x.classList.toggle('on', x === b));
+  $$('.secao').forEach((s) => s.classList.toggle('on', s.id === 'sec-' + b.dataset.sec));
+});
+
+function renderTudo() {
+  renderPainel(); renderPdv(); renderEstoque(); renderFinanceiro();
+}
+
+estado.modo = estado.nicho.modos[0];
+trocarNicho(VERTICAIS[0]);
+</script>
+</body>
+</html>

@@ -41,6 +41,10 @@ app/
   src/paginas/              login, empresas, catálogo, estoque, PDV, compras,
                             financeiro, fiscal, relatórios, integrações,
                             usuários, auditoria
+demo/
+  demonstracao.html         demonstração comercial: 9 nichos interativos em um
+                            arquivo único (pendrive/WhatsApp) — nada é gravado
+docs/GUIA-DE-INSTALACAO.pdf instalação do zero, passo a passo (8 páginas)
 prototipos/
   nucleo.html               protótipo original (fonte dos 9 kits, já migrados)
   comanda-pdv.html          protótipo original do PDV (fluxo já reimplementado)
