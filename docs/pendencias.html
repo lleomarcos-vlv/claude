@@ -280,49 +280,100 @@
 
 <div class="wrap">
 <header class="hd">
-  <span class="eyebrow">Documento de pendências · 62 itens do briefing</span>
+  <span class="eyebrow">Documento de pendências · 62 itens do briefing · 2ª sessão</span>
   <h1>O que falta para o sistema ficar pronto</h1>
-  <p class="lede">Conferência item a item contra o código que existe hoje. Só entra em “pronto” o que roda e tem prova.</p>
-  <div class="meta"><span>Branch: claude/system-review-edit-4rdm8i</span><span>Data: 18/08/2026</span></div>
+  <p class="lede">Conferência item a item contra o código após as Fases 1–10. Só entra em “pronto” o que roda e tem prova automatizada.</p>
+  <div class="meta"><span>Branch: claude/html-error-kry78y</span><span>Data: 18/08/2026</span><span>Testes: 76/76 banco · 23/23 app</span></div>
 </header>
 
 <div class="stats">
-  <div class="stat"><span class="k">Concluídos</span><span class="v">4</span><span class="d">6% dos 62 itens</span></div>
-  <div class="stat"><span class="k">Parciais</span><span class="v">7</span><span class="d">existe base, falta o resto</span></div>
-  <div class="stat"><span class="k">Não iniciados</span><span class="v">51</span><span class="d">82% dos 62 itens</span></div>
-  <div class="stat"><span class="k">Fases restantes</span><span class="v">10</span><span class="d">de 11 no total</span></div>
+  <div class="stat"><span class="k">Fases 1–6</span><span class="v">100%</span><span class="d">concluídas e testadas</span></div>
+  <div class="stat"><span class="k">Fase 7 · fiscal</span><span class="v">estrutura</span><span class="d">emissão bloqueada (B2–B4, B10)</span></div>
+  <div class="stat"><span class="k">Fases 8–10</span><span class="v">estrutura</span><span class="d">conexões bloqueadas (B5–B8)</span></div>
+  <div class="stat"><span class="k">Asserções</span><span class="v">99</span><span class="d">76 de banco + 23 de app</span></div>
+</div>
+
+<div class="verdict">
+  <p><strong>Uma coisa destrava tudo: a conta Supabase (B1).</strong>
+  O sistema opera de ponta a ponta contra um Postgres — cadastro, estoque com
+  ficha técnica, venda com pagamento dividido, caixa, compras com XML de NFe,
+  financeiro com DRE, relatórios e auditoria. Sem o projeto Supabase, o app
+  abre na tela “não configurado”, por decisão de honestidade.</p>
+</div>
+
+<h2><span class="n">01</span>Pronto e provado</h2>
+<p class="sub">Cada linha tem suíte de teste correspondente em <code>supabase/tests/</code>.</p>
+<div class="tablewrap"><table>
+  <tr><th>Entrega</th><th>Prova</th></tr>
+  <tr><td>Multi-tenant com RLS, 41 permissões, 13 papéis, auditoria imutável</td><td class="num">0001 · 9 asserções</td></tr>
+  <tr><td>Convites (hash SHA-256, aceite nominal, expiração), troca de empresa</td><td class="num">0002 · 9</td></tr>
+  <tr><td>9 kits de nicho no banco, unidades com conversão, catálogo, clientes, fornecedores, importador CSV</td><td class="num">0003 · 8</td></tr>
+  <tr><td>Ficha técnica recursiva, baixa em cascata, custo médio e real, precificação, alertas de ruptura</td><td class="num">0004 · 10</td></tr>
+  <tr><td>Caixa completo, venda numerada, pagamento dividido, desconto com limite, mesas, KDS, estorno</td><td class="num">0005 · 10</td></tr>
+  <tr><td>Compras 6 status com recebimento, contas parceladas, venda a prazo, fluxo de caixa, DRE com CMV congelado</td><td class="num">0006 · 10</td></tr>
+  <tr><td>Regras fiscais versionadas, motor que não inventa imposto, IBS/CBS/cClassTrib, fila de emissão</td><td class="num">0007 · 8</td></tr>
+  <tr><td>16 relatórios + ABC, pacote do contador, integrações honestas, API keys, webhooks com backoff, planos, LGPD</td><td class="num">0008 · 12</td></tr>
+  <tr><td>App PWA completo (12 telas) com fila offline, leitor de NFe e importador CSV</td><td class="num">build + 23 testes</td></tr>
+</table></div>
+
+<h2><span class="n">02</span>Falta e depende só de trabalho</h2>
+<div class="fase">
+  <ul>
+    <li>Tela de cozinha dedicada (o fluxo de status do KDS já roda no PDV)</li>
+    <li>Impressão de cupom e de pedido na cozinha</li>
+    <li>Seletor de filial na interface (o banco já segrega tudo por filial)</li>
+    <li>Tela de conciliação bancária (campo já existe no financeiro)</li>
+    <li>Fluxo visual de MFA (o Supabase Auth já suporta TOTP)</li>
+    <li>Onboarding guiado em 10 etapas (as etapas já gravam no banco)</li>
+    <li>Foto de produto (Supabase Storage), acréscimo no PDV</li>
+    <li>Testes E2E (Playwright) e manuais de uso</li>
+  </ul>
+</div>
+
+<h2><span class="n">03</span>Bloqueios que dependem de você</h2>
+<div class="tablewrap"><table>
+  <tr><th>#</th><th>O que preciso</th><th>Destrava</th><th>Urgência</th></tr>
+  <tr><td class="num">B1</td><td><strong>Conta Supabase</strong> (projeto, URL, chaves)</td><td>O sistema inteiro operar online</td><td><span class="pill p-crit">alta — destrava tudo</span></td></tr>
+  <tr><td class="num">B2</td><td>Certificado digital A1 + CNPJ</td><td>Emissão fiscal</td><td><span class="pill p-warn">alta na emissão</span></td></tr>
+  <tr><td class="num">B3</td><td>Contador parceiro</td><td>Regras tributárias reais</td><td><span class="pill p-warn">alta na emissão</span></td></tr>
+  <tr><td class="num">B4</td><td>Homologação SEFAZ</td><td>Emissão fiscal</td><td><span class="pill p-warn">iniciar cedo</span></td></tr>
+  <tr><td class="num">B5–B8</td><td>Credenciais WhatsApp, Meta, Google, marketplaces</td><td>Integrações da Fase 9</td><td><span class="pill p-mut">média</span></td></tr>
+  <tr><td class="num">B9</td><td>Acesso ao MySQL do G3 legado</td><td>Migração de histórico</td><td><span class="pill p-mut">média</span></td></tr>
+  <tr><td class="num">B10</td><td>Máquina Windows p/ agente ACBr</td><td>Emissão + impressora fiscal</td><td><span class="pill p-warn">alta na emissão</span></td></tr>
+  <tr><td class="num">B11</td><td>Nome comercial e logo</td><td>White-label final</td><td><span class="pill p-mut">baixa</span></td></tr>
+</table></div>
+
+<h2><span class="n">04</span>Depende de B1 + Edge Functions</h2>
+<div class="fase">
+  <ul>
+    <li>E-mail transacional (convite, pacote do contador) — Resend/SMTP</li>
+    <li>Endpoint REST <code>/api/v1</code> (a validação de chave já vive no banco)</li>
+    <li>Worker de webhooks (fila, payload e backoff já testados no banco)</li>
+    <li>Adapters de integração, um por credencial (B5–B8)</li>
+    <li>OCR de DANFE/PDF (o caminho pelo XML já funciona sem OCR)</li>
+    <li>Agendamentos: expirar convites, segmentação diária, alertas de contas</li>
+  </ul>
+</div>
+
+<h2><span class="n">05</span>Ordem recomendada</h2>
+<div class="fase destaque">
+  <ol>
+    <li><strong>B1 — criar o projeto Supabase</strong> e apontar o app; aplicar migrations e expor o schema <code>app</code>.</li>
+    <li>E-mail transacional (convites deixam de ser link manual).</li>
+    <li>KDS dedicado + impressão básica.</li>
+    <li>Multi-filial na interface e conciliação bancária.</li>
+    <li><strong>Fiscal em paralelo:</strong> contador (B3) + homologação (B4) + agente local (B10) — é o caminho mais longo.</li>
+    <li>Integrações conforme credencial aparecer, uma por vez.</li>
+  </ol>
+  <p class="obs">Corte para o primeiro cliente pagando: itens 1–4, com o 5 correndo em paralelo.</p>
 </div>
 
 <div class="note">
-  <span class="t">Traduzindo os números</span>
-  <p>A fundação de segurança está pronta e testada: dá para criar duas empresas e provar que uma não enxerga a outra. Mas a <strong>operação do dia a dia</strong> — vender, comprar, controlar estoque, emitir nota — ainda não existe conectada a banco. As fases 4, 5, 7 e 9 são, cada uma, maiores que a Fase 1 já entregue.</p>
-</div>
-<h2><span class="n">01</span>O que está pronto</h2>
-<div class="tablewrap"><table><thead><tr><th>Entrega</th><th>Evidência</th></tr></thead><tbody><tr><td><strong>Banco multi-tenant</strong></td><td>4 migrations aplicadas em Postgres 16 limpo, em ordem</td></tr><tr><td><strong>Isolamento por RLS</strong></td><td>10 tabelas com RLS ativa, 21 policies</td></tr><tr><td><strong>41 permissões granulares</strong></td><td>migration 0002_rbac.sql</td></tr><tr><td><strong>13 perfis de acesso</strong></td><td>Proprietário → Somente leitura, com recortes distintos</td></tr><tr><td><strong>Trilha de auditoria</strong></td><td>gatilho com valor anterior, novo e campos alterados</td></tr><tr><td><strong>Provisionamento de empresa</strong></td><td>uma chamada cria empresa + matriz + 13 papéis + proprietário</td></tr><tr><td><strong>Testes de isolamento</strong></td><td>9/9 asserções, como usuário comum sem superusuário</td></tr><tr><td><strong>Design system e kits de nicho</strong></td><td>protótipos com 9 nichos, tema claro/escuro, responsivo</td></tr><tr><td><strong>Decisão de arquitetura</strong></td><td>ADR-001: nuvem + agente local Windows</td></tr></tbody></table></div>
-<h2><span class="n">02</span>O que falta, por fase</h2>
-<div class="fase"><div class="cab"><span class="id">FASE 2</span><h3>Autenticação e usuários</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">O RBAC existe no banco, mas ninguém consegue fazer login ainda.</p><ul><li>Tela de login, cadastro e recuperação de senha</li><li>Fluxo de convite: enviar, aceitar, expirar</li><li>MFA (item 34)</li><li>Sessões seguras, refresh token, logout de todos os dispositivos</li><li>Troca de empresa para quem atende mais de um tenant</li><li>Rate limiting no login</li><li>Tela de gestão de usuários e permissões — o banco já suporta, falta a interface</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 3</span><h3>Cadastros e configuração de nicho</h3><span class="pill p-warn">Parcial</span></div><p class="obs">Os 9 kits de nicho existem no protótipo, em JavaScript. Precisam virar tabela.</p><ul><li>Tabelas <code>verticals</code>, <code>vertical_fields</code>, <code>vertical_terminology</code></li><li>Migração dos 9 kits do protótipo para o banco</li><li>Produtos e serviços com foto, SKU e código de barras</li><li>Unidades de medida e conversão: kg, g, mg, L, ml, unidade, caixa, fardo, pacote, saco, garrafa, lata, porção (item 8)</li><li>Cadastro completo de clientes (item 21) e fornecedores (item 12)</li><li>Onboarding em 10 etapas com percentual (item 44)</li><li>Importador Excel/CSV com mapeamento de colunas e preview (item 45)</li><li>Multi-filial operacional (item 55) — tabelas existem, falta a operação</li></ul></div><div class="fase destaque"><div class="cab"><span class="id">FASE 4</span><h3>Estoque inteligente</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">Você marcou como uma das partes mais importantes. Nada disso existe hoje.</p><ul><li>Ficha técnica: produto composto por insumos (item 7)</li><li>Baixa em cascata — vender 1 Soda Italiana baixa xarope 50 ml, água 150 ml, gelo 100 g, copo, tampa e canudo</li><li>Conversão automática: fornecedor entrega 5 L, sistema controla 5.000 ml</li><li>Rendimento, perdas e desperdício</li><li>Estoque mínimo, máximo e ponto de reposição</li><li>Movimentação com 9 tipos (venda, compra, perda, desperdício, ajuste, devolução, transferência, produção, consumo interno)</li><li>Alertas com consumo médio e fornecedor sugerido (item 10)</li><li>Previsão de ruptura: “acaba em ~4 dias” (item 11)</li><li>Custo real a partir da ficha técnica (item 38) e precificação inteligente (item 39)</li><li>Relatório de consumo de insumos (item 37)</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 5</span><h3>PDV em produção</h3><span class="pill p-warn">Parcial</span></div><p class="obs">O protótipo tem o fluxo certo, mas não grava nada.</p><ul><li>Conectar ao banco: venda que persiste e sobrevive ao F5 e à queda de energia</li><li>Código de barras, leitor e foto do produto</li><li>Acréscimo (hoje só existe desconto)</li><li>Vincular cliente e vendedor à venda</li><li><strong>Pagamento dividido</strong> — R$ 40 Pix + R$ 60 cartão (item 5)</li><li>Vale e transferência como formas de pagamento</li><li>Abertura, sangria, suprimento e fechamento de caixa</li><li>Mesas e comandas persistentes, com transferência entre mesas (item 6)</li><li>Status do pedido: aberto → recebido → preparando → pronto → entregue → cancelado</li><li><strong>KDS, painel de cozinha</strong> (item 6)</li><li>Impressão de cupom e de pedido na cozinha</li><li><strong>PWA instalável</strong> com manifest e service worker (item 41)</li><li><strong>Modo offline</strong> com fila de sincronização e resolução de conflito (item 42)</li><li>Cancelamento e devolução com estorno de estoque</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 6</span><h3>Compras e financeiro</h3><span class="pill p-warn">Parcial</span></div><p class="obs">Existe listagem estática no protótipo. Falta tudo que é real.</p><ul><li>Pedido de compra com 6 status, de rascunho a recebido (item 13)</li><li>Entrada de mercadoria aumentando estoque automaticamente</li><li><strong>Upload e leitura de XML de NFe do fornecedor</strong> (item 14)</li><li>OCR de DANFE/PDF com tela de conferência antes de lançar (itens 14–15)</li><li>Contas a pagar e a receber de verdade</li><li>Fluxo de caixa, categorias e centros de custo</li><li>Contas bancárias, taxas de cartão, parcelamento e recorrência</li><li>Conciliação bancária</li><li>DRE gerencial, CMV, margem, lucro, custos fixos e variáveis</li></ul></div><div class="fase destaque"><div class="cab"><span class="id">FASE 7</span><h3>Fiscal</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">O maior risco do projeto. Nenhuma linha existe.</p><ul><li>Tabela <code>tax_rules</code> versionada com vigência, fonte e versão (item 17)</li><li>NCM, CEST, CFOP, CST/CSOSN, origem e regime por produto</li><li>Motor de cálculo configurável, sem regra fixa em tela (item 16)</li><li>Estrutura para <strong>IBS, CBS, Imposto Seletivo e cClassTrib</strong> — Reforma Tributária</li><li>Marcação “validação pelo contador necessária” onde a regra depender de interpretação</li><li><strong>Agente local Windows</strong> com ACBr, certificado A1 e impressora fiscal</li><li>Emissão de NFe, NFCe, NFSe e SAT</li><li>Homologação por estado junto à SEFAZ</li><li>Cancelamento, carta de correção e inutilização</li><li>Contingência quando a SEFAZ cair</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 8</span><h3>Contador e relatórios</h3><span class="pill p-crit">Não iniciada</span></div><ul><li>Central do Contador com envio por API, XML, PDF, Excel, CSV, ZIP ou e-mail (item 18)</li><li>Pacote mensal “CONTABILIDADE — AGOSTO/2026”</li><li>Histórico: enviado, recebido, erro, pendente, processado</li><li>Camada de integração com plataforma contábil (item 19)</li><li>Convite do contador como usuário restrito (item 52) — o perfil já existe no banco, falta o fluxo</li><li>Central de relatórios com 18 relatórios e exportação PDF/Excel/CSV (item 36)</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 9</span><h3>Integrações</h3><span class="pill p-crit">Não iniciada</span></div><p class="obs">Nenhuma linha. Todas dependem de credenciais suas.</p><ul><li>Adapters: iFood, Mercado Livre, Shopee, Uber Eats, Uber, 99</li><li>Central de Integrações com conectar / testar / desconectar / logs (item 53)</li><li>WhatsApp Business Platform: conversas, templates, avisos automáticos (item 26)</li><li>Meta / Instagram / Facebook: conta, campanhas, métricas (item 24)</li><li>Google Ads: campanhas, custo, ROAS (item 25)</li><li>Marketing: calendário, campanhas, público, ROAS, CAC (item 23)</li><li>CRM com funil Lead → VIP, tarefas e lembretes (item 22)</li><li>Segmentação automática de clientes (item 21)</li><li>Central de pedidos omnichannel (item 28)</li><li>Estoque omnichannel com reserva para pedidos pendentes (item 29)</li><li>API pública <code>/api/v1/…</code> com chaves, rate limit e OpenAPI (item 46)</li><li>Webhooks com 12 eventos (item 47) e sistema de jobs com retry e backoff (item 48)</li></ul></div><div class="fase"><div class="cab"><span class="id">FASE 10</span><h3>SaaS comercial</h3><span class="pill p-crit">Não iniciada</span></div><ul><li>Planos Básico / Profissional / Empresarial com feature flags (item 54)</li><li>Monitoramento de saúde: API, banco, integrações, filas (itens 30–31)</li><li>Central de alertas inteligentes com 14 tipos (item 40)</li><li>Backup automático, exportação, restauração e retenção (item 33)</li><li>LGPD: consentimento, anonimização, exportação, retenção (item 35)</li><li>Tela de auditoria — o banco já grava, falta a interface (item 32)</li><li>Camada de IA sobre dados reais do tenant (item 56)</li><li>Testes de ponta a ponta dos fluxos críticos (item 57)</li><li>Manuais do administrador, proprietário e contador</li><li>Checklists de produção, homologação, segurança e integração</li><li>Instruções de deploy e de instalação para cliente</li></ul></div>
-<h2><span class="n">03</span>Bloqueios que dependem de você</h2>
-<div class="tablewrap"><table><thead><tr><th>#</th><th>O que preciso de você</th><th>Bloqueia</th><th>Urgência</th></tr></thead><tbody><tr><td class="num">B1</td><td><strong>Conta Supabase</strong> — projeto criado, URL e chaves</td><td>Fase 2 em diante — sem isso nada sai do banco local</td><td><span class="pill p-crit">Alta</span></td></tr><tr><td class="num">B2</td><td><strong>Certificado digital A1</strong> e CNPJ da empresa</td><td>Fase 7, emissão fiscal</td><td><span class="pill p-warn">Alta na fase 7</span></td></tr><tr><td class="num">B3</td><td><strong>Contador parceiro</strong> para validar regras tributárias</td><td>Fase 7 — não vou inventar regra fiscal</td><td><span class="pill p-crit">Alta</span></td></tr><tr><td class="num">B4</td><td><strong>Homologação na SEFAZ</strong> do seu estado</td><td>Fase 7 — processo externo, demora semanas</td><td><span class="pill p-crit">Iniciar cedo</span></td></tr><tr><td class="num">B5</td><td>Credenciais WhatsApp Business (Meta)</td><td>Fase 9, WhatsApp</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B6</td><td>Conta Meta Business com app aprovado</td><td>Fase 9, Instagram e Facebook</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B7</td><td>Conta Google Ads com acesso de API</td><td>Fase 9, Google</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B8</td><td>Credenciais iFood, Mercado Livre e Shopee</td><td>Fase 9, marketplaces</td><td><span class="pill p-mut">Média</span></td></tr><tr><td class="num">B9</td><td>Acesso somente-leitura ao <strong>MySQL do G3 legado</strong></td><td>Migração dos dados históricos</td><td><span class="pill p-warn">Média</span></td></tr><tr><td class="num">B10</td><td>Máquina Windows para desenvolver e testar o agente ACBr</td><td>Fase 7</td><td><span class="pill p-warn">Alta na fase 7</span></td></tr><tr><td class="num">B11</td><td>Nome comercial e logo do produto</td><td>White-label</td><td><span class="pill p-mut">Baixa</span></td></tr></tbody></table></div>
-<div class="note"><span class="t">Sobre B3 e B4</span>
-<p>A homologação de NFCe costuma levar semanas e é processo externo. Se a emissão própria for para frente, vale iniciar isso em paralelo ao desenvolvimento, não no fim.</p></div>
-<h2><span class="n">04</span>Ordem recomendada</h2>
-
-<ol>
-<li><strong>Fase 2 — autenticação.</strong> Destrava tudo: sem login, nenhuma tela existe de verdade.</li>
-<li><strong>Fase 3 — cadastros.</strong> Produtos e clientes reais no banco, kits de nicho migrados.</li>
-<li><strong>Fase 4 — estoque com ficha técnica.</strong> O que você marcou como mais importante, e o que separa o produto de um PDV comum.</li>
-<li><strong>Fase 5 — PDV em produção.</strong> Aqui o protótipo vira sistema: venda que grava, PWA, offline.</li>
-<li><strong>Fase 6 — compras e financeiro.</strong> A partir daqui já é um ERP vendável.</li>
-<li><strong>Fase 7 — fiscal.</strong> Começar a homologação em paralelo à Fase 5.</li>
-<li><strong>Fases 8 a 10</strong> conforme a demanda comercial aparecer.</li>
-</ol>
-<p><strong>Corte para o primeiro cliente pagando:</strong> fases 2 a 6, com a 7 correndo em paralelo.</p>
-<h2><span class="n">05</span>Compromisso</h2>
-
-<p>Os 62 itens equivalem a um ERP com equipe dedicada e anos de estrada. Não existe caminho em que isso fique pronto rápido — existe caminho em que <strong>cada fase entregue já é usável</strong>, e é esse o plano.</p>
-<div class="verdict">
-<p><strong>O que não vai acontecer</strong>, conforme sua seção 50: nenhuma tela que finge funcionar, nenhuma integração marcada como “conectada” sem conexão real, nenhuma regra fiscal inventada. Onde faltar credencial, a entrega será o adapter real mais a tela de configuração, exibindo honestamente “não conectado”.</p>
+  <span class="t">Compromissos mantidos (seção 50)</span>
+  <p>Nenhuma tela finge funcionar: integração sem credencial diz “não conectado”,
+  documento fiscal sem agente diz “aguardando agente local”, relatório não
+  implementado recusa execução, e o motor fiscal só calcula o que o contador
+  cadastrar — com fonte legal obrigatória.</p>
 </div>
 
-<footer>Levantamento feito por conferência direta do código em 18/08/2026. Percentuais calculados sobre as 62 seções do briefing.</footer>
 </div>

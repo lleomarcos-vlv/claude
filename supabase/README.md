@@ -40,13 +40,14 @@ mostra o link do convite para copiar e enviar manualmente — sem fingir envio.
 ## Rodar os testes
 
 ```bash
-psql -p 55432 -U grafista -d postgres -v ON_ERROR_STOP=1 \
-  -f supabase/tests/0001_isolamento_e_permissoes.sql
+PGHOST=localhost PGPORT=55432 PGUSER=grafista ./supabase/testar.sh
 ```
 
-Qualquer asserção que falhar aborta com erro. São 9 asserções cobrindo
-provisionamento, isolamento de leitura e escrita, permissões por papel,
-perfil do contador, auditoria e revogação de acesso.
+O script recria um banco limpo, aplica as 16 migrations em ordem e roda as
+8 suítes — **76 asserções** cobrindo isolamento, permissões, convites,
+cadastros, conversão de unidades, baixa em cascata, PDV, caixa, financeiro,
+DRE, regras fiscais versionadas, webhooks, planos e LGPD. As suítes são
+encadeadas: rodam em ordem no mesmo banco (0002 reusa dados do 0001, etc.).
 
 > Os testes rodam como o papel `authenticated`, sem privilégios de superusuário.
 > Rodar como superusuário invalidaria o resultado — superusuário ignora RLS.

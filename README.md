@@ -10,31 +10,60 @@ salão, distribuidora e materiais de construção — sem código separado por s
 |---|---|---|
 | — | Auditoria do projeto | Concluída · [docs/AUDITORIA.md](docs/AUDITORIA.md) |
 | 0 | Decisões de arquitetura | Concluída · [docs/ADR-001](docs/ADR-001-arquitetura.md) |
-| 1 | Banco, multi-tenant, RBAC e auditoria | Concluída · 9/9 testes passando |
-| 2 | Autenticação e convite de usuários | Próxima |
-| 3+ | Cadastros, estoque, PDV, financeiro, fiscal | Planejadas |
+| 1 | Banco, multi-tenant, RBAC e auditoria | Concluída · 9/9 testes |
+| 2 | Autenticação, convites e usuários | Concluída · 9/9 testes + app |
+| 3 | Kits de nicho no banco, catálogo, clientes, fornecedores | Concluída · 8/8 testes + app |
+| 4 | Estoque inteligente (ficha técnica, baixa em cascata) | Concluída · 10/10 testes + app |
+| 5 | PDV persistente (caixa, mesas, pagamento dividido, offline) | Concluída · 10/10 testes + app |
+| 6 | Compras (XML NFe) e financeiro (DRE, fluxo) | Concluída · 10/10 testes + app |
+| 7 | Estrutura fiscal (regras versionadas, motor, fila de emissão) | Estrutura concluída · 8/8 testes — emissão real bloqueada (certificado, contador, SEFAZ, agente local) |
+| 8–10 | Contador, relatórios, integrações, API, webhooks, planos, LGPD | Estrutura e telas concluídas · 12/12 testes — conexões externas bloqueadas (credenciais) |
 
-Ainda **não há interface conectada ao banco**. O que existe de interface são
-protótipos que operam em memória — veja o aviso no fim deste arquivo.
+**Total: 76/76 asserções de banco + 23/23 testes de app.**
+O que falta e por quê: [docs/PENDENCIAS.md](docs/PENDENCIAS.md).
+
+> **Para operar de verdade falta uma coisa: a conta Supabase (bloqueio B1).**
+> Sem ela o app abre na tela "não configurado" — honesto por decisão de projeto.
 
 ## Estrutura
 
 ```
 docs/
-  AUDITORIA.md              relatório técnico (seção 58 do briefing)
-  auditoria.html            mesma auditoria, versão navegável
+  AUDITORIA.md              relatório técnico da 1ª sessão
   ADR-001-arquitetura.md    decisão de stack: nuvem + agente local
+  PENDENCIAS.md             o que falta, por dependência (leia este)
 supabase/
-  migrations/               schema versionado (aplicar em ordem)
-  tests/                    testes de isolamento e permissões
-  README.md                 como aplicar e testar
+  migrations/               schema versionado, 16 migrations (aplicar em ordem)
+  tests/                    8 suítes · 76 asserções de isolamento e regra de negócio
+  testar.sh                 recria banco limpo, aplica tudo e roda os testes
+app/
+  src/lib/                  supabase, auth, CSV, fila offline, leitor de NFe
+  src/paginas/              login, empresas, catálogo, estoque, PDV, compras,
+                            financeiro, fiscal, relatórios, integrações,
+                            usuários, auditoria
 prototipos/
-  nucleo.html               protótipo do núcleo com 9 kits de nicho
-  comanda-pdv.html          protótipo inicial do PDV (nicho food)
+  nucleo.html               protótipo original (fonte dos 9 kits, já migrados)
+  comanda-pdv.html          protótipo original do PDV (fluxo já reimplementado)
 .env.example                variáveis necessárias
 ```
 
-Os protótipos são arquivos autocontidos: abra direto no navegador, sem instalação.
+## Rodar os testes do banco
+
+```bash
+# requer Postgres 16 local (ver supabase/README.md)
+PGHOST=localhost PGPORT=55432 PGUSER=grafista ./supabase/testar.sh
+```
+
+## Rodar o app
+
+```bash
+cd app
+npm install
+cp .env.example .env.local   # preencher com o projeto Supabase (B1)
+npm run dev                  # sem credenciais: tela "não configurado"
+npm test                     # 23 testes unitários
+npm run build                # typecheck + build de produção (PWA)
+```
 
 ## Conceito
 
@@ -44,10 +73,12 @@ Os protótipos são arquivos autocontidos: abra direto no navegador, sem instala
 | **Kit do nicho** | Terminologia, campos, regras, catálogo inicial | Sim |
 | **Identidade** | Cor, nome, logo (white-label) | Sim |
 
-Um nicho novo é um registro de configuração, não um sistema novo.
+Um nicho novo é um registro de configuração (tabelas `verticals*`), não um
+sistema novo.
 
-## Aviso sobre os protótipos
+## Compromisso de honestidade (seção 50 do briefing)
 
-Os arquivos em `prototipos/` operam **em memória**: nada é gravado e tudo se perde ao
-recarregar a página. Os catálogos, clientes e valores são dados de demonstração fixos no
-código. Não use em operação real — servem para validar fluxo e interface.
+Nenhuma tela finge funcionar: integração sem credencial mostra "não conectado",
+documento fiscal sem agente local mostra "aguardando agente", relatório não
+implementado aparece como "em breve" e o motor fiscal não calcula imposto que o
+contador não cadastrou.
