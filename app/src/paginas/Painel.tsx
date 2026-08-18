@@ -10,6 +10,7 @@ import Catalogo from './Catalogo'
 import Clientes from './Clientes'
 import Fornecedores from './Fornecedores'
 import EscolherNicho from './EscolherNicho'
+import Estoque from './Estoque'
 
 function EmConstrucao({ nome, fase }: { nome: string; fase: string }) {
   return (
@@ -95,7 +96,7 @@ export default function Painel() {
           <Route path="/pdv" element={<EmConstrucao nome="PDV" fase="Fase 5" />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/nicho" element={<EscolherNicho />} />
-          <Route path="/estoque" element={<EmConstrucao nome="Estoque" fase="Fase 4" />} />
+          <Route path="/estoque" element={<Estoque />} />
           <Route path="/compras" element={<EmConstrucao nome="Compras" fase="Fase 6" />} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/fornecedores" element={<Fornecedores />} />

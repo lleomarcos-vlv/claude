@@ -4,6 +4,7 @@
 #
 #   PGHOST=localhost PGPORT=55432 PGUSER=grafista ./supabase/testar.sh
 set -euo pipefail
+shopt -s inherit_errexit 2>/dev/null || true
 cd "$(dirname "$0")/.."
 
 : "${PGHOST:=localhost}"
@@ -20,9 +21,17 @@ for f in supabase/migrations/*.sql; do
   $PSQL -d "$DBNAME" -q -f "$f"
 done
 
+falha=0
 for f in supabase/tests/*.sql; do
   echo "teste: $f"
-  $PSQL -d "$DBNAME" -f "$f" | grep -E "OK|passaram" || true
+  if ! saida=$($PSQL -d "$DBNAME" -f "$f" 2>&1); then
+    echo "$saida" | tail -5
+    echo "FALHOU: $f"
+    falha=1
+    break
+  fi
+  echo "$saida" | grep -E "OK|passaram" || true
 done
+[ "$falha" -eq 0 ] || exit 1
 
 echo "Todos os testes passaram."
