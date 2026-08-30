@@ -193,11 +193,16 @@ input[type=range]{width:100%;accent-color:var(--blue)}
 .legend-bar{width:14px;border-radius:3px;background:linear-gradient(to bottom,#eaf2fb,#4a90d9,#08306b)}
 .legend-ticks{display:flex;flex-direction:column;justify-content:space-between;font-size:10.5px;color:var(--ink-3)}
 .map-holder{position:relative;flex:1;min-width:0;display:flex;justify-content:center}
-#mapaBrasil{width:100%;max-width:340px;height:auto}
-#mapaBrasil .uf{cursor:pointer;transition:filter .12s,stroke .12s}
-#mapaBrasil .uf:hover{stroke:#0d47a1;stroke-width:2}
-#mapaBrasil .uf.on{stroke:var(--green);stroke-width:2.5}
-#mapaBrasil text{font-size:11px;font-weight:600;pointer-events:none;font-family:inherit}
+#mapaBrasil{width:100%;max-width:460px;height:auto;display:block}
+#mapaBrasil .paises path{fill:#e7eaf0;stroke:#d5dbe4;stroke-width:.6;pointer-events:none}
+#mapaBrasil .contorno{fill:none;stroke:#8b98ab;stroke-width:1.1;stroke-linejoin:round;pointer-events:none}
+#mapaBrasil .uf{stroke:#fff;stroke-width:.6;cursor:pointer;transition:stroke .12s,stroke-width .12s}
+#mapaBrasil .uf:hover{stroke:#0d47a1;stroke-width:1.6}
+#mapaBrasil .uf.on{stroke:var(--green);stroke-width:1.8}
+#mapaBrasil .rotulos{pointer-events:none}
+#mapaBrasil text{font-size:9px;font-weight:600;font-family:inherit;text-anchor:middle}
+#mapaBrasil .lbl-out text{fill:#4a5666;text-anchor:start;font-weight:600}
+#mapaBrasil .lbl-out line{stroke:#b9c3d0;stroke-width:.6}
 .map-tip{
   position:absolute;background:#0f1a26;color:#fff;border-radius:5px;padding:8px 11px;font-size:12px;
   pointer-events:none;z-index:20;box-shadow:var(--shadow-lg);white-space:nowrap;

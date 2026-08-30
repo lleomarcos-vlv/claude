@@ -4,10 +4,15 @@ Dashboard de prospecção B2B e inteligência de empresas — HTML5, CSS3 e Java
 Sem backend e sem build: basta abrir `index.html` no navegador.
 
 ```
-index.html   estrutura da interface
-style.css    tema SaaS corporativo (claro, responsivo, com regras de impressão)
-script.js    dados simulados, filtros, agregações, mapa, gráficos e exportações
+index.html        estrutura da interface
+style.css         tema SaaS corporativo (claro, responsivo, com regras de impressão)
+geodata.js        contornos geográficos reais em SVG (gerado, não editar à mão)
+script.js         dados simulados, filtros, agregações, mapa, gráficos e exportações
+prospectar.html   versão única autocontida (CSS + geodata + JS embutidos)
 ```
+
+Para usar em um único arquivo, abra `prospectar.html`. Para trabalhar no código, use
+`index.html` com os arquivos separados — os dois têm exatamente as mesmas funcionalidades.
 
 ## Recursos
 
@@ -19,8 +24,10 @@ script.js    dados simulados, filtros, agregações, mapa, gráficos e exportaç
 - **Abas**: Região e Setor (mapa do Brasil em SVG + Top Cidades + gráfico por setor),
   Porte, Decisores e Colaboradores, Cadastrais/Legais/tributários, Saúde financeira e
   Presença digital — todas com gráficos Chart.js.
-- **Mapa por estado em SVG**, sem API key: escala de azuis por concentração, tooltip com
-  empresas e faturamento, clique para filtrar, legenda vertical.
+- **Mapa da América do Sul em SVG**, com contornos geográficos reais e sem API key: os 27
+  estados brasileiros preenchidos em escala de azuis por concentração, países vizinhos como
+  contexto, contorno nacional destacado, rótulos com linha-guia para os estados pequenos,
+  tooltip com empresas e faturamento, clique para filtrar e legenda vertical.
 - **Tabelas** de cidades e empresas com ordenação, busca e paginação.
 - **Exportação CSV** (separador `;` e BOM, abre direto no Excel) de qualquer painel,
   cópia para a área de transferência, impressão (`window.print()`) e resumo de mercado.
@@ -49,5 +56,14 @@ Chart.js 4.4.1 e Font Awesome 6.5.1, carregados via `cdnjs.cloudflare.com`. Se o
 estiver indisponível, a interface continua funcionando e os gráficos exibem um aviso no
 lugar do canvas.
 
-O mapa é SVG próprio (grid cartogram dos 27 estados, posicionados conforme a geografia
-real), o que dispensa Leaflet, tiles e chaves de API e mantém tudo offline.
+## Dados geográficos
+
+`geodata.js` é gerado offline e contém apenas os `path` já projetados (Mercator, viewBox
+400x470), então não há Leaflet, tiles nem chaves de API — o mapa é SVG puro:
+
+- **Estados do Brasil**: malha do IBGE (via `geodata-br-states`), simplificada com
+  `topojson-simplify` preservando as fronteiras compartilhadas, de modo que estados vizinhos
+  continuam encaixados sem frestas.
+- **América do Sul**: Natural Earth 1:50m (domínio público, via `world-atlas`), com 14 países
+  vizinhos — incluindo a Guiana Francesa, recortada da geometria da França.
+- **Contorno nacional**: união topológica dos 27 estados.

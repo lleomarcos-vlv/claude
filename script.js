@@ -536,39 +536,55 @@ function corEscala(t){ // t 0..1  → azul claro → azul escuro
   return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')})`;
 }
 function renderMapa(A){
-  const svg=el('mapaBrasil'); if(!svg) return;
+  const svg=el('mapaBrasil'); if(!svg||!window.GEO) return;
   const max=Math.max(1,...ESTADOS.map(e=>A.porUF[e.uf]||0));
-  const S=40, G=44;
-  svg.innerHTML=ESTADOS.map(e=>{
-    const v=A.porUF[e.uf]||0, t=v/max;
-    const x=(e.col-1)*G+6, y=(e.row-1)*G+6;
-    const on=F.estados.has(e.uf);
-    return `<g class="uf${on?' on':''}" data-uf="${e.uf}">
-      <rect x="${x}" y="${y}" width="${S}" height="${S}" rx="4" fill="${corEscala(t)}" stroke="${on?GREEN:'#cdd7e3'}" stroke-width="${on?2.5:1}"></rect>
-      <text x="${x+S/2}" y="${y+S/2+4}" text-anchor="middle" fill="${t>.55?'#fff':'#33414f'}">${e.uf}</text>
-    </g>`;
+  const fatUF={}; A.rows.forEach(r=>fatUF[r.state]=(fatUF[r.state]||0)+r.revenue*r.w);
+
+  const AREA_MIN=250;                       // abaixo disso o rótulo vai para fora do mapa
+  const fora=GEO.uf.filter(u=>u.a<AREA_MIN).sort((a,b)=>a.cy-b.cy);
+  let ultimoY=-99;
+  const rotulosFora=fora.map(u=>{
+    const y=Math.max(ultimoY+11,u.cy); ultimoY=y;
+    const x=Math.max(u.bb[1][0]+8, 318);
+    return `<g class="lbl-out" data-uf="${u.uf}">
+      <line x1="${u.bb[1][0]-1}" y1="${u.cy}" x2="${x-3}" y2="${y}"></line>
+      <text x="${x}" y="${y+3}">${u.uf}</text></g>`;
   }).join('');
+
+  svg.innerHTML =
+    `<g class="paises">${GEO.sa.map(p=>`<path d="${p.d}"><title>${esc(p.n)}</title></path>`).join('')}</g>`+
+    `<g class="estados">${GEO.uf.map(u=>{
+      const v=A.porUF[u.uf]||0, on=F.estados.has(u.uf);
+      return `<path class="uf${on?' on':''}" data-uf="${u.uf}" d="${u.d}" fill="${corEscala(v/max)}"></path>`;
+    }).join('')}</g>`+
+    `<path class="contorno" d="${GEO.br}"></path>`+
+    `<g class="rotulos">${GEO.uf.filter(u=>u.a>=AREA_MIN).map(u=>{
+      const t=(A.porUF[u.uf]||0)/max;
+      return `<text x="${u.cx}" y="${u.cy+3}" fill="${t>.55?'#fff':'#33414f'}">${u.uf}</text>`;
+    }).join('')}${rotulosFora}</g>`;
+
   const ticks=el('legendTicks');
   ticks.innerHTML=[0,.25,.5,.75,1].map(f=>`<span>${f===0?'0':fmtCompact(max*f)}</span>`).join('');
 
   const tip=el('mapTip'), holder=svg.parentElement;
-  svg.querySelectorAll('.uf').forEach(g=>{
-    const uf=g.dataset.uf, e=UF_MAP[uf];
-    const emp=A.porUF[uf]||0;
-    const fat=A.rows.filter(r=>r.state===uf).reduce((s,r)=>s+r.revenue*r.w,0);
-    g.addEventListener('mousemove',ev=>{
-      const b=holder.getBoundingClientRect();
-      tip.hidden=false;
-      tip.innerHTML=`<b>${e.nome}</b><span>${fmtInt(emp)} empresas</span><span>${fmtMoney(fat)}</span><span>Região ${e.regiao}</span>`;
-      let x=ev.clientX-b.left+14, y=ev.clientY-b.top+14;
-      if(x+tip.offsetWidth>b.width) x=b.width-tip.offsetWidth-4;
-      tip.style.left=x+'px'; tip.style.top=y+'px';
-    });
+  const mostrar=(uf,ev)=>{
+    const e=UF_MAP[uf], b=holder.getBoundingClientRect();
+    tip.hidden=false;
+    tip.innerHTML=`<b>${e.nome}</b><span>${fmtInt(A.porUF[uf]||0)} empresas</span>`+
+      `<span>${fmtMoney(fatUF[uf]||0)}</span><span>Região ${e.regiao}</span>`;
+    let x=ev.clientX-b.left+14, y=ev.clientY-b.top+14;
+    if(x+tip.offsetWidth>b.width) x=Math.max(0,ev.clientX-b.left-tip.offsetWidth-14);
+    if(y+tip.offsetHeight>b.height) y=Math.max(0,y-tip.offsetHeight-28);
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  };
+  svg.querySelectorAll('[data-uf]').forEach(g=>{
+    const uf=g.dataset.uf;
+    g.addEventListener('mousemove',ev=>mostrar(uf,ev));
     g.addEventListener('mouseleave',()=>{tip.hidden=true;});
     g.addEventListener('click',()=>{
       F.estados.has(uf)?F.estados.delete(uf):F.estados.add(uf);
-      tip.hidden=true; render();
-      toast(F.estados.has(uf)?e.nome+' adicionado ao filtro':e.nome+' removido do filtro');
+      tip.hidden=true; UI.cidPage=1; UI.empPage=1; render();
+      toast(UF_MAP[uf].nome+(F.estados.has(uf)?' adicionado ao filtro':' removido do filtro'));
     });
   });
 }
