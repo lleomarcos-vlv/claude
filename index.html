@@ -1,0 +1,489 @@
+<meta charset="utf-8">
+<title>Prospectar — Inteligência de Empresas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="icon-btn only-mobile" id="btnMenu" title="Filtros" aria-label="Abrir filtros"><i class="fa-solid fa-bars"></i></button>
+    <h1 class="brand">Prospectar</h1>
+  </div>
+
+  <nav class="viewnav" id="viewNav" role="tablist">
+    <button class="viewnav-btn active" data-view="calculadora" role="tab"><i class="fa-solid fa-chart-simple"></i> Calculadora</button>
+    <button class="viewnav-btn" data-view="empresas" role="tab"><i class="fa-solid fa-list"></i> Empresas</button>
+  </nav>
+
+  <div class="topbar-right">
+    <button class="ghost-btn" id="btnImprimir"><i class="fa-solid fa-print"></i> Imprimir</button>
+    <button class="ghost-btn" id="btnMercado"><i class="fa-regular fa-copy"></i> Mercado</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span class="sidebar-title">Filtros</span>
+      <button class="chip-btn" id="btnLimpar"><i class="fa-regular fa-trash-can"></i> Limpar Filtros</button>
+      <button class="icon-btn collapse-btn" id="btnCollapse" title="Recolher"><i class="fa-solid fa-outdent"></i></button>
+    </div>
+
+    <div class="sidebar-scroll">
+
+      <section class="fgroup open" data-group="regiao">
+        <button class="fgroup-head"><span>Região</span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+        <div class="fgroup-body">
+          <div class="opt-list" id="listRegiao"></div>
+          <div class="sub-label">Estados</div>
+          <input class="search-input" data-search="listEstado" placeholder="Pesquisar estado...">
+          <div class="opt-list scroll-sm" id="listEstado"></div>
+        </div>
+      </section>
+
+      <section class="fgroup open" data-group="setor">
+        <button class="fgroup-head"><span>Setor</span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+        <div class="fgroup-body nested">
+
+          <section class="fgroup open" data-group="setores">
+            <button class="fgroup-head sub"><span>Setores <i class="fa-solid fa-circle-info info" title="Setor econômico principal da empresa"></i></span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+            <div class="fgroup-body">
+              <input class="search-input" data-search="listSetor" placeholder="Pesquisar setor...">
+              <div class="opt-list scroll-sm" id="listSetor"></div>
+            </div>
+          </section>
+
+          <section class="fgroup" data-group="cnaePri">
+            <button class="fgroup-head sub"><span>CNAE Primário <i class="fa-solid fa-circle-info info" title="Atividade econômica principal"></i></span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+            <div class="fgroup-body">
+              <input class="search-input" data-search="listCnaePri" placeholder="Pesquisar CNAE...">
+              <div class="opt-list scroll-sm" id="listCnaePri"></div>
+            </div>
+          </section>
+
+          <section class="fgroup" data-group="cnaeSec">
+            <button class="fgroup-head sub"><span>CNAE Secundário <i class="fa-solid fa-circle-info info" title="Atividades econômicas secundárias"></i></span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+            <div class="fgroup-body">
+              <input class="search-input" data-search="listCnaeSec" placeholder="Pesquisar CNAE...">
+              <div class="opt-list scroll-sm" id="listCnaeSec"></div>
+            </div>
+          </section>
+
+          <section class="fgroup" data-group="ncm">
+            <button class="fgroup-head sub"><span>NCM <i class="fa-solid fa-circle-info info" title="Nomenclatura Comum do Mercosul"></i></span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+            <div class="fgroup-body">
+              <input class="search-input" data-search="listNcm" placeholder="Pesquisar NCM...">
+              <div class="opt-list scroll-sm" id="listNcm"></div>
+            </div>
+          </section>
+
+          <section class="fgroup" data-group="palavras">
+            <button class="fgroup-head sub"><span>Palavras Chave <i class="fa-solid fa-circle-info info" title="Busca no nome, setor e tags da empresa"></i></span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+            <div class="fgroup-body">
+              <input class="search-input" id="inputPalavra" placeholder="Digite e pressione Enter...">
+              <div class="tags" id="tagsPalavras"></div>
+              <p class="hint">A empresa é considerada quando corresponde a <b>qualquer</b> palavra.</p>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <section class="fgroup" data-group="porte">
+        <button class="fgroup-head"><span>Porte <i class="fa-solid fa-circle-info info" title="Porte pela receita bruta anual"></i></span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+        <div class="fgroup-body">
+          <div class="opt-list" id="listPorte"></div>
+          <div class="sub-label">Funcionários: <span id="lblFunc"></span></div>
+          <div class="range-row">
+            <input type="range" id="funcMin" min="0" max="2000" step="10" value="0">
+            <input type="range" id="funcMax" min="0" max="2000" step="10" value="2000">
+          </div>
+        </div>
+      </section>
+
+      <section class="fgroup" data-group="decisores">
+        <button class="fgroup-head"><span>Decisores e Colaboradores</span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+        <div class="fgroup-body">
+          <div class="opt-list" id="listDecisor"></div>
+        </div>
+      </section>
+
+      <section class="fgroup" data-group="cadastrais">
+        <button class="fgroup-head"><span>Cadastrais e tributários</span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+        <div class="fgroup-body">
+          <label class="field"><span>Situação cadastral</span><select id="selSituacao"></select></label>
+          <label class="field"><span>Natureza jurídica</span><select id="selNatureza"></select></label>
+          <label class="field"><span>Regime tributário</span><select id="selRegime"></select></label>
+          <label class="check-line"><input type="checkbox" id="chkSimples"> Optante pelo Simples Nacional</label>
+          <label class="check-line"><input type="checkbox" id="chkMei"> Somente MEI</label>
+          <div class="sub-label">Abertura: <span id="lblAno"></span></div>
+          <div class="range-row">
+            <input type="range" id="anoMin" min="1960" max="2026" value="1960">
+            <input type="range" id="anoMax" min="1960" max="2026" value="2026">
+          </div>
+          <div class="sub-label">Capital social: <span id="lblCap"></span></div>
+          <div class="range-row">
+            <input type="range" id="capMin" min="0" max="100" value="0">
+            <input type="range" id="capMax" min="0" max="100" value="100">
+          </div>
+        </div>
+      </section>
+
+      <section class="fgroup" data-group="saude">
+        <button class="fgroup-head"><span>Saúde financeira</span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+        <div class="fgroup-body">
+          <div class="sub-label">Score financeiro: <span id="lblScore"></span></div>
+          <div class="range-row">
+            <input type="range" id="scoreMin" min="0" max="100" value="0">
+            <input type="range" id="scoreMax" min="0" max="100" value="100">
+          </div>
+          <div class="sub-label">Faturamento anual: <span id="lblRev"></span></div>
+          <div class="range-row">
+            <input type="range" id="revMin" min="0" max="100" value="0">
+            <input type="range" id="revMax" min="0" max="100" value="100">
+          </div>
+          <div class="opt-list" id="listRisco"></div>
+        </div>
+      </section>
+
+      <section class="fgroup" data-group="digital">
+        <button class="fgroup-head"><span>Presença digital</span><span class="dot" hidden></span><i class="fa-solid fa-chevron-down caret"></i></button>
+        <div class="fgroup-body">
+          <div class="opt-list" id="listDigital"></div>
+        </div>
+      </section>
+
+      <div class="sidebar-cta">
+        <button class="primary-btn" id="btnEncontrar"><i class="fa-solid fa-magnifying-glass"></i> Encontrar Empresas</button>
+        <button class="outline-btn" id="btnExportarBase"><i class="fa-solid fa-file-csv"></i> Exportar seleção</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= CONTENT ================= -->
+  <main class="content" id="content">
+
+    <div class="stats-row">
+      <div class="stat-card green">
+        <div class="stat-label">Empresas</div>
+        <div class="stat-value" id="statEmpresas">—</div>
+        <div class="stat-sub" id="statEmpresasSub"></div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Faturamento Anual <i class="fa-solid fa-circle-info info" title="Soma do faturamento anual estimado das empresas selecionadas"></i></div>
+        <div class="stat-value" id="statFaturamento">—</div>
+        <div class="stat-sub" id="statFaturamentoSub"></div>
+      </div>
+    </div>
+
+    <!-- ---------- VIEW: CALCULADORA ---------- -->
+    <section id="viewCalculadora">
+      <nav class="tabs" id="tabs" role="tablist">
+        <button class="tab active" data-tab="regiao" role="tab">Região e Setor</button>
+        <button class="tab" data-tab="porte" role="tab">Porte</button>
+        <button class="tab" data-tab="decisores" role="tab">Decisores e Colaboradores</button>
+        <button class="tab" data-tab="cadastrais" role="tab">Cadastrais, Legais e tributários</button>
+        <button class="tab" data-tab="saude" role="tab">Saúde financeira</button>
+        <button class="tab" data-tab="digital" role="tab">Presença digital</button>
+      </nav>
+
+      <!-- REGIÃO E SETOR -->
+      <div class="panel active" id="panel-regiao">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h2>Distribuição por Estado</h2>
+              <div class="card-actions">
+                <button class="icon-btn excel" data-export="estados" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button>
+                <div class="menu-wrap">
+                  <button class="icon-btn" data-menu="mapa" title="Opções"><i class="fa-solid fa-bars"></i></button>
+                  <div class="menu" data-menu-for="mapa">
+                    <button data-export="estados"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
+                    <button data-copy="estados"><i class="fa-regular fa-copy"></i> Copiar dados</button>
+                    <button onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="map-wrap">
+              <div class="map-legend">
+                <div class="legend-bar"></div>
+                <div class="legend-ticks" id="legendTicks"></div>
+              </div>
+              <div class="map-holder">
+                <svg id="mapaBrasil" viewBox="0 0 320 380" role="img" aria-label="Mapa de empresas por estado"></svg>
+                <div class="map-tip" id="mapTip" hidden></div>
+              </div>
+            </div>
+            <p class="card-foot">Clique em um estado para filtrar. Tons mais escuros = maior concentração de empresas.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>Top Cidades</h2>
+              <div class="card-actions">
+                <button class="icon-btn excel" data-export="cidades" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button>
+                <div class="menu-wrap">
+                  <button class="icon-btn" data-menu="cid" title="Opções"><i class="fa-solid fa-bars"></i></button>
+                  <div class="menu" data-menu-for="cid">
+                    <button data-export="cidades"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
+                    <button data-copy="cidades"><i class="fa-regular fa-copy"></i> Copiar dados</button>
+                    <button onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <input class="search-input mb" id="buscaCidade" placeholder="Pesquisar cidade...">
+            <div class="table-wrap">
+              <table class="data-table" id="tblCidades">
+                <thead><tr>
+                  <th class="sortable" data-sort="cidade">Cidade <i class="fa-solid fa-sort"></i></th>
+                  <th class="sortable num" data-sort="uf">UF <i class="fa-solid fa-sort"></i></th>
+                  <th class="sortable num" data-sort="empresas">Nº de empresas <i class="fa-solid fa-sort"></i></th>
+                  <th class="sortable num" data-sort="faturamento">Faturamento <i class="fa-solid fa-sort"></i></th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="pager" id="pagerCidades"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Empresas por Setor</h2>
+            <div class="card-actions">
+              <button class="icon-btn excel" data-export="setores" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button>
+            </div>
+          </div>
+          <div class="chart-box tall"><canvas id="chartSetor"></canvas></div>
+        </div>
+      </div>
+
+      <!-- PORTE -->
+      <div class="panel" id="panel-porte">
+        <div class="kpi-row" id="kpiPorte"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h2>Empresas por Porte</h2>
+              <div class="card-actions"><button class="icon-btn excel" data-export="porte" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button></div>
+            </div>
+            <div class="chart-box"><canvas id="chartPorte"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Faturamento por Porte</h2></div>
+            <div class="chart-box"><canvas id="chartPorteFat"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DECISORES -->
+      <div class="panel" id="panel-decisores">
+        <div class="kpi-row" id="kpiDecisores"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h2>Decisores por função</h2>
+              <div class="card-actions"><button class="icon-btn excel" data-export="decisores" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button></div>
+            </div>
+            <div class="chart-box tall"><canvas id="chartDecisores"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Cobertura de contatos</h2></div>
+            <div class="table-wrap">
+              <table class="data-table" id="tblDecisores">
+                <thead><tr><th>Função</th><th class="num">Contatos</th><th class="num">Empresas com a função</th><th class="num">Cobertura</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CADASTRAIS -->
+      <div class="panel" id="panel-cadastrais">
+        <div class="kpi-row" id="kpiCadastrais"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h2>Natureza jurídica</h2>
+              <div class="card-actions"><button class="icon-btn excel" data-export="natureza" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button></div>
+            </div>
+            <div class="chart-box tall"><canvas id="chartNatureza"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Abertura de empresas por década</h2></div>
+            <div class="chart-box tall"><canvas id="chartAbertura"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAÚDE FINANCEIRA -->
+      <div class="panel" id="panel-saude">
+        <div class="kpi-row" id="kpiSaude"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h2>Distribuição do score financeiro</h2>
+              <div class="card-actions"><button class="icon-btn excel" data-export="score" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button></div>
+            </div>
+            <div class="chart-box"><canvas id="chartScore"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Crescimento médio por setor</h2></div>
+            <div class="chart-box"><canvas id="chartCrescimento"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIGITAL -->
+      <div class="panel" id="panel-digital">
+        <div class="kpi-row wrap" id="kpiDigital"></div>
+        <div class="card">
+          <div class="card-head"><h2>Presença digital das empresas selecionadas</h2>
+            <div class="card-actions"><button class="icon-btn excel" data-export="digital" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button></div>
+          </div>
+          <div class="chart-box tall"><canvas id="chartDigital"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- VIEW: EMPRESAS ---------- -->
+    <section id="viewEmpresas" hidden>
+      <div class="card">
+        <div class="card-head">
+          <h2>Empresas encontradas <span class="badge" id="badgeEmpresas"></span></h2>
+          <div class="card-actions">
+            <button class="icon-btn excel" data-export="empresas" title="Exportar Excel (CSV)"><i class="fa-solid fa-file-excel"></i></button>
+            <button class="icon-btn" onclick="window.print()" title="Imprimir"><i class="fa-solid fa-print"></i></button>
+          </div>
+        </div>
+        <input class="search-input mb" id="buscaEmpresa" placeholder="Pesquisar empresa, cidade ou setor...">
+        <div class="table-wrap">
+          <table class="data-table" id="tblEmpresas">
+            <thead><tr>
+              <th class="sortable" data-sort="name">Empresa <i class="fa-solid fa-sort"></i></th>
+              <th class="sortable" data-sort="city">Cidade <i class="fa-solid fa-sort"></i></th>
+              <th class="sortable num" data-sort="state">UF <i class="fa-solid fa-sort"></i></th>
+              <th class="sortable" data-sort="sector">Setor <i class="fa-solid fa-sort"></i></th>
+              <th class="sortable" data-sort="size">Porte <i class="fa-solid fa-sort"></i></th>
+              <th class="sortable num" data-sort="revenue">Faturamento <i class="fa-solid fa-sort"></i></th>
+              <th class="sortable num" data-sort="employees">Func. <i class="fa-solid fa-sort"></i></th>
+              <th class="sortable num" data-sort="financialScore">Score <i class="fa-solid fa-sort"></i></th>
+              <th>Digital</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pager" id="pagerEmpresas"></div>
+        <p class="card-foot">Amostra representativa da base. Cada registro representa um conjunto de empresas com o mesmo perfil — os totais do topo consideram a base completa.</p>
+      </div>
+    </section>
+
+      <!-- ---------- FOOTER: ATALHOS ---------- -->
+      <footer class="site-footer">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <h3>Principais setores do Brasil</h3>
+            <a class="flink" data-quick="setor" data-value="Serviços">Empresas de Serviços</a>
+            <a class="flink" data-quick="setor" data-value="Varejo">Empresas de Comércio Varejista</a>
+            <a class="flink" data-quick="setor" data-value="Alimentação">Empresas de Alimentos</a>
+            <a class="flink" data-quick="setor" data-value="Manufatura">Empresas de Manufatura</a>
+            <a class="flink" data-quick="setor" data-value="Indústria">Empresas de Indústria</a>
+            <a class="flink" data-quick="setor" data-value="Restaurantes">Empresas de Restaurantes</a>
+            <a class="flink" data-quick="setor" data-value="Construção">Empresas de Construção</a>
+            <a class="flink" data-quick="setor" data-value="Transporte">Empresas de Logística e Transporte</a>
+            <a class="flink" data-quick="setor" data-value="Tecnologia">Empresas de Tecnologia</a>
+            <a class="flink" data-quick="setor" data-value="Saúde">Empresas de Saúde</a>
+            <a class="flink" data-quick="setor" data-value="Educação">Empresas de Educação</a>
+            <a class="flink" data-quick="setor" data-value="Agricultura">Empresas de Agricultura</a>
+          </div>
+
+          <div class="footer-col">
+            <h3>Principais Estados do Brasil</h3>
+            <a class="flink" data-quick="estado" data-value="SP">Empresas em São Paulo</a>
+            <a class="flink" data-quick="estado" data-value="MG">Empresas em Minas Gerais</a>
+            <a class="flink" data-quick="estado" data-value="RJ">Empresas no Rio de Janeiro</a>
+            <a class="flink" data-quick="estado" data-value="PR">Empresas no Paraná</a>
+            <a class="flink" data-quick="estado" data-value="RS">Empresas no Rio Grande do Sul</a>
+            <a class="flink" data-quick="estado" data-value="SC">Empresas em Santa Catarina</a>
+            <a class="flink" data-quick="estado" data-value="BA">Empresas na Bahia</a>
+            <a class="flink" data-quick="estado" data-value="GO">Empresas em Goiás</a>
+            <a class="flink" data-quick="estado" data-value="PE">Empresas em Pernambuco</a>
+            <a class="flink" data-quick="estado" data-value="CE">Empresas no Ceará</a>
+            <a class="flink" data-quick="estado" data-value="DF">Empresas no Distrito Federal</a>
+            <a class="flink" data-quick="estado" data-value="ES">Empresas no Espírito Santo</a>
+          </div>
+
+          <div class="footer-col">
+            <h3>Principais CNAEs do Brasil</h3>
+            <a class="flink" data-quick="secao" data-value="Comércio; Reparação de Veículos e Motocicletas">Empresas de Comércio; Reparação de Veículos e Motocicletas</a>
+            <a class="flink" data-quick="secao" data-value="Outras Atividades de Serviços">Empresas de Outras Atividades de Serviços</a>
+            <a class="flink" data-quick="secao" data-value="Indústrias de Transformação">Empresas de Indústrias de Transformação</a>
+            <a class="flink" data-quick="secao" data-value="Atividades Administrativas e Serviços Complementares">Empresas de Atividades Administrativas e Serviços Complementares</a>
+            <a class="flink" data-quick="secao" data-value="Alojamento e Alimentação">Empresas de Alojamento e Alimentação</a>
+            <a class="flink" data-quick="secao" data-value="Construção">Empresas de Construção</a>
+            <a class="flink" data-quick="secao" data-value="Transporte, Armazenagem e Correio">Empresas de Transporte, Armazenagem e Correio</a>
+            <a class="flink" data-quick="secao" data-value="Informação e Comunicação">Empresas de Informação e Comunicação</a>
+            <a class="flink" data-quick="secao" data-value="Saúde Humana e Serviços Sociais">Empresas de Saúde Humana e Serviços Sociais</a>
+            <a class="flink" data-quick="secao" data-value="Agricultura, Pecuária e Produção Florestal">Empresas de Agricultura, Pecuária e Produção Florestal</a>
+          </div>
+
+          <div class="footer-col">
+            <h3>Empresas mais buscadas</h3>
+            <a class="flink" data-quick="faturamento" data-value="4800000">Empresas com faturamento acima de 4,8 milhões</a>
+            <a class="flink" data-quick="porte" data-value="Média Empresa">Empresas Médias</a>
+            <a class="flink" data-quick="porte" data-value="Grande Empresa">Empresas de Grande Porte</a>
+            <a class="flink" data-quick="funcionarios" data-value="50">Empresas com mais de 50 funcionários</a>
+            <a class="flink" data-quick="funcionarios" data-value="200">Empresas com mais de 200 funcionários</a>
+            <a class="flink" data-quick="cidade" data-value="">Empresas por Cidade</a>
+            <a class="flink" data-quick="digital" data-value="ecommerce">Empresas com E-commerce</a>
+            <a class="flink" data-quick="digital" data-value="website">Empresas com Website</a>
+            <a class="flink" data-quick="simples" data-value="1">Empresas do Simples Nacional</a>
+            <a class="flink" data-quick="mei" data-value="1">Empresas MEI</a>
+          </div>
+        </div>
+
+        <div class="footer-tools">
+          <div class="footer-col">
+            <a class="flink" data-tool="leads">Gerador de Leads Grátis</a>
+            <a class="flink" data-tool="extensao">Extensão Google Chrome</a>
+            <a class="flink" data-tool="lista">Lista de Empresas</a>
+            <a class="flink" data-tool="cnae">Consulta CNAE</a>
+            <a class="flink" data-tool="empresa">Consulta Empresa</a>
+            <a class="flink" data-tool="socio">Consulta Sócio e Decisor</a>
+          </div>
+          <div class="footer-col">
+            <a class="flink" data-tool="videos">Galeria de vídeos</a>
+            <a class="flink" data-tool="blog">Blog da Prospecção</a>
+            <a class="flink" data-tool="conteudos">Conteúdos Gratuitos</a>
+            <a class="flink" data-tool="geracao">Geração de Leads</a>
+            <a class="flink" data-tool="inteligencia">Inteligência de Mercado</a>
+            <a class="flink" data-tool="base">Base de Conhecimento</a>
+          </div>
+        </div>
+
+        <p class="footer-note">Prospectar — demonstração funcional com dados simulados. Nenhuma informação real de empresas é utilizada.</p>
+      </footer>
+  </main>
+</div>
+
+<!-- MODAL MERCADO -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h2 id="modalTitle">Resumo de Mercado</h2>
+      <button class="icon-btn" id="btnFecharModal" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="outline-btn" id="btnCopiarResumo"><i class="fa-regular fa-copy"></i> Copiar resumo</button>
+      <button class="primary-btn" id="btnFecharModal2">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="script.js"></script>
