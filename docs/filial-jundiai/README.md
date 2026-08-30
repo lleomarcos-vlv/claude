@@ -24,3 +24,7 @@ Nenhum documento trata o aval de Dom Moacir como obtido, e nenhuma projeção fi
 ---
 
 *Este material foi desenvolvido pela VLV Consultoria em parceria com a Associação Franz de Castro Holzwarth.*
+
+## Versão em PDF (A4)
+
+Os PDFs em `pdf/` são gerados a partir dos arquivos Markdown desta pasta, em página A4 (210 × 297 mm), por `pdf/gerar-pdf.py` seguido de renderização em Chromium headless (`--print-to-pdf`). Para regerar após editar os Markdown, execute o script e reimprima os HTML resultantes.
