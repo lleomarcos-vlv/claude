@@ -1,0 +1,309 @@
+// ---------------------------------------------------------------------------
+// PADARIA VILLA REIS - modelo de dados
+//
+// Desenvolvimento: SQLite (provider = "sqlite", DATABASE_URL = "file:./dev.db")
+// Producao:        PostgreSQL -> troque o provider abaixo para "postgresql",
+//                  ajuste DATABASE_URL e rode `npx prisma migrate deploy`.
+//
+// Regra de ouro: o banco guarda apenas METADADOS de midia. Os arquivos
+// (fotos e videos) ficam sempre no storage, nunca dentro das tabelas.
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------- ADMINISTRACAO ---------------------------------
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    @default("admin") // admin | editor
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("admin_users")
+}
+
+// ------------------------------- MIDIA -------------------------------------
+
+model MediaAsset {
+  id           String  @id @default(cuid())
+  kind         String // image | video
+  originalName String
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  durationSec  Int?
+  alt          String?
+  folder       String  @default("geral") // geral | produtos | banners | encomendas | instagram
+
+  // Caminhos no storage. O original NUNCA e recomprimido.
+  originalPath String
+  desktopPath  String?
+  mobilePath   String?
+  thumbPath    String?
+  posterPath   String? // capa do video (imagem enviada pelo admin)
+
+  createdAt DateTime @default(now())
+
+  productMedia   ProductMedia[]
+  categories     Category[]
+  banners        Banner[]
+  promotions     Promotion[]
+  customOrders   CustomOrder[]
+  galleryItems   GalleryItem[]
+  instagramPosts InstagramPost[]
+  productsAsMain Product[]       @relation("ProductMainImage")
+
+  @@index([kind])
+  @@index([folder])
+  @@map("media_assets")
+}
+
+model GalleryItem {
+  id        String     @id @default(cuid())
+  title     String?
+  caption   String?
+  mediaId   String
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  position  Int        @default(0)
+  active    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+
+  @@index([position])
+  @@map("gallery_items")
+}
+
+model InstagramPost {
+  id        String     @id @default(cuid())
+  caption   String?
+  link      String?
+  mediaId   String
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  position  Int        @default(0)
+  active    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+
+  @@map("instagram_posts")
+}
+
+// ---------------------------- CATALOGO -------------------------------------
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?
+  emoji       String?
+  imageId     String?
+  image       MediaAsset? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  position    Int         @default(0)
+  active      Boolean     @default(true)
+  showOnHome  Boolean     @default(true)
+  forOrders   Boolean     @default(false) // aparece no formulario de encomendas
+
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([position])
+  @@map("categories")
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  shortDesc   String?
+  description String?
+  ingredients String?
+  extraInfo   String?
+
+  priceCents Int
+  unit       String @default("un") // un | kg | fatia | caixa | litro
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  mainImageId String?
+  mainImage   MediaAsset? @relation("ProductMainImage", fields: [mainImageId], references: [id], onDelete: SetNull)
+
+  media ProductMedia[]
+
+  available Boolean @default(true)
+  featured  Boolean @default(false) // "Mais pedidos" / destaque
+  isNew     Boolean @default(false) // "Novidades"
+  artisanal Boolean @default(false) // "Feito na Villa Reis"
+  orderable Boolean @default(true) // pode ser adicionado ao carrinho
+
+  position  Int @default(0)
+  viewCount Int @default(0)
+
+  promotions Promotion[]
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([featured])
+  @@index([available])
+  @@map("products")
+}
+
+model ProductMedia {
+  id        String     @id @default(cuid())
+  productId String
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  position  Int        @default(0)
+
+  @@unique([productId, mediaId])
+  @@index([productId, position])
+  @@map("product_media")
+}
+
+model Promotion {
+  id            String      @id @default(cuid())
+  title         String?
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  oldPriceCents Int
+  newPriceCents Int
+  discountPct   Int
+  startsAt      DateTime?
+  endsAt        DateTime?
+  active        Boolean     @default(true)
+  mediaId       String?
+  media         MediaAsset? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([productId])
+  @@index([active])
+  @@map("promotions")
+}
+
+model Banner {
+  id          String      @id @default(cuid())
+  title       String?
+  subtitle    String?
+  buttonLabel String?
+  buttonLink  String?
+  mediaId     String?
+  media       MediaAsset? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  placement   String      @default("hero") // hero | faixa
+  position    Int         @default(0)
+  active      Boolean     @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([placement, position])
+  @@map("banners")
+}
+
+// ----------------------------- PEDIDOS -------------------------------------
+
+model Order {
+  id            String      @id @default(cuid())
+  code          String      @unique
+  customerName  String
+  customerPhone String
+  notes         String?
+  fulfillment   String      @default("retirada") // retirada | entrega
+  address       String?
+  totalCents    Int
+  status        String      @default("novo") // novo | confirmado | preparacao | pronto | entregue | cancelado
+  source        String      @default("site")
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String?
+  product        Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName    String
+  unitPriceCents Int
+  quantity       Int
+  subtotalCents  Int
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model CustomOrder {
+  id               String      @id @default(cuid())
+  code             String      @unique
+  name             String
+  phone            String
+  desiredDate      DateTime?
+  desiredTime      String?
+  peopleCount      Int?
+  categoryName     String?
+  productName      String?
+  description      String
+  notes            String?
+  referenceMediaId String?
+  referenceMedia   MediaAsset? @relation(fields: [referenceMediaId], references: [id], onDelete: SetNull)
+  status           String      @default("novo") // novo | orcado | confirmado | concluido | cancelado
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([status])
+  @@map("custom_orders")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@map("contact_messages")
+}
+
+// --------------------------- CONFIGURACOES ---------------------------------
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  productId String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("page_views")
+}

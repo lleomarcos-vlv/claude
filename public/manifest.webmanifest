@@ -1,0 +1,24 @@
+{
+  "name": "Padaria Villa Reis",
+  "short_name": "Villa Reis",
+  "description": "Paes artesanais, confeitaria e cafeteria. Peca pelo aplicativo.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF6EE",
+  "theme_color": "#241609",
+  "lang": "pt-BR",
+  "categories": ["food", "shopping"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Cardapio", "url": "/produtos" },
+    { "name": "Meu pedido", "url": "/carrinho" },
+    { "name": "Encomendas", "url": "/encomendas" }
+  ]
+}
