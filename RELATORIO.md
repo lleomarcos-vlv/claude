@@ -1,0 +1,84 @@
+# Prospecção Ribeirão Preto — lote 04
+
+Data do levantamento: 17/09/2026.
+
+## O que foi entregue
+
+| Arquivo | O que é |
+|---|---|
+| `painel/index.html` | Seu painel, com os 146 leads novos já dentro da aba **Clientes p/ Ligar (RP)**, filtro por nicho e botão **Importar CSV** |
+| `dados/clientes-ligar-ribeirao-preto-NOVOS.csv` | Só os 146 leads novos, no formato que o painel importa |
+| `dados/demais-empresas-ribeirao-preto-LIMPO.csv` | Sua base atual de 144 linhas, corrigida |
+| `dados/leads-brutos-coletados.tsv` | Coleta crua (nicho, nome, telefone, endereço), para auditoria |
+| `scripts/processar.py` | O script que limpa, deduplica e gera os CSVs |
+
+## Leads novos: 146
+
+Todos em Ribeirão Preto, todos com DDD 16, todos com nicho preenchido, nenhum
+repetindo empresa que já estava em qualquer uma das três abas do painel. São 136
+telefones fixos e 10 celulares (só esses 10 aceitam WhatsApp).
+
+Nichos com mais volume: padaria (8), farmácia (8), embalagens (8), lanchonete (7),
+clínica odontológica (5), supermercado (5), veterinária (5), papelaria (5),
+restaurante (4), ótica (4). No total, 69 nichos diferentes.
+
+**Origem e limite deste lote.** Os lotes 01 a 03 da sua lista vieram do Google
+Places. Este veio de busca em diretórios públicos (Guia Fácil e similares), porque
+o ambiente onde rodei não tem acesso ao Google Places nem à API da Casa dos Dados.
+A diferença prática: telefone de diretório envelhece mais rápido e a situação
+cadastral não é verificada. Por isso cada registro traz "Telefone não confirmado
+por ligação" na observação. Espere algo entre 10% e 20% de números desatualizados,
+e trate a primeira ligação como a validação.
+
+## Base atual: o que foi corrigido nas 144 linhas
+
+- **41 telefones** normalizados para `(16) 9XXXX-XXXX` / `(16) XXXX-XXXX`. Estavam
+  como `16 99241-4323`, `1699160 8566`, `16) 99755-5566`, `16 98801 9040`.
+- **83 nichos** preenchidos a partir do nome da empresa (119 linhas estavam sem
+  categoria). São dedução, não confirmação: "Panificadora Catedral" virou Padaria.
+- **9 duplicatas** encontradas (linhas 76 a 84 repetem as 67 a 75). Elas não foram
+  apagadas: os campos que só existiam na segunda cópia foram levados para a
+  primeira antes de marcar. Isso recuperou **7 nomes de responsável** (Andreia,
+  Inácio, Cristiano Bezerra, Fábio, Bruno, Fatima, Sr. Roberto) e, no caso da
+  New Tons Beleza, telefone e CNPJ que estavam faltando na linha original.
+- **Cidade** preenchida como Ribeirão Preto onde estava vazia (122 linhas).
+- **CNPJ** formatado com pontuação e conferido no dígito verificador.
+
+### Três coisas que precisam de você
+
+1. **37 empresas sem telefone nenhum.** Não dá para ligar para elas: Valmac,
+   Açougue Almir Rodrigues, A Toca, Motel A2, Alubri Lux, Vilagem Classe A,
+   Pradinho, Menu Autopeças, Grupo Cargo Polo, Martifer, Fava Comida de Verdade,
+   Boi Bom, Joiois, Augusta, Fina Gourmet, Piper, Robusti, Sushi Fã, Canomi,
+   Porti Horse, City Invictus, Posto CBW, Garar 78, Tom Tintas, Atenas,
+   Tapeçaria Chia, Vila Chique, RF Facas, Shopping dos Animais, Eletromontagem,
+   Indústria Gráfica, FMX, Vitória, La Vitória, Auto Mecânica, Anchieta Pet Shop,
+   Panificadora Progresso 2.
+2. **CNPJ da Punch (`357982150001-18`) não fecha no dígito verificador** e o
+   telefone cadastrado é `(34) 3224-4444`, DDD de Uberlândia. Vale reconferir se
+   é a unidade certa.
+3. **Copert está com `(19) 2106-7700`**, DDD de Campinas. É a matriz da Koppert;
+   se o alvo é a unidade de Ribeirão, o número é outro.
+
+## O que mudou no painel
+
+O painel só exportava CSV, não importava. Agora tem:
+
+- **Importar CSV** ao lado de Baixar CSV. Importa para a aba aberta, aceita o
+  mesmo formato que o próprio painel exporta, ignora linhas já existentes (por
+  nome ou por telefone) e pula as marcadas como DUPLICADO. Importar o mesmo
+  arquivo duas vezes não cria nada repetido.
+- **Filtro por nicho** na barra de ferramentas, montado com os nichos da aba
+  aberta. É o que permite ligar em lote: escolher "Padaria" e trabalhar as 8.
+- **Nicho e telefone visíveis na linha**, sem precisar abrir o detalhe.
+- A busca passou a enxergar nicho e cidade, além de nome, CNPJ e telefone.
+
+## Como continuar sozinho
+
+A aba **Leads Casa dos Dados** já existe no seu painel e faz exatamente este
+trabalho com dado de fonte melhor: busca por município e CNAE, filtra por situação
+cadastral ativa, traz CNPJ e telefone. Ela só precisa da chave em
+`portal.casadosdados.com.br/plataforma/api/chave`. Com a chave configurada, o
+caminho de cada lote novo passa a ser: buscar por CNAE, mandar para a aba, e o
+painel deduplica. Este lote 04 foi feito por fora porque o ambiente não alcança
+essa API, não porque o caminho não exista.
