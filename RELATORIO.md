@@ -82,3 +82,30 @@ cadastral ativa, traz CNPJ e telefone. Ela só precisa da chave em
 caminho de cada lote novo passa a ser: buscar por CNAE, mandar para a aba, e o
 painel deduplica. Este lote 04 foi feito por fora porque o ambiente não alcança
 essa API, não porque o caminho não exista.
+
+## Lote 05 (segunda rodada)
+
+Mais 86 empresas, em nichos que a primeira varredura não tinha coberto:
+refrigeração comercial (6), distribuidora de gás (6), clínica médica (6),
+açougue (5), motos e moto peças (5), auto elétrica (4), tapeçaria e persianas (3),
+distribuidoras (3), materiais de construção (3), segurança eletrônica (3),
+extintores e EPI, ferragens e parafusos, gesso, pisos, joalheria, locadora,
+academia, churrascaria, hospital e outros. São 43 nichos no total, 81 fixos e
+5 celulares.
+
+Arquivo: `dados/clientes-ligar-ribeirao-preto-LOTE05.csv`.
+
+Três empresas coletadas nesta rodada foram descartadas porque já estavam na sua
+lista com o mesmo telefone: Casa de Carnes Primeiro de Maio, Carnes Almir
+Rodrigues e Casa do Açougueiro. Isso é um bom sinal: a busca pública bateu com o
+que o Google Places já tinha te dado.
+
+Dois registros levam aviso na observação. **Kim Moto Peças** aparece com telefone
+diferente do "Kim Moto Peça" que você já tem, então confirme se é a mesma antes
+de ligar. **Mialich Supermercados** é outra unidade (Ipiranga), já que a Loja 07
+está na sua lista.
+
+Rendimento por rodada: os nichos de comércio de rua estão ficando saturados. A
+primeira varredura rendeu 146 leads, esta rendeu 86 com mais buscas. A próxima
+tende a render menos ainda por esse caminho, o que reforça configurar a chave da
+Casa dos Dados no painel para buscar por CNAE.
