@@ -109,3 +109,21 @@ Rendimento por rodada: os nichos de comércio de rua estão ficando saturados. A
 primeira varredura rendeu 146 leads, esta rendeu 86 com mais buscas. A próxima
 tende a render menos ainda por esse caminho, o que reforça configurar a chave da
 Casa dos Dados no painel para buscar por CNAE.
+
+## Lote 06 (terceira rodada)
+
+Mais 37 empresas, nenhuma repetindo o que já existe: telecomunicações e provedores
+de internet (4), farmácia (3), perfumaria e cosméticos (2), odontologia e prótese
+dentária (5 no conjunto), reciclagem e ferro velho (3), livraria e papelaria (4),
+móveis para escritório, despachante, funilaria, máquinas agrícolas, instalações
+elétricas e outros.
+
+Arquivo: `dados/clientes-ligar-ribeirao-preto-LOTE06.csv`.
+Os três lotes juntos estão em `dados/clientes-ligar-ribeirao-preto-TODOS.csv`
+(269 empresas). Importar o consolidado é seguro mesmo depois de já ter importado
+os lotes separados, porque o importador ignora quem já está na lista.
+
+A curva de rendimento por rodada: 146, depois 86, agora 37, com um número parecido
+de buscas em cada uma. Os diretórios públicos de Ribeirão Preto estão no fim para
+este tipo de varredura. Uma quarta rodada por aqui renderia poucas dezenas e cada
+vez mais empresa de porte pequeno sem cadastro atualizado.
