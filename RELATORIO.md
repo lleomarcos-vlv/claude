@@ -127,3 +127,20 @@ A curva de rendimento por rodada: 146, depois 86, agora 37, com um número parec
 de buscas em cada uma. Os diretórios públicos de Ribeirão Preto estão no fim para
 este tipo de varredura. Uma quarta rodada por aqui renderia poucas dezenas e cada
 vez mais empresa de porte pequeno sem cadastro atualizado.
+
+## Arquivo final: 501 empresas
+
+`dados/leads-ribeirao-preto.csv`, colunas `Nome;Telefone;Bairro;Nicho`, 151 nichos.
+Todos os telefones com DDD 16, nenhum repetido, nenhum campo obrigatório vazio.
+Deduplicado contra a base que já existia no painel.
+
+O que destravou o volume foi trocar de fonte. O Guia Fácil, usado nos lotes 04 a
+07, tinha saturado. Duas fontes novas renderam bem mais: o todosnegocios, que traz
+o telefone completo no próprio título da página, e a busca por prefixo telefônico
+("(16) 3627", "(16) 3969" e assim por diante), que devolve empresas de todos os
+ramos de uma vez em lugar de um nicho por busca.
+
+Bairro preenchido em 277 linhas; nas outras 224 a fonte não publicava endereço e o
+campo ficou em branco em vez de receber chute. Órgãos públicos, igrejas,
+condomínios residenciais e prefeitura foram descartados na coleta, por não serem
+alvo de prospecção.
