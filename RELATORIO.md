@@ -1,4 +1,4 @@
-# Prospecção Ribeirão Preto — lote 04
+# Prospecção Ribeirão Preto, lote 04
 
 Data do levantamento: 17/09/2026.
 
