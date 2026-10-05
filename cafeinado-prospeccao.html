@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cafeinado Prospecção</title>
+<style>
+:root{
+  --bg:#f7f3ee; --surface:#ffffff; --surface-2:#f1ebe3; --border:#e2d8cc;
+  --text:#2b2118; --muted:#7a6a5b; --accent:#7b4a2a; --accent-2:#a8693f; --accent-text:#ffffff;
+  --ok:#2f7d4f; --ok-bg:#e3f2e8; --warn:#9a6a00; --warn-bg:#fbf0d4; --bad:#a63a2f; --bad-bg:#f8e1de;
+  --info:#2d5f8a; --info-bg:#e1ecf6; --shadow:0 1px 2px rgba(43,33,24,.06),0 4px 14px rgba(43,33,24,.06);
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16110d; --surface:#211a14; --surface-2:#2a211a; --border:#3a2e24;
+    --text:#f1e8de; --muted:#b3a291; --accent:#d4955f; --accent-2:#e7b07f; --accent-text:#1a120c;
+    --ok:#7fd3a0; --ok-bg:#1d3326; --warn:#f0c560; --warn-bg:#3a2f14; --bad:#f19a8f; --bad-bg:#3d1f1b;
+    --info:#9cc6ee; --info-bg:#1c2c3b; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16110d; --surface:#211a14; --surface-2:#2a211a; --border:#3a2e24;
+  --text:#f1e8de; --muted:#b3a291; --accent:#d4955f; --accent-2:#e7b07f; --accent-text:#1a120c;
+  --ok:#7fd3a0; --ok-bg:#1d3326; --warn:#f0c560; --warn-bg:#3a2f14; --bad:#f19a8f; --bad-bg:#3d1f1b;
+  --info:#9cc6ee; --info-bg:#1c2c3b; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+h1{margin:0;font-size:22px;letter-spacing:-.01em}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:12px 0}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted)}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}
+nav button{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit}
+nav button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+@media (max-width:760px){.filters{grid-template-columns:1fr 1fr}}
+input,select,textarea{width:100%;font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+textarea{resize:vertical;min-height:38px}
+label.chk{display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:14px;color:var(--muted);cursor:pointer}
+label.chk input{width:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--accent-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.btn.wa{background:#1f8f4e;border-color:#1f8f4e;color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.list{display:grid;gap:8px;margin-top:10px}
+.lead{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:grid;grid-template-columns:1fr auto;gap:8px 12px}
+.lead .name{font-weight:600}
+.lead .meta{color:var(--muted);font-size:13px}
+.lead .phones{font-variant-numeric:tabular-nums;font-size:14px}
+.lead .side{display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:170px}
+.lead .bottom{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:760px){.lead{grid-template-columns:1fr}.lead .side{min-width:0}.lead .bottom{grid-template-columns:1fr}}
+.badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.badge{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+.badge.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.badge.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.badge.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.badge.info{background:var(--info-bg);color:var(--info);border-color:transparent}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin-top:8px}
+.slot{border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center;font-variant-numeric:tabular-nums;cursor:pointer;background:var(--surface);color:var(--text);font:inherit;font-size:14px}
+.slot.done{background:var(--ok-bg);color:var(--ok);border-color:transparent;text-decoration:line-through}
+.slot.past{opacity:.55}
+.slot.next{outline:2px solid var(--accent);font-weight:600}
+.big{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+.progress{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin-top:8px}
+.progress i{display:block;height:100%;background:var(--accent);width:0}
+code{background:var(--surface-2);padding:1px 6px;border-radius:6px;font-size:13px}
+ol li,ul li{margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>☕ <span>Cafeinado</span> Prospecção</h1>
+      <div class="sub">Leads sem site em Ribeirão Preto e região</div>
+    </div>
+    <div class="row">
+      <button class="btn" id="themeBtn" title="Alternar tema">🌓 Tema</button>
+    </div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <nav id="tabs">
+    <button data-tab="leads" class="on">Leads</button>
+    <button data-tab="agenda">Agenda do dia</button>
+    <button data-tab="buscar">Buscar no Google</button>
+    <button data-tab="config">Configurações</button>
+  </nav>
+
+  <!-- LEADS -->
+  <section class="panel on" id="p-leads">
+    <div class="card">
+      <div class="filters">
+        <input id="fBusca" placeholder="Buscar por nome, telefone ou nota">
+        <select id="fCidade"><option value="">Todas as cidades</option></select>
+        <select id="fSegmento"><option value="">Todos os segmentos</option></select>
+        <select id="fStatus"><option value="">Todos os status</option></select>
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <label class="chk"><input type="checkbox" id="fCel"> Só com celular</label>
+          <label class="chk"><input type="checkbox" id="fNaoVer"> Só site não verificado</label>
+          <label class="chk"><input type="checkbox" id="fOcultar" checked> Ocultar "Não contatar" e site confirmado</label>
+        </div>
+        <div class="row">
+          <span class="small muted" id="countInfo"></span>
+          <button class="btn" id="verifyAllBtn" title="Usa a Google Places API">🔎 Verificar sites (filtrados)</button>
+        </div>
+      </div>
+      <div id="verifyBox" style="display:none">
+        <div class="row small" style="justify-content:space-between;margin-top:8px"><span id="verifyTxt"></span><button class="btn" id="verifyStop">Parar</button></div>
+        <div class="progress"><i id="verifyBar"></i></div>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" id="moreBtn">Mostrar mais</button></div>
+  </section>
+
+  <!-- AGENDA -->
+  <section class="panel" id="p-agenda">
+    <div class="grid2">
+      <div class="card">
+        <div class="muted small">Próximo envio</div>
+        <div class="big" id="nextSlot">--:--</div>
+        <div class="muted small" id="nextCountdown"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="notifyBtn">🔔 Ativar lembrete</button>
+          <button class="btn" id="resetDay">Zerar dia</button>
+        </div>
+        <p class="small muted">Janelas: 9h às 11h e 14h às 16h30, um envio a cada 10 minutos (29 por dia, de segunda a sexta). O lembrete só funciona com esta página aberta. Clique em um horário para marcar como feito.</p>
+        <div class="slots" id="slots"></div>
+      </div>
+      <div class="card">
+        <div class="muted small">Próximo lead da fila</div>
+        <div id="nextLead" style="margin-top:6px"></div>
+        <p class="small muted">Fila: status "Novo", com celular e sem site confirmado. A ordem vem da lista de leads, com os segmentos de maior valor primeiro.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUSCAR -->
+  <section class="panel" id="p-buscar">
+    <div class="card">
+      <div class="filters" style="grid-template-columns:2fr 1.4fr 1fr">
+        <input id="qTermo" list="dlSeg" placeholder="O que buscar (ex.: serralheria, marmoraria)">
+        <input id="qCidade" list="dlCid" placeholder="Cidade" value="Ribeirão Preto">
+        <button class="btn primary" id="qBtn">Buscar no Google</button>
+      </div>
+      <datalist id="dlSeg"></datalist>
+      <datalist id="dlCid"></datalist>
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <label class="chk"><input type="checkbox" id="qSemSite" checked> Mostrar só quem não tem site</label>
+          <label class="chk"><input type="checkbox" id="qCel"> Só com celular</label>
+        </div>
+        <div class="row">
+          <button class="btn" id="qAddAll" disabled>➕ Adicionar todos visíveis</button>
+          <button class="btn" id="qMore" disabled>Mais resultados</button>
+        </div>
+      </div>
+      <div class="small muted" id="qInfo" style="margin-top:6px"></div>
+    </div>
+    <div class="list" id="qList"></div>
+  </section>
+
+  <!-- CONFIG -->
+  <section class="panel" id="p-config">
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-top:0">Google Places API</h3>
+        <label class="small muted" for="apiKey">Chave da API (fica salva só neste navegador)</label>
+        <div class="row" style="margin-top:4px">
+          <input id="apiKey" type="password" placeholder="AIza..." style="flex:1">
+          <button class="btn" id="apiShow">👁</button>
+          <button class="btn primary" id="apiSave">Salvar</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="apiTest">Testar conexão</button>
+          <span class="small" id="apiStatus"></span>
+        </div>
+        <p class="small muted" id="usageTxt"></p>
+        <details>
+          <summary class="small">Como criar e proteger a chave</summary>
+          <ol class="small">
+            <li>Acesse console.cloud.google.com, crie um projeto e ative o faturamento.</li>
+            <li>Em "APIs e serviços", ative a <b>Places API (New)</b>.</li>
+            <li>Em "Credenciais", crie uma chave de API.</li>
+            <li>Restrinja a chave: em "Restrições de API", deixe só a Places API (New).</li>
+            <li>Em "Cotas", defina um limite diário de requisições para não ter surpresa na fatura.</li>
+            <li>Se for abrir o painel por <code>http://localhost</code>, restrinja também por referenciador HTTP.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Mensagem de abordagem</h3>
+        <p class="small muted">Usada no botão WhatsApp. Variáveis: <code>{empresa}</code> <code>{cidade}</code> <code>{segmento}</code></p>
+        <textarea id="tpl" rows="8"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn primary" id="tplSave">Salvar mensagem</button><button class="btn" id="tplReset">Restaurar padrão</button></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Backup e exportação</h3>
+        <p class="small muted">Seus status e notas ficam salvos neste navegador. Se limpar os dados do navegador, eles somem, então exporte um backup de vez em quando.</p>
+        <div class="row">
+          <button class="btn" id="expCsv">⬇ Exportar CSV</button>
+          <button class="btn" id="expJson">⬇ Backup (JSON)</button>
+          <label class="btn" for="impJson">⬆ Restaurar backup</label>
+          <input type="file" id="impJson" accept=".json,application/json" hidden>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="resetAll">Restaurar lista original</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SEED = [{"id": "g001", "nome": "Medeiros Caldeiraria (Cidade Industrial)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3945-8709 / (16) 3942-9020"}, {"id": "g002", "nome": "Britto Caldeiraria (Lourenço Domenici)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 98165-8187"}, {"id": "g003", "nome": "A. J. Caldeiraria (Jd Diamante)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3945-6676"}, {"id": "g004", "nome": "MBA Caldeiraria Industrial (Alvorada)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3945-7663"}, {"id": "g005", "nome": "Caldeiraria Sertãozinho (Zona Industrial)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3491-1009"}, {"id": "g006", "nome": "F R Caldeiraria Industrial (Jd Boa Vista)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 9116-0685 (testar 99116-0685)"}, {"id": "g007", "nome": "Sublas Equip. Industriais e Usinagem", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3942-1315"}, {"id": "g008", "nome": "Cardoso Equipamentos Industriais (Centro)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3524-3502"}, {"id": "g009", "nome": "JM Car (oficina, Jd Europa)", "cidade": "Sertãozinho", "segmento": "Oficinas e autopeças", "telefone": "(16) 99248-5820"}, {"id": "g010", "nome": "Marmoraria Castelo (Pq dos Bandeirantes)", "cidade": "Ribeirão Preto", "segmento": "Marmorarias", "telefone": "(16) 3877-6132"}, {"id": "g011", "nome": "Marmoraria Classe A", "cidade": "Ribeirão Preto", "segmento": "Marmorarias", "telefone": "(16) 98869-8119"}, {"id": "g012", "nome": "ERS Stilo Marmoraria", "cidade": "Ribeirão Preto", "segmento": "Marmorarias", "telefone": "(16) 99718-2212"}, {"id": "g013", "nome": "VMK Mármores e Granitos", "cidade": "Ribeirão Preto", "segmento": "Marmorarias", "telefone": "(16) 99776-8978"}, {"id": "g014", "nome": "Emigran Marmoraria (Vila Brasil)", "cidade": "Ribeirão Preto", "segmento": "Marmorarias", "telefone": "(16) 3969-1390"}, {"id": "g015", "nome": "Vidraçaria Rosseto", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3612-3464"}, {"id": "g016", "nome": "Vidrobel", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3615-8034"}, {"id": "g017", "nome": "Astral Vidros", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 99102-2377"}, {"id": "g018", "nome": "Marc Vidros", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3021-5478"}, {"id": "g019", "nome": "Lin & Art Móveis Planejados", "cidade": "Ribeirão Preto", "segmento": "Marcenarias e móveis", "telefone": "(16) 99734-0206"}, {"id": "g020", "nome": "Marcenaria Elanodri", "cidade": "Ribeirão Preto", "segmento": "Marcenarias e móveis", "telefone": "(16) 99766-0774"}, {"id": "g021", "nome": "Rios Marcenaria", "cidade": "Ribeirão Preto", "segmento": "Marcenarias e móveis", "telefone": "(16) 98247-7877"}, {"id": "g022", "nome": "Jofrasi Marceneiro", "cidade": "Ribeirão Preto", "segmento": "Marcenarias e móveis", "telefone": "(16) 99306-8698"}, {"id": "g023", "nome": "LEC Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3975-1875"}, {"id": "g024", "nome": "CR Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3627-9860"}, {"id": "g025", "nome": "Aportécnica Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3969-4117"}, {"id": "g026", "nome": "Calhas Paulista", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 3638-0344"}, {"id": "g027", "nome": "Laurenti Calhas", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 3627-9518"}, {"id": "g028", "nome": "Calhas Ferreira", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 3626-4312"}, {"id": "g029", "nome": "GS Calhas", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 3626-4116"}, {"id": "g030", "nome": "PA Calhas", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 3967-9716"}, {"id": "g031", "nome": "Auto Tapeçaria Soma (Ipiranga)", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 3630-3537"}, {"id": "g032", "nome": "Auto Tapeçaria Reis (Campos Elíseos)", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 3626-9002"}, {"id": "g033", "nome": "Paraná Pufs e Baús (Heitor Rigon)", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 99316-9373"}, {"id": "g034", "nome": "Serralheria Santa Rita", "cidade": "Jaboticabal", "segmento": "Serralherias e portões", "telefone": "(16) 99314-8892"}, {"id": "g035", "nome": "Serralheria Artística Mundial (Jd Aroeira)", "cidade": "Jaboticabal", "segmento": "Serralherias e portões", "telefone": "(16) 99705-7115"}, {"id": "g036", "nome": "Ronimar Estruturas Metálicas (Sorocabano)", "cidade": "Jaboticabal", "segmento": "Serralherias e portões", "telefone": "(16) 3202-2422"}, {"id": "g037", "nome": "Serralheria Arquitécnica Valma", "cidade": "Jaboticabal", "segmento": "Serralherias e portões", "telefone": "(16) 3202-1009"}, {"id": "g038", "nome": "Sagat Vidros (Centro)", "cidade": "Jaboticabal", "segmento": "Vidraçarias e box", "telefone": "(16) 99719-2600 / (16) 3204-4404"}, {"id": "g039", "nome": "Ribeiro Usinagem de Batatais (Distrito Industrial)", "cidade": "Batatais", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3761-9275"}, {"id": "g040", "nome": "Mauricio Marques do Amaral (marcenaria)", "cidade": "Monte Alto", "segmento": "Marcenarias e móveis", "telefone": "(16) 99606-8163"}, {"id": "g041", "nome": "Costa Serralheria (Jd Parisi)", "cidade": "Orlândia", "segmento": "Serralherias e portões", "telefone": "(16) 99108-0020"}, {"id": "g042", "nome": "Desentupidora e Limpa Fossa Morillo", "cidade": "Bebedouro", "segmento": "Serviços residenciais", "telefone": "(17) 99773-7121"}, {"id": "g043", "nome": "Artmetal Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3628-5560"}, {"id": "g044", "nome": "Box Moura Vidraçarias", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3289-0761"}, {"id": "g045", "nome": "TJ Toldos e Coberturas (Vila Elisa)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 3626-9294"}, {"id": "g046", "nome": "Mayim Dedetizadora", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99104-4996"}, {"id": "g047", "nome": "Ambinseto Controle de Pragas", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99254-9093"}, {"id": "g048", "nome": "Santos Empreiteira (marido de aluguel)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99613-7890"}, {"id": "g049", "nome": "CarTech Funilaria e Pintura (Campos Elíseos)", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3979-0790"}, {"id": "g050", "nome": "Graffiti Pintura (pintor)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99277-6689 / (16) 99305-2514"}, {"id": "g051", "nome": "Maxiar Ar Condicionado", "cidade": "Ribeirão Preto", "segmento": "Ar condicionado e refrigeração", "telefone": "(16) 3621-3114"}, {"id": "g052", "nome": "Ar-Condicionado e Refrigeração LG", "cidade": "Ribeirão Preto", "segmento": "Ar condicionado e refrigeração", "telefone": "(16) 3969-4112"}, {"id": "g053", "nome": "Refrigeração Galati (Independência)", "cidade": "Ribeirão Preto", "segmento": "Ar condicionado e refrigeração", "telefone": "(16) 3628-6662"}, {"id": "g054", "nome": "Refrigeração União (Pq Servidores)", "cidade": "Ribeirão Preto", "segmento": "Ar condicionado e refrigeração", "telefone": "(16) 3995-3913"}, {"id": "g055", "nome": "Agnaldo da Silva Refrigeração (Planalto Verde)", "cidade": "Ribeirão Preto", "segmento": "Ar condicionado e refrigeração", "telefone": "(16) 99224-7297"}, {"id": "g056", "nome": "J. B. Dantas Refrigeração (Vila Virgínia)", "cidade": "Ribeirão Preto", "segmento": "Ar condicionado e refrigeração", "telefone": "(16) 99109-4690"}, {"id": "g057", "nome": "Roberto Barbosa Giglio Madeiras (Jd Piratininga)", "cidade": "Ribeirão Preto", "segmento": "Marcenarias e móveis", "telefone": "(16) 99320-8900"}, {"id": "g058", "nome": "Córdoba Autoelétricas (Vila Brasil)", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3514-4361"}, {"id": "g059", "nome": "Apoio 4x4 Centro Automotivo (Campos Elíseos)", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3635-3805"}, {"id": "g060", "nome": "Calhas Rufos e Coifas", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 98812-4603"}, {"id": "g061", "nome": "Caobianco Calhas", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 3626-8690"}, {"id": "g062", "nome": "JMC Calhas", "cidade": "Ribeirão Preto", "segmento": "Calhas", "telefone": "(16) 3636-3544"}, {"id": "g063", "nome": "Metálicas Viafer Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3996-8271"}, {"id": "g064", "nome": "Serralheria Guizelini", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3914-3492"}, {"id": "g065", "nome": "Serralheria Irmãos Ribeiro", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3621-2522"}, {"id": "g066", "nome": "Serralheria Irmãos Espadari", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3626-1877"}, {"id": "g067", "nome": "Gasfer Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3996-1350"}, {"id": "g068", "nome": "AMR Marcos Rick Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3628-7678"}, {"id": "g069", "nome": "Art Ferro Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3904-9469"}, {"id": "g070", "nome": "JM e Mateus Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3622-9403"}, {"id": "g071", "nome": "Sumarezinho Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3633-4011"}, {"id": "g072", "nome": "Squadri Art (serralheria)", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3966-3564"}, {"id": "g073", "nome": "Dinabel Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3628-5299"}, {"id": "g074", "nome": "Alto Estilo Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3637-3575"}, {"id": "g075", "nome": "Vidraçaria Areados", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3626-3716"}, {"id": "g076", "nome": "Decore e Vidros", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3624-8707"}, {"id": "g077", "nome": "Vidros Carvalho", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3011-6311"}, {"id": "g078", "nome": "EPS Controle de Pragas", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 3615-8393"}, {"id": "g079", "nome": "Bioforte Controle de Pragas", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 3963-2272"}, {"id": "g080", "nome": "Antinseto Controle de Pragas", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 3622-1854"}, {"id": "g081", "nome": "Itapuã Saneamento (dedetização)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 98844-5017"}, {"id": "g082", "nome": "Auto Elétrica Tonhão (Centro)", "cidade": "Sertãozinho", "segmento": "Oficinas e autopeças", "telefone": "(16) 3942-2047"}, {"id": "g083", "nome": "Grazina Montagens e Soldagens Industriais", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3945-0337"}, {"id": "g084", "nome": "L.M. Comércio e Soldagens (Alvorada)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3942-5241"}, {"id": "g085", "nome": "Dapimoques Manutenção e Montagem Industrial", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3947-9763"}, {"id": "g086", "nome": "M.C. Manutenção e Montagem Industrial", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3041-3742"}, {"id": "g087", "nome": "Riber Placas (comunicação visual)", "cidade": "Ribeirão Preto", "segmento": "Gráficas e comunicação visual", "telefone": "(16) 3610-2737"}, {"id": "g088", "nome": "Serel Assistência Técnica (Campos Elíseos)", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 3961-3374"}, {"id": "g089", "nome": "Ripre Assistência Técnica (Jd Paulistano)", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 3624-9319"}, {"id": "g090", "nome": "Ag Tec Fogões", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 99162-9141"}, {"id": "g091", "nome": "Paulo Gallo Conserto de Fogões", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 3637-9062"}, {"id": "g092", "nome": "M D Refrigeração (lavadoras e geladeiras)", "cidade": "Ribeirão Preto", "segmento": "Ar condicionado e refrigeração", "telefone": "(16) 98104-5706"}, {"id": "g093", "nome": "Irmãos Augusto Transportadora (caçambas)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99125-9147"}, {"id": "g094", "nome": "Caçambas Angelim Limpa Tudo", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 3630-1585"}, {"id": "g095", "nome": "Braghin Terraplanagem (caçambas)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 98162-3942"}, {"id": "g096", "nome": "Trilho Suisso Persianas", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 3966-2363"}, {"id": "g097", "nome": "Cor & Forma Decoração (cortinas)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99218-0748"}, {"id": "g098", "nome": "Masva Persianas e Cortinas", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99961-3857"}, {"id": "g099", "nome": "Alfa Automatização e Serralheria", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 98821-0705"}, {"id": "g100", "nome": "DGL Portões Eletrônicos", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 99153-2846"}, {"id": "g101", "nome": "Auto Mecânica Guilherme", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3203-5185"}, {"id": "g102", "nome": "Auto Mecânica Cidão", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3203-3772"}, {"id": "g103", "nome": "Auto Mecânica Bilo", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3202-1045"}, {"id": "g104", "nome": "Auto Mecânica Santos", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3202-1455"}, {"id": "g105", "nome": "Auto Mecânica Tolecar", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3202-1730"}, {"id": "g106", "nome": "Mecânica Fiat Car", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3202-3762"}, {"id": "g107", "nome": "Mecânica Cláudio", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3202-2817"}, {"id": "g108", "nome": "Auto Mecânica Atenas", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3203-2343"}, {"id": "g109", "nome": "Caldevan Montagem Industrial", "cidade": "Guariba", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3251-3181"}, {"id": "g110", "nome": "Bartolomeu Materiais para Construção", "cidade": "Brodowski", "segmento": "Construção e tintas", "telefone": "(16) 3664-9900"}, {"id": "g111", "nome": "Marmoraria Santa Lídia (Sorocabano)", "cidade": "Jaboticabal", "segmento": "Marmorarias", "telefone": "(16) 3202-1737"}, {"id": "g112", "nome": "Marmoraria Granissil (Sorocabano)", "cidade": "Jaboticabal", "segmento": "Marmorarias", "telefone": "(16) 3202-3070"}, {"id": "g113", "nome": "Morescalchi Marmoraria (Centro)", "cidade": "Jaboticabal", "segmento": "Marmorarias", "telefone": "(16) 3203-2306"}, {"id": "g114", "nome": "Silva Marmoraria Jaboticabal", "cidade": "Jaboticabal", "segmento": "Marmorarias", "telefone": "(16) 3204-8125"}, {"id": "g115", "nome": "Serralheria Gomes (Jd 1º de Maio)", "cidade": "Sertãozinho", "segmento": "Serralherias e portões", "telefone": "(16) 98103-3702"}, {"id": "g116", "nome": "Millanno Espaço Planejado (Centro)", "cidade": "Sertãozinho", "segmento": "Marcenarias e móveis", "telefone": "(16) 99180-8576"}, {"id": "g117", "nome": "Eliel Caetano da Silva (oficina, Araras)", "cidade": "Batatais", "segmento": "Oficinas e autopeças", "telefone": "(16) 99370-7818"}, {"id": "g118", "nome": "Reginaldo Tolentino de Toledo (oficina, Castelo)", "cidade": "Batatais", "segmento": "Oficinas e autopeças", "telefone": "(16) 99158-3302"}, {"id": "g119", "nome": "Lanchote Serviços Especializados (oficina)", "cidade": "Batatais", "segmento": "Oficinas e autopeças", "telefone": "(16) 99214-3945"}, {"id": "g120", "nome": "Disk Borracheiro Kampeão (borracharia móvel)", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 98825-5058"}, {"id": "g121", "nome": "Borracharia e Autocenter Rodrigues", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 99219-8052"}, {"id": "g122", "nome": "Tapeçaria Gomes", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 99293-4014"}, {"id": "g123", "nome": "Tapeçaria Nascimento", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 98106-4920"}, {"id": "g124", "nome": "J.A. Tapeçaria", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 99272-8989"}, {"id": "g125", "nome": "Estofados Loureiro (Centro)", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 3625-1332"}, {"id": "g126", "nome": "Rib Decorações (Centro)", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 3636-4392"}, {"id": "g127", "nome": "A Casa dos Estofados (Alto da Boa Vista)", "cidade": "Ribeirão Preto", "segmento": "Tapeçaria e estofados", "telefone": "(16) 3623-6664"}, {"id": "g128", "nome": "Vidraçaria Santa Cecília", "cidade": "Jaboticabal", "segmento": "Vidraçarias e box", "telefone": "(16) 3202-2188"}, {"id": "g129", "nome": "Montabox (box e vidros)", "cidade": "Jaboticabal", "segmento": "Vidraçarias e box", "telefone": "(16) 98198-4000"}, {"id": "g130", "nome": "Auto Funilaria e Pintura J T", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3202-2144"}, {"id": "g131", "nome": "Auto Elétrica Santa Capita", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3203-7196"}, {"id": "g132", "nome": "Auto Mecânica Tabacaro", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3202-2922"}, {"id": "g133", "nome": "Auto Mecânica Nenecar", "cidade": "Jaboticabal", "segmento": "Oficinas e autopeças", "telefone": "(16) 3203-2237"}, {"id": "g134", "nome": "Auto Mecânica Monte Alto", "cidade": "Monte Alto", "segmento": "Oficinas e autopeças", "telefone": "(16) 99717-1268"}, {"id": "g135", "nome": "Oficina Mecânica Boer", "cidade": "Monte Alto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3242-4088"}, {"id": "g136", "nome": "Oficina Mecânica Joca e Luiz", "cidade": "Monte Alto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3242-3101"}, {"id": "g137", "nome": "Auto Mecânica Castelo Branco", "cidade": "Monte Alto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3242-5075"}, {"id": "g138", "nome": "Auto Mecânica Rodrigues", "cidade": "Monte Alto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3241-3980"}, {"id": "g139", "nome": "Rossetti e Pugliesi", "cidade": "Monte Alto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3242-6655"}, {"id": "g140", "nome": "Atelier Neiva Alves (costura)", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 3911-6354"}, {"id": "g141", "nome": "Casa da Costura (conserto de máquinas)", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 3630-0304"}, {"id": "g142", "nome": "Robergraf (gráfica)", "cidade": "Ribeirão Preto", "segmento": "Gráficas e comunicação visual", "telefone": "(16) 3628-6442"}, {"id": "g143", "nome": "Mesquita Encadernações", "cidade": "Ribeirão Preto", "segmento": "Gráficas e comunicação visual", "telefone": "(16) 98834-5847"}, {"id": "g144", "nome": "Art Press Gráfica", "cidade": "Ribeirão Preto", "segmento": "Gráficas e comunicação visual", "telefone": "(16) 3612-9336"}, {"id": "g145", "nome": "Artes Gráficas Use", "cidade": "Ribeirão Preto", "segmento": "Gráficas e comunicação visual", "telefone": "(16) 3635-5752"}, {"id": "g146", "nome": "Artworks Gráficas Rápidas", "cidade": "Ribeirão Preto", "segmento": "Gráficas e comunicação visual", "telefone": "(16) 3635-1759"}, {"id": "g147", "nome": "Quintal Gardens (jardinagem)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 3965-6788"}, {"id": "g148", "nome": "E.L. de Abreu Serviços Automotivos (Vila Novo Lar)", "cidade": "Bebedouro", "segmento": "Oficinas e autopeças", "telefone": "(17) 3342-8412"}, {"id": "g149", "nome": "Pinotti Mecânica Industrial (Centro)", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3942-3089"}, {"id": "g150", "nome": "Executa Já Serviços (caça vazamentos)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99322-6717"}, {"id": "g151", "nome": "Encanador Souza (Jd Aeroporto)", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 99423-7153"}, {"id": "g152", "nome": "Ademir Construções e Reformas", "cidade": "Ribeirão Preto", "segmento": "Serviços residenciais", "telefone": "(16) 98859-0948"}, {"id": "g153", "nome": "Oriente Pet Shop", "cidade": "Ribeirão Preto", "segmento": "Pet shops", "telefone": "(16) 99105-1410"}, {"id": "g154", "nome": "Pet Shop Animal Mix", "cidade": "Ribeirão Preto", "segmento": "Pet shops", "telefone": "(16) 99428-0458"}, {"id": "g155", "nome": "Chick Tosa Pet Shop (Jd Paulista)", "cidade": "Ribeirão Preto", "segmento": "Pet shops", "telefone": "(16) 3621-4735"}, {"id": "g156", "nome": "Bichos e Cia Pet Shop", "cidade": "Ribeirão Preto", "segmento": "Pet shops", "telefone": "(16) 3623-8183"}, {"id": "g157", "nome": "R V Auto Peças", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3237-6139"}, {"id": "g158", "nome": "Auto Peças Brito Guirão (Ipiranga)", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3877-4102"}, {"id": "g159", "nome": "MVS Peças (Vila Brasil)", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3329-4978"}, {"id": "g160", "nome": "Casa Nobre Fechaduras e Esquadrias", "cidade": "Ribeirão Preto", "segmento": "Serralherias e portões", "telefone": "(16) 3635-6600"}, {"id": "g161", "nome": "Comercial dos Pisos", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3625-5135"}, {"id": "g162", "nome": "Refratários Ribeirão Preto", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3626-5744"}, {"id": "g163", "nome": "Vinimar Piscinas e Serviços", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3236-9194"}, {"id": "g164", "nome": "Spazio Bello Acabamentos", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3623-8895"}, {"id": "g165", "nome": "Marcotex Tintas", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3636-2725"}, {"id": "g166", "nome": "Avenida Tintas (Jd Macedo)", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3635-1314"}, {"id": "g167", "nome": "Art Cril Revestimento Texturizado (Vila Seixas)", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3797-9991"}, {"id": "g168", "nome": "Art Crew (tintas)", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3976-9192"}, {"id": "g169", "nome": "Comtintas Revestimentos Anticorrosivos", "cidade": "Ribeirão Preto", "segmento": "Construção e tintas", "telefone": "(16) 3626-1459"}, {"id": "g170", "nome": "Buffet Augusto (Campos Elíseos)", "cidade": "Ribeirão Preto", "segmento": "Buffets e eventos", "telefone": "(16) 3625-7138"}, {"id": "g171", "nome": "Athenas Salão de Festas e Buffet", "cidade": "Ribeirão Preto", "segmento": "Buffets e eventos", "telefone": "(16) 3633-3949"}, {"id": "g172", "nome": "Buffet Infantil Happy Birthday (Ribeirânia)", "cidade": "Ribeirão Preto", "segmento": "Buffets e eventos", "telefone": "(16) 3965-3433"}, {"id": "g173", "nome": "Buffet Imperial (Vila Monte Alegre)", "cidade": "Ribeirão Preto", "segmento": "Buffets e eventos", "telefone": "(16) 3625-6402"}, {"id": "g174", "nome": "Phone DOC (assistência celular)", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 99173-7858"}, {"id": "g175", "nome": "PontoSmartRP (assistência celular)", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 97407-2633"}, {"id": "g176", "nome": "Leone Soluções (informática, Jd Paulista)", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 3967-7075"}, {"id": "g177", "nome": "Proservice Informática", "cidade": "Ribeirão Preto", "segmento": "Consertos e assistência técnica", "telefone": "(16) 3621-9050"}, {"id": "g178", "nome": "Morette Motos", "cidade": "Ribeirão Preto", "segmento": "Oficinas e autopeças", "telefone": "(16) 3610-4368"}, {"id": "g179", "nome": "Box 3 Irmãos (vidros e box)", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3625-4294"}, {"id": "g180", "nome": "Perdiza Ind. e Com. (vidros)", "cidade": "Ribeirão Preto", "segmento": "Vidraçarias e box", "telefone": "(16) 3627-1828"}, {"id": "g181", "nome": "Academia Evolution RP (Campos Elíseos)", "cidade": "Ribeirão Preto", "segmento": "Academias", "telefone": "(16) 99208-2796"}, {"id": "g182", "nome": "Auto Moto Escola San Rafael", "cidade": "Ribeirão Preto", "segmento": "Autoescolas", "telefone": "(16) 3612-2998"}, {"id": "g183", "nome": "CFC São Cristóvão", "cidade": "Ribeirão Preto", "segmento": "Autoescolas", "telefone": "(16) 3625-1915"}, {"id": "g184", "nome": "Malu Auto Moto Escola", "cidade": "Ribeirão Preto", "segmento": "Autoescolas", "telefone": "(16) 3963-2882"}, {"id": "g185", "nome": "CFC Andrez", "cidade": "Ribeirão Preto", "segmento": "Autoescolas", "telefone": "(16) 3441-9065"}, {"id": "g186", "nome": "CFC Nota 10", "cidade": "Ribeirão Preto", "segmento": "Autoescolas", "telefone": "(16) 3941-6720"}, {"id": "g187", "nome": "E.B Assessoria Contábil", "cidade": "Ribeirão Preto", "segmento": "Contabilidade", "telefone": "(16) 98220-4338"}, {"id": "g188", "nome": "Azul Contabilidade", "cidade": "Ribeirão Preto", "segmento": "Contabilidade", "telefone": "(16) 99966-8210"}, {"id": "g189", "nome": "Contábil Agrícola", "cidade": "Ribeirão Preto", "segmento": "Contabilidade", "telefone": "(16) 3602-7222"}, {"id": "g190", "nome": "L F Leite Actua Contabilidade", "cidade": "Ribeirão Preto", "segmento": "Contabilidade", "telefone": "(16) 3441-1950"}, {"id": "g191", "nome": "Clínica Daher (fisioterapia, Alto da Boa Vista)", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3623-1944"}, {"id": "g192", "nome": "Clínica Integrada de Fisioterapia", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3626-7764"}, {"id": "g193", "nome": "Centro Integrado de Reabilitação", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3623-1202"}, {"id": "g194", "nome": "Clínica Ribeirão (fisioterapia)", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3635-8221"}, {"id": "g195", "nome": "Clínica de Fisioterapia Santa Branca", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3636-5960"}, {"id": "g196", "nome": "Equilíbrio Clínica de Fisioterapia", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3620-4799"}, {"id": "g197", "nome": "Gesthetic Fisioterapia Estética", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3911-1399"}, {"id": "g198", "nome": "Famil Equipamentos Industriais", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3513-5352"}, {"id": "g199", "nome": "Rossin Equipamentos Industriais", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 99707-4357"}, {"id": "g200", "nome": "RDG Equipamentos Industriais", "cidade": "Sertãozinho", "segmento": "Caldeiraria e indústria", "telefone": "(16) 3942-3399"}, {"id": "g201", "nome": "Dra. Glaucia Maria Pelis (dentista)", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 98220-1451"}, {"id": "g202", "nome": "Ortoclasse Odontologia", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3236-2600"}, {"id": "g203", "nome": "Malheiros Odontologia", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3443-3300"}, {"id": "g204", "nome": "24 Hour Dentist", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3011-1253"}, {"id": "g205", "nome": "Clínica Odontológica Dr. Moraes", "cidade": "Ribeirão Preto", "segmento": "Odontologia e fisioterapia", "telefone": "(16) 3610-8205"}];
+
+const STATUS = [
+  ["novo","Novo"],["abordado","Abordado"],["respondeu","Respondeu"],["negociando","Negociando"],
+  ["ganho","Ganho"],["perdido","Perdido"],["nao_contatar","Não contatar"]
+];
+const STATUS_LABEL = Object.fromEntries(STATUS);
+const SITE_LABEL = {nao_verificado:"Site não verificado",sem_site:"Sem site (Google)",tem_site:"Tem site",nao_encontrado:"Não achado no Google"};
+const DEFAULT_TPL = "Olá, tudo bem? Aqui é da Cafeinado, de Ribeirão Preto.\n\nProcurei a *{empresa}* no Google e não encontrei um site de vocês. Hoje muita gente pesquisa antes de pedir orçamento, e quem não aparece acaba perdendo esse cliente para o concorrente.\n\nMontamos sites simples e rápidos para empresas da região, com botão direto para o WhatsApp de vocês.\n\nPosso te mandar um exemplo de como ficaria o de vocês?\n\n(Se preferir não receber mensagens, é só responder SAIR.)";
+const PRIORITY = ["Caldeiraria e indústria","Marmorarias","Vidraçarias e box","Serralherias e portões","Marcenarias e móveis"];
+const KEY = "cafeinado-prospeccao-v1";
+const PAGE = 40;
+
+// ---------- storage ----------
+function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function save(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ toast("Não consegui salvar no navegador"); } }
+
+function seedLeads(){
+  return SEED.map(s => ({...s, telefoneGoogle:"", site:"nao_verificado", siteUrl:"", mapsUrl:"", placeId:"", googleNome:"", fechada:false,
+    status:"novo", notas:"", ultimoContato:"", origem:"guia", criadoEm:new Date().toISOString()}));
+}
+let state = load(KEY, null);
+if(!state || !Array.isArray(state.leads)){ state = {leads: seedLeads(), tpl: DEFAULT_TPL, slots:{}, usage:{}}; save(KEY, state); }
+state.slots ||= {}; state.usage ||= {}; state.tpl ||= DEFAULT_TPL;
+function persist(){ save(KEY, state); renderStats(); }
+
+// ---------- phones ----------
+function parsePhones(str){
+  const out = []; if(!str) return out;
+  const re = /\((\d{2})\)\s*([\d\s-]{8,11})/g; let m;
+  while((m = re.exec(str))){
+    const ddd = m[1]; let local = m[2].replace(/\D/g,"");
+    if(local.length < 8 || local.length > 9) continue;
+    let mobile = false;
+    if(local.length === 9 && local[0] === "9") mobile = true;
+    else if(local.length === 8 && "6789".includes(local[0])){ mobile = true; local = "9" + local; }
+    out.push({ddd, local, mobile, digits: ddd + local});
+  }
+  return out;
+}
+function leadPhones(l){ return [...parsePhones(l.telefone), ...parsePhones(l.telefoneGoogle)]; }
+function mobileOf(l){ return leadPhones(l).find(p => p.mobile); }
+function allDigits(l){ return leadPhones(l).map(p => p.digits); }
+function fmt(p){ return `(${p.ddd}) ${p.local.length===9 ? p.local.slice(0,5)+"-"+p.local.slice(5) : p.local.slice(0,4)+"-"+p.local.slice(4)}`; }
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+function esc(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove("on"), 2600); }
+function today(){ const d = new Date(); return d.toISOString().slice(0,10); }
+function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\(.*?\)/g," ").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim(); }
+function fillTpl(l){ return state.tpl.replaceAll("{empresa}", l.nome.replace(/\s*\(.*?\)\s*/g," ").trim()).replaceAll("{cidade}", l.cidade).replaceAll("{segmento}", l.segmento.toLowerCase()); }
+function waLink(l){ const m = mobileOf(l); return m ? `https://wa.me/55${m.digits}?text=${encodeURIComponent(fillTpl(l))}` : ""; }
+
+// ---------- stats ----------
+function renderStats(){
+  const L = state.leads;
+  const c = s => L.filter(l => l.status === s).length;
+  const cel = L.filter(l => mobileOf(l)).length;
+  const items = [
+    ["Leads", L.length], ["Com celular", cel], ["Novos", c("novo")], ["Abordados", c("abordado")],
+    ["Responderam", c("respondeu") + c("negociando")], ["Ganhos", c("ganho")]
+  ];
+  $("#stats").innerHTML = items.map(([k,v]) => `<div class="stat"><b>${v}</b><small>${k}</small></div>`).join("");
+}
+
+// ---------- filters ----------
+function fillSelects(){
+  const cities = [...new Set(state.leads.map(l => l.cidade))].sort((a,b)=>a.localeCompare(b,"pt"));
+  const segs = [...new Set(state.leads.map(l => l.segmento))].sort((a,b)=>a.localeCompare(b,"pt"));
+  const keep = (sel, arr, first) => { const v = sel.value; sel.innerHTML = `<option value="">${first}</option>` + arr.map(x=>`<option>${esc(x)}</option>`).join(""); sel.value = arr.includes(v) ? v : ""; };
+  keep($("#fCidade"), cities, "Todas as cidades");
+  keep($("#fSegmento"), segs, "Todos os segmentos");
+  $("#fStatus").innerHTML = `<option value="">Todos os status</option>` + STATUS.map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+  const segTerms = ["serralheria","marmoraria","vidraçaria","marcenaria","caldeiraria","oficina mecânica","auto elétrica","tapeçaria","calhas","dedetizadora","desentupidora","refrigeração","pet shop","clínica de fisioterapia","dentista","buffet","autoescola","contabilidade","gráfica","toldos","persianas","funilaria","borracharia","madeireira","loja de tintas"];
+  $("#dlSeg").innerHTML = segTerms.map(s=>`<option value="${s}">`).join("");
+  const cityList = ["Ribeirão Preto","Sertãozinho","Jaboticabal","Batatais","Cravinhos","Jardinópolis","Brodowski","Serrana","Pontal","Monte Alto","Orlândia","Bebedouro","São Joaquim da Barra","Guariba","Barrinha","Pradópolis","Franca","Altinópolis","Santa Rosa de Viterbo","Dumont"];
+  $("#dlCid").innerHTML = cityList.map(s=>`<option value="${s}">`).join("");
+}
+let shown = PAGE;
+function filtered(){
+  const q = norm($("#fBusca").value), cid = $("#fCidade").value, seg = $("#fSegmento").value, st = $("#fStatus").value;
+  const cel = $("#fCel").checked, nv = $("#fNaoVer").checked, hide = $("#fOcultar").checked;
+  return state.leads.filter(l => {
+    if(cid && l.cidade !== cid) return false;
+    if(seg && l.segmento !== seg) return false;
+    if(st && l.status !== st) return false;
+    if(cel && !mobileOf(l)) return false;
+    if(nv && l.site !== "nao_verificado") return false;
+    if(hide && !st && (l.status === "nao_contatar" || l.site === "tem_site")) return false;
+    if(q){
+      const okText = norm(l.nome + " " + l.notas + " " + l.cidade + " " + l.segmento).includes(q);
+      const qd = q.replace(/\D/g,""); const okNum = qd.length >= 4 && allDigits(l).some(d => d.includes(qd));
+      if(!okText && !okNum) return false;
+    }
+    return true;
+  });
+}
+
+// ---------- lead card ----------
+function siteBadge(l){
+  const cls = {sem_site:"ok", tem_site:"bad", nao_encontrado:"warn", nao_verificado:""}[l.site];
+  const label = SITE_LABEL[l.site] || l.site;
+  return l.site === "tem_site" && l.siteUrl ? `<a class="badge bad" href="${esc(l.siteUrl)}" target="_blank" rel="noopener">${label} ↗</a>` : `<span class="badge ${cls}">${label}</span>`;
+}
+function leadHTML(l){
+  const phones = leadPhones(l);
+  const ph = phones.length ? phones.map(p => `<a href="tel:+55${p.digits}">${fmt(p)}</a>${p.mobile ? ' <span class="badge info">celular</span>' : ' <span class="badge">fixo</span>'}`).join(" &nbsp; ") : `<span class="muted">${esc(l.telefone)}</span>`;
+  const wa = waLink(l);
+  return `<article class="lead" data-id="${l.id}">
+    <div>
+      <div class="name">${esc(l.nome)}</div>
+      <div class="meta">${esc(l.segmento)} · ${esc(l.cidade)}${l.origem === "google" ? " · via Google" : ""}</div>
+      <div class="phones" style="margin-top:4px">${ph}</div>
+      <div class="badges">
+        ${siteBadge(l)}
+        ${l.fechada ? '<span class="badge bad">Fechada no Google</span>' : ""}
+        ${l.googleNome && norm(l.googleNome) !== norm(l.nome) ? `<span class="badge">Google: ${esc(l.googleNome)}</span>` : ""}
+        ${l.mapsUrl ? `<a class="badge" href="${esc(l.mapsUrl)}" target="_blank" rel="noopener">Ver no Maps ↗</a>` : ""}
+        ${l.ultimoContato ? `<span class="badge">Último contato: ${esc(l.ultimoContato.split("-").reverse().join("/"))}</span>` : ""}
+      </div>
+    </div>
+    <div class="side">
+      <select data-act="status">${STATUS.map(([k,v])=>`<option value="${k}" ${l.status===k?"selected":""}>${v}</option>`).join("")}</select>
+      ${wa ? `<a class="btn wa" data-act="wa" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` : `<button class="btn" disabled title="Sem celular cadastrado">Sem WhatsApp</button>`}
+      <button class="btn" data-act="verify">🔎 Verificar no Google</button>
+    </div>
+    <div class="bottom">
+      <textarea data-act="notas" rows="1" placeholder="Notas (nome do dono, melhor horário, objeções...)">${esc(l.notas)}</textarea>
+      <div class="row"><button class="btn" data-act="copy">Copiar mensagem</button><button class="btn" data-act="del" title="Remover da lista">Remover</button></div>
+    </div>
+  </article>`;
+}
+function renderList(){
+  const arr = filtered();
+  $("#countInfo").textContent = `${arr.length} de ${state.leads.length}`;
+  $("#list").innerHTML = arr.length ? arr.slice(0, shown).map(leadHTML).join("") : `<div class="empty card">Nenhum lead com esses filtros.</div>`;
+  $("#moreBtn").style.display = arr.length > shown ? "" : "none";
+}
+function byId(id){ return state.leads.find(l => l.id === id); }
+function setStatus(l, s){
+  l.status = s;
+  if(["abordado","respondeu","negociando","ganho","perdido"].includes(s)) l.ultimoContato = today();
+}
+$("#list").addEventListener("change", e => {
+  const card = e.target.closest(".lead"); if(!card) return; const l = byId(card.dataset.id);
+  if(e.target.dataset.act === "status"){ setStatus(l, e.target.value); persist(); renderList(); renderAgenda(); }
+  if(e.target.dataset.act === "notas"){ l.notas = e.target.value; persist(); toast("Nota salva"); }
+});
+$("#list").addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if(!b) return; const card = b.closest(".lead"); const l = byId(card.dataset.id);
+  const act = b.dataset.act;
+  if(act === "wa"){ if(l.status === "novo"){ setStatus(l, "abordado"); persist(); setTimeout(()=>{renderList(); renderAgenda();}, 300); } markNextSlot(); }
+  if(act === "copy"){ try{ await navigator.clipboard.writeText(fillTpl(l)); toast("Mensagem copiada"); }catch(err){ toast("Não consegui copiar"); } }
+  if(act === "verify"){ b.disabled = true; b.textContent = "Verificando..."; try{ await verifyLead(l); persist(); toast(`${l.nome}: ${SITE_LABEL[l.site]}`); }catch(err){ toast(err.message); } renderList(); }
+  if(act === "del"){ if(confirm(`Remover "${l.nome}" da lista?`)){ state.leads = state.leads.filter(x => x !== l); persist(); renderList(); fillSelects(); } }
+});
+["#fBusca","#fCidade","#fSegmento","#fStatus","#fCel","#fNaoVer","#fOcultar"].forEach(s => $(s).addEventListener("input", () => { shown = PAGE; renderList(); }));
+$("#moreBtn").onclick = () => { shown += PAGE; renderList(); };
+
+// ---------- Google Places API (New) ----------
+const FIELDS = ["places.id","places.displayName","places.formattedAddress","places.nationalPhoneNumber","places.websiteUri","places.googleMapsUri","places.businessStatus","places.rating","places.userRatingCount","places.primaryTypeDisplayName","nextPageToken"].join(",");
+function bumpUsage(){ const m = new Date().toISOString().slice(0,7); state.usage[m] = (state.usage[m]||0) + 1; persist(); renderUsage(); }
+function renderUsage(){ const m = new Date().toISOString().slice(0,7); $("#usageTxt").textContent = `Requisições feitas por este painel em ${m.split("-").reverse().join("/")}: ${state.usage[m]||0}. Confira o custo real no painel de faturamento do Google Cloud.`; }
+async function placesSearch(textQuery, pageToken){
+  const key = load("cafeinado-api-key", "");
+  if(!key) throw new Error("Cadastre a chave da Google Places API em Configurações.");
+  const body = {textQuery, languageCode:"pt-BR", regionCode:"BR", pageSize:20};
+  if(pageToken) body.pageToken = pageToken;
+  let res;
+  try{
+    res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+      method:"POST", headers:{"Content-Type":"application/json","X-Goog-Api-Key":key,"X-Goog-FieldMask":FIELDS}, body:JSON.stringify(body)
+    });
+  }catch(err){ throw new Error("Falha de rede ou bloqueio do navegador. Tente abrir o painel por http://localhost (veja o guia)."); }
+  bumpUsage();
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok){ const msg = data?.error?.message || `Erro ${res.status}`; throw new Error("Google: " + msg); }
+  return data;
+}
+function placeToInfo(p){
+  return { placeId:p.id, nome:p.displayName?.text || "", endereco:p.formattedAddress || "", telefone:p.nationalPhoneNumber || "", site:p.websiteUri || "",
+    maps:p.googleMapsUri || "", fechada:p.businessStatus === "CLOSED_PERMANENTLY", nota:p.rating, avaliacoes:p.userRatingCount, tipo:p.primaryTypeDisplayName?.text || "" };
+}
+function similar(a, b){
+  const stop = new Set(["e","de","da","do","das","dos","ltda","me","sp","ribeirao","preto","em","a","o"]);
+  const ta = norm(a).split(" ").filter(w => w.length > 2 && !stop.has(w)), tb = new Set(norm(b).split(" "));
+  return ta.some(w => tb.has(w));
+}
+async function verifyLead(l){
+  const name = l.nome.replace(/\s*\(.*?\)\s*/g, " ").trim();
+  const data = await placesSearch(`${name} ${l.cidade} SP`);
+  const places = (data.places || []).map(placeToInfo);
+  const mine = allDigits(l);
+  let hit = places.find(p => { const d = parsePhones(p.telefone)[0]; return d && mine.includes(d.digits); }) || places.find(p => similar(name, p.nome));
+  if(!hit){ l.site = "nao_encontrado"; return; }
+  l.placeId = hit.placeId; l.googleNome = hit.nome; l.mapsUrl = hit.maps; l.fechada = hit.fechada;
+  l.site = hit.site ? "tem_site" : "sem_site"; l.siteUrl = hit.site;
+  const gp = parsePhones(hit.telefone)[0];
+  if(gp && !mine.includes(gp.digits)) l.telefoneGoogle = hit.telefone;
+}
+let verifyStop = false;
+$("#verifyStop").onclick = () => { verifyStop = true; };
+$("#verifyAllBtn").onclick = async () => {
+  const arr = filtered().filter(l => l.site === "nao_verificado");
+  if(!arr.length){ toast("Nenhum lead não verificado nos filtros atuais"); return; }
+  if(!confirm(`Verificar ${arr.length} leads no Google? Isso faz ${arr.length} requisições pagas na Places API.`)) return;
+  verifyStop = false; $("#verifyBox").style.display = ""; let ok = 0, fail = 0;
+  for(let i = 0; i < arr.length && !verifyStop; i++){
+    $("#verifyTxt").textContent = `Verificando ${i+1} de ${arr.length}: ${arr[i].nome}`;
+    $("#verifyBar").style.width = `${((i+1)/arr.length)*100}%`;
+    try{ await verifyLead(arr[i]); ok++; }catch(err){ fail++; toast(err.message); if(/chave|key|API key|PERMISSION|403|400/i.test(err.message)) break; }
+    persist(); await new Promise(r => setTimeout(r, 350));
+  }
+  $("#verifyTxt").textContent = `Pronto: ${ok} verificados${fail ? `, ${fail} com erro` : ""}.`;
+  setTimeout(()=>{$("#verifyBox").style.display="none";}, 4000);
+  renderList();
+};
+
+// ---------- search tab ----------
+let qResults = [], qToken = "", qLast = "";
+function inList(info){
+  const d = parsePhones(info.telefone)[0];
+  return state.leads.find(l => (info.placeId && l.placeId === info.placeId) || (d && allDigits(l).includes(d.digits)));
+}
+function qVisible(){
+  return qResults.filter(r => (!$("#qSemSite").checked || !r.site) && (!$("#qCel").checked || parsePhones(r.telefone).some(p=>p.mobile)) && !r.fechada);
+}
+function renderQ(){
+  const vis = qVisible();
+  const semSite = qResults.filter(r => !r.site).length;
+  $("#qInfo").textContent = qResults.length ? `${qResults.length} empresas encontradas, ${semSite} sem site. Mostrando ${vis.length}.` : "";
+  $("#qAddAll").disabled = !vis.some(r => !inList(r));
+  $("#qMore").disabled = !qToken;
+  $("#qList").innerHTML = vis.length ? vis.map((r, i) => {
+    const dup = inList(r); const ph = parsePhones(r.telefone)[0];
+    return `<article class="lead">
+      <div>
+        <div class="name">${esc(r.nome)}</div>
+        <div class="meta">${esc(r.tipo)}${r.tipo ? " · " : ""}${esc(r.endereco)}</div>
+        <div class="phones" style="margin-top:4px">${ph ? `${fmt(ph)} ${ph.mobile ? '<span class="badge info">celular</span>' : '<span class="badge">fixo</span>'}` : '<span class="muted">Sem telefone no Google</span>'}</div>
+        <div class="badges">
+          ${r.site ? `<a class="badge bad" href="${esc(r.site)}" target="_blank" rel="noopener">Tem site ↗</a>` : '<span class="badge ok">Sem site</span>'}
+          ${r.nota ? `<span class="badge">★ ${r.nota} (${r.avaliacoes||0})</span>` : ""}
+          ${r.maps ? `<a class="badge" href="${esc(r.maps)}" target="_blank" rel="noopener">Ver no Maps ↗</a>` : ""}
+        </div>
+      </div>
+      <div class="side">${dup ? `<span class="badge warn">Já está na lista</span>` : `<button class="btn primary" data-add="${qResults.indexOf(r)}">➕ Adicionar</button>`}</div>
+    </article>`;
+  }).join("") : (qResults.length ? `<div class="empty card">Nenhum resultado com esses filtros.</div>` : "");
+}
+function guessSegment(termo){
+  const t = norm(termo);
+  const map = [["serralh","Serralherias e portões"],["portao","Serralherias e portões"],["marmor","Marmorarias"],["granit","Marmorarias"],["vidr","Vidraçarias e box"],["box","Vidraçarias e box"],["marcen","Marcenarias e móveis"],["movei","Marcenarias e móveis"],["madeir","Marcenarias e móveis"],["caldeir","Caldeiraria e indústria"],["usinag","Caldeiraria e indústria"],["industri","Caldeiraria e indústria"],["metalur","Caldeiraria e indústria"],["oficina","Oficinas e autopeças"],["mecanic","Oficinas e autopeças"],["auto","Oficinas e autopeças"],["funilar","Oficinas e autopeças"],["borrach","Oficinas e autopeças"],["tapec","Tapeçaria e estofados"],["estof","Tapeçaria e estofados"],["calha","Calhas"],["dedetiz","Serviços residenciais"],["desentup","Serviços residenciais"],["toldo","Serviços residenciais"],["persian","Serviços residenciais"],["refriger","Ar condicionado e refrigeração"],["ar condic","Ar condicionado e refrigeração"],["pet","Pet shops"],["fisio","Odontologia e fisioterapia"],["dent","Odontologia e fisioterapia"],["odont","Odontologia e fisioterapia"],["buffet","Buffets e eventos"],["escola","Autoescolas"],["contab","Contabilidade"],["grafic","Gráficas e comunicação visual"],["tinta","Construção e tintas"],["academ","Academias"]];
+  const f = map.find(([k]) => t.includes(k)); return f ? f[1] : (termo.charAt(0).toUpperCase() + termo.slice(1));
+}
+function addFromInfo(info){
+  if(inList(info)) return false;
+  const termo = qLast.split("|")[0], cidade = qLast.split("|")[1];
+  state.leads.push({ id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2,6), nome:info.nome, cidade, segmento:guessSegment(termo), telefone:info.telefone || "",
+    telefoneGoogle:"", site: info.site ? "tem_site" : "sem_site", siteUrl:info.site, mapsUrl:info.maps, placeId:info.placeId, googleNome:info.nome, fechada:info.fechada,
+    status:"novo", notas: info.endereco ? `Endereço: ${info.endereco}` : "", ultimoContato:"", origem:"google", criadoEm:new Date().toISOString() });
+  return true;
+}
+async function runSearch(more){
+  const termo = $("#qTermo").value.trim(), cidade = $("#qCidade").value.trim();
+  if(!termo || !cidade){ toast("Preencha o que buscar e a cidade"); return; }
+  const btn = more ? $("#qMore") : $("#qBtn"); btn.disabled = true; const old = btn.textContent; btn.textContent = "Buscando...";
+  try{
+    if(!more){ qResults = []; qToken = ""; qLast = `${termo}|${cidade}`; }
+    const data = await placesSearch(`${termo} em ${cidade}, SP`, more ? qToken : "");
+    qResults.push(...(data.places || []).map(placeToInfo));
+    qToken = data.nextPageToken || "";
+    renderQ();
+  }catch(err){ toast(err.message); $("#qInfo").textContent = err.message; }
+  btn.textContent = old; btn.disabled = false; $("#qMore").disabled = !qToken;
+}
+$("#qBtn").onclick = () => runSearch(false);
+$("#qTermo").addEventListener("keydown", e => { if(e.key === "Enter") runSearch(false); });
+$("#qMore").onclick = () => runSearch(true);
+["#qSemSite","#qCel"].forEach(s => $(s).addEventListener("input", renderQ));
+$("#qList").addEventListener("click", e => {
+  const b = e.target.closest("[data-add]"); if(!b) return;
+  if(addFromInfo(qResults[+b.dataset.add])){ persist(); fillSelects(); renderQ(); renderList(); toast("Lead adicionado"); }
+});
+$("#qAddAll").onclick = () => {
+  let n = 0; qVisible().forEach(r => { if(addFromInfo(r)) n++; });
+  persist(); fillSelects(); renderQ(); renderList(); toast(`${n} leads adicionados`);
+};
+
+// ---------- agenda ----------
+function slotTimes(){
+  const t = []; const add = (h1, m1, h2, m2) => { for(let m = h1*60+m1; m <= h2*60+m2; m += 10) t.push(m); };
+  add(9,0,11,0); add(14,0,16,30); return t;
+}
+const hhmm = m => `${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;
+function nowMin(){ const d = new Date(); return d.getHours()*60 + d.getMinutes(); }
+function isWeekday(){ const d = new Date().getDay(); return d >= 1 && d <= 5; }
+function doneSet(){ return new Set(state.slots[today()] || []); }
+function markNextSlot(){
+  const done = doneSet(), n = nowMin();
+  const cand = slotTimes().filter(m => !done.has(m) && m <= n + 10).pop() ?? slotTimes().find(m => !done.has(m));
+  if(cand === undefined) return;
+  state.slots[today()] = [...done, cand]; persist(); renderAgenda();
+}
+function queue(){
+  const prio = s => { const i = PRIORITY.indexOf(s); return i === -1 ? 99 : i; };
+  return state.leads.filter(l => l.status === "novo" && mobileOf(l) && l.site !== "tem_site" && !l.fechada)
+    .sort((a,b) => prio(a.segmento) - prio(b.segmento));
+}
+function renderAgenda(){
+  const done = doneSet(), n = nowMin(), T = slotTimes();
+  const next = T.find(m => m >= n && !done.has(m));
+  $("#slots").innerHTML = T.map(m => `<button class="slot ${done.has(m)?"done":""} ${m < n && !done.has(m) ? "past":""} ${m===next?"next":""}" data-m="${m}">${hhmm(m)}</button>`).join("");
+  if(!isWeekday()){ $("#nextSlot").textContent = "Fim de semana"; $("#nextCountdown").textContent = "As janelas voltam na segunda às 09:00."; }
+  else if(next === undefined){ $("#nextSlot").textContent = "Encerrado"; $("#nextCountdown").textContent = `Hoje: ${done.size} de ${T.length} envios feitos.`; }
+  else { $("#nextSlot").textContent = hhmm(next); const d = next - n; $("#nextCountdown").textContent = d <= 0 ? "Agora!" : `Em ${d} min · hoje: ${done.size} de ${T.length} feitos`; }
+  const q = queue();
+  const l = q[0];
+  $("#nextLead").innerHTML = l ? `<div class="name" style="font-weight:600">${esc(l.nome)}</div><div class="muted small">${esc(l.segmento)} · ${esc(l.cidade)} · ${fmt(mobileOf(l))}</div>
+    <div class="row" style="margin-top:10px"><a class="btn wa" id="qWa" href="${waLink(l)}" target="_blank" rel="noopener">Abrir WhatsApp</a><button class="btn" id="qSkip">Pular (não contatar)</button></div>
+    <div class="small muted" style="margin-top:8px">${q.length} leads na fila · dá para ${Math.ceil(q.length/29)} dia(s) de envio</div>`
+    : `<div class="empty">Fila vazia. Busque novos leads na aba "Buscar no Google".</div>`;
+  if(l){
+    $("#qWa").onclick = () => { setStatus(l, "abordado"); markNextSlot(); persist(); setTimeout(()=>{renderAgenda(); renderList();}, 300); };
+    $("#qSkip").onclick = () => { setStatus(l, "nao_contatar"); persist(); renderAgenda(); renderList(); };
+  }
+}
+$("#slots").addEventListener("click", e => {
+  const b = e.target.closest(".slot"); if(!b) return; const m = +b.dataset.m; const done = doneSet();
+  done.has(m) ? done.delete(m) : done.add(m); state.slots[today()] = [...done]; persist(); renderAgenda();
+});
+$("#resetDay").onclick = () => { state.slots[today()] = []; persist(); renderAgenda(); };
+let lastNotified = -1;
+setInterval(() => {
+  renderAgenda();
+  const n = nowMin();
+  if(isWeekday() && slotTimes().includes(n) && !doneSet().has(n) && lastNotified !== n && "Notification" in window && Notification.permission === "granted"){
+    lastNotified = n; const l = queue()[0];
+    new Notification("Cafeinado: hora do envio " + hhmm(n), { body: l ? `Próximo: ${l.nome}` : "Fila vazia" });
+  }
+}, 20000);
+$("#notifyBtn").onclick = async () => {
+  if(!("Notification" in window)){ toast("Este navegador não suporta notificações"); return; }
+  const p = await Notification.requestPermission(); toast(p === "granted" ? "Lembretes ativados" : "Permissão negada");
+};
+
+// ---------- config ----------
+$("#apiKey").value = load("cafeinado-api-key", "");
+$("#apiShow").onclick = () => { const i = $("#apiKey"); i.type = i.type === "password" ? "text" : "password"; };
+$("#apiSave").onclick = () => { save("cafeinado-api-key", $("#apiKey").value.trim()); toast("Chave salva neste navegador"); };
+$("#apiTest").onclick = async () => {
+  save("cafeinado-api-key", $("#apiKey").value.trim()); $("#apiStatus").textContent = "Testando...";
+  try{ const d = await placesSearch("serralheria em Ribeirão Preto, SP"); $("#apiStatus").innerHTML = `<span class="badge ok">Conectado · ${(d.places||[]).length} resultados</span>`; }
+  catch(err){ $("#apiStatus").innerHTML = `<span class="badge bad">${esc(err.message)}</span>`; }
+};
+$("#tpl").value = state.tpl;
+$("#tplSave").onclick = () => { state.tpl = $("#tpl").value; persist(); renderList(); renderAgenda(); toast("Mensagem salva"); };
+$("#tplReset").onclick = () => { $("#tpl").value = DEFAULT_TPL; state.tpl = DEFAULT_TPL; persist(); renderList(); toast("Mensagem padrão restaurada"); };
+function download(name, text, type){ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], {type})); a.download = name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000); }
+$("#expCsv").onclick = () => {
+  const cols = ["nome","segmento","cidade","telefone","telefoneGoogle","status","site","siteUrl","ultimoContato","notas","origem","mapsUrl"];
+  const q = v => `"${String(v ?? "").replace(/"/g,'""')}"`;
+  const csv = "﻿" + cols.join(";") + "\n" + state.leads.map(l => cols.map(c => q(c === "status" ? STATUS_LABEL[l.status] : c === "site" ? SITE_LABEL[l.site] : l[c])).join(";")).join("\n");
+  download(`cafeinado-leads-${today()}.csv`, csv, "text/csv;charset=utf-8");
+};
+$("#expJson").onclick = () => download(`cafeinado-backup-${today()}.json`, JSON.stringify(state, null, 1), "application/json");
+$("#impJson").onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{ const s = JSON.parse(await f.text()); if(!Array.isArray(s.leads)) throw 0; state = {slots:{}, usage:{}, tpl:DEFAULT_TPL, ...s}; persist(); fillSelects(); renderList(); renderAgenda(); $("#tpl").value = state.tpl; toast("Backup restaurado"); }
+  catch(err){ toast("Arquivo de backup inválido"); }
+  e.target.value = "";
+};
+$("#resetAll").onclick = () => {
+  if(!confirm("Isso apaga status, notas e leads adicionados pelo Google, e volta para a lista original. Exporte um backup antes. Continuar?")) return;
+  state = {leads: seedLeads(), tpl: state.tpl, slots:{}, usage: state.usage}; persist(); fillSelects(); renderList(); renderAgenda(); toast("Lista original restaurada");
+};
+
+// ---------- tabs & theme ----------
+$("#tabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("on", p.id === "p-" + b.dataset.tab));
+  try{ localStorage.setItem("cafeinado-tab", b.dataset.tab); }catch(e){}
+});
+$("#themeBtn").onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nxt = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nxt; try{ localStorage.setItem("cafeinado-theme", nxt); }catch(e){}
+};
+try{ const th = localStorage.getItem("cafeinado-theme"); if(th) document.documentElement.dataset.theme = th; }catch(e){}
+
+fillSelects(); renderStats(); renderList(); renderAgenda(); renderUsage();
+try{ const tab = localStorage.getItem("cafeinado-tab"); if(tab) document.querySelector(`#tabs button[data-tab="${tab}"]`)?.click(); }catch(e){}
+</script>
+</body>
+</html>
