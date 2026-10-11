@@ -32,12 +32,25 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;p
 .tw{overflow-x:auto}.hi{cursor:pointer}.hi:hover{background:var(--p2)}.mu{color:var(--mu)}
 #toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--p2);border:1px solid var(--ac);padding:8px 14px;border-radius:6px;display:none;z-index:9}
 .two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.room{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));padding:22px;border-radius:10px;border:1px solid var(--ln);background:linear-gradient(0deg,rgba(255,255,255,.03) 1px,transparent 1px) 0 0/100% 30px,linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px) 0 0/30px 100%,var(--bg)}
+.desk{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:8px;cursor:pointer;text-align:center}
+.desk:hover{background:var(--p2)}.desk.off{opacity:.35}.desk.pend{cursor:default;opacity:.5}
+.bubble{min-height:15px;max-width:140px;font-size:10px;color:var(--mu);background:var(--p);border:1px solid var(--ln);border-radius:6px;padding:3px 6px;line-height:1.3}
+.avatar{width:34px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.avatar .head{width:18px;height:18px;border-radius:50%;background:var(--c);display:block}
+.avatar .body{width:26px;height:20px;border-radius:8px 8px 4px 4px;background:var(--c);opacity:.75;margin-top:-2px;display:block}
+.desk.run .avatar{animation:pl 1s infinite}
+.desk.ok .avatar .head,.desk.ok .avatar .body{box-shadow:0 0 0 2px var(--ok)}
+.desk.err .avatar .head,.desk.err .avatar .body{box-shadow:0 0 0 2px var(--er)}
+.desk.pend .avatar .head,.desk.pend .avatar .body{box-shadow:0 0 0 2px var(--mu)}
+.deskname{font-size:11px;color:var(--mu)}
 </style></head><body>
 <header><h1>AI Intelligence Hub<small>modo análise e recomendação · nenhuma ação externa é executada</small></h1>
-<nav id="nav"><button data-t="ov" class="on">Visão geral</button><button data-t="ag">Agentes</button><button data-t="ex">Execuções</button><button data-t="hi">Histórico</button><button data-t="cf">Configurações</button></nav></header>
+<nav id="nav"><button data-t="ov" class="on">Visão geral</button><button data-t="ag">Agentes</button><button data-t="sl">Sala</button><button data-t="ex">Execuções</button><button data-t="hi">Histórico</button><button data-t="cf">Configurações</button></nav></header>
 <main>
 <section id="ov" class="on"><div class="grid" id="kpis"></div><div class="box"><h2>Alertas recentes</h2><div id="alerts"></div></div></section>
 <section id="ag"><div class="ag" id="aglist"></div></section>
+<section id="sl"><div class="box"><h2>Sala dos agentes</h2><p class="mu">Clique num agente para ligar ou desligar. O avatar pulsa com o estado real da execução em andamento e o balão mostra a última mensagem real do agente, sem simulação.</p><div id="room" class="room"></div></div></section>
 <section id="ex">
 <div class="box"><h2>Nova execução</h2>
 <label>Título da tarefa</label><input id="title" placeholder="Ex.: Revisão semanal de vendas">
@@ -130,7 +143,8 @@ if(!(c.find||[]).length)L.push('- Nenhum.');for(const id of['verificador','anali
 L.push('','## Limitações','Valores de confiança são estimativas, não probabilidades calibradas. Texto de IA é opinião e não foi verificado. Revisão humana recomendada.');c.report=L.join('\n');
 return{status:'ok',summary:'Relatório gerado e salvo no histórico.',findings:[],assumptions:[],uncertainties:[],confidence:{value:1,explanation:'Compilação direta dos resultados.'},next:'Revisão humana.'}}};
 /* ---------- orchestrator ---------- */
-function pipeUI(ids,state){$('#pipe').innerHTML=ids.map(i=>`<div class="st ${state[i]||''}" style="--c:${A(i).c}"><i></i>${A(i).n}</div>`).join('')}
+function pipeUI(ids,state){$('#pipe').innerHTML=ids.map(i=>`<div class="st ${state[i]||''}" style="--c:${A(i).c}"><i></i>${A(i).n}</div>`).join('');
+ids.forEach(i=>{const d=document.querySelector('.desk[data-agent="'+i+'"]');if(d){d.classList.remove('run','ok','err','pend');if(state[i])d.classList.add(state[i])}})}
 async function run(){if(ctl)return;const text=$('#paste').value.trim();if(!text){toast('Carregue ou cole dados antes de iniciar.');return}
 const ids=AG.filter(a=>cfg.agents[a.id]&&sel.has(a.id)).map(a=>a.id);if(!ids.length){toast('Selecione ao menos um agente.');return}
 const ex={id:uid(),title:$('#title').value.trim()||'Execução sem título',started:new Date().toISOString(),status:'em andamento',agents:ids,results:{},log:[],steps:0};
@@ -164,10 +178,18 @@ const al=hist.filter(x=>x.severity=='alta'||x.severity=='média').slice(0,6);$('
 $('#aglist').innerHTML=AG.map(a=>{const rs=hist.filter(h=>h.results&&h.results[a.id]),er=rs.filter(h=>h.results[a.id].status=='erro').length,last=rs[0];
 return`<div class="box" style="--c:${a.c}"><h2>${a.n} ${cfg.agents[a.id]?'<span class="tag ok">ativo</span>':'<span class="tag">desabilitado</span>'}${a.llm&&!llmOk()?'<span class="tag ac">modelo pendente</span>':''}</h2><p>${a.d}</p><p>Execuções: ${rs.length} · erros: ${er} · última: ${last?last.started.slice(0,16).replace('T',' '):'—'}</p>${a.tools.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`}).join('')+PEND.map(p=>`<div class="box" style="--c:#8796a8"><h2>${p[0]} <span class="tag">pendente</span></h2><p>${p[1]}</p></div>`).join('');
 const q=$('#q').value.toLowerCase(),fa=$('#fa').value,fd=$('#fd').value;
-$('#hl').innerHTML=hist.filter(x=>(!q||x.title.toLowerCase().includes(q)||x.id.includes(q))&&(!fa||x.agents.includes(fa))&&(!fd||x.started.slice(0,10)>=fd)).map(x=>`<tr class="hi"><td><input type="checkbox" class="cm" value="${x.id}"></td><td data-open="${x.id}">${x.started.slice(0,16).replace('T',' ')}</td><td data-open="${x.id}">${esc(x.title)}</td><td>${stTag(x.status)}</td><td>${esc(x.severity||'—')}</td><td>${x.ms??'—'} ms</td></tr>`).join('')||'<tr><td colspan="6" class="mu">Nenhuma execução encontrada.</td></tr>'}
+$('#hl').innerHTML=hist.filter(x=>(!q||x.title.toLowerCase().includes(q)||x.id.includes(q))&&(!fa||x.agents.includes(fa))&&(!fd||x.started.slice(0,10)>=fd)).map(x=>`<tr class="hi"><td><input type="checkbox" class="cm" value="${x.id}"></td><td data-open="${x.id}">${x.started.slice(0,16).replace('T',' ')}</td><td data-open="${x.id}">${esc(x.title)}</td><td>${stTag(x.status)}</td><td>${esc(x.severity||'—')}</td><td>${x.ms??'—'} ms</td></tr>`).join('')||'<tr><td colspan="6" class="mu">Nenhuma execução encontrada.</td></tr>';
+renderRoom()}
+function renderRoom(){const last=hist[0];
+$('#room').innerHTML=AG.map(a=>{const r=last&&last.results?last.results[a.id]:null,on=!!cfg.agents[a.id];
+const txt=r?(r.status=='pendente'?'Pendente: '+r.summary:r.summary):'Sem execução ainda.';
+return`<div class="desk ${on?'':'off'}" data-agent="${a.id}" style="--c:${a.c}" title="${on?'Clique para desligar':'Clique para ligar'}">
+<div class="bubble">${esc(txt.slice(0,80))}</div><div class="avatar"><i class="head"></i><i class="body"></i></div><div class="deskname">${a.n}</div></div>`}).join('')
++PEND.map(p=>`<div class="desk pend" title="${esc(p[1])}"><div class="bubble">${esc(p[1].slice(0,80))}</div><div class="avatar"><i class="head"></i><i class="body"></i></div><div class="deskname">${p[0]}</div></div>`).join('')}
 function go(t){document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==t));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==t))}
 function init(){$('#nav').onclick=e=>e.target.dataset.t&&go(e.target.dataset.t);
-document.body.addEventListener('click',e=>{const be=e.target.closest('[data-exp]');if(be){exp(be.dataset.exp,be.dataset.expt);return}const oe=e.target.closest('[data-open]');if(oe){if(oe.dataset.goto)go(oe.dataset.goto);open_(oe.dataset.open)}});
+document.body.addEventListener('click',e=>{const be=e.target.closest('[data-exp]');if(be){exp(be.dataset.exp,be.dataset.expt);return}const oe=e.target.closest('[data-open]');if(oe){if(oe.dataset.goto)go(oe.dataset.goto);open_(oe.dataset.open);return}
+const de=e.target.closest('.desk[data-agent]');if(de){const id=de.dataset.agent;cfg.agents[id]=cfg.agents[id]?0:1;const cb=$('#ca-'+id);if(cb)cb.checked=!!cfg.agents[id];LS.s('aih_cfg',cfg)?toast((cfg.agents[id]?'Agente ligado: ':'Agente desligado: ')+A(id).n+'. Recarregue a página para atualizar a seleção em Execuções.'):toast('Não foi possível salvar.');render()}});
 AG.forEach(a=>{if(cfg.agents[a.id])sel.add(a.id)});
 $('#sel').innerHTML=AG.filter(a=>cfg.agents[a.id]).map(a=>`<label class="row" style="margin:0"><input type="checkbox" id="sel-${a.id}" checked>${a.n}</label>`).join('');AG.forEach(a=>{const e=$('#sel-'+a.id);if(e)e.onchange=()=>e.checked?sel.add(a.id):sel.delete(a.id)});
 $('#fa').innerHTML='<option value="">Todos</option>'+AG.map(a=>`<option value="${a.id}">${a.n}</option>`).join('');
