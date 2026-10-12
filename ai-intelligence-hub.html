@@ -34,17 +34,31 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;p
 .two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 .room{position:relative;min-height:360px;padding:12px;border-radius:10px;border:1px solid var(--ln);background:linear-gradient(0deg,rgba(255,255,255,.03) 1px,transparent 1px) 0 0/100% 30px,linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px) 0 0/30px 100%,var(--bg);touch-action:none}
 .pendrow{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--ln)}
-.desk{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;width:96px;padding:8px 4px;border-radius:8px;cursor:grab;text-align:center;user-select:none}
-.desk:hover{background:var(--p2)}.desk.off{opacity:.35}.desk.dragging{cursor:grabbing;opacity:.85;z-index:5}
+.desk{position:absolute;display:flex;flex-direction:column;align-items:center;gap:4px;width:100px;padding:8px 4px;border-radius:8px;cursor:grab;text-align:center;user-select:none;transition:transform .15s,background .15s}
+.desk:hover{background:var(--p2);transform:translateY(-2px)}.desk.off{opacity:.35}.desk.dragging{cursor:grabbing;opacity:.85;z-index:5;transform:none}
 .pendrow .desk{position:static;cursor:default;opacity:.5}
-.bubble{min-height:15px;max-width:140px;font-size:10px;color:var(--mu);background:var(--p);border:1px solid var(--ln);border-radius:6px;padding:3px 6px;line-height:1.3}
-.avatar{width:34px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
-.avatar .head{width:18px;height:18px;border-radius:50%;background:var(--c);display:block}
-.avatar .body{width:26px;height:20px;border-radius:8px 8px 4px 4px;background:var(--c);opacity:.75;margin-top:-2px;display:block}
+.info{display:none;position:absolute;top:2px;right:4px;width:14px;height:14px;line-height:14px;border-radius:50%;background:var(--p2);border:1px solid var(--ln);font-size:10px;color:var(--mu);z-index:7}
+.desk:hover .info{display:block}.info:hover{color:var(--ac);border-color:var(--ac)}
+.bubble{min-height:15px;max-width:140px;font-size:10px;color:var(--mu);background:var(--p);border:1px solid var(--ln);border-radius:6px;padding:3px 6px;line-height:1.3;transition:max-width .15s,box-shadow .15s;position:relative;z-index:1}
+.desk:hover .bubble{max-width:260px;z-index:6;box-shadow:0 2px 10px rgba(0,0,0,.45)}
+.avatar{width:34px;height:34px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;z-index:2}
+.avatar .head{width:16px;height:16px;border-radius:50%;background:var(--c);display:block}
+.avatar .body{width:22px;height:16px;border-radius:7px 7px 3px 3px;background:var(--c);opacity:.75;margin-top:-2px;display:block}
 .desk.run .avatar{animation:pl 1s infinite}
+.desk:not(.off):not(.run) .avatar{animation:idle 3.2s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 .desk.ok .avatar .head,.desk.ok .avatar .body{box-shadow:0 0 0 2px var(--ok)}
 .desk.err .avatar .head,.desk.err .avatar .body{box-shadow:0 0 0 2px var(--er)}
 .desk.pend .avatar .head,.desk.pend .avatar .body,.pendrow .avatar .head,.pendrow .avatar .body{box-shadow:0 0 0 2px var(--mu)}
+.table{width:58px;height:13px;background:#3a2b1d;border-radius:0 0 3px 3px;position:relative;margin-top:-3px;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.monitor{position:absolute;left:50%;top:-15px;transform:translateX(-50%);width:26px;height:17px;background:#15171b;border:2px solid #30343a;border-radius:3px}
+.monitor .screen{position:absolute;inset:2px;background:var(--bg);border-radius:1px;transition:background .3s,opacity .3s;opacity:.6}
+.desk:not(.off) .monitor .screen{background:var(--c);opacity:.3}
+.desk.run .monitor .screen{background:var(--c);opacity:.9;animation:scan 1s infinite}
+.desk.ok .monitor .screen{background:var(--ok);opacity:.7}
+.desk.err .monitor .screen{background:var(--er);opacity:.7}
+.desk.pend .monitor .screen{background:var(--mu);opacity:.4}
+@keyframes scan{50%{opacity:.35}}
 .deskname{font-size:11px;color:var(--mu)}
 #deskmenu .box{width:220px}
 </style></head><body>
@@ -203,15 +217,25 @@ const here=allAgents().filter(a=>cfg.roomOf[a.id]==cfg.curRoom);
 $('#room').innerHTML=here.map((a,idx)=>{const r=last&&last.results?last.results[a.id]:null,on=!!cfg.agents[a.id];
 const txt=r?(r.status=='pendente'?'Pendente: '+r.summary:r.summary):'Sem execução ainda.';
 const sp=(cfg.pos[cfg.curRoom]||{})[a.id]||{x:6+(idx%5)*18,y:10+Math.floor(idx/5)*34};
-return`<div class="desk ${on?'':'off'}" data-agent="${a.id}" style="--c:${a.c};left:${sp.x}%;top:${sp.y}%" title="${on?'Clique para desligar':'Clique para ligar'} · clique direito para mais opções · arraste para mover">
-<div class="bubble">${esc(txt.slice(0,80))}</div><div class="avatar"><i class="head"></i><i class="body"></i></div><div class="deskname">${esc(a.n)}</div></div>`}).join('');
-$('#pendrow').innerHTML=PEND.map(p=>`<div class="desk pend" title="${esc(p[1])}"><div class="bubble">${esc(p[1].slice(0,80))}</div><div class="avatar"><i class="head"></i><i class="body"></i></div><div class="deskname">${p[0]}</div></div>`).join('')}
+return`<div class="desk ${on?'':'off'}" data-agent="${a.id}" style="--c:${a.c};left:${sp.x}%;top:${sp.y}%;--d:${(idx%6)*.4}s" title="${on?'Clique para desligar':'Clique para ligar'} · clique direito para mais opções · arraste para mover">
+<div class="info" data-info="${a.id}">i</div><div class="bubble">${esc(txt.slice(0,80))}</div><div class="avatar"><i class="head"></i><i class="body"></i></div><div class="table"><div class="monitor"><div class="screen"></div></div></div><div class="deskname">${esc(a.n)}</div></div>`}).join('');
+$('#pendrow').innerHTML=PEND.map(p=>`<div class="desk pend" title="${esc(p[1])}"><div class="bubble">${esc(p[1].slice(0,80))}</div><div class="avatar"><i class="head"></i><i class="body"></i></div><div class="table"><div class="monitor"><div class="screen"></div></div></div><div class="deskname">${p[0]}</div></div>`).join('')}
+function showInfo(id,e){const ag=A(id),rs=hist.filter(h=>h.results&&h.results[id]),er=rs.filter(h=>h.results[id].status=='erro').length,last=rs[0],lastR=last?last.results[id]:null;
+$('#deskmenu').innerHTML=`<div class="box"><b>${esc(ag.n)}</b> ${cfg.agents[id]?'<span class="tag ok">ativo</span>':'<span class="tag">desabilitado</span>'}
+<p class="mu">${esc(ag.d||ag.prompt||'')}</p>
+<p>Execuções: ${rs.length} · erros: ${er} · última: ${last?last.started.slice(0,16).replace('T',' '):'—'}</p>
+${lastR?`<p class="mu">Último resultado: ${esc(lastR.summary.slice(0,160))}</p>`:''}
+${(ag.tools||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}
+<div class="row"><button class="btn g" id="dm_cancel">Fechar</button></div></div>`;
+$('#deskmenu').style.left=Math.min(e.clientX,window.innerWidth-240)+'px';$('#deskmenu').style.top=e.clientY+'px';$('#deskmenu').style.display='block';
+$('#dm_cancel').onclick=()=>{$('#deskmenu').style.display='none'}}
 function go(t){document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==t));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==t))}
 function init(){$('#nav').onclick=e=>e.target.dataset.t&&go(e.target.dataset.t);
 document.body.addEventListener('click',e=>{const be=e.target.closest('[data-exp]');if(be){exp(be.dataset.exp,be.dataset.expt);return}const oe=e.target.closest('[data-open]');if(oe){if(oe.dataset.goto)go(oe.dataset.goto);open_(oe.dataset.open);return}
+const ie=e.target.closest('[data-info]');if(ie){showInfo(ie.dataset.info,e);return}
 const de=e.target.closest('.desk[data-agent]');if(de){if(justDragged){justDragged=false;return}const id=de.dataset.agent;cfg.agents[id]=cfg.agents[id]?0:1;const cb=$('#ca-'+id);if(cb)cb.checked=!!cfg.agents[id];LS.s('aih_cfg',cfg)?toast((cfg.agents[id]?'Agente ligado: ':'Agente desligado: ')+A(id).n+'. Recarregue a página para atualizar a seleção em Execuções.'):toast('Não foi possível salvar.');render();return}
 if(!e.target.closest('#deskmenu'))$('#deskmenu').style.display='none'});
-$('#room').addEventListener('pointerdown',e=>{const d=e.target.closest('.desk[data-agent]');if(!d)return;dragEl=d;dragMoved=false;dragStart={x:e.clientX,y:e.clientY};try{d.setPointerCapture(e.pointerId)}catch(err){}const dr=d.getBoundingClientRect();dragEl._offX=e.clientX-dr.left;dragEl._offY=e.clientY-dr.top});
+$('#room').addEventListener('pointerdown',e=>{if(e.target.closest('[data-info]'))return;const d=e.target.closest('.desk[data-agent]');if(!d)return;dragEl=d;dragMoved=false;dragStart={x:e.clientX,y:e.clientY};try{d.setPointerCapture(e.pointerId)}catch(err){}const dr=d.getBoundingClientRect();dragEl._offX=e.clientX-dr.left;dragEl._offY=e.clientY-dr.top});
 $('#room').addEventListener('pointermove',e=>{if(!dragEl)return;if(Math.abs(e.clientX-dragStart.x)>4||Math.abs(e.clientY-dragStart.y)>4)dragMoved=true;if(!dragMoved)return;const r=$('#room').getBoundingClientRect();let x=(e.clientX-r.left-dragEl._offX)/r.width*100,y=(e.clientY-r.top-dragEl._offY)/r.height*100;x=Math.max(0,Math.min(88,x));y=Math.max(0,Math.min(80,y));dragEl.style.left=x+'%';dragEl.style.top=y+'%';dragEl.classList.add('dragging')});
 $('#room').addEventListener('pointerup',e=>{if(!dragEl)return;if(dragMoved){const id=dragEl.dataset.agent;cfg.pos[cfg.curRoom]=cfg.pos[cfg.curRoom]||{};cfg.pos[cfg.curRoom][id]={x:parseFloat(dragEl.style.left),y:parseFloat(dragEl.style.top)};LS.s('aih_cfg',cfg);justDragged=true}dragEl.classList.remove('dragging');dragEl=null});
 $('#room').addEventListener('contextmenu',e=>{const d=e.target.closest('.desk[data-agent]');if(!d)return;e.preventDefault();const id=d.dataset.agent,ag=A(id),isCustom=cfg.customAgents.some(a=>a.id==id);
