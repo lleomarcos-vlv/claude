@@ -178,27 +178,41 @@ def page_servicos():
              ("ESCADAS E GUARDA-CORPOS", "Corrimãos e guarda-corpos que protegem com visual leve.",
               ("img", "040", (0.5, 0.55))),
              ("BOX PARA BANHEIRO", "Box de vidro sob medida, prático e elegante no dia a dia.",
-              ("img", "041", (0.5, 0.45))),
-             ("ESPELHOS", "Espelhos sob medida que ampliam e valorizam os ambientes.",
-              ("icon", "espelho", None)),
-             ("COBERTURAS E PERGOLADOS", "Áreas externas protegidas e mais bem aproveitadas.",
-              ("icon", "pergolado", None))]
-    top, gap = 78, 5
+              ("img", "041", (0.5, 0.45)))]
+    top, gap, bottom, band_h = 78, 5, 272, 44
     cw = (CW - 6) / 2
-    ch = (274 - top - 2 * gap) / 3
+    ch = (bottom - band_h - gap - top - gap) / 2
     ph = ch - 27
     for i, (t, d, media) in enumerate(cards):
         x = M + (i % 2) * (cw + 6)
         y = top + (i // 2) * (ch + gap)
-        e.append(R(x, y, cw, ch, INK2))
-        if media[0] == "img":
-            e.append(I(x, y, cw, ph, media[1], focus=media[2]))
-        else:
-            e += [R(x, y, cw, ph, STEEL), P(x + (cw - ph * 0.62) / 2, y + ph * 0.19, ph * 0.62,
-                                            ph * 0.62, ROOT / f"build/icon_{media[1]}.png")]
-        e += [T(x + 5, y + ph + 4, cw - 10, 7, t, 17, font="display", bold=True, track=0.03,
+        e += [R(x, y, cw, ch, INK2),
+              I(x, y, cw, ph, media[1], focus=media[2]),
+              T(x + 5, y + ph + 4, cw - 10, 7, t, 17, font="display", bold=True, track=0.03,
                 lh=1.0),
               T(x + 5, y + ph + 11.5, cw - 10, 13, d, 13.5, color=MUTED, lh=1.3)]
+
+    by = bottom - band_h
+    pad, divider = 6, 8
+    col_w = (CW - 2 * pad - divider) / 2
+    badge = 14
+    e += [R(M, by, CW, band_h, INK2),
+          R(M, by, CW, 0.6, ACCENT),
+          T(M + pad, by + 6.5, CW - 2 * pad, 6, "TAMBÉM FAZEMOS", 12.5, color=ACCENT,
+            font="display", bold=True, track=0.16),
+          R(M + pad + col_w + divider / 2, by + 17, 0.3, band_h - 23, LINE)]
+    extras = [("espelho", "ESPELHOS", "Sob medida, para ampliar e valorizar os ambientes."),
+              ("pergolado", "COBERTURAS E PERGOLADOS",
+               "Áreas externas protegidas e mais bem aproveitadas.")]
+    for j, (ic, t, d) in enumerate(extras):
+        x = M + pad + j * (col_w + divider)
+        y = by + 17
+        tx = x + badge + 4.5
+        e += [O(x, y, badge, stroke=ACCENT, sw=0.45),
+              P(x + 3, y + 3, badge - 6, badge - 6, ROOT / f"build/icon_{ic}.png"),
+              T(tx, y + 0.3, x + col_w - tx, 7, t, 15.5, font="display", bold=True, track=0.03,
+                lh=1.0),
+              T(tx, y + 7.5, x + col_w - tx, 13, d, 13.5, color=MUTED, lh=1.3)]
     return dict(bg=INK, els=e + footer())
 
 
@@ -347,29 +361,33 @@ def hexrgb(c):
 def make_icons():
     col = hexrgb(ACCENT) + (255,)
     s = 1600
-    sw = 34
+    sw = 96
+
+    def cap_line(d, p0, p1):
+        d.line((*p0, *p1), fill=col, width=sw)
+        for p in (p0, p1):
+            d.ellipse((p[0] - sw / 2, p[1] - sw / 2, p[0] + sw / 2, p[1] + sw / 2), fill=col)
+
     im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    x0, x1, y0, y1 = 470, 1130, 170, 1430
+    x0, x1, y0, y1 = 470, 1130, 120, 1480
     r = (x1 - x0) // 2
     d.arc((x0, y0, x1, y0 + 2 * r), 180, 360, fill=col, width=sw)
-    d.line((x0 + sw // 2, y0 + r, x0 + sw // 2, y1), fill=col, width=sw)
-    d.line((x1 - sw // 2, y0 + r, x1 - sw // 2, y1), fill=col, width=sw)
-    d.line((x0, y1 - sw // 2, x1, y1 - sw // 2), fill=col, width=sw)
-    d.line((640, 760, 900, 500), fill=col, width=sw)
-    d.line((660, 960, 980, 640), fill=col, width=sw)
+    d.rectangle((x0, y0 + r, x0 + sw, y1), fill=col)
+    d.rectangle((x1 - sw, y0 + r, x1, y1), fill=col)
+    d.rectangle((x0, y1 - sw, x1, y1), fill=col)
+    cap_line(d, (650, 820), (900, 570))
+    cap_line(d, (650, 1080), (960, 770))
     im.resize((400, 400), Image.LANCZOS).save(BUILD / "icon_espelho.png")
 
     im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.rectangle((200, 560, 1400, 600), fill=col)
-    d.rectangle((150, 620, 1450, 680), fill=col)
-    for k in range(8):
-        cx = 230 + k * 163
-        d.rectangle((cx - 22, 470, cx + 22, 556), fill=col)
-    d.rectangle((330, 680, 380, 1350), fill=col)
-    d.rectangle((1220, 680, 1270, 1350), fill=col)
-    d.rectangle((150, 1350, 1450, 1384), fill=col)
+    for k in range(6):
+        cx = 250 + k * 220
+        d.rectangle((cx - 38, 330, cx + 38, 500), fill=col)
+    d.rectangle((120, 500, 1480, 630), fill=col)
+    d.rectangle((300, 630, 410, 1480), fill=col)
+    d.rectangle((1190, 630, 1300, 1480), fill=col)
     im.resize((400, 400), Image.LANCZOS).save(BUILD / "icon_pergolado.png")
 
 
