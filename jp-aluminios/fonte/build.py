@@ -1,24 +1,17 @@
 #!/usr/bin/env python3
 """Gera a apresentação da JP Alumínios: PDF, PDF leve, PPTX editável e JPGs por página."""
-import hashlib
-import html
-import re
-import shutil
-import subprocess
+import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
-from pptx import Presentation
-from pptx.dml.color import RGBColor
-from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE, PP_ALIGN
-from pptx.oxml.ns import qn
-from pptx.util import Mm, Pt
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT.parents[1]))
+from motor import apresentacao as mt  # noqa: E402
+from motor.apresentacao import H, I, O, P, R, W  # noqa: E402
+
 OUT = ROOT.parent / "entregas"
 BUILD = ROOT / "build"
-CHROME = "/opt/pw-browsers/chromium"
 
 CONTATO_NOME = "Felipe"
 CONTATO_TEL = "(16) 99101-9797"
@@ -37,50 +30,24 @@ MUTED_D = "#4E5258"
 ACCENT = "#C9A26B"
 ACCENT_D = "#8A6A3D"
 
-W, H, M = 210, 297, 16
+M = 16
 CW = W - 2 * M
 
 FONTS = {
-    ("display", True): ROOT / "fontes/BarlowCondensed-Bold.ttf",
-    ("display", False): ROOT / "fontes/BarlowCondensed-Regular.ttf",
-    ("body", True): ROOT / "fontes/Barlow-Bold.ttf",
-    ("body", False): ROOT / "fontes/Barlow-Regular.ttf",
+    ("display", True, False): ROOT / "fontes/BarlowCondensed-Bold.ttf",
+    ("display", False, False): ROOT / "fontes/BarlowCondensed-Regular.ttf",
+    ("body", True, False): ROOT / "fontes/Barlow-Bold.ttf",
+    ("body", False, False): ROOT / "fontes/Barlow-Regular.ttf",
 }
 FAMILY = {"display": "Barlow Condensed", "body": "Barlow"}
 
 
-# ---------------------------------------------------------------- elementos
-
-def R(x, y, w, h, fill, alpha=1.0, radius=0, stroke=None, sw=0.3, link=None):
-    return dict(k="rect", x=x, y=y, w=w, h=h, fill=fill, alpha=alpha, radius=radius,
-                stroke=stroke, sw=sw, link=link)
-
-
-def O(x, y, d, fill=None, stroke=None, sw=0.4):
-    return dict(k="oval", x=x, y=y, w=d, h=d, fill=fill, stroke=stroke, sw=sw)
-
-
-def I(x, y, w, h, src, focus=(0.5, 0.5), link=None):
-    return dict(k="img", x=x, y=y, w=w, h=h, src=src, focus=focus, link=link)
-
-
-def P(x, y, w, h, path, link=None):
-    return dict(k="png", x=x, y=y, w=w, h=h, path=str(path), link=link)
-
-
 def G(x, y, w, h, a0, a1, color=INK, ease=1.6):
-    return dict(k="grad", x=x, y=y, w=w, h=h, a0=a0, a1=a1, color=color, ease=ease)
+    return mt.G(x, y, w, h, a0, a1, color=color, ease=ease)
 
 
-def T(x, y, w, h, text, size, color=LIGHT, font="body", bold=False, align="left",
-      valign="top", lh=1.35, track=0.0, accent=ACCENT, pspace=0, link=None):
-    return dict(k="text", x=x, y=y, w=w, h=h, text=text, size=size, color=color, font=font,
-                bold=bold, align=align, valign=valign, lh=lh, track=track, accent=accent,
-                pspace=pspace, link=link)
-
-
-def A(x, y, w, h, url=WA):
-    return dict(k="link", x=x, y=y, w=w, h=h, link=url)
+def T(*args, color=LIGHT, accent=ACCENT, **kw):
+    return mt.T(*args, color=color, accent=accent, **kw)
 
 
 def logo_w(h, dark=False):
@@ -337,7 +304,7 @@ def page_contato():
           T(M + 8, py + 39, 82, 14, "CHAMAR NO WHATSAPP", 15, color=INK, font="display",
             bold=True, align="center", valign="middle", track=0.08, link=WA),
           R(qx, py + 5, qs, qs, "#FFFFFF", radius=1.2, link=WA),
-          P(qx + 3.5, py + 8.5, qs - 7, qs - 7, ROOT / "build/qr_whatsapp.png", link=WA),
+          P(qx + 3.5, py + 8.5, qs - 7, qs - 7, ROOT / "build/qr_whatsapp.png", link=WA, keep=True),
           T(qx, py + 52.5, qs, 6, "APONTE A CÂMERA", 11.5, color=MUTED, font="display",
             bold=True, align="center", valign="middle", track=0.14)]
     lw = logo_w(9)
@@ -351,15 +318,8 @@ PAGES = [page_capa, page_quem_somos, page_servicos, page_detalhes, page_porque,
          page_aplicacoes, page_contato]
 
 
-# ---------------------------------------------------------------- recursos gerados
-
-def hexrgb(c):
-    c = c.lstrip("#")
-    return tuple(int(c[i:i + 2], 16) for i in (0, 2, 4))
-
-
 def make_icons():
-    col = hexrgb(ACCENT) + (255,)
+    col = mt.hexrgb(ACCENT) + (255,)
     s = 1600
     sw = 96
 
@@ -391,338 +351,16 @@ def make_icons():
     im.resize((400, 400), Image.LANCZOS).save(BUILD / "icon_pergolado.png")
 
 
-def make_qr():
-    import segno
-    q = segno.make(WA, error="h")
-    q.save(str(BUILD / "qr_whatsapp.png"), scale=24, border=0, dark=INK, light="#FFFFFF")
-
-
-def grad_png(e):
-    key = hashlib.md5(repr((e["a0"], e["a1"], e["color"], e["ease"])).encode()).hexdigest()[:10]
-    path = BUILD / f"grad_{key}.png"
-    if not path.exists():
-        hgt = 1024
-        r, g, b = hexrgb(e["color"])
-        im = Image.new("RGBA", (8, hgt))
-        px = im.load()
-        for yy in range(hgt):
-            t = (yy / (hgt - 1)) ** e["ease"] if e["a1"] > e["a0"] else \
-                1 - (1 - yy / (hgt - 1)) ** e["ease"]
-            a = e["a0"] + (e["a1"] - e["a0"]) * t
-            for xx in range(8):
-                px[xx, yy] = (r, g, b, round(255 * a))
-        im.save(path)
-    return path
-
-
-def crop_img(e, dpi, quality, outdir):
-    src = Image.open(ROOT / f"fotos/{e['src']}.jpg").convert("RGB")
-    ar = e["w"] / e["h"]
-    sw, sh = src.size
-    if sw / sh > ar:
-        cw, ch = sh * ar, sh
-    else:
-        cw, ch = sw, sw / ar
-    fx, fy = e["focus"]
-    left = min(max(fx * sw - cw / 2, 0), sw - cw)
-    top = min(max(fy * sh - ch / 2, 0), sh - ch)
-    im = src.crop((round(left), round(top), round(left + cw), round(top + ch)))
-    tw = round(e["w"] / 25.4 * dpi)
-    if tw < im.width:
-        im = im.resize((tw, round(tw / ar)), Image.LANCZOS)
-    im = im.filter(ImageFilter.UnsharpMask(radius=1.2, percent=35, threshold=2))
-    name = f"{e['src']}_{round(e['w'])}x{round(e['h'])}_{hashlib.md5(repr(e['focus']).encode()).hexdigest()[:4]}.jpg"
-    path = outdir / name
-    im.save(path, quality=quality, optimize=True, progressive=True)
-    return path
-
-
-# ---------------------------------------------------------------- verificação de texto
-
-def runs_of(paragraph, color, accent):
-    out = []
-    for part in re.split(r"(\{[^}]*\})", paragraph):
-        if not part:
-            continue
-        if part.startswith("{"):
-            out.append((part[1:-1], accent))
-        else:
-            out.append((part, color))
-    return out
-
-
-def check_text(e, pageno):
-    f = ImageFont.truetype(str(FONTS[(e["font"], e["bold"])]), 1000)
-    scale = e["size"] / 1000
-    maxw = e["w"] / 25.4 * 72
-    lines = 0
-    widest = 0
-    for para in e["text"].split("\n"):
-        plain = para.replace("{", "").replace("}", "")
-        words = plain.split(" ")
-        cur = ""
-        for wd in words:
-            cand = (cur + " " + wd) if cur else wd
-            wpt = f.getlength(cand) * scale + len(cand) * e["track"] * e["size"]
-            if wpt > maxw and cur:
-                lines += 1
-                widest = max(widest, f.getlength(cur) * scale)
-                cur = wd
-            else:
-                cur = cand
-        lines += 1
-        widest = max(widest, f.getlength(cur) * scale + len(cur) * e["track"] * e["size"])
-    need = lines * e["size"] * e["lh"] + (len(e["text"].split("\n")) - 1) * e["pspace"]
-    have = e["h"] / 25.4 * 72
-    warn = []
-    if need > have + 0.5:
-        warn.append(f"p{pageno} altura: precisa {need / 72 * 25.4:.1f}mm, tem {e['h']:.1f}mm")
-    if widest > maxw + 0.5:
-        warn.append(f"p{pageno} largura: {widest / 72 * 25.4:.1f}mm > {e['w']:.1f}mm")
-    for w_ in warn:
-        print("  AVISO", w_, "->", e["text"][:50].replace("\n", " / "))
-    return not warn
-
-
-# ---------------------------------------------------------------- HTML / PDF
-
-def mm(v):
-    return f"{v:.3f}mm"
-
-
-def html_el(e, assets, outdir):
-    k = e["k"]
-    box = f"left:{mm(e['x'])};top:{mm(e['y'])};width:{mm(e['w'])};height:{mm(e['h'])};"
-    if k == "rect":
-        r, g, b = hexrgb(e["fill"])
-        st = f"background:rgba({r},{g},{b},{e['alpha']});border-radius:{mm(e['radius'])};"
-        if e["stroke"]:
-            st += f"border:{mm(e['sw'])} solid {e['stroke']};"
-        out = f'<div class="e" style="{box}{st}"></div>'
-    elif k == "oval":
-        st = "border-radius:50%;"
-        if e["fill"]:
-            st += f"background:{e['fill']};"
-        if e["stroke"]:
-            st += f"border:{mm(e['sw'])} solid {e['stroke']};"
-        out = f'<div class="e" style="{box}{st}"></div>'
-    elif k in ("img", "png", "grad"):
-        path = assets(e)
-        rel = Path(shutil.copy(path, outdir / path.name)).name
-        out = f'<img class="e" style="{box}" src="{rel}" alt="">'
-    elif k == "text":
-        jc = {"top": "flex-start", "middle": "center", "bottom": "flex-end"}[e["valign"]]
-        st = (f"font-family:'{FAMILY[e['font']]}';font-weight:{700 if e['bold'] else 400};"
-              f"font-size:{e['size']}pt;line-height:{e['lh']};color:{e['color']};"
-              f"text-align:{e['align']};letter-spacing:{e['track']}em;justify-content:{jc};")
-        paras = []
-        for i, para in enumerate(e["text"].split("\n")):
-            inner = "".join(
-                html.escape(t) if c == e["color"] else
-                f'<span style="color:{c}">{html.escape(t)}</span>'
-                for t, c in runs_of(para, e["color"], e["accent"]))
-            mt = f' style="margin-top:{e["pspace"]}pt"' if i and e["pspace"] else ""
-            paras.append(f"<p{mt}>{inner or '&nbsp;'}</p>")
-        out = f'<div class="e t" style="{box}{st}">{"".join(paras)}</div>'
-    elif k == "link":
-        out = ""
-    if e.get("link"):
-        out += (f'<a class="e" href="{html.escape(e["link"])}" style="{box}" '
-                f'aria-label="WhatsApp {CONTATO_NOME}"></a>')
-    return out
-
-
-def build_html(pages, dpi, quality, tag):
-    outdir = BUILD / tag
-    if outdir.exists():
-        shutil.rmtree(outdir)
-    outdir.mkdir(parents=True)
-    for f in FONTS.values():
-        shutil.copy(f, outdir / f.name)
-
-    def assets(e):
-        if e["k"] == "img":
-            return crop_img(e, dpi, quality, BUILD / f"img_{tag}")
-        if e["k"] == "grad":
-            return grad_png(e)
-        return Path(e["path"])
-
-    (BUILD / f"img_{tag}").mkdir(exist_ok=True)
-    faces = "".join(
-        f"@font-face{{font-family:'{FAMILY[fam]}';font-weight:{700 if b else 400};"
-        f"src:url('{p.name}')}}" for (fam, b), p in FONTS.items())
-    body = []
-    for pg in pages:
-        els = "".join(html_el(e, assets, outdir) for e in pg["els"])
-        body.append(f'<section class="page" style="background:{pg["bg"]}">{els}</section>')
-    doc = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<title>JP Alumínios | Apresentação institucional</title>
-<style>{faces}
-@page{{size:210mm 297mm;margin:0}}
-html,body{{margin:0;padding:0;background:{INK}}}
-*{{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-.page{{position:relative;width:210mm;height:297mm;overflow:hidden;break-after:page}}
-.page:last-child{{break-after:auto}}
-.e{{position:absolute;box-sizing:border-box;margin:0;display:block}}
-.t{{display:flex;flex-direction:column}}
-.t p{{margin:0}}
-</style></head><body>{''.join(body)}</body></html>"""
-    path = outdir / "index.html"
-    path.write_text(doc, encoding="utf-8")
-    return path
-
-
-def print_pdf(html_path, pdf_path):
-    subprocess.run([CHROME, "--headless=new", "--no-sandbox", "--disable-gpu",
-                    "--allow-file-access-from-files", "--no-pdf-header-footer",
-                    "--virtual-time-budget=10000", f"--print-to-pdf={pdf_path}",
-                    html_path.as_uri()], check=True, capture_output=True)
-
-
-def set_pdf_meta(pdf_path):
-    from pypdf import PdfReader, PdfWriter
-    r = PdfReader(str(pdf_path))
-    w = PdfWriter(clone_from=r)
-    w.add_metadata({"/Title": "JP Alumínios | Apresentação institucional",
-                    "/Author": "JP Alumínios", "/Subject": "Vidros e esquadrias de alumínio",
-                    "/Keywords": f"orçamento, {CONTATO_NOME}, {CONTATO_TEL}"})
-    w.compress_identical_objects()
-    with open(pdf_path, "wb") as fh:
-        w.write(fh)
-
-
-# ---------------------------------------------------------------- PPTX
-
-def strip_style(shape):
-    st = shape._element.find(qn("p:style"))
-    if st is not None:
-        shape._element.remove(st)
-
-
-def pptx_fill(shape, color, alpha=1.0):
-    shape.fill.solid()
-    shape.fill.fore_color.rgb = RGBColor(*hexrgb(color))
-    if alpha < 1:
-        clr = shape.fill._xPr.find(qn("a:solidFill")).find(qn("a:srgbClr"))
-        a = clr.makeelement(qn("a:alpha"), {"val": str(round(alpha * 100000))})
-        clr.append(a)
-
-
-def build_pptx(pages, path):
-    prs = Presentation()
-    prs.slide_width, prs.slide_height = Mm(W), Mm(H)
-    prs.core_properties.title = "JP Alumínios | Apresentação institucional"
-    prs.core_properties.author = "JP Alumínios"
-    layout = prs.slide_layouts[6]
-
-    def assets(e):
-        if e["k"] == "img":
-            return crop_img(e, 200, 88, BUILD / "img_pptx")
-
-    (BUILD / "img_pptx").mkdir(exist_ok=True)
-    for pg in pages:
-        s = prs.slides.add_slide(layout)
-        s.background.fill.solid()
-        s.background.fill.fore_color.rgb = RGBColor(*hexrgb(pg["bg"]))
-        for e in pg["els"]:
-            x, y, w, h = Mm(e["x"]), Mm(e["y"]), Mm(e["w"]), Mm(e["h"])
-            k = e["k"]
-            shp = None
-            if k == "rect":
-                kind = MSO_SHAPE.ROUNDED_RECTANGLE if e["radius"] else MSO_SHAPE.RECTANGLE
-                shp = s.shapes.add_shape(kind, x, y, w, h)
-                strip_style(shp)
-                if e["radius"]:
-                    shp.adjustments[0] = min(0.5, e["radius"] / min(e["w"], e["h"]))
-                pptx_fill(shp, e["fill"], e["alpha"])
-                if e["stroke"]:
-                    shp.line.color.rgb = RGBColor(*hexrgb(e["stroke"]))
-                    shp.line.width = Mm(e["sw"])
-                else:
-                    shp.line.fill.background()
-            elif k == "oval":
-                shp = s.shapes.add_shape(MSO_SHAPE.OVAL, x, y, w, h)
-                strip_style(shp)
-                if e["fill"]:
-                    pptx_fill(shp, e["fill"])
-                else:
-                    shp.fill.background()
-                if e["stroke"]:
-                    shp.line.color.rgb = RGBColor(*hexrgb(e["stroke"]))
-                    shp.line.width = Mm(e["sw"])
-                else:
-                    shp.line.fill.background()
-            elif k == "img":
-                shp = s.shapes.add_picture(str(assets(e)), x, y, w, h)
-            elif k == "png":
-                shp = s.shapes.add_picture(e["path"], x, y, w, h)
-            elif k == "grad":
-                shp = s.shapes.add_picture(str(grad_png(e)), x, y, w, h)
-            elif k == "text":
-                shp = s.shapes.add_textbox(x, y, w, h)
-                tf = shp.text_frame
-                tf.word_wrap = True
-                tf.auto_size = MSO_AUTO_SIZE.NONE
-                tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
-                tf.vertical_anchor = {"top": MSO_ANCHOR.TOP, "middle": MSO_ANCHOR.MIDDLE,
-                                      "bottom": MSO_ANCHOR.BOTTOM}[e["valign"]]
-                for i, para in enumerate(e["text"].split("\n")):
-                    p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
-                    p.alignment = {"left": PP_ALIGN.LEFT, "center": PP_ALIGN.CENTER,
-                                   "right": PP_ALIGN.RIGHT}[e["align"]]
-                    p.line_spacing = Pt(e["size"] * e["lh"])
-                    if i and e["pspace"]:
-                        p.space_before = Pt(e["pspace"])
-                    for t, c in runs_of(para, e["color"], e["accent"]):
-                        r = p.add_run()
-                        r.text = t
-                        f = r.font
-                        f.name = FAMILY[e["font"]]
-                        f.size = Pt(e["size"])
-                        f.bold = e["bold"]
-                        f.color.rgb = RGBColor(*hexrgb(c))
-                        if e["track"]:
-                            r._r.get_or_add_rPr().set("spc", str(round(e["track"] * e["size"] * 100)))
-            elif k == "link":
-                shp = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, w, h)
-                strip_style(shp)
-                shp.fill.background()
-                shp.line.fill.background()
-            if shp is not None and e.get("link"):
-                shp.click_action.hyperlink.address = e["link"]
-    prs.save(path)
-
-
-# ---------------------------------------------------------------- principal
-
 def main():
     BUILD.mkdir(exist_ok=True)
-    OUT.mkdir(exist_ok=True)
     make_icons()
-    make_qr()
-    pages = [fn() for fn in PAGES]
-    ok = all([check_text(e, i + 1) for i, pg in enumerate(pages) for e in pg["els"]
-              if e["k"] == "text"])
-    print("textos cabem nas caixas" if ok else "ATENÇÃO: textos com risco de corte")
-
-    hq = OUT / f"{ARQ}.pdf"
-    lite = OUT / f"{ARQ}-leve.pdf"
-    print_pdf(build_html(pages, 230, 90, "hq"), hq)
-    print_pdf(build_html(pages, 120, 72, "lite"), lite)
-    for p in (hq, lite):
-        set_pdf_meta(p)
-    build_pptx(pages, OUT / f"{ARQ}-editavel.pptx")
-
-    jpg_dir = OUT / "paginas-para-whatsapp"
-    if jpg_dir.exists():
-        shutil.rmtree(jpg_dir)
-    jpg_dir.mkdir()
-    subprocess.run(["pdftoppm", "-jpeg", "-jpegopt", "quality=88,progressive=y",
-                    "-scale-to-x", "1240", "-scale-to-y", "-1", str(hq),
-                    str(jpg_dir / "pagina")], check=True)
-    for f in OUT.rglob("*"):
-        if f.is_file():
-            print(f"  {f.relative_to(OUT)}  {f.stat().st_size / 1024:.0f} KB")
+    mt.qr_png(WA, BUILD / "qr_whatsapp.png", dark=INK)
+    projeto = mt.Projeto(
+        root=ROOT, out=OUT, arquivo=ARQ, titulo="JP Alumínios | Apresentação institucional",
+        autor="JP Alumínios", assunto="Vidros e esquadrias de alumínio",
+        palavras=f"orçamento, {CONTATO_NOME}, {CONTATO_TEL}", fontes=FONTS, familias=FAMILY,
+        fundo=INK, rotulo_link=f"WhatsApp {CONTATO_NOME}")
+    projeto.gerar([fn() for fn in PAGES])
 
 
 if __name__ == "__main__":

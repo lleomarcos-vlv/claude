@@ -1,0 +1,750 @@
+[
+ {
+  "nome": "Mojito de Tangerina",
+  "codigo": "FT-001",
+  "tipo": "Alcoólico",
+  "metodo": "Montado",
+  "copo": "Long drink",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Rum Bacardi",
+    "50 ml",
+    2.25
+   ],
+   [
+    "Xarope de tangerina",
+    "50 ml",
+    2.26
+   ],
+   [
+    "Campari",
+    "30 ml",
+    1.44
+   ],
+   [
+    "Xarope de limão-taiti",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Hortelã",
+    "8 folhas",
+    0.33
+   ],
+   [
+    "Água tônica",
+    "100 ml",
+    1.33
+   ]
+  ],
+  "insumos": 9.02,
+  "operacao": 3.6,
+  "custo_total": 12.62,
+  "lucro": 17.38,
+  "cmv": 42.1,
+  "markup": 2.38
+ },
+ {
+  "nome": "Chá Caribenho",
+  "codigo": "FT-002",
+  "tipo": "Alcoólico",
+  "metodo": "Batido",
+  "copo": "Long drink",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Chá de limão-siciliano",
+    "60 ml",
+    2.71
+   ],
+   [
+    "Rum Bacardi",
+    "50 ml",
+    2.25
+   ],
+   [
+    "Cynar",
+    "30 ml",
+    1.32
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Hortelã",
+    "8 folhas",
+    0.33
+   ]
+  ],
+  "insumos": 6.89,
+  "operacao": 3.6,
+  "custo_total": 10.49,
+  "lucro": 19.51,
+  "cmv": 35.0,
+  "markup": 2.86
+ },
+ {
+  "nome": "Moscow Mule",
+  "codigo": "FT-003",
+  "tipo": "Alcoólico",
+  "metodo": "Montado",
+  "copo": "Caneca de 300 ml",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Vodka Smirnoff",
+    "50 ml",
+    2.0
+   ],
+   [
+    "Xarope de gengibre",
+    "50 ml",
+    2.26
+   ],
+   [
+    "Xarope de limão-taiti",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Espuma cítrica",
+    "1 porção",
+    0.88
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ]
+  ],
+  "insumos": 6.55,
+  "operacao": 3.6,
+  "custo_total": 10.15,
+  "lucro": 19.85,
+  "cmv": 33.8,
+  "markup": 2.96
+ },
+ {
+  "nome": "Pink Lady",
+  "codigo": "FT-004",
+  "tipo": "Alcoólico",
+  "metodo": "Batido",
+  "copo": "Taça coupe gelada",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Gin nacional ou Gordon’s",
+    "50 ml",
+    4.33
+   ],
+   [
+    "Xarope de frutas vermelhas",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Xarope de limão-taiti",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Espuma cítrica",
+    "1 porção",
+    0.88
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ]
+  ],
+  "insumos": 7.75,
+  "operacao": 3.6,
+  "custo_total": 11.35,
+  "lucro": 18.65,
+  "cmv": 37.8,
+  "markup": 2.64
+ },
+ {
+  "nome": "Sunset",
+  "codigo": "FT-005",
+  "tipo": "Alcoólico",
+  "metodo": "Montado",
+  "copo": "Taça Hurricane",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Vodka Smirnoff",
+    "50 ml",
+    2.0
+   ],
+   [
+    "Xarope de pêssego",
+    "30 ml",
+    1.35
+   ],
+   [
+    "Suco de laranja néctar",
+    "100 ml",
+    0.6
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Xarope de frutas vermelhas",
+    "10 ml",
+    0.44
+   ]
+  ],
+  "insumos": 4.67,
+  "operacao": 3.6,
+  "custo_total": 8.27,
+  "lucro": 21.73,
+  "cmv": 27.6,
+  "markup": 3.63
+ },
+ {
+  "nome": "Bellini",
+  "codigo": "FT-006",
+  "tipo": "Alcoólico",
+  "metodo": "Montado",
+  "copo": "Taça flute gelada",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Espumante brut",
+    "125 ml",
+    7.0
+   ],
+   [
+    "Xarope de pêssego",
+    "60 ml",
+    2.71
+   ]
+  ],
+  "insumos": 9.71,
+  "operacao": 3.6,
+  "custo_total": 13.31,
+  "lucro": 16.69,
+  "cmv": 44.4,
+  "markup": 2.25
+ },
+ {
+  "nome": "Good Apple",
+  "codigo": "FT-007",
+  "tipo": "Alcoólico",
+  "metodo": "Batido",
+  "copo": "Taça Hurricane",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Vodka Smirnoff",
+    "50 ml",
+    2.0
+   ],
+   [
+    "Xarope de maçã verde",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Suco de laranja",
+    "100 ml",
+    0.6
+   ],
+   [
+    "Gelo",
+    "100 g",
+    0.14
+   ],
+   [
+    "Refrigerante de limão",
+    "50 ml",
+    0.57
+   ]
+  ],
+  "insumos": 4.44,
+  "operacao": 3.6,
+  "custo_total": 8.04,
+  "lucro": 21.96,
+  "cmv": 26.8,
+  "markup": 3.73
+ },
+ {
+  "nome": "Negroni com Frutas Vermelhas",
+  "codigo": "FT-008",
+  "tipo": "Alcoólico",
+  "metodo": "Mexido",
+  "copo": "Copo baixo",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Campari",
+    "30 ml",
+    1.44
+   ],
+   [
+    "Gin nacional ou Gordon’s",
+    "30 ml",
+    2.6
+   ],
+   [
+    "Vermute",
+    "30 ml",
+    1.56
+   ],
+   [
+    "Xarope de frutas vermelhas",
+    "10 ml",
+    0.45
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ]
+  ],
+  "insumos": 6.33,
+  "operacao": 3.6,
+  "custo_total": 9.93,
+  "lucro": 20.07,
+  "cmv": 33.1,
+  "markup": 3.02
+ },
+ {
+  "nome": "NY",
+  "codigo": "FT-009",
+  "tipo": "Alcoólico",
+  "metodo": "Batido",
+  "copo": "Taça coupe gelada",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Limoncello",
+    "50 ml",
+    5.33
+   ],
+   [
+    "Xarope de frutas vermelhas",
+    "20 ml",
+    0.9
+   ],
+   [
+    "Xarope de limão-siciliano",
+    "25 ml",
+    1.23
+   ],
+   [
+    "Suco de limão",
+    "20 ml",
+    0.22
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Espumante brut",
+    "100 ml",
+    4.13
+   ]
+  ],
+  "insumos": 12.09,
+  "operacao": 3.6,
+  "custo_total": 15.69,
+  "lucro": 14.31,
+  "cmv": 52.3,
+  "markup": 1.91
+ },
+ {
+  "nome": "Tangerina Spritz",
+  "codigo": "FT-010",
+  "tipo": "Alcoólico",
+  "metodo": "Montado",
+  "copo": "Taça balão",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Gin nacional ou Gordon’s",
+    "50 ml",
+    4.33
+   ],
+   [
+    "Xarope de tangerina",
+    "50 ml",
+    2.26
+   ],
+   [
+    "Xarope de limão-siciliano",
+    "25 ml",
+    1.23
+   ],
+   [
+    "Espumante brut",
+    "100 ml",
+    4.13
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ]
+  ],
+  "insumos": 12.23,
+  "operacao": 3.6,
+  "custo_total": 15.83,
+  "lucro": 14.17,
+  "cmv": 52.8,
+  "markup": 1.9
+ },
+ {
+  "nome": "Red Mule",
+  "codigo": "FT-011",
+  "tipo": "Alcoólico",
+  "metodo": "Montado e mexido",
+  "copo": "Caneca",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Vodka Smirnoff",
+    "50 ml",
+    2.0
+   ],
+   [
+    "Xarope de gengibre",
+    "25 ml",
+    1.23
+   ],
+   [
+    "Xarope de limão-taiti",
+    "25 ml",
+    1.23
+   ],
+   [
+    "Xarope de frutas vermelhas",
+    "15 ml",
+    1.12
+   ],
+   [
+    "Espuma de frutas vermelhas",
+    "1 porção",
+    0.88
+   ],
+   [
+    "Gelo",
+    "100 g",
+    0.14
+   ]
+  ],
+  "insumos": 6.6,
+  "operacao": 3.6,
+  "custo_total": 10.2,
+  "lucro": 19.8,
+  "cmv": 34.0,
+  "markup": 2.94
+ },
+ {
+  "nome": "Green Apple",
+  "codigo": "FT-012",
+  "tipo": "Alcoólico",
+  "metodo": "Montado",
+  "copo": "Long drink",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Gin nacional ou Gordon’s",
+    "50 ml",
+    4.33
+   ],
+   [
+    "Xarope de maçã verde",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Xarope de limão-siciliano",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Água com gás",
+    "1 porção",
+    0.25
+   ]
+  ],
+  "insumos": 7.12,
+  "operacao": 3.6,
+  "custo_total": 10.72,
+  "lucro": 19.28,
+  "cmv": 35.7,
+  "markup": 2.8
+ },
+ {
+  "nome": "Sicília Sunset",
+  "codigo": "FT-013",
+  "tipo": "Alcoólico",
+  "metodo": "Montado",
+  "copo": "Long drink",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Vodka Smirnoff",
+    "50 ml",
+    2.0
+   ],
+   [
+    "Chá de limão-siciliano",
+    "60 ml",
+    2.71
+   ],
+   [
+    "Licor de laranja",
+    "15 ml",
+    2.46
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Água com gás",
+    "1 porção",
+    0.25
+   ]
+  ],
+  "insumos": 7.7,
+  "operacao": 3.6,
+  "custo_total": 11.3,
+  "lucro": 18.7,
+  "cmv": 37.7,
+  "markup": 2.65
+ },
+ {
+  "nome": "Strawberry Smash",
+  "codigo": "FT-014",
+  "tipo": "Alcoólico",
+  "metodo": "Batido",
+  "copo": "Long drink",
+  "preco": 30.0,
+  "ingredientes": [
+   [
+    "Gin nacional ou Gordon’s",
+    "50 ml",
+    4.33
+   ],
+   [
+    "Chá de morango",
+    "60 ml",
+    2.71
+   ],
+   [
+    "Xarope de limão-taiti",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Hortelã",
+    "8 folhas",
+    0.33
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Água com gás",
+    "1 porção",
+    0.25
+   ]
+  ],
+  "insumos": 9.03,
+  "operacao": 3.6,
+  "custo_total": 12.63,
+  "lucro": 17.37,
+  "cmv": 42.1,
+  "markup": 2.38
+ },
+ {
+  "nome": "Green Fresh",
+  "codigo": "FT-014-SA",
+  "tipo": "Sem álcool",
+  "metodo": "Montado e mexido",
+  "copo": "Long drink",
+  "preco": 24.0,
+  "ingredientes": [
+   [
+    "Chá de maçã verde",
+    "60 ml",
+    2.71
+   ],
+   [
+    "Xarope de maçã verde",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Xarope de limão-siciliano",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Água com gás",
+    "1 porção",
+    0.25
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ]
+  ],
+  "insumos": 5.5,
+  "operacao": 2.88,
+  "custo_total": 8.38,
+  "lucro": 15.62,
+  "cmv": 34.9,
+  "markup": 2.86
+ },
+ {
+  "nome": "Stea Red Fruit",
+  "codigo": "FT-015",
+  "tipo": "Sem álcool",
+  "metodo": "Batido",
+  "copo": "Long drink",
+  "preco": 24.0,
+  "ingredientes": [
+   [
+    "Chá de Cranberry",
+    "60 ml",
+    2.71
+   ],
+   [
+    "Xarope de cranberry",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Xarope de limão-taiti",
+    "25 ml",
+    1.23
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ],
+   [
+    "Água com gás",
+    "1 porção",
+    0.35
+   ]
+  ],
+  "insumos": 5.7,
+  "operacao": 2.88,
+  "custo_total": 8.58,
+  "lucro": 15.42,
+  "cmv": 35.8,
+  "markup": 2.8
+ },
+ {
+  "nome": "Pink Tangerina",
+  "codigo": "FT-016",
+  "tipo": "Sem álcool",
+  "metodo": "Batido",
+  "copo": "Long drink",
+  "preco": 24.0,
+  "ingredientes": [
+   [
+    "Chá de tangerina",
+    "60 ml",
+    2.71
+   ],
+   [
+    "Xarope de tangerina",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Xarope de morango",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Água com gás",
+    "1 porção",
+    0.25
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ]
+  ],
+  "insumos": 5.5,
+  "operacao": 2.88,
+  "custo_total": 8.38,
+  "lucro": 15.62,
+  "cmv": 34.9,
+  "markup": 2.86
+ },
+ {
+  "nome": "Sicilian Cooler",
+  "codigo": "FT-017",
+  "tipo": "Sem álcool",
+  "metodo": "Batido",
+  "copo": "Long drink",
+  "preco": 24.0,
+  "ingredientes": [
+   [
+    "Chá de limão-siciliano",
+    "60 ml",
+    2.71
+   ],
+   [
+    "Xarope de limão-taiti",
+    "25 ml",
+    1.13
+   ],
+   [
+    "Hortelã",
+    "8 folhas",
+    0.33
+   ],
+   [
+    "Água com gás",
+    "1 porção",
+    0.25
+   ],
+   [
+    "Gelo",
+    "200 g",
+    0.28
+   ]
+  ],
+  "insumos": 4.7,
+  "operacao": 2.88,
+  "custo_total": 7.58,
+  "lucro": 16.42,
+  "cmv": 31.6,
+  "markup": 3.17
+ }
+]

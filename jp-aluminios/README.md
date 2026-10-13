@@ -15,7 +15,7 @@ Material comercial para envio pelo WhatsApp, feito a partir do catálogo oficial
 
 ## Gerar novamente
 
-O arquivo `fonte/build.py` monta todas as versões a partir da mesma definição de páginas.
+O arquivo `fonte/build.py` define as páginas e usa o motor compartilhado em `../motor/` para gerar todas as versões.
 Para gerar uma versão para outro vendedor, altere `CONTATO_NOME`, `CONTATO_TEL` e `WA` no topo do script e rode:
 
 ```bash
